@@ -1,0 +1,572 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <!--binding="#//{massSalaryIncrementControllers.rbnAllEmployees}"
+      binding="#/{massSalaryIncrementControllers.somIncrement}"-->
+
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlWfIcon"  rendered="#{massSalaryIncrementControllers.pnlrWfIcon}"> 
+                        <p:outputLabel id="lblNotWF" value="" class="fa fa-fw fa-gear"   style="color: #245269" title="WorkFlow"/>
+                    </h:panelGroup>
+                    <p:overlayPanel widgetVar="lblNotWF" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotWF"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="box-body">
+                            <div class="col-md-12">                                       
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblHistory" value="#{massSalaryIncrementControllers.workFlowDataModel}"
+                                                     var="WF" class="dataTable" rowKey="#{WF.workflowId}" widgetVar="tblHistory"
+                                                     rowIndexVar="num" editable="true">      
+                                            <p:column headerText="No." style="width:40px">
+                                                <h:outputText value="#{num + 1}"/>
+                                            </p:column>                                                                
+                                            <p:column headerText="Processed By">
+                                                <h:outputText value="#{WF.processedBy}"/>
+                                            </p:column>
+                                            <p:column headerText="Processed On">
+                                                <h:outputText value="#{WF.processedOn}"/>
+                                            </p:column>
+                                            <p:column headerText="Comment Given">
+                                                <h:outputText value="#{WF.commentGiven}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>        
+                        </div>
+
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                        <h:panelGroup id="notification" rendered="#{massSalaryIncrementControllers.pnlnotification}">
+                        <p:outputLabel id="lblNotf" value="#{massSalaryIncrementControllers.requestNotificationCounter} " class="fa fa-bell" style="color: red" />
+
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotf"
+                                        class="col-md-4" style="height: 400px">
+
+                            <div class="box-body">
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblMassSal" value="#{massSalaryIncrementControllers.salaryIncrementRequests}" rowsPerPageTemplate="10,20,30"
+                                                         var="req" selectionMode="single" rowIndexVar="num" rows="10"
+                                                         selection="#{massSalaryIncrementControllers.hrSalaryIncrementDetails}" rowKey="#{req.id}" class="dataTable" >
+                                                <p:ajax event="rowSelect" process="@this,tblMassSal" listener="#{massSalaryIncrementControllers.massSal_processMyEvent}" 
+                                                        update="@this,:frmMainUI,:frmMainUI:tblEmpList,:frmSample"/>
+                                                <p:column headerText="Increment Id" >
+                                                    <h:outputText value="#{req.id
+}"/>
+                                                </p:column> 
+                                                <p:column headerText="Refrence NO" filterMatchMode="contains" filterBy="#{req.referenceNo}">
+                                                    <h:outputText value="#{req.referenceNo}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+
+                    <a href="massSalaryIncrement.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i> </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <p:growl id="growl"  autoUpdate="true" severity="information,fatal" showDetail="true" /> 
+            <h:panelGroup id="pnlSearch"  style="border: 0px; background-color: transparent">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header with-border" >
+                                <h3 class="box-title">Employee's Mass Salary Increment </h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlGroup1" class="col-sm-12"  > 
+                                                <div class="form-group ">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <h:panelGroup id="incid">
+                                                                <div class="col-md-12 form-group">
+                                                                    <div class="form-group form-horizontal form-group required"> 
+                                                                        <h:outputLabel for="somSalIncId" class="control-label col-sm-4" value="Mass Salary Increment Id :"/>  
+                                                                        <div class="col-sm-7" > 
+                                                                            <p:selectOneMenu id="somSalIncId" style="width: 100%" value="#{massSalaryIncrementControllers.hrSalaryIncrements.id}" 
+                                                                                             valueChangeListener="#{massSalaryIncrementControllers.salIncVLC}"
+                                                                                             converter="entConverter"   filterMatchMode="startsWith" filter="true" required="true" requiredMessage="select salary incrment Id"  >
+                                                                                <f:selectItem itemLabel="-- Select --" itemValue="" />
+                                                                                <f:selectItems  value="#{massSalaryIncrementControllers.salaryIncrementRequestList}"  var="salIncId" itemValue="#{salIncId.id}" itemLabel="#{salIncId.referenceNo}---#{salIncId.preparedOn}"/>    
+                                                                                <p:ajax event="change" process="@this" update=":frmMainUI,:frmSample" />
+                                                                                <p:message for="somSalIncId" display="icon"/>  
+                                                                            </p:selectOneMenu>
+                                                                        </div>
+                                                                        <div class="col-sm-1">
+                                                                            <p:commandButton value="+" onclick="PF('dlg').show()" partialSubmit="true" style="background: transparent;"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </h:panelGroup>
+                                                            <p:dialog  modal="true" widgetVar="dlg"  position="center" showEffect="explode" hideEffect="fade" height="350" width="600" class="col-md-6" >
+                                                                <h:panelGroup id="pnlfill" >
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div class="box-header with-border" >
+                                                                                <h3 class="box-title"> Mass Salary Increment setup </h3>
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <div class="box-body ">
+                                                                                    <div  class=" col-md-12 textBoxMargin6px ">
+                                                                                        <div class="form-group form-horizontal">
+                                                                                            <h:outputLabel for="PreparedOn" class="control-label col-sm-4" value="Prepared On :"/> 
+                                                                                            <div class="col-sm-8">
+                                                                                                <p:inputText id="PreparedOn" value="#{massSalaryIncrementControllers.hrSalaryIncrements.preparedOn}"
+                                                                                                             onclick="displayCalendar('frmMainUI:PreparedOn', 'frmMainUI:PreparedOn');"
+                                                                                                             validator="#{validatorManagedBean.Date}" validatorMessage="date format should be dd/mm/yyyy"
+                                                                                                             title="Strt Date" class="form-control" rendered="true" requiredMessage="Please Select date"/>
+                                                                                                <p:message for="PreparedOn" display="icon"/>
+                                                                                            </div>
+                                                                                        </div>                                               
+                                                                                    </div> 
+
+                                                                                    <div  class=" col-md-12 textBoxMargin6px">
+                                                                                        <div class="form-group form-horizontal"> 
+                                                                                            <h:outputLabel  for="searchAutocomplete1" class="control-label col-sm-4" value="Prepared By :"/>  
+                                                                                            <div class="col-sm-8">
+                                                                                                <p:inputText id="searchAutocomplete1" value="#{massSalaryIncrementControllers.fullName}"  readonly="true"/>
+
+                                                                                                <p:message for="searchAutocomplete1" display="icon"/>
+                                                                                            </div> 
+                                                                                        </div>
+                                                                                    </div> 
+                                                                                    <div class="col-md-6"></div>
+                                                                                    <div  class="col-md-12 textBoxMargin6px ">
+                                                                                        <div class="form-horizontal form-group required">
+                                                                                            <h:outputLabel for="RefNo" class="control-label col-sm-4" value="Reference No:"/> 
+                                                                                            <div class="col-sm-8">
+                                                                                                <h:inputText id ="RefNo"  value="#{massSalaryIncrementControllers.hrSalaryIncrements.referenceNo}" 
+                                                                                                             class="form-control" required="true" requiredMessage="Please Enter letter Reference No"  style="width:100%" ></h:inputText>
+                                                                                                <p:message for="RefNo" display="icon"/>
+                                                                                            </div>
+                                                                                        </div>                                               
+                                                                                    </div> 
+                                                                                    <div  class="col-md-12 textBoxMargin6px ">
+                                                                                        <div class="form-group form-horizontal form-group required">
+                                                                                            <h:outputLabel for="txtEffectiveDate" class="control-label col-sm-4" value="Effective Date:"/> 
+                                                                                            <div class="col-sm-8">
+                                                                                                <p:inputText id="txtEffectiveDate" value="#{massSalaryIncrementControllers.hrSalaryIncrements.effectiveDate}"
+                                                                                                             onclick="displayCalendar('frmMainUI:txtEffectiveDate', 'frmMainUI:txtEffectiveDate');"
+                                                                                                             validator="#{validatorManagedBean.Date}" validatorMessage="date format should be dd/mm/yyyy"
+                                                                                                             title="effective Date" class="form-control" required="true" requiredMessage="Please Select effective date"/>
+                                                                                                <p:message for="txtEffectiveDate" display="icon"/>
+                                                                                            </div>
+
+                                                                                        </div>                                               
+                                                                                    </div> 
+                                                                                    <div  class=" col-md-12 textBoxMargin6px">
+                                                                                        <div class="form-group form-horizontal">
+                                                                                            <h:outputLabel for="Remark" class="control-label col-sm-4" value="Remark:"/> 
+                                                                                            <div class="col-sm-8">
+                                                                                                <h:inputTextarea id ="Remark"  value="#{massSalaryIncrementControllers.hrSalaryIncrements.remark}"  validator="#{validatorManagedBean.Remark}" class="form-control"  style="width:100%" />
+                                                                                                <p:message for="Remark" display="icon"/>
+                                                                                            </div>
+                                                                                        </div>                                               
+                                                                                    </div> 
+                                                                                    <div class=" col-md-12 textBoxMargin6px">
+                                                                                        <div class="form-group form-horizontal">
+                                                                                            <div class="col-md-4 "></div>
+                                                                                            <div class="col-sm-3">
+
+                                                                                                <p:commandButton id="btnadd" value="Save" class="btn btn-block btn-primary col-sm-4"                                            
+                                                                                                                 action="#{massSalaryIncrementControllers.saveMassSalIncInfo}"
+                                                                                                                 process="@this,pnlfill"  update=":frmMainUI:pnlfill"/> 
+                                                                                            </div>
+                                                                                            <div class="col-sm-3">
+
+                                                                                                <p:commandButton id="btncancel" value="Cancel"  class="btn btn-block btn-primary col-sm-4"                                          
+                                                                                                                 action="#{massSalaryIncrementControllers.clean()}"
+                                                                                                                 process="@this"  update="frmMainUI:pnlGroup1"/> 
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </h:panelGroup>
+                                                            </p:dialog> 
+
+                                                            <div class="col-md-12 form-group">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="txtDepartment" class="control-label col-sm-4" value="Department :"/> 
+                                                                    <div class="col-sm-7">
+                                                                        <p:inputText id="txtDepartment" value="#{massSalaryIncrementControllers.hrDepartments.depName}" required="true" readonly="true"/>
+                                                                        <p:message for="txtDepartment" display="icon"/>
+                                                                    </div>
+                                                                    <div class="col-sm-1">
+                                                                        <p:commandButton  onclick="PF('dlgDpt').show();" id="btnTree" partialSubmit="true" style="background: transparent;" value="+"/>
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                            <p:dialog id="dlgDpt" header="Departments" position="center" widgetVar="dlgDpt" height="300" width="500" showEffect="explode">
+                                                                <h:panelGroup id="selectdept" >
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div class="row">
+                                                                                <div class="box-body"> 
+                                                                                    <h:panelGrid columns="3" style="border-color: #ffffff ">
+                                                                                        <p:tree id="deptTree" value="#{massSalaryIncrementControllers.root}" var="nodes" style="border: transparent; width: 100%"
+                                                                                                selectionMode="single" selection="#{massSalaryIncrementControllers.selectedNode}" >
+                                                                                            <p:ajax event="select" listener="#{massSalaryIncrementControllers.onNodeSelect}" process="@this" 
+                                                                                                    update=":frmMainUI:txtDepartment,:frmMainUI:position,:frmMainUI:pnlGroup1"/>
+                                                                                            <p:treeNode>                                                                                                    
+                                                                                                <h:outputText value="#{nodes}" />
+                                                                                            </p:treeNode>
+                                                                                        </p:tree>                                       
+                                                                                    </h:panelGrid>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </h:panelGroup>
+                                                            </p:dialog> 
+
+                                                            <div class="col-md-12 form-group">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="position" class="control-label col-sm-4" value="position :"/>  
+                                                                    <div class="col-sm-7" > 
+                                                                        <p:selectOneMenu id="position" style="width: 100%" value="#{massSalaryIncrementControllers.hrJobTypes.id}" 
+                                                                                         converter="entConverter"  >
+                                                                            <f:selectItem itemLabel="-- Select --" itemValue=""  />
+                                                                            <f:selectItems  value="#{massSalaryIncrementControllers.allJobtypes}" var="position"  itemValue="#{position.id}" itemLabel="#{position.jobTitle}"/>    
+                                                                            <p:ajax event="change" process="@this" update="" />
+                                                                            <p:message for="position" display="icon"/>  
+                                                                        </p:selectOneMenu>
+                                                                    </div>
+                                                                    <div class="col-sm-1"></div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 form-group">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="salaryStep" class="control-label col-sm-4" value="Salary Step :"/>  
+                                                                    <div class="col-sm-7"> 
+                                                                        <p:selectOneMenu id="salaryStep" style="width: 100%" value="#{massSalaryIncrementControllers.hrLuSalarySteps.id}" 
+                                                                                         converter="entConverter" >
+                                                                            <f:selectItem itemLabel="-- Select --" itemValue=""  />
+                                                                            <f:selectItems  value="#{massSalaryIncrementControllers.allSalarySteps}" var="SalStep" itemValue="#{SalStep.id}" itemLabel="#{SalStep.salaryStep}"/>    
+                                                                            <p:ajax event="change" process="@this" update="" />
+                                                                            <p:message for="salaryStep" display="icon"/>  
+                                                                        </p:selectOneMenu>
+                                                                    </div>
+                                                                    <div class="col-sm-1"></div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="col-md-12 form-group">
+                                                                <div class="form-group form-horizontal"> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 form-group">
+                                                                <div class="form-group form-horizontal"> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 form-group">
+                                                                <div class="form-group form-horizontal"> 
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-12 form-group">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="grade" class="control-label col-sm-4" value="Grade :"/>  
+                                                                    <div class="col-sm-7"> 
+                                                                        <p:selectOneMenu id="grade" style="width: 100%" value="#{massSalaryIncrementControllers.hrLuGrades.id}" 
+                                                                                         converter="entConverter" >
+                                                                            <f:selectItem itemLabel="-- Select --" itemValue=""  />
+                                                                            <f:selectItems  value="#{massSalaryIncrementControllers.allJobGrades}" var="grade" itemValue="#{grade.id}" itemLabel="#{grade.description}"/>    
+                                                                            <p:ajax event="change" process="@this" update="" />
+                                                                            <p:message for="grade" display="icon"/>  
+                                                                        </p:selectOneMenu>
+                                                                    </div>
+                                                                    <div class="col-sm-1"></div>
+                                                                </div>
+                                                            </div>
+                                                            <h:panelGroup rendered="#{massSalaryIncrementControllers.perpareOnlyRadio}">
+                                                                <div class="col-md-12 form-group">
+                                                                    <div class="form-group form-horizontal"> 
+                                                                        <div class="col-sm-4"></div>
+                                                                        <div class="col-md-8">
+                                                                            <p:selectOneRadio id="rbnAllEmployees" value="#{massSalaryIncrementControllers.selectedValue}">
+                                                                                <f:selectItem itemLabel="All Employees &nbsp; &nbsp;" itemValue="#{massSalaryIncrementControllers.allEmployees}" />
+                                                                                <f:selectItem itemLabel="Increment Done &nbsp; &nbsp;" itemValue="#{massSalaryIncrementControllers.included}" />
+                                                                                <f:selectItem itemLabel="Increment Not Done" itemValue="#{massSalaryIncrementControllers.nonIncluded}" />
+                                                                                <p:ajax update=":frmMainUI" event="valueChange" />
+                                                                            </p:selectOneRadio>
+                                                                            <p:message for="rbnAllEmployees" display="icon"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </h:panelGroup>
+                                                            <div class="col-md-12 form-group">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <div class="col-sm-4"> </div>
+                                                                    <div class="col-sm-8">
+                                                                        <div class="col-sm-4">
+                                                                            <p:commandButton id="btnLoad" class="btn btn-block btn-primary col-sm-4"
+                                                                                             value="Load"
+                                                                                             action="#{massSalaryIncrementControllers.btnLoad_action()}"
+                                                                                             process="@this,incid,txtDepartment"                                       
+                                                                                             update="@this,:frmMainUI,tblEmpList,:frmSample"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlwf" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">  
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="SomeComment" class="control-label col-sm-4"  value="Remark:"/>
+
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="SomeComment" value="#{massSalaryIncrementControllers.wfHrProcessed.commentGiven}"
+                                                                                         title="SomeComment"  class="form-control"/>
+                                                                        <p:message for="SomeComment" display="icon"/>
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="txtxreqdate" class="control-label col-sm-4" value="Prepared On: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtxreqdate" value="#{massSalaryIncrementControllers.wfHrProcessed.processedOn}"
+                                                                                     onclick="displayCalendar('frmMainUI:txtxreqdate', 'frmMainUI:txtxreqdate');"
+                                                                                     title="prepared on" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                        <p:message for="txtxreqdate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+                                                           
+                                                           
+                                                        </div>
+                                                         <div class="col-md-6"> 
+                                                              <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel class="control-label col-sm-4" />
+
+                                                                    <div class="col-sm-8">
+                                                                        
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+                                                              <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtPreparedBY" class="control-label col-sm-4"  value="Prepared By:"/>
+
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtPreparedBY" value="#{massSalaryIncrementControllers.fullName}"
+                                                                                     title="txtPreparedBY" readonly="true" />
+                                                                        <p:message for="txtPreparedBY" display="icon"/>
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+                                                         </div>
+
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlsave">
+                                                <div class=" form-horizontal col-sm-12"> 
+                                                    <div  class="form-horizontal col-md-6">
+                                                        <div class="form-group"> 
+                                                            <h:panelGroup rendered="#{massSalaryIncrementControllers.selectIncremetStep}">
+                                                                <h:outputLabel for="somIncrement" value="Increment By For All Selected Employees" class="control-label col-sm-4"></h:outputLabel>
+                                                                <div class=" col-sm-6" > 
+                                                                    <p:selectOneMenu id="somIncrement"  style="width: 100%"  value="#{massSalaryIncrementControllers.hrLuSalarySteps.id}" 
+                                                                                     valueChangeListener="#{massSalaryIncrementControllers.somIncrement_processValueChange}">
+                                                                        <f:selectItem itemLabel="-- Select --" itemValue="" />
+                                                                        <f:selectItems value="#{massSalaryIncrementControllers.incrementNumbers}" var="incNum" itemValue="#{incNum.salaryStep}" itemLabel=" +  #{incNum.salaryStep}" />
+                                                                        <p:ajax event="change" process="@this" update=":frmMainUI:tblEmpList" />
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </h:panelGroup>
+                                                        </div>
+                                                    </div>
+
+                                                    <h:panelGroup id="btns">
+                                                        <div class="panel-body col-sm-12">
+                                                            <div class="form-group col-sm-12">
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-sm-4"></div>
+                                                                    <div class="col-sm-6">
+                                                                        <!--<p:commandButton id="ReadFromSalaryScale" value="Read From Salary Scale" class="btn  btn-block btn-primary col-sm-4"                                             
+                                                                                         process="@this" 
+                                                                                         update=":frmMainUI:tblEmpList" /> -->
+                                                                    </div> 
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-sm-4"></div>
+                                                                    <div class="col-sm-4">
+                                                                        <h:panelGroup rendered="#{massSalaryIncrementControllers.savebtn}">
+                                                                            <p:commandButton id="btnSaveSelected" value="Save Selected" class="btn  btn-block btn-primary col-sm-4"
+                                                                                             action="#{massSalaryIncrementControllers.saveMassSalIncDetailInfo}"
+                                                                                             process="@this,incid,pnlsave,pnlwf" 
+                                                                                             icon="pi pi-check"
+                                                                                             update="@this,:frmMainUI,:frmMainUI:tblEmpList" /> 
+                                                                        </h:panelGroup>
+                                                                    </div>
+
+                                                                    <div class="col-sm-4">
+                                                                        <h:panelGroup rendered="#{massSalaryIncrementControllers.approvebtn}">
+                                                                            <p:commandButton id="ApproveSelected" value="Approve Selected" class="btn  btn-block btn-primary col-sm-4"
+                                                                                             action="#{massSalaryIncrementControllers.approvMassSalIncDetailInfo}"
+                                                                                             process="@this,incid,pnlsave,pnlwf" 
+                                                                                             update="@this,:frmMainUI,:frmMainUI:tblEmpList" /> 
+                                                                        </h:panelGroup>
+                                                                    </div>   
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </div>
+                                                <div class="col-md-12" >
+                                                    <div class="form-group">
+                                                        <p:dataTable id="tblEmpList" value="#{massSalaryIncrementControllers.empListDataModel}"     
+                                                                     rowIndexVar="num" var="empList" rowKey="#{empList.id}" rows="10" paginator="true" paginatorPosition="bottom" class="dataTable"  >
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Employee Id"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.empId}" />
+                                                            </p:column>
+                                                            <p:column  >
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Employee Name"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.empName}" />
+                                                            </p:column>
+                                                            <p:column  >
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Department"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.deptName}"  />
+                                                            </p:column>
+                                                            <p:column >
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="position"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.jobTitle}" />
+                                                            </p:column>
+                                                            <p:column style="width:80px;">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Grade"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.grade}" />
+                                                            </p:column>
+                                                            <p:column style="width:80px;">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Salary Step"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.prevSalaryStep}" />
+                                                            </p:column>
+                                                            <p:column style="width:115px;">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Salary"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.prevSalary}" />
+                                                            </p:column>
+                                                            <p:column style="width:100px;">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Incremented By" style=""/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.incrementBy}" />
+                                                            </p:column>
+                                                            <p:column style="width:80px;">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="New Salary Step"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.newSalaryStep}" />
+                                                            </p:column>
+                                                            <p:column style="width:115px;">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="New Salary"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText value="#{empList.newSalary}" />
+                                                            </p:column>
+                                                            <p:column style="width:90px;">
+                                                                <f:facet name="header">
+
+                                                                    <h:selectBooleanCheckbox id="ckbAll" binding="#{massSalaryIncrementControllers.ckbAll}">
+                                                                        <p:ajax update="tblEmpList" listener="#{massSalaryIncrementControllers.ckbAll_processValueChange}"/> 
+                                                                    </h:selectBooleanCheckbox>                                                        
+                                                                </f:facet>
+                                                                <h:selectBooleanCheckbox value="#{empList.approved}">
+                                                                    <p:ajax update="tblEmpList" listener="#{massSalaryIncrementControllers.ckb_processValueChange}"/> 
+                                                                </h:selectBooleanCheckbox>
+                                                            </p:column>
+                                                        </p:dataTable> 
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>   
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

@@ -1,0 +1,1115 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">    
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="finalAward.xhtml"><i class="fa  fa-circle-o"></i> Award</a>   </li>
+        <li> <a href="contractInformation.xhtml"><i class="fa  fa-circle-o"></i>Contract Information</a>   </li>
+        <li> <a href="contractAmendment.xhtml"><i class="fa fa-circle-o"></i>Contract Amendment</a>   </li>
+        <li> <a href="purchaseOrder.xhtml"><i class="fa  fa-circle-o"></i>Purchase Order</a> </li>
+        <li> <a href="requestForPayment.xhtml"><i class="fa  fa-circle-o"></i>Request For Payment</a>  </li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackToSearch" rendered="#{quatationController.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{quatationController.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                         process="@this" update="@this,:frmToolBar,:frmQuotation"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton validateClient="true" action="#{quatationController.createNewParty()}"
+                                     icon="#{quatationController.icon}" style="background-color: white; border-color: white"
+                                     title="#{quatationController.createOrSearchBundle}" process="@this" update="@this,:frmToolBar,:frmQuotation"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress" title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf" class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{quatationController.wfPrmsProcessedDModel_}" var="currentRow" selectionMode="single" 
+                                                             rowIndexVar="num" rows="10" paginator="true" rowKey="#{currentRow.processedId}" paginatorPosition="bottom">
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{currentRow.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Decision">
+                                                        <h:outputText value="#{currentRow.decision}" />
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{currentRow.processedOn}" />
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{currentRow.commentGiven}" />
+                                                    </p:column> 
+
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="PGNotification" rendered="#{quatationController.renderDecision}">
+                        <p:commandLink id="cmdLinkNotf" action="#{quatationController.createNewParty()}" class="fa fa-bell-o" title="Notifications" value="#{quatationController.prmsQuotationLis1.size()}" 
+                                       style="color: red;background-color: white; border-color: white"/>
+
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Quotation"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains" converterMessage="entConverter"                                            
+                                                converter="entConverter"  valueChangeListener="#{quatationController.RequestListChange}">
+                                <f:selectItems id="selectOneMenuAppListkl" var="purchaseReqlst" value="#{quatationController.prmsQuotationLis1}" 
+                                               itemValue="#{purchaseReqlst}" itemLabel="#{purchaseReqlst.quotationNo}"/> 
+                                <p:ajax event="valueChange" process="@this" update=":frmToolBar,:frmQuotation"/>               
+                            </p:selectOneListbox>
+                        </p:overlayPanel>                        
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <a href="Quotation.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../prmsDashboardNew.xhtml" ><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmQuotation"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup id="pnlSearch" rendered="#{quatationController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="col-md-12">                                        
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6"> 
+                                                <div class="form-horizontal col-md-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel id="lblSearchingBy"  value="Searching By:" class="control-label col-sm-4"/>                                                          
+                                                        <div class="col-sm-8">  
+                                                            <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{quatationController.prmsQuotation.columnName}"
+                                                                             valueChangeListener="#{quatationController.selectedParamChangeEvent}" converter="entConverter">
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItems value="#{quatationController.quatationSearchParameterLst}"
+                                                                               var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                                <p:ajax event="change" process="@this," update="txtSearchBy,lblSearchBy"/>
+                                                            </p:selectOneMenu>                                                        
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">                                        
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6"> 
+                                                <div class="form-horizontal col-md-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel id="lblSearchBy" value="Search By #{quatationController.prmsQuotation.columnName}:" class="control-label col-sm-4"/>                                                          
+                                                        <div class="col-sm-8">  
+                                                            <p:inputText id="txtSearchBy" value="#{quatationController.prmsQuotation.columnValue}"
+                                                                         title="Enter column Value" class="form-control"/>                                                        
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12"> 
+                                        <div class="col-md-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-md-4">                                                    
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnSearch" value="Find" class="btn  btn-block btn-primary col-lg-4" 
+                                                                     action="#{quatationController.searchQuotation()}" title="searching" icon="ui-icon-search"
+                                                                     process="@this,:frmQuotation" update=":frmQuotation:tblQuatation"/>
+                                                </div>                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12" >
+                                        <div class="form-group">
+                                            <p:dataTable id="tblQuatation" value="#{quatationController.prmsQuotationsModel}" var="quatations"
+                                                         selection="#{quatationController.quotationSelection}" rows="10" rowIndexVar="indexCount"
+                                                         rowKey="#{quatations.quatationId}" selectionMode="single" rowsPerPageTemplate="10,20,30"
+                                                         paginator="true" paginatorPosition="bottom" editable="true">
+                                                <p:ajax event="rowSelect" listener="#{quatationController.PopulateQuotation}"
+                                                        process="@this" update=":frmToolBar,:frmQuotation,:frmQuotation:tblSavedDoc,:frmQuotation:pnlUpload"/>    
+                                                <p:column style="width: 60px">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="S.No"/>
+                                                    </f:facet> #{indexCount+1}
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Quotation No."/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{quatations.quotationNo}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Purchase Type"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{quatations.purchaseType}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Registared Date"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{quatations.regDate}">
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Purchaser" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{quatations.purchaser.firstName}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>          
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+            <h:panelGroup id="pnlMainpage" rendered="#{quatationController.renderPnlCreateParty}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Quotation</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlQuotation">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtQuotationNo" value="Quotation No:" class="control-label col-sm-4"/>                                                               
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtQuotationNo" value="#{quatationController.generateQuotationNo()}" 
+                                                                                             readonly="true" title="Quotation Number" />
+                                                                            </div>
+                                                                        </div>                                                                                          
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPurchaseType" value="Purchase Type:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="txtPurchaseType" value="#{quatationController.prmsQuotation.purchaseType}" 
+                                                                                                 valueChangeListener="#{quatationController.PurchaseType_Vlc}" style="width: 100%"
+                                                                                                 disabled="#{workFlow.readonly}" required="true" requiredMessage="Selct purchase type">
+                                                                                    <f:selectItem itemLabel="--- Select One ---"/>
+                                                                                    <f:selectItem itemLabel="Goods" itemValue="Goods"/>
+                                                                                    <f:selectItem itemLabel="Service " itemValue="Service"/>
+                                                                                    <f:selectItem itemLabel="Works" itemValue="Works"/>
+                                                                                    <p:ajax event="change" process="@this" update="@this,frmQuotation"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="txtPurchaseType" display="icon"/>
+                                                                            </div>                                                               
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtRigisteredDate" value="Registered Date:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:calendar id="txtRigisteredDate" required="true" readonlyInput="true"  requiredMessage="Registered Date is required"                     
+                                                                                            value="#{quatationController.prmsQuotation.regDate}"  disabled="#{workFlow.readonly}"                  
+                                                                                            pattern="dd/MM/yyyy" tabindex="4">
+                                                                                    <f:convertDateTime  pattern="dd/MM/yyyy"/>
+                                                                                </p:calendar>
+                                                                                <p:message for="txtRigisteredDate" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section> 
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlItem" rendered="#{quatationController.rndItem}" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="drdPRNo" value="PR No.:"  class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">                                                       
+                                                                                <p:selectOneMenu id="drdPRNo" value="#{quatationController.prmsPurchaseRequest}" converter="entConverter"  
+                                                                                                 valueChangeListener="#{quatationController.getPurchaseRqustNo}" style="width: 100%" required="true" 
+                                                                                                 requiredMessage="Select PR No" disabled="#{workFlow.readonly}">
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{quatationController.prmsPurchaseRequestList}" var="goodsPrList" itemLabel="#{goodsPrList.prNumber}"/>
+                                                                                    <p:ajax event="change" update="@this, drdItemName,pnlPreparerInfo"/> 
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdPRNo" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="drdItemName" class="control-label col-sm-4" value="Item Name:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="drdItemName" value="#{quatationController.mmsItemRegistration}" converter="entConverter" valueChangeListener="#{quatationController.BidDateGetter}" style="width: 100%" required="true" requiredMessage="Select item name">
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{quatationController.itemList}" var="itemCode" itemLabel="#{itemCode.matName}" itemValue="#{itemCode}"/>
+                                                                                    <p:ajax event="change" update="txtUnitMeasure,txtQuantity"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdItemName" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtQuantity" class="control-label col-sm-4" value="Quantity:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtQuantity" value="#{quatationController.prmsQuotationDetail.quantity}" title="Quantity" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtQuantity" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtUnitMeasure" class="control-label col-sm-4" value="Unit Measure:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtUnitMeasure" value="#{quatationController.mmsItemRegistration.unitOfMeasure}" title="Unit Measure" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtUnitMeasure" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-12 form-horizontal">
+                                                                        <div class="col-sm-4">                                                              
+                                                                        </div>                                                                    
+                                                                        <div class="col-sm-3">
+                                                                            <center>
+                                                                                <p:commandButton id="btnAdd" value="#{quatationController.addOrModifyBundle}" class="btn  btn-block btn-primary col-lg-4" action="#{quatationController.addItem()}" style="margin-top: 10px"  process="@this,pnlItem" title="Add item detail" update="@this,pnlItem,tblItem"/>
+                                                                            </center>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+
+                                                                            <h:outputLabel class="control-label col-sm-4" value="Supplier Name:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="drdSupplierName"  value="#{quatationController.prmsQuotationDetail.supId}" disabled="#{workFlow.readonly}"
+                                                                                                 valueChangeListener="#{quatationController.supplierName_vlc}" style="width: 100%"
+                                                                                                 converter="entConverter" required="true" requiredMessage="Select supplier name">
+                                                                                    <f:selectItems value="#{quatationController.getSuppName()}"/>
+                                                                                    <p:ajax event="change" process="@this" update="@this,txtTaxType,txtRate,rbnVatType"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdSupplierName" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtTaxType" class="control-label col-sm-4" value="Tax Type:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtTaxType" value="#{quatationController.prmsQuotationDetail.supId.vatTypeId.vatType}" title="Tax Type" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtTaxType" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtRate" class="control-label col-sm-4" value="Rate:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtRate" value="#{quatationController.prmsQuotationDetail.supId.vatTypeId.vatRate}" title="Rate" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtRate" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <br></br><br></br><br></br><br></br><br></br> 
+                                                        <br></br><br></br><br></br><br></br><br></br> 
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-12">                                                                      
+                                                                    <div class="form-group form-horizontal">  
+                                                                        <p:dataTable id="tblItem" value="#{quatationController.itemDataModel}" var="item"
+                                                                                     paginator="true" paginatorPosition="bottom" editable="true" rowIndexVar="rowNum">
+                                                                            <p:column headerText="No." style="width: 60px">
+                                                                                #{rowNum+1}
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="PR No"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.purchaseRquestDetId.purchaseReqId.prNumber}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Supplier Name"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.supId.vendorName}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Item Name"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.purchaseRquestDetId.materialCodeId.matName}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Unit Measure"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.purchaseRquestDetId.materialCodeId.unitOfMeasure}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Tax Types"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.supId.vatTypeId.vatType}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Rate"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.supId.vatTypeId.vatRate}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Quantity"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.quantity}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Unit Price"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.unitPrice}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Vat Types"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.vatType}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="vat"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.totalVat}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Total Price"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{item.totalPrice}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Option"> 
+                                                                                <p:commandLink action="#{quatationController.editItemDataTbl()}" value="Edit" 
+                                                                                               process="@this,tblItem" update="@this,:frmQuotation:pnlItem,:frmQuotation:txtRequestedBy"/>
+                                                                            </p:column>
+                                                                        </p:dataTable>
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup id="pnlService" rendered="#{quatationController.rndSerive}" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="drdPRNo1" value="PR No.:"  class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">                                                       
+                                                                                <p:selectOneMenu id="drdPRNo1" value="#{quatationController.prmsPurchaseRequest}" converter="entConverter" 
+                                                                                                 valueChangeListener="#{quatationController.getService}" style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                                                 required="true" requiredMessage="Select PR number">
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{quatationController.prmsPurchaseRequestListforService}"
+                                                                                                   var="prForService" itemLabel="#{prForService.prNumber}"/>
+                                                                                    <p:ajax event="change" update="drdServiceNo"/> 
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdPRNo1" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="drdServiceNo" value="Service Name.:" class="control-label col-sm-4" />
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="drdServiceNo" value="#{quatationController.prmsServiceAndWorkReg}" style="width: 100%"   
+                                                                                                 label="#{quatationController.prmsServiceAndWorkReg.serviceName}"
+                                                                                                 converter="entConverter" required="true" requiredMessage="Select service No."  
+                                                                                                 valueChangeListener ="#{quatationController.BidDateGet}" disabled="#{workFlow.readonly}"> 
+                                                                                    <f:selectItem itemLabel="--- Select  One ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{quatationController.serviceList}" var="varSer"
+                                                                                                   itemValue="#{varSer}" itemLabel="#{varSer.serviceName}"/> 
+                                                                                    <p:ajax event="change" update="txtServiceName,txtUnitMeasure1"/>
+                                                                                </p:selectOneMenu> 
+                                                                                <p:message for="drdItemName" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtServiceName" class="control-label col-sm-4" value="Service No:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtServiceName" value="#{quatationController.prmsServiceAndWorkReg.serviceNo}" title="Service Name" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtServiceName" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtUnitMeasure1" class="control-label col-sm-4" value="Unit Measure:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtUnitMeasure1" value="#{quatationController.prmsServiceAndWorkReg.unitMeasures}" title="Unit Measure" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtUnitMeasure1" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtQuantity1" class="control-label col-sm-4" value="Quantity:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtQuantity1" value="#{quatationController.prmsQuotationDetail.quantity}" 
+                                                                                             title="Quantity" required="true" requiredMessage="Quantity is required" class="form-control" disabled="#{workFlow.readonly}"/>
+                                                                                <p:message for="txtQuantity1" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-12 form-horizontal">
+                                                                        <div class="col-sm-4">                                                              
+                                                                        </div>                                                                    
+                                                                        <div class="col-sm-3">
+                                                                            <center>
+                                                                                <p:commandButton id="btnAdd1" value="#{quatationController.addOrModifyBundle}" class="btn  btn-block btn-primary col-lg-4" disabled="#{workFlow.readonly}"
+                                                                                                 action="#{quatationController.addService()}" style="margin-top: 10px"
+                                                                                                 process="@this,pnlService" title="Add service detail" update="@this,pnlService,tblService"/>
+                                                                            </center>
+                                                                        </div>
+                                                                    </div>
+                                                                </div> 
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="drdSupplierName1" class="control-label col-sm-4" value="Supplier Name:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="drdSupplierName1"  value="#{quatationController.prmsSupplyProfile}" disabled="#{workFlow.readonly}"
+                                                                                                 valueChangeListener="#{quatationController.supplierName_vlc}" style="width: 100%"
+                                                                                                 converter="entConverter" required="true" requiredMessage="Select supplier name">
+                                                                                    <f:selectItem itemLabel="---Select---" itemValue=""/>
+                                                                                    <f:selectItems value="#{quatationController.supplierList}"/>
+                                                                                    <p:ajax event="change" process="@this" update="@this,txtTaxType1,txtRate1"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdSupplierName1" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtTaxType1" class="control-label col-sm-4" value="Tax Type:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtTaxType1" value="#{quatationController.prmsQuotationDetail.supId.vatTypeId.vatType}" 
+                                                                                             title="Tax Type" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtTaxType1" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtRate1" class="control-label col-sm-4" value="Rate:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtRate1" value="#{quatationController.prmsQuotationDetail.supId.vatTypeId.vatRate}" 
+                                                                                             title="Rate" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtRate1" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtUnitPrice1" class="control-label col-sm-4" value="Unit Price" title="Unit Price"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtUnitPrice1" value="#{quatationController.prmsQuotationDetail.unitPrice}" 
+                                                                                             title="Price for a single value" required="true" requiredMessage="Enter unit price" class="form-control" disabled="#{workFlow.readonly}"
+                                                                                             validator="#{validatorManagedBean.Double}" converterMessage="Unit price must be a number">
+                                                                                    <p:ajax></p:ajax></p:inputText>
+                                                                                <p:message for="txtUnitPrice1" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="rbnVatType" class="control-label col-sm-4" value="Vat Type: "/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneRadio id="rbnVatType" value="#{quatationController.prmsQuotationDetail.vatType}"
+                                                                                                  required="false" requiredMessage="Select vat type" class="col-sm-7" disabled="#{workFlow.readonly}">
+                                                                                    <f:selectItem itemLabel="Exclude" itemValue="Exclude"/>
+                                                                                    <f:selectItem itemLabel="Include" itemValue="Include"/>
+                                                                                </p:selectOneRadio>
+                                                                                <p:message for="rbnVatType" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <br></br><br></br><br></br><br></br><br></br><br></br>
+                                                        <br></br><br></br><br></br><br></br><br></br><br></br> 
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-12">                                                                      
+                                                                    <div class="form-group form-horizontal">  
+                                                                        <p:dataTable id="tblService" value="#{quatationController.serviceDataModel}" var="service"
+                                                                                     paginator="true" paginatorPosition="bottom" rowIndexVar="rowNo">
+                                                                            <p:column headerText="No" style="width: 60px">
+                                                                                #{rowNo+1}
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="PR No"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.purchaseReqServiceId.purchaseReqId.prNumber}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Service No"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.purchaseReqServiceId.serviceId.serviceNo}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Service Name"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.purchaseReqServiceId.serviceId.serviceName}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Unit Measure"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.purchaseReqServiceId.serviceId.unitMeasures}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Quantity"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.quantity}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Supplier Name"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.supId.vendorName}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Tax Types"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.supId.vatTypeId.vatType}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Rate"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.supId.vatTypeId.vatRate}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Unit Price"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.unitPrice}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="vat"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.totalVat}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Total Price"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{service.totalPrice}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Option"> 
+                                                                                <p:commandLink action="#{quatationController.editServiceDataTbl()}" value="Edit" 
+                                                                                               process="@this,tblService" update="@this,:frmQuotation:pnlService"/>
+                                                                            </p:column>
+                                                                        </p:dataTable>
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup id="pnlWork" rendered="#{quatationController.rndWork}" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="drdPRNo2" value="PR No.:"  class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">                                                       
+                                                                                <p:selectOneMenu id="drdPRNo2" value="#{quatationController.prmsPurchaseRequest}" converter="entConverter" 
+                                                                                                 valueChangeListener="#{quatationController.getService}" style="width: 100%"
+                                                                                                 required="true" requiredMessage="Select PR number">
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{quatationController.prmsPurchaseRequestListForWorks}"
+                                                                                                   var="prForWork" itemLabel="#{prForWork.prNumber}"/>
+                                                                                    <p:ajax event="change" update="drdWorkNo"/> 
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdPRNo2" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="drdWorkNo" value="Work No.:" class="control-label col-sm-4" />
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="drdWorkNo" value="#{quatationController.prmsServiceAndWorkReg}"                                                                                                  
+                                                                                                 converter="entConverter" required="true" requiredMessage="Select service No."  
+                                                                                                 valueChangeListener ="#{quatationController.BidDateGet}" style="width: 100%"> 
+                                                                                    <f:selectItem itemLabel="--- Select  ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{quatationController.serviceList}" var="work"
+                                                                                                   itemValue="#{work}" itemLabel="#{work.workNo}"/> 
+                                                                                    <p:ajax event="change" update="txtWorkName,txtUnitMeasure2"/>
+                                                                                </p:selectOneMenu> 
+                                                                                <p:message for="drdWorkNo" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtWorkName" class="control-label col-sm-4" value="Work Name:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtWorkName" value="#{quatationController.prmsServiceAndWorkReg.workName}" 
+                                                                                             title="Work Name" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtWorkName" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtUnitMeasure2" class="control-label col-sm-4" value="Unit Measure:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtUnitMeasure2" value="#{quatationController.prmsServiceAndWorkReg.unitMeasures}" 
+                                                                                             title="Unit Measure" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtUnitMeasure2" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtQuantity2" class="control-label col-sm-4" value="Quantity:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtQuantity2" value="#{quatationController.prmsQuotationDetail.quantity}"
+                                                                                             title="Quantity" required="true" requiredMessage="Quantity is required"/>
+                                                                                <p:message for="txtQuantity2" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-12 form-horizontal">
+                                                                        <div class="col-sm-4">                                                              
+                                                                        </div>                                                                    
+                                                                        <div class="col-sm-3">
+                                                                            <center>
+                                                                                <p:commandButton id="btnAdd2" value="#{quatationController.addOrModifyBundle}" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                                 action="#{quatationController.addWork()}" style="margin-top: 10px" disabled="#{workFlow.readonly}"
+                                                                                                 process="@this,pnlWork" title="Add work detail"
+                                                                                                 update="@this,pnlWork,tblWork"/>
+                                                                            </center>
+                                                                        </div>
+                                                                    </div>
+                                                                </div> 
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="drdSupplierName2" class="control-label col-sm-4" value="Supplier Name:" title="Supplier Name"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="drdSupplierName2"  value="#{quatationController.prmsQuotationDetail.supId}" 
+                                                                                                 valueChangeListener="#{quatationController.supplierName_vlc}" style="width: 100%"
+                                                                                                 converter="entConverter" required="true" requiredMessage="Select supplier name">
+
+                                                                                    <f:selectItems value="#{quatationController.getSuppName()}"/>
+                                                                                    <p:ajax event="change" process="@this,drdSupplierName2" update="txtTaxType2,txtRate2"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdSupplierName2" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtTaxType2" class="control-label col-sm-4" value="Tax Type:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtTaxType2" value="#{quatationController.prmsQuotationDetail.supId.vatTypeId.vatType}" 
+                                                                                             title="Tax Type" readonly="true" class="form-control"/>
+                                                                                <p:message for="txtTaxType2" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtRate2" class="control-label col-sm-4" value="Rate:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtRate2" value="#{quatationController.prmsQuotationDetail.supId.vatTypeId.vatRate}" 
+                                                                                             title="Rate" readonly="true" class="form-control" />
+                                                                                <p:message for="txtRate2" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtUnitPrice2" class="control-label col-sm-4" value="Unit Price" title="Unit Price"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtUnitPrice2" value="#{quatationController.prmsQuotationDetail.unitPrice}" class="form-control"
+                                                                                             title="Price for a single value"  required="true" requiredMessage="Enter unit price"
+                                                                                             validator="#{validatorManagedBean.Double}" converterMessage="Unit price must be a number">
+                                                                                    <p:ajax></p:ajax></p:inputText>
+                                                                                <p:message for="txtUnitPrice2" display="icon"/>
+                                                                            </div> 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="rbnVatType2" class="control-label col-sm-4" value="Vat Type: "/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneRadio id="rbnVatType2" value="#{quatationController.prmsQuotationDetail.vatType}"
+                                                                                                  required="false" requiredMessage="Select vat type" class="col-sm-7">
+                                                                                    <f:selectItem itemLabel="Exclude" itemValue="Exclude"/>
+                                                                                    <f:selectItem itemLabel="Include" itemValue="Include"/>
+                                                                                </p:selectOneRadio>
+                                                                                <p:message for="rbnVatType2" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <br></br><br></br><br></br><br></br><br></br><br></br>
+                                                        <br></br><br></br><br></br><br></br><br></br><br></br> 
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-12">                                                                      
+                                                                    <div class="form-group form-horizontal">  
+                                                                        <p:dataTable id="tblWork" value="#{quatationController.workDataModel}" var="work"
+                                                                                     paginator="true" paginatorPosition="bottom" editable="true" rowIndexVar="rowNos">
+                                                                            <p:column headerText="No" style="width: 60px">
+                                                                                #{rowNos+1}
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="PR No"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.purchaseReqServiceId.purchaseReqId.prNumber}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Work No"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.purchaseReqServiceId.serviceId.workNo}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Work Name"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.purchaseReqServiceId.serviceId.workName}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Unit Measure"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.purchaseReqServiceId.serviceId.unitMeasures}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Quantity"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.quantity}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Supplier Name"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.supId.vendorName}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Tax Types"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.supId.vatTypeId.vatType}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Rate"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.supId.vatTypeId.vatRate}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Unit Price"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.unitPrice}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="vat"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.totalVat}"/>
+                                                                            </p:column>
+                                                                            <p:column>
+                                                                                <f:facet name="header">
+                                                                                    <h:outputText value="Total Price"/>
+                                                                                </f:facet>
+                                                                                <h:outputText value="#{work.totalPrice}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Option"> 
+                                                                                <p:commandLink action="#{quatationController.editWorkDataTbl()}" value="Edit" 
+                                                                                               process="@this,tblWork" update="@this,:frmQuotation:pnlWork"/>
+                                                                            </p:column>
+                                                                        </p:dataTable>
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlUpload" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">                                                                            
+                                                                            <h:outputLabel class="control-label col-sm-4" value="Upload File: "/> 
+                                                                            <p:panelGrid columns="1" style="float: left;"> 
+                                                                                <p:fileUpload  id="fileUplod" fileUploadListener="#{quatationController.uploadListener}"
+                                                                                               value="#{quatationController.prmsLuDmArchive.documentId}" allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                                               invalidFileMessage="This type of file is not valid" invalidSizeMessage="The size is not Allowed"
+                                                                                               multiple="false" mode="advanced" sizeLimit="52428800" auto="true" process="@this" update="tblSavedDoc"/>
+                                                                                <p:dataTable id="tblSavedDoc"  var="currentRow" sortBy="#{currentRow.documentId}" lazy="true"  rowIndexVar="current" value="#{quatationController.prmsLuDmArchivesDModel}"
+                                                                                             paginator="true" paginatorPosition="bottom" selectionMode="single" rowKey="#{currentRow.documentId}"  selection="#{quatationController.prmsLuDmArchiveSelection}"
+                                                                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                                             rowsPerPageTemplate="5,10,15" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:1100px">
+                                                                                    <p:ajax event="rowSelect" listener="#{quatationController.onRowSelect}" update="tblSavedDoc" process="@this"/>
+                                                                                    <p:column headerText="S.No">
+                                                                                        <h:outputText value="#{current+1}"/>
+                                                                                    </p:column>
+                                                                                    <p:column id="docNames" style="font-size: 10px; text-align: left;" headerText="File Name"> 
+                                                                                        <h:outputText id="txtcoScale" value="#{currentRow.fileName}"/>
+                                                                                    </p:column>
+                                                                                    <p:column  style="text-align: center" headerText="Download">
+                                                                                        <p:commandButton process="@this,tblSavedDoc"  update="tblSavedDoc"                                             
+                                                                                                         icon="ui-icon-arrowthickstop-1-s"  ajax="false"  >
+                                                                                            <p:fileDownload value="#{quatationController.file}" />
+                                                                                        </p:commandButton>
+                                                                                        <!-- <h:panelGrid style="border: none " columns="2"
+                                                                                                     id="pnlGridtblDoccolOptions">
+                                                                                            <p:outputPanel id="buttonDetail">
+                                                                                                <p:commandButton  process="tblSavedDoc" title="{dmsBundle.delete}" id="docRemove" 
+                                                                                                                  update="tblSavedDoc" immediate="true" ajax="true" 
+                                                                                                                  icon="ui-icon-trash" style="border: none; color: #0B70F9">
+                                                                                                    <p:confirm header="Confirmation" message="Are you sure?"  icon="ui-icon-alert" />
+                                                                                                </p:commandButton>
+                                                                                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                                                                    <p:commandButton value="Yes" action="{quatationController.remove(rowselect)}" immediate="true" process="@this,tblSavedDoc" update="tblSavedDoc" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                                                                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                                                                </p:confirmDialog>
+                                                                                            </p:outputPanel>
+                                                                                        </h:panelGrid>-->
+                                                                                    </p:column>  
+                                                                                </p:dataTable>
+                                                                            </p:panelGrid>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlPreparerInfo">                                                                   
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-sm-6">  
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel value="Purchaser:" for="txtPurchaser" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">                                                                                
+                                                                                <p:autoComplete id="txtPurchaser"  style="width: 100%" value="#{quatationController.hrEmployees.firstName}"
+                                                                                                completeMethod="#{quatationController.searchEmployeeByName}" var="sucList" 
+                                                                                                title="Purchased By" requiredMessage="Purchased By" placeholder="Search by first name" disabled="#{workFlow.readonly}"
+                                                                                                itemValue="#{sucList.firstName}" itemLabel="#{sucList}" forceSelection="true" size="20" emptyMessage="no data">  
+                                                                                    <p:ajax event="itemSelect"  process="@this" listener="#{quatationController.getByFirstName}" update="@this"/>     
+                                                                                    <!--Id,position,salary,birth,Number,Department-->
+                                                                                    <f:facet name="itemtip" >
+                                                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">                        
+                                                                                            <h:outputText value="First Name " />
+                                                                                            <h:outputText value="#{sucList.firstName}" /> 
+                                                                                            <h:outputText value="middle Name: " />
+                                                                                            <h:outputText value="#{sucList.middleName}" />
+                                                                                            <h:outputText value="Last Name: " />
+                                                                                            <h:outputText value="#{sucList.lastName}" />
+                                                                                        </h:panelGrid>
+                                                                                    </f:facet>
+                                                                                </p:autoComplete> 
+                                                                                <p:message for="txtPurchaser" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                                                                                       
+                                                                    </div>                                                                     
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtRequestedBy" class="control-label col-sm-4" value="Requested By:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtRequestedBy" value="#{quatationController.departments}" 
+                                                                                             readonly="true" label="#{quatationController.departments.depName}" title="Requester" class="form-control" />
+                                                                                <p:message for="txtRequestedBy" display="icon"/>                         
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </div> 
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">  
+                                                    <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-md-12">                      
+                                                                <div class="box-body"> 
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel  class="control-label col-sm-4" value="Decision: " rendered="#{quatationController.renderDecision}"/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <p:selectOneMenu id="drddecision" value="#{quatationController.wfPrmsProcessed.decision}" required="true" requiredMessage="Select Decision" style="width: 100%" valueChangeListener="#{quatationController.handleDecision}" rendered="#{quatationController.renderDecision}" >
+                                                                                        <f:selectItem itemLabel="---Select---" itemValue=""/>
+                                                                                        <f:selectItem itemLabel="Approved" itemValue="Approve"/>
+                                                                                        <f:selectItem itemLabel="Rejected" itemValue="Reject"/>                                                                                       
+                                                                                    </p:selectOneMenu>
+                                                                                    <p:message for="drddecision" display="icon"/>
+                                                                                </div>   
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal form-group">
+                                                                                <p:outputLabel  for="txtComment" class="control-label col-sm-4" value="Comment Given:" rendered="#{purchaseReqController.renderDecision}"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputTextarea id="txtComment" class="form-control"  value="#{quatationController.wfPrmsProcessed.commentGiven}" rendered="#{purchaseReqController.renderDecision}"
+                                                                                                     title="Remark"  required="false"  requiredMessage="Enter Plan" 
+                                                                                                     validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                                                </div> 
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal form-group">
+                                                                                <p:outputLabel  for="txtProcessedBy" class="control-label col-sm-4" value="Processed By:"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText  id="txtProcessedBy" readonly="true" class="form-control" value="#{quatationController.userName}" title="descripition"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal required">
+                                                                                <p:outputLabel  id="lblApproved" value="Processed Date:"  class="control-label col-sm-4" />
+                                                                                <div class="col-sm-8">
+                                                                                    <p:calendar id="calprocessed" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" 
+                                                                                                autocomplete="off" required="true" requiredMessage="Processed Date is required"
+                                                                                                value="#{quatationController.wfPrmsProcessed.processedOn}">
+                                                                                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                                                    </p:calendar>
+                                                                                    <p:message for="calprocessed" display="icon"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <h:panelGroup id="pnlSave" class="col-sm-12">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">
+                                                                    <p:commandButton id="btnSave" value="#{quatationController.saveorUpdateBundle}"  action="#{quatationController.saveForQuotationRigstration()}" 
+                                                                                     class="btn  btn-block btn-primary col-lg-4" process="@this,pnlQuotation,tblItem,tblService,tblWork,pnlPreparerInfo,pnlworkflow" update=":frmQuotation,pnlworkflow"/>
+                                                                    <h:form>
+                                                                        <p:commandButton value="Print" type="button" class="btn btn-primary col-lg-12" icon="ui-icon-print" style="display:block;margin-bottom: 20px; margin-top: 3px">
+                                                                            <p:printer target=":frmQuotation" />
+                                                                        </p:commandButton>     
+                                                                        <p:media style="display:none;" id="pdf" value="/Invoice.pdf" />
+                                                                    </h:form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>   
+                                    </div>
+                                </div>                   
+                            </div>
+                        </div>
+                    </div>
+                </div>              
+            </h:panelGroup>
+        </h:form> 
+    </ui:define>
+</ui:composition>

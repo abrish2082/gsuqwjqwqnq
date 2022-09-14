@@ -1,0 +1,742 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+            </div>
+        </h:form>
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+        <li><a href="MmsSIV.xhtml"><i class="fa fa-circle-o"></i> <span>Store Issue Voucher</span></a></li> 
+        <li><a href="ISIV.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV (For Issue)</span></a></li> 
+        <li><a href="ISIV_Received.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV(For Receiving)</span></a></li> 
+        <li><a href="MmsGRN.xhtml"><i class="fa fa-circle-o"></i> <span>Goods Receiving Note</span></a></li> 
+        <li><a href="RMG.xhtml"><i class="fa fa-circle-o"></i> <span>Received Manufactured Goods</span></a></li>
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{gatePassInformationController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch" action="#{gatePassInformationController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>                
+                    <p:commandButton id="btnNew" action="#{gatePassInformationController.createNewGatePassInfo()}" icon="#{gatePassInformationController.icone}" validateClient="true"
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{gatePassInformationController.createOrSearchBundle}" />
+
+
+                    <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell-o" value="#{gatePassInformationController.mmsGpiList.size()}"
+                                   rendered="#{gatePassInformationController.isRenderedIconNitification}" title="Notification" style="color: red;background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblReqNotf" value="Local Per Diem Request List"/>
+
+                        <div class="col-md-12 textBoxMargin6px">     
+                            <div class="form-group">  
+                                <div class="col-sm-8">                                                               
+                                    <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                        converter="entConverter" valueChangeListener="#{gatePassInformationController.onSelectGpiRequest}" scrollHeight="400">
+                                        <f:selectItems  var="GpiListVar" value="#{gatePassInformationController.mmsGpiList}"
+                                                        itemValue="#{GpiListVar}"  itemLabel="#{GpiListVar.gatePassNo}"/> 
+                                        <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmToolbar"/>
+                                    </p:selectOneListbox>
+                                </div>                               
+                            </div> 
+                        </div> 
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress" rendered="#{gatePassInformationController.isRenderedIconNitification}" 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWf" value="#{gatePassInformationController.workflowDataModel}" rowIndexVar="num" var="wfVar" 
+                                                             rows="10" paginator="true" paginatorPosition="bottom" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{wfVar.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{wfVar.processedOn}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    <a href="../../mms/Stock Movement Information/GatePassInformation.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{gatePassInformationController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"        
+                                                                   converter="entConverter"  value="#{gatePassInformationController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{gatePassInformationController.columnNameChangeEvent}"> 
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{gatePassInformationController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2"  value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{gatePassInformationController.gatePassEntity.columnValue}"/>
+                                            </div>
+                                        </div>       
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnFindInfo" class="btn btn-primary" action="#{gatePassInformationController.searchGatePassByParameter()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find" />            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{gatePassInformationController.mmsGatePassSearchInfoDtlDataModel}" var="gatePassInfo" rows="5" 
+                                                             selectionMode="single" rowIndexVar="num"
+                                                             selection="#{gatePassInformationController.selectedInfo}" rowKey="#{gatePassInfo.gatePassId}" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowSelect" listener="#{gatePassInformationController.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Gate_Pass_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{gatePassInfo.gatePassNo}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Department}:"  />
+                                                        </f:facet>
+                                                        <h:outputText value="#{gatePassInfo.department.depName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Requested_By}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{gatePassInfo.requestedBy}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Requisition_Date}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{gatePassInfo.requsitionDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Accepted_Date}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{gatePassInfo.acceptedDate}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{gatePassInformationController.renderPnlCreateGatePass}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Gate Pass Information</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel  for="CkeckMovementType" class="control-label col-sm-2"  value="#{MMS.Movement_Type}:"/>
+                                            <div class="col-sm-6">
+                                                <p:selectOneRadio id="CkeckMovementType" layout="grid" columns="3" value="#{gatePassInformationController.ckeckMovementType}" class="col-sm-4"
+                                                                  valueChangeListener="#{gatePassInformationController.changeCheckMovementType}">
+                                                    <f:selectItem itemLabel="SIV" itemValue="1" />
+                                                    <f:selectItem itemLabel="ISIV" itemValue="2" />   
+                                                    <f:selectItem itemLabel="Transfer" itemValue="3" />
+                                                    <p:ajax process="@this,CkeckMovementType" update=":frmRegisterUI:ISIV1,:frmRegisterUI:siv1,:frmRegisterUI:itemInfo,renderDepartment"  event="valueChange" />  
+                                                </p:selectOneRadio>                                    
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Gate_Pass_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtGatePassNumber" readonly="true"  
+                                                             value="#{gatePassInformationController.generateGatePassNo()}"/>
+                                            </div>
+                                        </div>
+
+                                        <h:panelGroup id="ISIV1">
+                                            <h:panelGroup id="ISIV"   rendered="#{gatePassInformationController.renderISIVNo}" >
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lbl_ISIV_NO" class="control-label col-sm-2"   value="#{MMS.ISI_No}:"
+                                                                   />
+                                                    <div class="col-sm-4">
+                                                        <p:selectOneMenu id="drdISIV_NO" value="#{gatePassInformationController.isivEntity}" style="width: 100%" 
+                                                                         converter="entConverter" required="true" requiredMessage="isiv number is required"
+                                                                         valueChangeListener="#{gatePassInformationController.getItemsByISivNo}">
+
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems id="selectOneMenuISivNumber" var="isivNo" itemLabel="#{isivNo.transferNo}" 
+                                                                           value="#{gatePassInformationController.approvedIsivNos}"/>
+                                                            <p:ajax update="txtreceiverdept,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmApproverInfo" event="change" />
+
+                                                        </p:selectOneMenu> 
+                                                        <p:message for="drdISIV_NO" display="icon"/>
+                                                    </div>
+                                                    <div class="form-group textBoxMargin6px ">
+                                                        <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Department}:" />
+                                                        <div class="col-sm-4">
+                                                            <p:inputText id="txtreceiverdeptIsiv" class="form-control" readonly="true" 
+                                                                         value="#{gatePassInformationController.hrDepartmentsEntity.depName}" />
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                        <h:panelGroup id="siv1">
+                                            <h:panelGroup id="siv"  rendered="#{gatePassInformationController.renderSivNo}">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lbl_SIV_NO" class="control-label col-sm-2"  value="#{MMS.SIV_NO}:" />
+                                                    <div class="col-sm-4">
+                                                        <p:selectOneMenu id="drdSIV_NO" value="#{gatePassInformationController.siv}"  style="width: 100%" 
+                                                                         converter="entConverter" required="true" requiredMessage="Siv Number is required"
+                                                                         valueChangeListener="#{gatePassInformationController.getItemsBySivNo}">
+
+
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems id="selectOneMenuSivNumber" var="sivVar" itemLabel="#{sivVar.sivNo}" itemValue="#{sivVar}" 
+                                                                           value="#{gatePassInformationController.sivList}" />
+                                                            <p:ajax update="txtreceiverdept,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmApproverInfo" event="change" />
+                                                        </p:selectOneMenu> 
+                                                        <p:message for="drdSIV_NO" display="icon"/>
+                                                    </div>
+                                                    <div class="form-group textBoxMargin6px ">
+                                                        <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Department}:" />
+                                                        <div class="col-sm-4">
+                                                            <p:inputText id="txtreceiverdept" class="form-control" readonly="true" 
+                                                                         value="#{gatePassInformationController.hrDepartmentsEntity.depName}" />
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:panelGroup id="renderDepartment">
+                                                <h:panelGroup id="departments" rendered="#{gatePassInformationController.renderTransfer}">
+
+
+                                                    <h:outputLabel id="lbl_Requester" class="control-label col-sm-2"  value="#{MMS.Requested_By}:" />
+                                                    <div class="col-sm-4">
+                                                        <p:inputText   id="txtRequesterName" class="form-control col-sm-2" 
+
+                                                                       value="#{gatePassInformationController.gatePassEntity.requestedBy}"
+                                                                       validator="#{validatorManagedBean.FullName}"
+                                                                       ><p:ajax></p:ajax></p:inputText>
+                                                        <p:message for="txtRequesterName" display="icon" />
+                                                    </div>
+                                                    <div class="form-group textBoxMargin6px required">
+                                                        <p:outputLabel  class="control-label col-sm-2"  value="#{MMS.Department}:"/> 
+                                                        <div class="col-sm-3">
+                                                            <p:inputText   id="txtDepartment" class="form-control" required="true" placeholder="Use Only From + Button" onmousedown="return false;"
+                                                                           requiredMessage="Department is required"
+                                                                           value="#{gatePassInformationController.hrDepartmentsEntity.depName}"  />
+                                                            <p:message for="txtDepartment" display="icon"/>
+                                                        </div>
+                                                        <div class="col-sm-1">
+                                                            <p:commandButton  id="btnTree"  onclick="PF('dlgDpt').show();"  partialSubmit="true" style="background: transparent;" value="+"/>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                            </h:panelGroup>
+                                        </div> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  for="selectStoreInfoList1" class="control-label col-sm-2"  value="#{MMS.Store_Name}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="selectStoreInfoList1" style="width: 100%"  required="true"  requiredMessage="Store Name Is required"
+                                                                   value="#{gatePassInformationController.storeInfoEntity.storeId}"
+                                                                   valueChangeListener="#{gatePassInformationController.handleSelectStoreName}" > 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuQualification2" value="#{gatePassInformationController.storeList}" 
+                                                                   var="store" itemLabel="#{store.storeName}" itemValue="#{store.storeId}"/>
+                                                    <p:ajax update="siv1,ISIV1" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectStoreInfoList1" display="icon"/>
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px ">
+                                                <p:outputLabel id="lbl_ModeOftransport" class="control-label col-sm-2"  value="#{MMS.Mode_of_Transport}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdModeOftransport" 
+                                                                     value="#{gatePassInformationController.gatePassEntity.modeOfTransport}" 
+                                                                     valueChangeListener="#{gatePassInformationController.handleSelectModeOfTransport}"
+                                                                     required="true" requiredMessage="mode of transport is required"
+                                                                     style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItem itemLabel="By car" itemValue="Car" />
+                                                        <f:selectItem itemLabel="Other" itemValue="Other" />
+                                                        <p:ajax update="txtDriverName,txtPlateNumber,txtAreaLabours" process="@this" event="change" />
+                                                    </p:selectOneMenu> 
+                                                    <p:message display="icon"  for="drdModeOftransport"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px ">
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Type_of_Transfer}:" rendered="#{gatePassInformationController.renderTransfer}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdTypeOfTransfer" value="#{gatePassInformationController.gatePassEntity.typeOfTransfer}" style="width: 100%" rendered="#{gatePassInformationController.renderTransfer}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItem itemLabel="Permanent" itemValue="Permanent" />
+                                                    <f:selectItem itemLabel="Temporary" itemValue="Temporary" />
+                                                    <p:ajax process="@this" update="" event="change"/>
+                                                </p:selectOneMenu> 
+                                            </div>
+
+
+
+                                            <div class="form-group textBoxMargin6px  required">
+                                                <h:outputLabel for="txtacceptedDate" class="control-label col-sm-2"  value="#{MMS.Accepted_Date}:" />                                                                        
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtacceptedDate" class="form-control" value="#{gatePassInformationController.gatePassEntity.acceptedDate}"
+                                                                 required="true" requiredMessage="Date Is Required" validator="#{validatorManagedBean.Date}"
+                                                                 onclick="displayCalendar('frmRegisterUI:txtacceptedDate', 'frmRegisterUI:txtacceptedDate');" />                                                                                                                                                    
+                                                    <p:message for="txtacceptedDate" display="icon"/>
+                                                </div> 
+                                            </div>
+                                        </div>
+
+
+
+                                        <!-- Type Of Transfer and Approval Date-->
+
+                                        <div class="form-group textBoxMargin6px required"> 
+
+                                            <p:outputLabel id="lbl_OfficerName"  class="control-label col-sm-2"  value="#{MMS.Security_Officer}:" />
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="txtOfficerName" emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;" required="true" requiredMessage="security officer is required"
+                                                                value="#{gatePassInformationController.gatePassEntity.securityOfficer}"
+                                                                completeMethod="#{gatePassInformationController.searchEmployeeInformation}"
+                                                                var="approverName" itemValue="#{approverName.firstName}" itemLabel="#{approverName}"  size="15"> 
+                                                    <p:ajax  event="itemSelect" listener="#{gatePassInformationController.getEmployeeInfo}"
+                                                             process="@this" update="txtOfficerName" />  
+                                                    <p:column headerText="First Name" >
+                                                        <h:outputText  value="#{approverName.firstName}" />
+                                                    </p:column>
+                                                    <p:column headerText="Middle Name"  >
+                                                        <h:outputText value="#{approverName.middleName}" />
+                                                    </p:column>
+                                                    <p:column  headerText="Sex">
+                                                        <h:outputText value="#{approverName.sex}" />
+                                                    </p:column>
+                                                </p:autoComplete> 
+                                                <p:message for="txtOfficerName" display="icon" />
+                                            </div>
+                                            <div class="form-group textBoxMargin6px ">
+                                                <p:outputLabel id="lbl_GatePassStatus" class="control-label col-sm-2"  value="#{MMS.Gate_Pass_Status}:"/>
+
+                                                <div class="col-sm-4">
+
+                                                    <p:selectOneMenu id="drdGatePassStatus" required="true" requiredMessage="Gate Pass Status is required" 
+                                                                     value="#{gatePassInformationController.gatePassEntity.gatePassStatus}" style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItem itemLabel="Accepted" itemValue="Accepted" />
+                                                        <f:selectItem itemLabel="Rejected" itemValue="Rejected" />
+                                                        <p:ajax process="@this" update="" event="change"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="drdGatePassStatus" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px ">
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Driver_Name}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtDriverName" class="form-control col-sm-2" 
+                                                               disabled="#{gatePassInformationController.modeoftransport}"
+                                                               value="#{gatePassInformationController.gatePassEntity.driverName}"
+                                                               validator="#{validatorManagedBean.FullName}"
+                                                               ><p:ajax></p:ajax></p:inputText>
+                                                <p:message for="txtDriverName" display="icon" />
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+
+                                                <h:outputLabel for="txtPlateNumber" class="control-label col-sm-2" value="#{MMS.Plate_Number}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtPlateNumber" class="form-control col-sm-2" 
+                                                                   disabled="#{gatePassInformationController.modeoftransport}"
+                                                                   value="#{gatePassInformationController.gatePassEntity.plateNo}"
+
+                                                                   validator="#{validatorManagedBean.Remark}">
+
+                                                    </p:inputText>
+                                                    <p:message for="txtPlateNumber" display="icon" />
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <!-- Security Officer And Remark-->
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Remark}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtAreaRemark" class="form-control" 
+                                                                 value="#{gatePassInformationController.gatePassEntity.officerRemark}"
+                                                                 validator="#{validatorManagedBean.Remark}"><p:ajax></p:ajax></p:inputTextarea>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px ">
+                                                <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Transporters}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputTextarea id="txtAreaLabours" 
+                                                                     disabled="#{gatePassInformationController.modeoftransportCar}"
+                                                                     value="#{gatePassInformationController.gatePassEntity.laborNames}"
+                                                                     validator="#{validatorManagedBean.FullName}"><p:ajax></p:ajax></p:inputTextarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Gate Pass Status-->
+                                        <div class="form-group textBoxMargin6px"> 
+
+
+
+
+
+
+
+                                        </div>
+                                        <p:dialog id="dlgDpt" header="Departments" widgetVar="dlgDpt" height="300" width="500" showEffect="explode"  >
+                                            <h:panelGrid columns="3" style="border-color: #ffffff " >
+                                                <p:tree value="#{gatePassInformationController.root2}" var="nodes" style="border: transparent; width: 100%" 
+                                                        selectionMode="single" selection="#{gatePassInformationController.selectedNode}" >
+                                                    <p:ajax event="select" listener="#{gatePassInformationController.onNodeSelect}" process="@this" 
+                                                            update=":frmRegisterUI:txtDepartment"/>
+                                                    <p:treeNode>
+                                                        <h:outputText value="#{nodes}" />
+                                                    </p:treeNode>
+                                                </p:tree>                                       
+                                            </h:panelGrid>
+                                        </p:dialog>    
+
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Item Information</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="itemInfo">
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="frmMaterialInfo" rendered="#{gatePassInformationController.renderTransfer}" >
+                                        <div class="form-horizontal col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Item_Name}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:autoComplete id="searchItemNames" required="true" requiredMessage="Item Name is required"
+                                                                    value="#{gatePassInformationController.itemRegistrationEntity.matName}" 
+                                                                    completeMethod="#{gatePassInformationController.ItemInformationList}" 
+                                                                    style="width: 100%;"
+                                                                    var="mat" itemValue="#{mat.matName}" itemLabel="#{mat}" forceSelection="true" 
+                                                                    emptyMessage="no data">  
+                                                        <p:ajax event="itemSelect"  process="@this" listener="#{gatePassInformationController.getMmsItemInformation}"
+                                                                update="txtItemCode,searchItemNames,txtunitmeasure,txtdescription"/>  
+                                                        <p:column headerText="Item Name" >
+                                                            <h:outputText  value="#{mat.matName}" />
+                                                        </p:column>
+
+                                                    </p:autoComplete>   
+                                                    <p:message for="searchItemNames" display="icon" />
+                                                </div>
+                                                <div class="form-group textBoxMargin6px ">
+                                                    <p:outputLabel  id="lbl_Quantity"  class="control-label col-sm-2" value="#{MMS.Quantity}:"/>
+                                                    <div class="col-sm-4">
+                                                        <p:inputText   id="txtQuantity" class="form-control"
+                                                                       required="true" requiredMessage="quantity is required"
+                                                                       value="#{gatePassInformationController.gatePassDtlEntity.quantity}"
+                                                                       validator="#{validatorManagedBean.Number}"
+                                                                       converterMessage="Pls Enter Only Digit Numbers">
+
+                                                        </p:inputText>
+                                                        <p:message for="txtQuantity" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px ">
+                                                <h:outputLabel id="lbl_ItemCode" class="control-label col-sm-2"  value="#{MMS.Item_Code}:" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtItemCode" 
+                                                                 value="#{gatePassInformationController.itemRegistrationEntity.matCode}"
+
+                                                                 readonly="true"
+                                                                 />
+                                                    <p:message for="txtItemCode" display="icon"/>
+                                                </div>
+                                                <div class="form-group textBoxMargin6px">
+                                                    <h:outputLabel  id="txtunitmeasure1"  class="control-label col-sm-2"  value="#{MMS.Unit_of_Measure}:"/>
+                                                    <div class="col-sm-4">
+                                                        <p:inputText   id="txtunitmeasure" 
+                                                                       readonly="true"
+                                                                       value="#{gatePassInformationController.itemRegistrationEntity.unitOfMeasure}"/>
+                                                        <p:message for="txtunitmeasure" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+
+                                                <h:outputLabel for="txtdescription" class="control-label col-sm-2"  value="#{MMS.Description}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputTextarea id="txtdescription"   readonly="true"
+
+                                                                     value="#{gatePassInformationController.itemRegistrationEntity.matCategory}"
+
+                                                                     />
+                                                    <p:message for="txtdescription" display="icon" />
+                                                </div> 
+                                                <div class="form-group textBoxMargin6px ">
+                                                    <h:outputLabel id="tlbl_Remark" class="control-label col-sm-2"  value="#{MMS.Remark}:"/>
+                                                    <div class="col-sm-4">
+                                                        <p:inputTextarea id="txtRemark" class="form-control"
+                                                                         value="#{gatePassInformationController.gatePassDtlEntity.remark}"
+                                                                         validator="#{validatorManagedBean.Remark}">
+
+                                                        </p:inputTextarea>
+                                                        <p:message for="txtRemark" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel  class="control-label col-sm-2"/>
+                                                <div class="col-sm-4">
+                                                    <p:commandButton  id="btnAddGatepassDtl" class="btn btn-primary" action="#{gatePassInformationController.addGatePassInfoDetail()}" icon="ui-icon-new" validateClient="true" 
+                                                                      process="frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,frmMaterialInfo"
+                                                                      value="#{gatePassInformationController.addorModifiy}"/>            
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblMaterial" value="#{gatePassInformationController.mmsGatePassInfoDtlDataModel}" rowIndexVar="rowContact" var="material"
+                                                             selectionMode="single"
+                                                             selection="#{gatePassInformationController.selectedInfoDtl}" rowKey="#{material.itemId}" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowSelect" listener="#{gatePassInformationController.onRowUpdate}" update=":frmRegisterUI:frmMaterialInfo" />
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{rowContact+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.itemId.matName}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.itemId.matCode}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Unit_Measure}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.itemId.unitOfMeasure}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Description}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.itemId.matCategory.catDescription}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="#{MMS.Quantity}:"  >
+                                                        <p:cellEditor >
+                                                            <f:facet name="output"><h:outputText value="#{material.quantity}" /></f:facet>
+                                                            <f:facet name="input"><p:inputText id="Quantity" value="#{material.quantity}" style="width:100%"/></f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Remark}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.remark}" />
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Approver Information</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmApproverInfo">
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px ">
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required ">
+                                            <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-2"   value="#{MMS.Processed_By}:"/>
+
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby"    readonly="true"
+                                                               value="#{gatePassInformationController.userName}" 
+                                                               required="true" requiredMessage="prepared is required"
+                                                               />                                             
+                                            </div>  
+
+                                            <div class="form-group textBoxMargin6px ">   
+                                                <h:outputLabel for="txtApprovedDate" class="control-label col-sm-2"  value="#{MMS.Processed_On}:"/>                                                                        
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtApprovedDate" class="form-control" value="#{gatePassInformationController.wfMmsProcessed.processedOn}"
+                                                                 required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                                 onclick="displayCalendar('frmRegisterUI:txtApprovedDate', 'frmRegisterUI:txtApprovedDate');" />                                                                                                                                                    
+                                                    <p:message for="txtApprovedDate" display="icon"/>
+                                                </div> 
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">  
+
+                                            <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="#{MMS.comment}:" rendered="#{gatePassInformationController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{gatePassInformationController.wfMmsProcessed.commentGiven}"  rendered="#{gatePassInformationController.renderDecision}"/>     
+                                            </div> 
+                                            <div class="form-group textBoxMargin6px required">   
+                                                <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2"  value="#{MMS.Decision}:" rendered="#{gatePassInformationController.renderDecision}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{gatePassInformationController.wfMmsProcessed.decision}" 
+                                                                     required="true" requiredMessage="Decicsion is required" rendered="#{gatePassInformationController.renderDecision}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                        <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                    </p:selectOneMenu>   
+                                                </div> 
+                                            </div>
+                                        </div>                                      
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSaveButtonGatePass" class="btn btn-primary" action="#{gatePassInformationController.save_GatePass_Information()}" icon="ui-icon-new" validateClient="true"
+
+                                                                 process="@this,frmRegisterUI:frmGatePassDtlInfo,frmRegisterUI:frmTblMaterialInfo,frmRegisterUI:frmApproverInfo"  
+                                                                 update="frmGatePassDtlInfo,frmTblMaterialInfo,:frmRegisterUI"
+                                                                 value="#{gatePassInformationController.saveorUpdateBundle}"/> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,633 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+
+
+        <li><a href="FixedAssetAttributeReg.xhtml"><i class="fa fa-circle-o"></i> <span>FA Attribute Registration</span></a></li> 
+        <li><a href="FixedAssetRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Minor Asset Registration</span></a></li> 
+        <li><a href="Insurance.xhtml"><i class="fa fa-circle-o"></i> <span>Insurance Registration</span></a></li>  
+        <li><a href="FixedAssetIFRS.xhtml"><i class="fa fa-circle-o"></i> <span>FixedAssetRegistration</span></a></li>
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew"  action="#{leaseRegistrationController.createNewStoreInfo}" icon="#{leaseRegistrationController.icone}" validateClient="true"
+                                     style="background-color: white;border-color: white" 
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{leaseRegistrationController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" /> 
+                        <a href="LeaseRegistration.xhtml"></a>
+                    </span>
+                    <a href="../../mms/FixedAssetsInformation/LeaseRegistration.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{leaseRegistrationController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="Lease Code:" />
+
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchStoreName" class="form-control" value="#{leaseRegistrationController.lease.leaseCode}"
+                                                             required="true" requiredMessage="lease code is required"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnFindInfo" class="btn btn-primary" action="#{leaseRegistrationController.SearchLease()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find" />            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" var="LeaseInfo" rows="5" 
+                                                             style="font-family: Cambria; "  
+                                                             rowIndexVar="num"   
+                                                             selection="#{leaseRegistrationController.hpSelect}"
+                                                             rowKey="#{LeaseInfo}"  selectionMode="single" 
+                                                             value="#{leaseRegistrationController.mmsLeasesSearchInfoDataModel}"
+                                                             class="dataTable"
+                                                             paginator="true" paginatorPosition="bottom">
+
+                                                    <p:ajax event="rowSelect" listener="#{leaseRegistrationController.rowSelect}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Lease_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{LeaseInfo.leaseCode}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Lease_Type}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{LeaseInfo.assetType}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Lease_Period}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LeaseInfo.leasePeried}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Asset_Name}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LeaseInfo.assetName}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl" showDetail="true" severity="information,fatal" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{leaseRegistrationController.renderPnlCreateLeaseInformation}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                        <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Lease_Registration}:" />
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group  textBoxMargin6px required">
+
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Lease_Code}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtCatNames" class="form-control" value="#{leaseRegistrationController.lease.leaseCode}"
+                                                             required="true" requiredMessage="Category name is required"><p:ajax></p:ajax></p:inputText>
+                                                <p:message for="txtCatNames" display="icon"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Lease_Type}:" />
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="leasetype"   required="true" requiredMessage="Lease Type*"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.leaseType}"                                                                                    
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel=" Select One " itemValue="" />
+                                                    <f:selectItem itemLabel="Financial" itemValue="Financial" />  
+                                                    <f:selectItem itemLabel="Operational" itemValue="Operational" />  <p:ajax></p:ajax>
+                                                </p:selectOneMenu> 
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group  textBoxMargin6px required">
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Lease_Period_Type}:" />
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="txtleasePt"   required="true" requiredMessage="Lease Pariod Type is requaired:"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.leasePeriodType}"                                                                                    
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel=" Select One " itemValue="" />
+                                                    <f:selectItem itemLabel="Option to Extend" itemValue="Option to Extend" />  
+                                                    <f:selectItem itemLabel="Terminate Period" itemValue="Terminate Period" />  
+                                                    <f:selectItem itemLabel="Non Cancellabel " itemValue="Non Cancellabel" />  <p:ajax></p:ajax>
+                                                </p:selectOneMenu> 
+                                                <p:message for="txtleasePt" display="icon"/>
+                                            </div>
+                                            <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Lease_Period}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleasep" class="form-control" value="#{leaseRegistrationController.lease.leasePeried}"
+
+                                                             required="true" requiredMessage="category code is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                <p:message for="txtleasep" display="icon"/>
+                                            </div>
+
+
+                                        </div>  
+                                        <div class="form-group  textBoxMargin6px required"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Asset_Type}:"/>                                        
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="txtleaseAtyp"   required="true" requiredMessage="Asset Type is required:"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.assetType}"                                                                                    
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel=" Select One " itemValue="" />
+                                                    <f:selectItem itemLabel="Land" itemValue="Land" />  
+                                                    <f:selectItem itemLabel="Building" itemValue="Building" />  
+                                                    <f:selectItem itemLabel="Machinery" itemValue="Machinery" />  <p:ajax></p:ajax>
+                                                </p:selectOneMenu> 
+                                                <p:message for="txtleaseAtyp" display="icon"/> 
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Lease_Status}:" />                                        
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="txtleaseSt"   required="true" requiredMessage="Lease Status:"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.leaseStatus}"                                                                                    
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel=" Select One " itemValue="" />
+                                                    <f:selectItem itemLabel="Active" itemValue="Active" />  
+                                                    <f:selectItem itemLabel="Termination" itemValue="Termination" />  <p:ajax></p:ajax>
+                                                </p:selectOneMenu> 
+                                                <p:message display="icon"  for="txtleaseSt"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2"  for="txtleaseAmo"  value="#{MMS.Lease_Amount}:"/>                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseAmo"  class="form-control"  value="#{leaseRegistrationController.lease.leaseAmount}"/> 
+                                                <p:message display="icon"  for="txtleaseAmo"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Lease_Currency}:" />                                        
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="txtleaseCrr"  value="#{leaseRegistrationController.lease.leaseCurrency}" 
+                                                                 style= "width: 100%" converter="entConverter"  required="true" requiredMessage="Currency required"
+                                                                 valueChangeListener="#{leaseRegistrationController.handleSelectCurrency}">
+
+                                                    <f:selectItems  value="#{leaseRegistrationController.currencyList}"  />                                                
+                                                </p:selectOneMenu>
+                                                <p:message for="txtleaseCrr" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px required"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Payment_Type}:"/>                                        
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="txtPayTy"   required="true" requiredMessage="payement Type:"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.leasePayementType}"                                                                                    
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel=" Select One " itemValue="" />
+                                                    <f:selectItem itemLabel="Full" itemValue="Full" />  
+                                                    <f:selectItem itemLabel="Paritial Payment" itemValue="Paritial Payment" />   <p:ajax></p:ajax>
+                                                </p:selectOneMenu> 
+                                                <p:message for="txtPayTy" display="icon" /> 
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Payment_Frequency}:" />                                        
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="txtPfrq"   required="true" requiredMessage="payement Frequency:"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.paymentFrequency}"                                                                                    
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel=" Select One " itemValue="" />
+                                                    <f:selectItem itemLabel="Monthlly" itemValue="Monthlly" />  
+                                                    <f:selectItem itemLabel="Annually" itemValue="Annually" />   <p:ajax></p:ajax>
+                                                </p:selectOneMenu> 
+                                                <p:message for="txtPfrq" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2"  for="txtintre" value="#{MMS.Interest_Rate}:"/>                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtintre"  class="form-control"  value="#{leaseRegistrationController.lease.interestRate}"/> 
+                                                <p:message display="icon"  for="txtintre"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2"  for="txtdisc"  value="#{MMS.Discount_Rate}:"/>                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtdisc"  class="form-control"  value="#{leaseRegistrationController.lease.discountRate}"/> 
+                                                <p:message display="icon"  for="txtdisc"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px"> 
+
+                                            <h:outputLabel class="control-label col-sm-2" for="txtTerm" value="#{MMS.Lease_Term}:" />                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtTerm"  class="form-control"  value="#{leaseRegistrationController.lease.leaseTerm}"/> 
+                                                <p:message display="icon"  for="txtTerm"/> 
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2" for="txtOTerm"  value="#{MMS.Original_Term}:" />                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtOTerm"  class="form-control"  value="#{leaseRegistrationController.lease.originalTerm}"/> 
+                                                <p:message display="icon"  for="txtOTerm"/> 
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" for="txtLeasor" value="#{MMS.Leasor}:" />                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtLeasor"  class="form-control"  value="#{leaseRegistrationController.lease.leasor}"/> 
+                                                <p:message display="icon"  for="txtLeasor"/> 
+                                            </div> 
+                                            <h:outputLabel class="control-label col-sm-2" for="txtCid" value="#{MMS.Client_Id}:" />                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtCid"  class="form-control"  value="#{leaseRegistrationController.lease.clientId}"/> 
+                                                <p:message display="icon"  for="txtCid"/> 
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px required">
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Depreciation_Type}:"/>
+                                            <div class="col-sm-4">
+
+                                                <p:selectOneMenu id="txtFixedGroup" value="#{leaseRegistrationController.depreciationSetup}"
+                                                                 converter="entConverter"  style="width: 100%" filter="true"  required="true" requiredMessage="Depreciation type is requird">
+                                                    <f:selectItem  itemLabel="--- Select One ---"/>
+                                                    <f:selectItems value="#{leaseRegistrationController.listofGroups}" var="depre" itemValue="#{depre}" 
+
+                                                                   />
+                                                </p:selectOneMenu>
+                                                <p:message for="txtFixedGroup" display="icon" />
+                                            </div>
+
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Purchase_Options}:" />
+                                            <div class="col-sm-4">                                          
+                                                <p:selectOneMenu   id="txtPO"   required="true" requiredMessage="Purchase Options:"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.purchaseOption}"                                                                                    
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel=" Select One " itemValue="" />
+                                                    <f:selectItem itemLabel="Yes" itemValue="Yes" />  
+                                                    <f:selectItem itemLabel="No" itemValue="No" />  <p:ajax></p:ajax>
+                                                </p:selectOneMenu> 
+                                                <p:message for="txtPO" display="icon" />
+                                            </div>
+                                        </div> 
+
+                                        <div class="form-group  textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2"  for="txtfair"  value="#{MMS.Fair_Value}:"/>                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtfair"  class="form-control"  value="#{leaseRegistrationController.lease.fairValu}"/> 
+                                                <p:message display="icon"  for="txtfair"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Act_Policy}:"/>                                        
+                                            <div class="col-sm-4">                                              
+                                                <p:selectOneMenu   id="txtAct"   required="true" requiredMessage=" Act policy Valuation Methode"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.actPolicy}"  
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItem itemLabel="Costing" itemValue="Costing" />
+                                                    <f:selectItem itemLabel="Revaluation" itemValue="Revaluation" />                                                          
+                                                </p:selectOneMenu> 
+                                                <p:message display="icon"  for="txtAct"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2"  for="txtter" value="#{MMS.Lease_Termination}:"/>                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtter"  class="form-control"  value="#{leaseRegistrationController.lease.leaseTermination}"/> 
+                                                <p:message display="icon"  for="txtter"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2" for="txtloc" value="#{MMS.Lease_Location}:" />                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtloc"  class="form-control"  value="#{leaseRegistrationController.lease.leaseLocation}"/> 
+                                                <p:message display="icon"  for="txtloc"/> 
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group  textBoxMargin6px required">
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Lease_Area}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseArea" class="form-control" value="#{leaseRegistrationController.lease.leaseArea}"
+
+                                                             required="true" requiredMessage="Lease Area is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                <p:message for="txtleaseArea" display="icon"/>
+                                            </div>
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Impairment_Cost}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseImpC" class="form-control" value="#{leaseRegistrationController.lease.impairmentCost}"
+
+                                                             required="true" requiredMessage="Impairment Cost is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                <p:message for="txtleaseImpC" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px required">
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Rental_Payment}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseRP" class="form-control" value="#{leaseRegistrationController.lease.rentalPayement}"
+
+                                                             required="true" requiredMessage="Rental Payment is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                <p:message for="txtleaseRP" display="icon"/>
+                                            </div>
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Inception_Years}:"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseIY" class="form-control" value="#{leaseRegistrationController.lease.inceptionYear}"
+
+                                                             required="true" requiredMessage="Inception is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                <p:message for="txtleaseIY" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px required"> 
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Original_Commensement_Date}:"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseOCd" class="form-control" value="#{leaseRegistrationController.lease.originalCommencementDate}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             placeholder="dd/mm/yyyy"  onclick="displayCalendar('frmRegisterUI:txtleaseOCd', 'frmRegisterUI:txtleaseOCd');" />                                                                                                                                                    
+                                                <p:message for="txtleaseOCd" display="icon"/>
+
+                                            </div>    
+                                            <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Commensement_Date}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseCd" class="form-control" value="#{leaseRegistrationController.lease.commencementDate}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             placeholder="dd/mm/yyyy"  onclick="displayCalendar('frmRegisterUI:txtleaseCd', 'frmRegisterUI:txtleaseCd');" />                                                                                                                                                    
+                                                <p:message for="txtleaseCd" display="icon"/>
+
+                                            </div>  
+                                        </div>
+
+                                        <div class="form-group  textBoxMargin6px required">
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Rent_Free}:" />
+                                            <div class="col-sm-4">                                          
+                                                <p:selectOneMenu   id="txtleaseRf"   required="true" requiredMessage="Rent Free:"
+                                                                   style="width: 100%;"
+                                                                   value="#{leaseRegistrationController.lease.rentFree}"                                                                                    
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel=" Select One " itemValue="" />
+                                                    <f:selectItem itemLabel="Yes" itemValue="Yes" />  
+                                                    <f:selectItem itemLabel="No" itemValue="No" />  <p:ajax></p:ajax>
+                                                </p:selectOneMenu> 
+                                            </div>
+                                            <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Reduced_Rent_Period}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseRrp" class="form-control" value="#{leaseRegistrationController.lease.reduceRentPeriod}"
+
+                                                             required="true" requiredMessage="Reduced Rent Period is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                <p:message for="txtleaseRrp" display="icon"/>
+                                            </div>  
+                                        </div>   
+
+                                        <div class="form-group  textBoxMargin6px required"> 
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Agreement_Date}:"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseAd" class="form-control" value="#{leaseRegistrationController.lease.agreementDate}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             placeholder="dd/mm/yyyy"  onclick="displayCalendar('frmRegisterUI:txtleaseAd', 'frmRegisterUI:txtleaseAd');" />                                                                                                                                                    
+                                                <p:message for="txtleaseAd" display="icon"/>
+
+                                            </div>  
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Lease_Life_Remaining}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseLR" class="form-control" value="#{leaseRegistrationController.lease.leaseLifeRemaining}"
+
+                                                             required="true" requiredMessage="Lease Life Remaining is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                <p:message for="txtleaseLR" display="icon"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px required">
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Original_Expiration_Date}:"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleaseOEd" class="form-control" value="#{leaseRegistrationController.lease.originalExpiration}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             placeholder="dd/mm/yyyy"  onclick="displayCalendar('frmRegisterUI:txtleaseOEd', 'frmRegisterUI:txtleaseOEd');" />                                                                                                                                                    
+                                                <p:message for="txtleaseOEd" display="icon"/>
+
+                                            </div> 
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Possession_Date}:"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtleasePd" class="form-control" value="#{leaseRegistrationController.lease.possessionDate}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             placeholder="dd/mm/yyyy"  onclick="displayCalendar('frmRegisterUI:txtleasePd', 'frmRegisterUI:txtleasePd');" />                                                                                                                                                    
+                                                <p:message for="txtleasePd" display="icon"/>
+
+                                            </div>  
+
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px">
+                                            <h:outputLabel for="txtDescriptions" class="control-label col-sm-2" value="#{MMS.Description}:"/>
+                                            <div class="col-sm-4"> 
+                                                <p:inputTextarea   id="txtDescriptions" class="form-control"  
+                                                                   value="#{leaseRegistrationController.lease.description}"
+                                                                   />
+                                            </div>
+                                        </div>
+                                        <div class="box box-primary">  
+                                            <div class="box-header with-border">
+                                                <h3 class="box-title"></h3>
+                                            </div>  
+                                            <h:panelGroup id="frmApproverInfo">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <h:form id="formcontract" prependId="false" enctype="multipart/form-data" dir="" >            
+                                                        <p:panelGrid columns="1" style="float: left;"> 
+                                                            <h:outputLabel id="uploadfile1" class="control-label col-sm-2"  value="#{MMS.Attach_File}:"/>
+                                                            <!--<p:growl id="growl1" showSummary="true" showDetail="false" autoUpdate="true"/>-->
+                                                            <p:fileUpload  id="fileUplod" cancelLabel="#{contenu.annuler}"
+                                                                           fileUploadListener="#{leaseRegistrationController.uploadHandling}"
+                                                                           value="#{leaseRegistrationController.mmsLuDmArchive.documentId}" 
+                                                                           allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                           invalidFileMessage="This type of file is not Allowed"
+                                                                           invalidSizeMessage="The size is not Allowed"
+                                                                           multiple="false" mode="advanced" sizeLimit="100000" auto="true" process="tblSavedDoc" update="tblSavedDoc"/>
+                                                            <p:dataTable id="tblSavedDoc"  var="currentRow" sortBy="#{currentRow.fileName}"  rowIndexVar="current" value="#{leaseRegistrationController.mmsLuDmArchivesDModel}"
+                                                                         paginator="true" selectionMode="single" rowKey="#{currentRow.documentId}" paginatorPosition="bottom"
+                                                                         selection="#{leaseRegistrationController.mmsLuDmArchiveSelection}"
+                                                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                         rowsPerPageTemplate="5,10,15" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:950px;">
+                                                                <p:ajax event="rowSelect" listener="#{leaseRegistrationController.onRowSelectFileUploaded}" update="tblSavedDoc" />
+                                                                <f:facet name="header">
+                                                                    <p:column headerText="File Name From DBMS">
+                                                                        <p:outputLabel value="#{currentRow.fileName}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Download">
+                                                                        <p:panelGrid>
+                                                                            <p:commandButton id="cmdDownd" ajax="false" icon="ui-icon-arrowthick-1-s" title="Downloading">
+                                                                                <p:fileDownload value="#{leaseRegistrationController.download}" />
+                                                                            </p:commandButton> 
+                                                                        </p:panelGrid>
+
+                                                                    </p:column>
+                                                                </f:facet>
+
+
+                                                            </p:dataTable>
+
+
+
+                                                        </p:panelGrid>
+                                                    </h:form>       
+
+                                                </div>
+                                                <br></br>
+                                                <br></br>
+                                                <br></br>
+                                                <br></br>
+
+
+                                                <div class="box-header with-border">
+                                                    <h3 class="box-title"> </h3>
+                                                </div>
+                                                <div class="box-header with-border">
+                                                    <h3 class="box-title"> </h3>
+                                                </div>
+                                                <div class="box-body">
+                                                    <div class="row"> 
+                                                        <div class="col-md-12 textBoxMargin6px" > 
+
+
+                                                            <div class="form-group textBoxMargin6px">                                        
+                                                                <div class="col-sm-12">
+                                                                    <div class="form-group textBoxMargin6px required">
+
+                                                                        <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Company_Name}:"  />
+                                                                        <div class="col-sm-4">
+                                                                            <p:inputText id="txtCompN" class="form-control" value="#{leaseRegistrationController.lease.companyName}"
+
+                                                                                         required="true" requiredMessage="Company Name is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                                            <p:message for="txtCompN" display="icon"/>
+                                                                        </div>
+                                                                        <h:outputLabel for="txtDepart"  class="control-label col-sm-2"  value="#{MMS.Department}:" />
+                                                                        <div class="col-sm-4">
+                                                                            <p:inputText id="txtDepart" class="form-control" value="#{leaseRegistrationController.lease.department}"
+
+                                                                                         required="true" requiredMessage="Department is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                                            <p:message for="txtDepart" display="icon"/>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group textBoxMargin6px required">
+
+                                                                        <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Contract_Name}:" />
+                                                                        <div class="col-sm-4">
+                                                                            <p:inputText id="txtContN" class="form-control" value="#{leaseRegistrationController.lease.contratName}"
+
+                                                                                         required="true" requiredMessage="Contract Name is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                                            <p:message for="txtContN" display="icon"/>
+                                                                        </div>
+                                                                        <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Contract_Id}:" />
+                                                                        <div class="col-sm-4">
+                                                                            <p:inputText id="txtContId" class="form-control" value="#{leaseRegistrationController.lease.contratId}"
+
+                                                                                         required="true" requiredMessage="Contrat Id is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                                            <p:message for="txtContId" display="icon"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>                                        
+                                                <div class="form-group textBoxMargin6px">
+                                                    <h:outputLabel id="saveButtonlbl" class="control-label col-sm-2" />
+                                                    <div class="col-sm-4">
+                                                        <p:commandButton  id="btnSave" class="btn btn-primary "
+                                                                          value="#{leaseRegistrationController.saveorUpdateBundle}"
+                                                                          process="@this,frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmApproverInfo"
+                                                                          update="frmGatePassDtlInfo,:frmRegisterUI"
+                                                                          action="#{leaseRegistrationController.saveLeaseInfo()}" />
+                                                    </div> 
+                                                </div>
+
+                                            </h:panelGroup>
+                                        </div> 
+                                    </div>                           
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+
+            </h:panelGroup>                           
+        </h:form>
+    </ui:define>
+</ui:composition>
+

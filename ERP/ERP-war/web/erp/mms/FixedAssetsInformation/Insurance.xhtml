@@ -1,0 +1,692 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+            </div>
+        </h:form>
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li><a href="FixedAssetRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Minor Asset Registration</span></a></li> 
+        <li><a href="FixedAssetAttributeReg.xhtml"><i class="fa fa-circle-o"></i> <span>FixedAssetAttributeRegistration</span></a></li> 
+        <li><a href="FixedAssetIFRS.xhtml"><i class="fa fa-circle-o"></i> <span>FixedAssetRegistration</span></a></li> 
+        <li><a href="LeaseRegistration.xhtml"><i class="fa fa-circle-o"></i> <span> Lease Registration </span></a></li>
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackSarch" rendered="#{insuranceControllers.renderpnlToSeachPage}">
+                        <p:commandButton id="btnBackToSearch" action="#{insuranceControllers.goBackToSearchpageBtnAction()}" icon="#{insuranceControllers.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                      title="Back to Search" />              
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew" action="#{insuranceControllers.createNewInsuranceInfo()}" icon="#{insuranceControllers.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white" rendered="#{insuranceControllers.isRenderCreate}" 
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{insuranceControllers.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{insuranceControllers.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{insuranceControllers.mmsInsList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Insurance Item  List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{insuranceControllers.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="srListVar" value="#{insuranceControllers.mmsInsList}"
+                                                            itemValue="#{srListVar}"  itemLabel="#{srListVar.insNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI, :frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{insuranceControllers.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>                      
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{insuranceControllers.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.decision}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../mms/FixedAssetsInformation/Insurance.xhtml"><i class="fa fa-fw fa-refresh"  title="Refresh"> </i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+          <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{insuranceControllers.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Search}...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                       <div class="form-group textBoxMargin6px"> 
+                                           <h:outputLabel class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="txtPartyName" value="#{insuranceControllers.columnNameResolver.col_Name_FromTable}"
+                                                                 valueChangeListener="#{insuranceControllers.changeEventColumnName}" converter="entConverter"
+                                                                 style="width: 100%">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue=""/>
+                                                    <f:selectItems value="#{insuranceControllers.columnNameResolverList}" var="InsuranceFAColName"
+                                                                    itemValue="#{InsuranceFAColName.col_Name_FromTable}"  itemLabel="#{InsuranceFAColName.parsed_Col_Name}"/>
+                                                                   
+                                                    <p:ajax event="change" process="@this" update="lblColumnName,txtColumnValue"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblColumnName" class="control-label col-sm-2" value="#{insuranceControllers.columnNameResolver.parsed_Col_Name}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtColumnValue" class="form-control" value="#{insuranceControllers.insuranceEntity.columnValue}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="findbtn" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSearch" class="btn btn-primary" action="#{insuranceControllers.searchInsuranceInformation1()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="#{MMS.find}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                       
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" var="InsuranceInfo" rows="5" 
+                                                             style="font-family: Cambria; "  
+                                                             rowIndexVar="num"   
+                                                             selection="#{insuranceControllers.hpSelect}"
+                                                             rowKey="#{InsuranceInfo.insId}"  selectionMode="single" 
+                                                             value="#{insuranceControllers.mmsInsuranceSearchInfoDataModel}"
+                                                             class="dataTable"
+                                                             paginator="true" paginatorPosition="bottom">
+                                                    <p:ajax event="rowSelect" listener="#{insuranceControllers.rowSelect}" update=":frmRegisterUI, :frmMainUI,:frmToolbar" />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Insurance_no}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InsuranceInfo.insNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Department}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InsuranceInfo.department}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Authorized_By}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InsuranceInfo.authorizedBy}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Issued_by}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InsuranceInfo.issuedBy}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.To_be_issued}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InsuranceInfo.toBeIssued}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmRegisterUI" >
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" life="3500" autoUpdate="true" />
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{insuranceControllers.renderPnlCreateInsurance}">
+                <p:dialog id="dlg" header="Departments" widgetVar="dlgDpt" height="400" width="500" showEffect="explode">
+                    <h:panelGrid columns="2" style="border-color: #ffffff ">
+                        <p:tree value="#{fixedAssetRegController.root2}" var="nodes" style="border: transparent; width: 100%"
+                                selectionMode="single" selection="#{insuranceControllers.selectedNode}" >
+                            <p:treeNode>
+                                <h:outputText value="#{nodes}" />
+                            </p:treeNode>
+                        </p:tree>                                       
+                    </h:panelGrid>
+                </p:dialog>             
+                <div class="box box-primary ">
+                    <div class="box-header">
+                        <h3 class="box-title">#{MMS.Insurance_Registration}</h3>                   
+                    </div>                 
+                    <div class="box-body ">
+                        <div class="box-body">
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:panelGroup id="frmGatePassDtlInfo">
+                                        <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                        <div class="form-horizontal  col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required"> 
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.Insurance_no}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtGatePassNumber" readonly="true"   
+                                                                 value="#{insuranceControllers.generateInsuranceNo()}"/>
+
+                                                </div>
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.Insurance_Company}:" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="drdTypeOfTransfer" class="form-control"  validator="#{validatorManagedBean.Text}"
+                                                                 value="#{insuranceControllers.insuranceEntity.toBeIssued}"
+                                                                 required="true" 
+                                                                 requiredMessage="Name is required" readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="drdTypeOfTransfer" display="icon" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required "> 
+                                                <p:outputLabel  class="control-label col-sm-2" value="#{MMS.Department}:"/> 
+                                                <div class="col-sm-3">
+                                                    <p:inputText   id="txtDepartment" class="form-control" required="true" 
+                                                                   requiredMessage="Department is required"  placeholder="Use Only From + Button" onmousedown="return false;"
+                                                                   value="#{insuranceControllers.hrDepartmentsEntity.depName}" readonly="#{workFlow.readonly}" />
+                                                    <p:message for="txtDepartment" display="icon"/>
+                                                </div>
+                                                <div class="col-sm-1">
+                                                    <p:commandButton id="btnTree" onclick="PF('dlgDpt').show();"  partialSubmit="true" style="background: transparent;" value="+" disabled="#{workFlow.readonly}"/>
+                                                </div>
+                                                <h:outputLabel for="txtReg" class="control-label col-sm-2" value="#{MMS.Registration_Date}:"/>
+                                                <div class="col-sm-4">
+                                    
+                                                    <p:inputText id="txtReg" value="#{insuranceControllers.insuranceEntity.regDate}"
+                                                                 placeholder="#{MMS.dd_mm_yyyy}" required="true" requiredMessage="Date is required" class="form-control"
+                                                                 onclick="displayCalendar('frmRegisterUI:txtReg', 'frmRegisterUI:txtReg');"  validator="#{validatorManagedBean.Date}" readonly="#{workFlow.readonly}"/>
+
+
+                                                    <p:message for="txtReg" display="icon"/>
+                                                </div>
+                                                <p:dialog id="dlgDpt" header="Departments" widgetVar="dlgDpt" height="300" width="500" showEffect="explode">
+                                                    <h:panelGrid columns="3" style="border-color: #ffffff ">
+                                                        <p:tree value="#{insuranceControllers.root2}" var="nodes" style="border: transparent; width: 100%"
+                                                                selectionMode="single" selection="#{insuranceControllers.selectedNode}" >
+                                                            <p:ajax event="select" listener="#{insuranceControllers.onNodeSelect}" process="@this" 
+                                                                    update=":frmRegisterUI:txtDepartment"/>
+                                                            <p:treeNode>
+                                                                <h:outputText value="#{nodes}" />
+                                                            </p:treeNode>
+                                                        </p:tree>                                       
+                                                    </h:panelGrid>
+                                                </p:dialog>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">#{MMS.Insurance_Detail}</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row"> 
+                                    <div class="col-md-12" > 
+                                    </div>
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="frmMaterialInfo"  >
+                                        <div class="form-horizontal col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  for="CkeckMovementType" class="control-label col-sm-2"  value="#{MMS.Type}:"/>
+                                                <div class="col-sm-10">
+                                                    <p:selectOneRadio id="CkeckMovementType" layout="grid" columns="2" value="#{insuranceControllers.insuranceDetailEntity.selectOpt}" class="col-sm-4" disabled="#{workFlow.readonly}"
+                                                                      valueChangeListener="#{insuranceControllers.changeInsuranceType}" required="true" requiredMessage="Please  Choose One">
+                                                        <f:selectItem itemLabel="#{MMS.Minor_Asset}" itemValue="1" />
+                                                        <f:selectItem itemLabel="#{MMS.Major_Asset}" itemValue="2" />                                                        
+                                                        <p:ajax process="CkeckMovementType" update="frmMaterialInfo"  event="valueChange" />  
+                                                    </p:selectOneRadio>  
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-horizontal col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  for="tagNo1"  class="control-label col-sm-2" value="#{MMS.Tag_No}:"  rendered="#{insuranceControllers.renderMinor}" />
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="tagNo1" value="#{insuranceControllers.fixedAssetRegDtlEntity.tagNo}" required="true" rendered="#{insuranceControllers.renderMinor}"
+                                                                     requiredMessage="Please Select Tag No" style="width: 100%"  filter="true" filterMatchMode="contains"
+                                                                     valueChangeListener="#{insuranceControllers.handleTagNo}"  disabled="#{workFlow.readonly}">
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems value="#{insuranceControllers.findTagNum()}" var="listSt" itemLabel="#{listSt}" itemValue="#{listSt}" />
+                                                        <p:ajax update="@this,lblMatCode1,txtAccCode11,minorname" event="change" />
+                                                    </p:selectOneMenu> 
+                                                    <p:message for="tagNo1" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  for="minorname"  class="control-label col-sm-2" value="#{MMS.Asset_Name}:" rendered="#{insuranceControllers.renderMinor}"  />
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="minorname"   rendered="#{insuranceControllers.renderMinor}" 
+                                                                   value="#{insuranceControllers.fixedAssetRegDtlEntity.itemName}" 
+                                                                   readonly="true"/>
+                                                    <p:message for="minorname" display="icon" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel  for="facode"  class="control-label col-sm-2" value="FA Code:"  rendered="#{insuranceControllers.renderMajor}" />
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="facode" value="#{insuranceControllers.fixedassetIfrs.faCode}" rendered="#{insuranceControllers.renderMajor}"
+                                                                     required="true" requiredMessage="Please Input FA CODE" style="width: 100%"  filter="true" filterMatchMode="contains"
+
+                                                                     valueChangeListener="#{insuranceControllers.handleFaCode}"  
+                                                                     converterMessage="Please Insert FA Code" 
+                                                                     disabled="#{workFlow.readonly}"
+                                                                     >
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{insuranceControllers.ifrsFixedAssetsList}" var="listSt" itemLabel="#{listSt.faCode}" itemValue="#{listSt.faCode}" />
+                                                        <p:ajax update="@this,majorname,txtAccCode1" event="change" />
+                                                    </p:selectOneMenu> 
+                                                </div>
+                                                <h:outputLabel  for="majorname"  class="control-label col-sm-2" value="#{MMS.Asset_Name}:"  rendered="#{insuranceControllers.renderMajor}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="majorname"   rendered="#{insuranceControllers.renderMajor}"
+
+                                                                   value="#{insuranceControllers.fixedassetIfrs.faName}" 
+                                                                   readonly="true"/>
+                                                    <p:message for="majorname" display="icon" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel for="txtAccCode1" class="control-label col-sm-2" value="SL Code:" rendered="#{insuranceControllers.renderMajor}" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtAccCode1"  class="form-control"  rendered="#{insuranceControllers.renderMajor}"
+                                                                 value="#{insuranceControllers.fixedassetIfrs.subsidiaryId.subsidiaryCode}" 
+                                                                 readonly="true"/>
+                                                    <p:message for="txtAccCode1" display="icon" />
+                                                </div>
+                                                <h:outputLabel  for="txtQuantity1"  class="control-label col-sm-2" value="#{MMS.Description}:" rendered="#{insuranceControllers.renderMajor}" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtQuantity1" class="form-control"  validator="#{validatorManagedBean.Text}" rendered="#{insuranceControllers.renderMajor}"
+
+                                                                   value="#{insuranceControllers.insuranceDetailEntity.description}"
+                                                                   readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="txtQuantity1" display="icon" />
+                                                </div>    
+                                            </div>
+                                            <div class="form-group required">
+                                                <h:outputLabel  for="val1"  class="control-label col-sm-2" value="#{MMS.Insurance_Value}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="val1" class="form-control" required="true" 
+
+                                                                   value="#{insuranceControllers.insuranceDetailEntity.insuranceValue}"
+                                                                   validator="#{validatorManagedBean.Number}"
+                                                                   requiredMessage="Insurance Value is required" converterMessage="Please Insert Value"
+                                                                   readonly="#{workFlow.readonly}"
+
+                                                                   />
+                                                    <p:message for="val1" display="icon"/>
+                                                </div>
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.Insurance_Period}:" />
+                                                <div class="col-sm-4 required">
+                                                    <p:inputText   id="insid1" class="form-control" required="true" requiredMessage="Insurance Period"
+
+                                                                   value="#{insuranceControllers.insuranceDetailEntity.insuranceYear}"
+                                                                   converterMessage="Please Put Text"
+                                                                   readonly="#{workFlow.readonly}"
+                                                                   />
+                                                    <p:message for="insid1" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+
+                                                <h:outputLabel  for="insuranceTyepe" class="control-label col-sm-2" value="#{MMS.Insurance_Type}:" 
+
+                                                                />
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu   id="insuranceTyepe"   required="true" requiredMessage="Type is required"
+                                                                       style="width: 100%;"
+                                                                       value="#{insuranceControllers.insuranceDetailEntity.insuranceType}"  
+                                                                       disabled="#{workFlow.readonly}">  
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" />
+                                                        <f:selectItem itemLabel="Flood" itemValue="Flood" />
+                                                        <f:selectItem itemLabel="Fire" itemValue="Fire" />
+                                                        <f:selectItem itemLabel="Accident" itemValue="Accident" />
+                                                    </p:selectOneMenu> 
+                                                </div>                     
+                                                <h:outputLabel for="selectRegion1" class="control-label col-sm-2" value="#{MMS.Region_Name}:" 
+                                                               />
+                                                <div class="col-sm-4 required">
+                                                    <p:selectOneMenu   id="selectRegion1"   required="true" requiredMessage="Region is required"
+                                                                       style="width: 100%;"
+                                                                       value="#{insuranceControllers.insuranceDetailEntity.region}"  
+                                                                       disabled="#{workFlow.readonly}" >  
+                                                        <f:selectItem itemLabel="#{MMS.Region_Name}" itemValue="" />
+                                                        <f:selectItem itemLabel="Addis Ababa" itemValue="Addis Ababa" />
+                                                        <f:selectItem itemLabel="Oromia" itemValue="Oromia" />
+                                                        <f:selectItem itemLabel="Tigray" itemValue="Tigray" />
+                                                        <f:selectItem itemLabel="Afar" itemValue="Afar" />
+                                                        <f:selectItem itemLabel="Dire Dawa" itemValue="Dire Dawa" />
+                                                        <f:selectItem itemLabel="Gambella" itemValue="Gambella" />
+                                                        <f:selectItem itemLabel="Amhara" itemValue="Amhara" />
+                                                        <f:selectItem itemLabel="Benshangul" itemValue="Benshangul" />
+                                                        <f:selectItem itemLabel="Somalia" itemValue="Somalia" />
+                                                        <f:selectItem itemLabel="SNNPR" itemValue="SNNPR" />
+                                                        <f:selectItem itemLabel="SNN" itemValue="SNN" />
+                                                        <p:ajax update=":frmRegisterUI:frmTblMaterialInfo:" event="change" />
+                                                    </p:selectOneMenu> 
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  for="txtUnit11"  class="control-label col-sm-2" value="#{MMS.Unit_Cost}:" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtUnit11" class="form-control" required="true" requiredMessage="Please Input Number" validator="#{validatorManagedBean.Number}" 
+
+                                                                   value="#{insuranceControllers.insuranceDetailEntity.cost}"
+                                                                   converterMessage="Please Put Number"
+                                                                   readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="txtUnit11" display="icon"/>
+                                                </div> 
+                                                <h:outputLabel id="txtItemName1" class="control-label col-sm-2" value="#{MMS.Category}:"  rendered="#{insuranceControllers.renderMinor}"  />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="lblMatCode1"    rendered="#{insuranceControllers.renderMinor}" 
+                                                                 value="#{insuranceControllers.itemRegistration.matCategory.catName}"  
+                                                                 readonly="true"/>
+                                                    <p:message for="lblMatCode1" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel for="txtAccCode11" class="control-label col-sm-2" value="#{MMS.Account_Code}:" rendered="#{insuranceControllers.renderMinor}"  />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtAccCode11" 
+                                                                 value="#{insuranceControllers.fixedAssetRegDtlEntity.accountCode.generalLedgerCode}" rendered="#{insuranceControllers.renderMinor}" 
+                                                                 readonly="true"/>
+                                                    <p:message for="txtAccCode11" display="icon" />
+                                                </div>
+                                                <h:outputLabel  for="txtQuantity"  class="control-label col-sm-2" value="#{MMS.Description}:" rendered="#{insuranceControllers.renderMinor}"  />
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtQuantity" class="form-control"  rendered="#{insuranceControllers.renderMinor}" 
+
+                                                                   value="#{insuranceControllers.insuranceDetailEntity.description}"  
+                                                                   readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="txtQuantity" display="icon" />
+                                                </div>    
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="buttonaddFADtl" class="control-label col-sm-2"/>  
+                                                <div class="col-sm-4">
+                                                    <p:commandButton id="btnAdd" class="btn btn-primary" action="#{insuranceControllers.addInsuranceDetailMinor()}" icon="ui-icon-new" validateClient="true" 
+                                                                     process="@this,frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,frmMaterialInfo"
+                                                                     value="#{insuranceControllers.addOrModifyBundle}"/>            
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+
+                    
+                        <h:panelGroup id="frmTblMaterialInfo">
+                            <div class="form-horizontal col-sm-12">
+                                <div class="form-group textBoxMargin6px">                                        
+                                    <div class="col-sm-12">
+                                        <p:dataTable id="tblMaterial1" value="#{insuranceControllers.insuranceAddDetailDataModelMinor}" rowIndexVar="rowContact" var="insurance"
+                                                     paginator="true" paginatorPosition="bottom" editable="true" >
+                                            <p:ajax event="rowEdit"  update="" />
+                                            <p:ajax event="rowEditCancel"  update="" />
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{MMS.No}"/>
+                                                </f:facet>
+                                                <h:outputText value="#{rowContact+1}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{MMS.Tag_No}" rendered="#{insuranceControllers.renderMinor}" />
+                                                    <h:outputText value="Fa Code" rendered="#{insuranceControllers.renderMajor}" />
+                                                </f:facet>
+                                                <h:outputText value="#{insurance.tagNo}" rendered="#{insuranceControllers.renderMinor}" />
+                                                <h:outputText value="#{insurance.faCode}" rendered="#{insuranceControllers.renderMajor}" />
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{MMS.Asset_Name}" rendered="#{insuranceControllers.renderMinor}"/>
+                                                    <h:outputText value="Asset Name" rendered="#{insuranceControllers.renderMajor}" />
+                                                </f:facet>
+                                                <h:outputText value="#{insurance.assetName}" rendered="#{insuranceControllers.renderMinor}" />
+                                                <h:outputText value="#{insurance.assetName}" rendered="#{insuranceControllers.renderMajor}"  />
+                                            </p:column>
+                                            <p:column headerText="#{MMS.Description}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{insurance.description}" /></f:facet>
+                                                    <f:facet name="input"><p:inputText id="desk" value="#{insurance.description}" style="width:100%"/></f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                            <p:column headerText="#{MMS.Cost}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{insurance.cost}" /></f:facet>
+                                                    <f:facet name="input"><p:inputText id="cost" value="#{insurance.cost}" style="width:100%"/></f:facet>
+                                                </p:cellEditor>
+                                            </p:column>                       
+                                            <p:column headerText="#{MMS.Insurance_Value}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{insurance.insuranceValue}" /></f:facet>
+                                                    <f:facet name="input"><p:inputText id="val" value="#{insurance.insuranceValue}" style="width:100%"/></f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                            <p:column headerText="#{MMS.Insurance_Period}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{insurance.insuranceYear}" /></f:facet>
+                                                    <f:facet name="input"><p:inputText id="year" value="#{insurance.insuranceYear}" style="width:100%"/></f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                            <p:column headerText="#{MMS.Insurance_Type}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{insurance.insuranceType}" /></f:facet>
+                                                    <f:facet name="input"> <p:selectOneMenu   id="selectRegion5"   
+                                                                                              style="width: 100%;"
+                                                                                              value="#{insurance.insuranceType}"  
+                                                                                              >  
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                            <f:selectItem itemLabel="Flood" itemValue="Flood" />
+                                                            <f:selectItem itemLabel="Fire" itemValue="Fire" />
+                                                            <f:selectItem itemLabel="Accident" itemValue="Accident" />
+                                                        </p:selectOneMenu> </f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                            <p:column headerText="#{MMS.Region}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{insurance.region}" /></f:facet>
+                                                    <f:facet name="input"><p:selectOneMenu   id="selectRegion2"  
+                                                                                             style="width: 100%;"
+                                                                                             value="#{insurance.region}"  
+                                                                                             >  
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                            <f:selectItem itemLabel="Addis Ababa" itemValue="Addis Ababa" />
+                                                            <f:selectItem itemLabel="Oromia" itemValue="Oromia" />
+                                                            <f:selectItem itemLabel="Tigray" itemValue="Tigray" />
+                                                            <f:selectItem itemLabel="Afar" itemValue="Afar" />
+                                                            <f:selectItem itemLabel="Dire Dawa" itemValue="Dire Dawa" />
+                                                            <f:selectItem itemLabel="Gambella" itemValue="Gambella" />
+                                                            <f:selectItem itemLabel="Amhara" itemValue="Amhara" />
+                                                            <f:selectItem itemLabel="Benshangul" itemValue="Benshangul" />
+                                                            <f:selectItem itemLabel="Somalia" itemValue="Somalia" />
+                                                            <f:selectItem itemLabel="SNNPR" itemValue="SNNPR" />
+                                                            <f:selectItem itemLabel="SNN" itemValue="SNN" />
+                                                            <p:ajax update="" event="change" />
+
+                                                        </p:selectOneMenu> </f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                            <p:column rendered="#{insuranceControllers.renderMinor}">
+                                                <f:facet name="header" rendered="#{insuranceControllers.renderMinor}">
+                                                    <h:outputText value="#{MMS.Account_Code}" rendered="#{insuranceControllers.renderMinor}" />
+                                                </f:facet>
+                                                <h:outputText value="#{insurance.accountCode}" rendered="#{insuranceControllers.renderMinor}" />
+                                            </p:column>
+                                            <p:column rendered="#{insuranceControllers.renderMinor}">
+                                                <f:facet name="header" rendered="#{insuranceControllers.renderMinor}">
+                                                    <h:outputText value="#{MMS.Category}" rendered="#{insuranceControllers.renderMinor}"/>
+
+                                                </f:facet>
+                                                <h:outputText value="#{insurance.catagory}" rendered="#{insuranceControllers.renderMinor}" />
+
+                                            </p:column>
+                                            <p:column headerText="#{MMS.Option}">
+                                                <p:commandLink action="#{insuranceControllers.editDataTable()}" value="Edit" 
+                                                               process="@this,:frmRegisterUI:tblMaterial1"
+                                                               update="@this,:frmRegisterUI:frmMaterialInfo"/>
+                                            </p:column>   
+                                        </p:dataTable>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+
+                     
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Receiver_Information}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmApproverInfo">
+                                    <div class="form-horizontal col-sm-12"> 
+                                       
+                                        <div class="form-horizontal col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtRequestedBy"  validator="#{validatorManagedBean.Text}"
+                                                                 value="#{insuranceControllers.userName}"
+                                                                 required="true"
+                                                                 requiredMessage="Name is required" readonly="true"/>
+                                                    <p:message for="txtRequestedBy" display="icon" />
+                                                </div>
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>
+                                                <div class="col-sm-4 required">
+                                                    <p:inputText id="txtAcceptedDate7" class="form-control" value="#{insuranceControllers.workFlow.processedOn}"
+                                                                 required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                                 onclick="displayCalendar('frmRegisterUI:txtAcceptedDate7', 'frmRegisterUI:txtAcceptedDate7');" />                                                                                                                                                    
+                                                    <p:message for="txtAcceptedDate7" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <h:panelGroup id="padding">
+                                                <div class="form-group textBoxMargin6px"> 
+                                                    <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="Decision:" rendered="#{insuranceControllers.renderDecision}"/>
+                                                    <div class="col-sm-4">
+                                                        <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{insuranceControllers.selectedValue}" rendered="#{insuranceControllers.renderDecision}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                            <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                        </p:selectOneMenu>   
+                                                    </div> 
+                                                    <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="comment:" rendered="#{insuranceControllers.renderDecision}"/>
+                                                    <div class="col-sm-4">
+                                                        <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{insuranceControllers.workFlow.commentGiven}"  rendered="#{insuranceControllers.renderDecision}"/>     
+                                                    </div> 
+                                                </div>
+                                            </h:panelGroup>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="saveButtonFAR" class="control-label col-sm-2"/>
+                                                <div class="col-sm-4">
+                                                    <p:commandButton id="btnSave" class="btn btn-primary" action="#{insuranceControllers.saveInsurance()}" icon="ui-icon-new" validateClient="true"
+                                                                     process="@this,frmRegisterUI:frmGatePassDtlInfo,frmRegisterUI:frmApproverInfo"  
+                                                                     update="frmGatePassDtlInfo,:frmRegisterUI,:frmToolbar" 
+                                                                     value="#{insuranceControllers.saveorUpdateBundle}"/> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

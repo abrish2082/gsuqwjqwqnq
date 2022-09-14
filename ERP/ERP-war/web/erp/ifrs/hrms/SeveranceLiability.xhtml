@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+
+    <ui:define name="navigaion_content">
+        <li> <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li> 
+        <li><a href="accrued_leave_balance.xhtml"><i class="fa fa-fw"></i> <span>Accrued Leave Balance </span></a></li> 
+
+
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+
+            <p:toolbar  style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="SeveranceLiability.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+
+            </p:toolbar>
+
+        </h:form>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-header">
+                        <h3 class="box-title">Severance Liability </h3>  
+                    </div>
+                    <div class="box-body ">
+                        <div class="box-body ">
+                            <h:form id="frmLeaveBalance">
+                                <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>  
+                                <h:panelGroup id="panelPenality"  >
+
+                                    <div class="form-group" >
+                                        <div class="col-md-12 ">
+                                            <div class="col-sm-6 textBoxMargin6px" > 
+                                                <div  class="form-group form-horizontal">
+                                                    <h:outputLabel  value="Budget Year: " class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">                                        
+                                                        <p:selectOneMenu id="txtYear"   value="#{severanceLiabilityController.fmsLuBudgetYear}" style="width: 100%" 
+                                                                         valueChangeListener="#{severanceLiabilityController.getLeaveYear}" converter="entConverter" required="true"   >
+                                                            <p:ajax event="change" process="@this" update="@this,:frmLeaveBalance,tblAllBalance" />
+                                                            <f:selectItem itemLabel="--- select---" itemValue="" noSelectionOption="true"></f:selectItem>
+                                                            <f:selectItems value="#{severanceLiabilityController.budgetYearsForAccruedLeave}" />
+                                                        </p:selectOneMenu>  
+                                                        <p:message for="txtYear" display="icon"/>
+
+
+                                                        <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+
+                                                        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                                                            <p:graphicImage value="../../../resources/image/Loading3.gif"  height="20" width="20"/>
+                                                        </p:dialog>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <br/>
+                                        <br/>
+                                        <div class="col-md-12 ">
+                                            <div class="col-sm-6 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <div class="col-sm-4">                                                              
+                                                    </div>                                                                    
+                                                    <div class="col-sm-2">
+                                                        <p:commandButton id="btnBallance" class="btn  btn-block btn-primary col-lg-4" value="Save"  rendered="#{severanceLiabilityController.balanceButonShow}"
+                                                                         action="#{severanceLiabilityController.saveSeveranceLiability}" process="@this" update="@this,:frmLeaveBalance:tblAllBalance"/> 
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>  
+
+
+                                    <div class="form-group" >
+                                        <br/><br/>  
+                                        <div class="col-md-12 ">
+                                            <div class="form-group">
+                                                <p:dataTable id="tblAllBalance" value="#{ severanceLiabilityController.severanceLiablilityDataModel}"
+                                                             var="severance" rowIndexVar="num" rows="50" sortBy="#{severance.employeeId.firstName}#{accruedBalance.employeeId.middleName}"
+                                                             class="dataTable"    scrollable="true" scrollHeight="500"
+                                                             paginator="true" paginatorPosition="bottom" 
+                                                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"                                                             rowsPerPageTemplate="5,10,15,20" >                   
+
+                                                    <p:column headerText="No" width="80"  >
+                                                        <h:outputText value="#{num + 1}"/>
+                                                    </p:column>
+
+                                                    <p:column filterBy="#{severance.employeeId.empId}" >
+                                                        <f:facet name="header" >
+                                                            <h:outputText value="Employee Id"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{severance.employeeId.empId}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Employee Name"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{severance.employeeId.firstName} "/>
+                                                        <h:outputText value="#{severance.employeeId.middleName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Hire Date"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{severance.employeeId.hireDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Salary"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{severance.employeeId.basicSalary}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Service Year"/><br></br>
+                                                           
+                                                        </f:facet>
+                                                        <h:outputText value="#{severance.exprience}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Severance Amount"/><br></br>
+                                                            <h:outputText value="(In Birr)"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{severance.severanceAmount}"/>
+                                                    </p:column>
+
+                                                    <p:columnGroup type="footer" >
+                                                        <p:row >
+                                                            <p:column colspan=""  footerText="" />
+                                                            <p:column colspan=""  footerText="" />
+                                                            <p:column colspan=""  footerText="" />
+                                                            <p:column colspan=""  footerText="" />
+                                                            <p:column colspan=""  footerText="Total= #{severanceLiabilityController.totalSeveranceIndecimal} ETB" />
+                                                        </p:row>
+                                                        <p:row>
+                                                            <p:column colspan="5"   footerText="Severance Expense..............................#{severanceLiabilityController.totalSeveranceIndecimal} " /> 
+                                                        </p:row>
+                                                        <p:row>
+                                                            <p:column  colspan="5"  footerText="                      Severance.............................#{severanceLiabilityController.totalSeveranceIndecimal} " />
+
+                                                        </p:row>
+                                                    </p:columnGroup>
+                                                </p:dataTable>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+
+                            </h:form>
+                        </div>
+
+                    </div>
+                    <div class="box-footer ">                       
+                    </div>
+                </div>                   
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

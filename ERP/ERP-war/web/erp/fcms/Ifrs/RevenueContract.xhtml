@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li>
+            <a href="FinancialInstrumentRegister.xhtml"><i class="fa fa-circle-o"></i>Financial Instrument Register</a>
+        </li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmRevenueSearch">
+            <p:toolbar style="background-color: white;border-color: white" >
+                <f:facet name="right">
+                    <p:commandButton id="cmdNewOrSearch" icon="#{revenueContractController.icon}" style="background-color: white;border-color: white"
+                                     action="#{revenueContractController.createSearchAction()}"
+                                     title="#{revenueContractController.createOrSearchBundle}"
+                                     update=":frmRevenueRegist,:frmRevContractMain,:frmRevenueSearch" 
+                                     process="@this,:frmRevenueRegist,:frmRevContractMain,:frmRevenueSearch"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="RevenueContract.xhtml"><i class="fa fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-dashboard" title="Dashboard"></i></a>
+
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmRevenueRegist">
+            <h:panelGroup id="mainUI" rendered="#{revenueContractController.renderPnlManPage}" style="border: 0px; background-color: transparent" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Searching_By_Revenue_Contract_ID}:</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-body">
+
+                                    <div class="box-body">
+                                        <div class="col-md-12">                                        
+                                            <div class="col-sm-12">
+                                                <div class="col-sm-6"> 
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12">   
+                                                            <p:outputLabel  value="#{FCMS.searching_By}: " class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="columnName" value="#{revenueContractController.columnNameResolver.col_Name_FromTable}" 
+                                                                                 valueChangeListener="#{revenueContractController.selectedParamChangeEvent}"
+                                                                                 style="width:100%">
+                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                    <f:selectItems value="#{revenueContractController.columnNameResolverList}"
+                                                                                   var="revenuContract" itemLabel="#{revenuContract.parsed_Col_Name}" itemValue="#{revenuContract.col_Name_FromTable}" /> 
+                                                                    <p:ajax event="change" process="@this" update="columnName,lbRevenuContract,autoRevenuContrat"/>
+                                                                </p:selectOneMenu> 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12 "> 
+                                                            <h:outputLabel id="lbRevenuContract" class="control-label col-sm-4" value="#{revenueContractController.columnNameResolver.parsed_Col_Name}:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:autoComplete id="autoRevenuContrat"  style="width: 100%;" value="#{revenueContractController.prmsRevenueContarct.columnValue}"
+                                                                                completeMethod="#{revenueContractController.searchByRevenuContract}" var="revenuContractList" converter="entConverter"
+                                                                                itemValue="#{revenuContractList}" itemLabel="#{revenuContractList.contractName}" 
+                                                                                forceSelection="true" size="20" emptyMessage="no data" scrollHeight="500">  
+                                                                    <p:ajax event="itemSelect" listener="#{revenueContractController.getByFinancialInstColumn}" 
+                                                                            process="@this" update="tblRevContractInfo"/>
+                                                                </p:autoComplete>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" >    
+                                <div class="panel-body">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblRevContractInfo" value="#{revenueContractController.prmsRevenueContarctsList}"
+                                                             var="RCInfoList" rows="5" selection="#{revenueContractController.prmsRevenueContarct}" 
+                                                             selectionMode="Single" 
+                                                             rowKey="#{RCInfoList.id}"
+                                                             paginator="true" paginatorPosition="bottom" editable="true" rowIndexVar="RCList"
+                                                             rowsPerPageTemplate="5,10,15"
+                                                             paginatorTemplate="{CurrentPageReport} {PreviousPageLink} {FirstPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+                                                    <p:ajax event="rowSelect" listener="#{revenueContractController.onRowSelect}" 
+                                                            update=":frmRevContractMain,:frmRevContractMain:registerUI,:frmRevenueSearch,:frmRevenueRegist" process="@this" />  
+                                                    <p:column headerText="#{FCMS.No}" sortBy="#{RCList+1}">
+                                                        #{RCList+1}
+                                                    </p:column>
+                                                    <p:column sortBy="#{RCInfoList.revContractNo}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{FCMS.Rev_Contract_Number}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{RCInfoList.revContractNo}"/>
+                                                    </p:column>
+                                                    <p:column sortBy="#{RCInfoList.contractName}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{FCMS.contract_Name}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{RCInfoList.contractName}"/>
+                                                    </p:column>
+                                                    <p:column sortBy="#{RCInfoList.glId.generalLedgerCode}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{FCMS.General_Ledger_Code}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{RCInfoList.glId.generalLedgerCode}"/>
+                                                    </p:column>
+                                                    <p:column sortBy="#{RCInfoList.paymentPeriod}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{FCMS.Payment_Period}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{RCInfoList.paymentPeriod}"/>
+                                                    </p:column>
+                                                    <p:column sortBy="#{RCInfoList.contractedDate}">
+                                                        <f:facet name="header">
+                                                            <h:outputLabel value="#{FCMS.Contracted_Date}"/>
+                                                        </f:facet>
+                                                        <h:outputLabel value="#{RCInfoList.contractedDate}">
+                                                            <f:convertDateTime pattern="dd/MMM/yyy"/>
+                                                        </h:outputLabel>
+                                                    </p:column>
+
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </div>  
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <div class="row">
+            <div class="col-md-12">
+                <h:form id="frmRevContractMain">
+                    <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,fatal" />
+                    <h:panelGroup id="registerUI" rendered="#{revenueContractController.renderPnlCreateParty}" style="border: 0px; background-color: transparent">
+                        <p:tabView>
+                            <p:tab title="Revenue Contract">
+                                <h:form id="frmRevContractMaster">
+                                    <h:panelGroup id="PGRevContractMaster">
+                                        <div class="box box-primary">
+                                            <div class="box-header">
+                                                <h3 class="box-title">#{FCMS.Revenue_Contract_Registration}</h3>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row"> 
+                                                    <div class="col-md-12"> 
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+                                                                <p:outputLabel id="lblRevContractNo"  class=" col-sm-2" style="text-align: right" value="#{FCMS.Rev_Contract_Number}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtRevContractNo" class="form-control" readonly="true" value="#{revenueContractController.revContNoAutogenarate()}"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblRegDate"  class="control-label col-sm-2" value="#{FCMS.General_Ledger}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="glId" required="true" requiredMessage="General Ledger is Required"  style="width: 100%"                       
+                                                                                     value="#{revenueContractController.fmsGeneralLedger}"
+                                                                                     valueChangeListener="#{revenueContractController.changeOnGL}"
+                                                                                     disabled="#{workFlow.readonly}" converter="entConverter">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems var="gl" value="#{revenueContractController.glLists}" itemLabel="#{gl.generalLedgerCode}" itemValue="#{gl}"/>
+                                                                        <p:ajax event="change" process="@this" update="txtSubsidiary"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message  for="glId" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+                                                                <p:outputLabel id="lblPerOblType"  class="control-label col-sm-2" value="#{FCMS.Performace_Obl_Type}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="txtPerOblType" style="width: 100%" required="true" requiredMessage="Performace Obligation Type is Required"
+                                                                                     value="#{revenueContractController.prmsRevenueContarct.performanceObligationType}" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Single" itemValue="single"/>
+                                                                        <f:selectItem itemLabel="Separate" itemValue="separate"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message for="txtPerOblType" display="icon"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblSubsidiary" class="col-sm-2" style="text-align: right" value="#{FCMS.Subsidiary_Ledger}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="txtSubsidiary" style="width: 100%"                       
+                                                                                     value="#{revenueContractController.fmsSubsidiaryLedger}"
+                                                                                     disabled="#{workFlow.readonly}" converter="entConverter">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems  value="#{revenueContractController.subsLists}" 
+                                                                                        var="subsidiary" itemLabel="#{subsidiary.subsidiaryCode}" itemValue="#{subsidiary}"/>
+
+                                                                    </p:selectOneMenu>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+
+                                                                <p:outputLabel id="lblPerOblSatis" class="control-label col-sm-2" value="#{FCMS.Performace_Obl_Satisfy}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="txtPerOblSatis" required="true" requiredMessage="Performace Obl. Satisfy is Required"                         
+                                                                                     value="#{revenueContractController.prmsRevenueContarct.performanceObligationSatis}"  style="width: 100%"                   
+                                                                                     disabled="#{workFlow.readonly}">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="At Point of Time" itemValue="at point of time"/>
+                                                                        <f:selectItem itemLabel="Over Time" itemValue="over time"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message  for="txtPerOblSatis" display="icon"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblContForms" class="control-label col-sm-2" value="#{FCMS.Form_of_Contract}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="txtContForms" required="true" requiredMessage="Form of Contract is Required"                         
+                                                                                     value="#{revenueContractController.prmsRevenueContarct.formOfContract}"  style="width: 100%"                   
+                                                                                     disabled="#{workFlow.readonly}">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Written" itemValue="written"/>
+                                                                        <f:selectItem itemLabel="Oral" itemValue="oral"/>
+                                                                        <f:selectItem itemLabel="Implied" itemValue="implied"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message  for="txtContForms" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+                                                                <p:outputLabel id="lblContractedWith" class="col-sm-2" style="text-align: right" value="#{FCMS.Contracted_With}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtContractedWith" class="form-control"
+                                                                                 value="#{revenueContractController.prmsRevenueContarct.contractedWith}"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblContName" class="control-label col-sm-2" value="#{FCMS.contract_Name}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtContName" required="true" requiredMessage="Contract Name is Required"                         
+                                                                                 value="#{revenueContractController.prmsRevenueContarct.contractName}"                   
+                                                                                 disabled="#{workFlow.readonly}" class="form-control"/>
+                                                                    <p:message  for="txtContName" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px">
+                                                                <p:outputLabel id="lblEstCost" for="lblEstCost" class="control-label col-sm-2" value="#{FCMS.Estimated_Total_Cost}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtEstCost" class="form-control"
+                                                                                 value="#{revenueContractController.prmsRevenueContarct.estimatedTotalCost}"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblContDate" for="lblContDate" class="control-label col-sm-2" value="#{FCMS.Contracted_Date}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:calendar id="txtContDate" required="true" requiredMessage="Contracted Date is Required"                         
+                                                                                value="#{revenueContractController.prmsRevenueContarct.contractedDate}"                    
+                                                                                disabled="#{workFlow.readonly}" pattern="dd/MM/yyyy" placeholder="dd/MM/yyyy">
+                                                                    </p:calendar>
+                                                                    <p:message  for="txtContDate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+                                                                <p:outputLabel id="lblCurrency"  class="control-label col-sm-2" value="#{FCMS.Currency}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="txtCurrency" style="width: 100%"  required="true" requiredMessage="Please Select a Currency" 
+                                                                                     value="#{revenueContractController.luCurrency}" converter="entConverter">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{revenueContractController.currencyLists}" var="currency" itemLabel="#{currency.currency}" itemValue="#{currency}"/>
+                                                                        <p:ajax event="change" process="@this"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="txtCurrency"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblContDuration"  class=" col-sm-2" style="text-align: right" value="#{FCMS.Contract_Duration}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtContDuration" class="form-control" 
+                                                                                 value="#{revenueContractController.prmsRevenueContarct.contractDuration}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+                                                                <p:outputLabel id="lblPayPeriod"  class="control-label col-sm-2" value="#{FCMS.Payment_Period}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="CmdPayPeriod" required="true" requiredMessage="Payment Period is Required"                         
+                                                                                     value="#{revenueContractController.prmsRevenueContarct.paymentPeriod}"  style="width: 100%"                   
+                                                                                     disabled="#{workFlow.readonly}">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Monthly" itemValue="monthly"/>
+                                                                        <f:selectItem itemLabel="Quarterly" itemValue="quarterly"/>
+                                                                        <f:selectItem itemLabel="6 Months" itemValue="6 month"/>
+                                                                        <f:selectItem itemLabel="Year" itemValue="year"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="CmdPayPeriod"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblEffecDate" class="col-sm-2"  style="text-align: right" value="#{FCMS.Effective_Date}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:calendar id="txtEffecDate" pattern="dd/MM/yyyy" placeholder="dd/MM/yyyy"
+                                                                                value="#{revenueContractController.prmsRevenueContarct.effectiveDate}">
+                                                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                    </p:calendar>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px">
+                                                                <p:outputLabel id="lblPayAmount" for="lblPayAmount" class="control-label col-sm-2" value="#{FCMS.Payment_Amount}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtPayAmount" class="form-control" 
+                                                                                 value="#{revenueContractController.prmsRevenueContarct.paymentAmount}"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblStatus" for="lblStatus" class="control-label col-sm-2" value="#{FCMS.Status}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="drdStatus" style="width: 100%" converter="entConverter"
+                                                                                     value="#{revenueContractController.status}"
+                                                                                     valueChangeListener="#{revenueContractController.checkStatus}">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Active" itemValue="active"/>
+                                                                        <f:selectItem itemLabel="DeActive" itemValue="deactive"/>
+                                                                        <p:ajax event="change"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px">
+                                                                <p:outputLabel id="lblContDescp" for="lblContDescp" class="control-label col-sm-2" value="#{FCMS.Contract_Description}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputTextarea id="txtContDescp" class="form-control" rows="3"  
+                                                                                     value="#{revenueContractController.prmsRevenueContarct.contractDescription}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px">
+                                                                <div class="col-sm-3 col-sm-push-2">
+                                                                    <p:commandButton id="cmdSaveUpdate" class="btn btn-primary"
+                                                                                     action="#{revenueContractController.saveRevenueConractInfo()}"
+                                                                                     value="#{revenueContractController.saveUpdateBundle}" icon="ui-icon-save"
+                                                                                     update=":frmRevContractMain,:frmRevContractMain:registerUI,:frmRevenueSearch" process="@this,:frmRevContractMain,:frmRevContractMain:registerUI"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </h:form>
+                            </p:tab>
+                            <p:tab title="Revenue Contract Detail" disabled="#{revenueContractController.isRevContDataFilled}">
+                                <h:form id="frmRevContDetail">
+                                    <h:panelGroup id="PGRevContDetail">
+                                        <div class="box box-primary">
+                                            <div class="box-header">
+                                                <h3 class="box-title">#{FCMS.Revenue_Contract_Detail}</h3>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row"> 
+                                                    <div class="col-md-12"> 
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px">
+                                                                <p:outputLabel id="lblPerfOblg" for="txtPerfOblg" class="control-label col-sm-2" value="#{FCMS.Performance_Obligation}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtPerfOblg" class="form-control" 
+                                                                                 value="#{revenueContractController.prmsRevenueContractDetail.performanceObligation}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+                                                                <p:outputLabel id="lblSellingPrice" class="control-label col-sm-2" value="#{FCMS.Stand_Alone_Selling_Price}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtSellingPrice" required="true" requiredMessage="Stand Alone Selling Price is Required"                       
+                                                                                 value="#{revenueContractController.prmsRevenueContractDetail.standAloneSellingPrice}"                    
+                                                                                 disabled="#{workFlow.readonly}" class="form-control"/>
+                                                                    <p:message  for="txtSellingPrice" display="icon"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblInterest" class="control-label col-sm-2" value="#{FCMS.Interest}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <h:inputText id="txtInterest" class="form-control" required="true" requiredMessage="Interest Value is Required" 
+                                                                                 value="#{revenueContractController.prmsRevenueContractDetail.interest}"/>
+                                                                    <p:message for="txtInterest" display="icon"/>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+                                                                <p:outputLabel id="lblDiscount" class="col-sm-2" style="text-align: right" value="#{FCMS.Discount}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:inputText id="txtDiscount" class="form-control" 
+                                                                                 value="#{revenueContractController.prmsRevenueContractDetail.discount}"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblConsAmount" class="control-label col-sm-2" value="#{FCMS.Consideration_Amount}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:inputText id="txtConsAmount" required="true" requiredMessage="Consideration Amount is Required"  style="width: 100%"                       
+                                                                                 value="#{revenueContractController.prmsRevenueContractDetail.cosiderationAmount}"                    
+                                                                                 disabled="#{workFlow.readonly}"/>
+                                                                    <p:message  for="txtConsAmount" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px required">
+                                                                <p:outputLabel id="lbltxtTransDate" class="control-label col-sm-2" value="#{FCMS.Transaction_Date}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:calendar id="txtTransDate" required="true" requiredMessage="Transaction Date is Required"                        
+                                                                                value="#{revenueContractController.prmsRevenueContractDetail.transactionDate}"
+                                                                                placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"
+                                                                                disabled="#{workFlow.readonly}" mindate="today">
+                                                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                    </p:calendar>
+                                                                    <p:message  for="txtTransDate" display="icon"/>
+                                                                </div>
+                                                                <p:outputLabel id="lblStatuses" class="col-sm-2" style="text-align: right" value="#{FCMS.Status}:"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:selectOneMenu id="txtStatuses" style="width: 100%"
+                                                                                     value="#{revenueContractController.prmsRevenueContractDetail.status}">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Prepare" itemValue="prepared"/>
+                                                                        <f:selectItem itemLabel="Submit" itemValue="submitted"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px">
+                                                                <div class="col-sm-3 col-sm-push-4">
+                                                                    <p:commandButton id="cmdAdd" value="#{FCMS.Add}" class="btn btn-primary" icon="icon-ui-add" 
+                                                                                     process="@this,PGRevContDetail,dtRevContDetail" update="dtRevContDetail,PGRevContDetail"
+                                                                                     action="#{revenueContractController.addRevContDetail()}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row">
+                                                    <div class="col-md-12"> 
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px">
+                                                                <p:dataTable id="dtRevContDetail" paginator="true" paginatorPosition="bottom" rowIndexVar="rowIndex"
+                                                                             var="userObj" rows="5" value="#{revenueContractController.prmsRevenueContractDetailsList}" editable="true"
+                                                                             rowKey="#{userObj.revenueContractId}">
+                                                                    <p:ajax event="rowEdit" process="@this,dtRevContDetail"  update="@this,dtRevContDetail" listener="#{revenueContractController.onRowEdit}"/>
+                                                                    <p:column headerText="#{FCMS.No}">
+                                                                        #{rowIndex+1}
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Performance_Obligation}">
+                                                                        <p:cellEditor>
+                                                                            <f:facet name="output"><h:outputText value="#{userObj.performanceObligation}"/></f:facet>
+                                                                            <f:facet name="input"><p:inputText value="#{userObj.performanceObligation}"/></f:facet>
+                                                                        </p:cellEditor>
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Discount}">
+                                                                        <p:cellEditor>
+                                                                            <f:facet name="output"><h:outputText value="#{userObj.discount}"/></f:facet>
+                                                                            <f:facet name="input"><p:inputText value="#{userObj.discount}"/></f:facet>
+                                                                        </p:cellEditor>
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Interest}">
+                                                                        <p:cellEditor>
+                                                                            <f:facet name="output"><h:outputText value="#{userObj.interest}"/></f:facet>
+                                                                            <f:facet name="input"><p:inputText value="#{userObj.interest}"/></f:facet>
+                                                                        </p:cellEditor>
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Consideration_Amount}">
+                                                                        <p:cellEditor>
+                                                                            <f:facet name="output"><h:outputText value="#{userObj.cosiderationAmount}"/></f:facet>
+                                                                            <f:facet name="input"><p:inputText value="#{userObj.cosiderationAmount}"/></f:facet>
+                                                                        </p:cellEditor>
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Stand_Alone_Selling_Price}">
+                                                                        <p:cellEditor>
+                                                                            <f:facet name="output"><h:outputText value="#{userObj.standAloneSellingPrice}"/></f:facet>
+                                                                            <f:facet name="input"><p:inputText value="#{userObj.standAloneSellingPrice}"/></f:facet>
+                                                                        </p:cellEditor>
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Allocated_Transaction_Price}">
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Transaction_Date}">
+                                                                        <p:cellEditor>
+                                                                            <f:facet name="#{FCMS.output}">
+                                                                                <h:outputText value="#{userObj.transactionDate}">
+                                                                                    <f:convertDateTime pattern="dd/MMM/yy"/>
+                                                                                </h:outputText>
+                                                                            </f:facet>
+                                                                            <f:facet name="#{FCMS.input}">
+                                                                                <p:calendar value="#{userObj.transactionDate}">
+                                                                                    <f:convertDateTime pattern="dd/MMM/yy"/>
+                                                                                </p:calendar>
+                                                                            </f:facet>
+                                                                        </p:cellEditor>
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Status}">
+                                                                        <p:cellEditor>
+                                                                            <f:facet name="#{FCMS.output}">
+                                                                                <h:outputText value="#{userObj.status}"/>
+                                                                            </f:facet>
+                                                                            <f:facet name="#{FCMS.input}">
+                                                                                <p:selectOneMenu value="#{userObj.status}" style="width: 120px">
+                                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                                    <f:selectItem itemLabel="Prepare" itemValue="prepared"/>
+                                                                                    <f:selectItem itemLabel="Submit" itemValue="submitted"/>
+                                                                                </p:selectOneMenu>
+                                                                            </f:facet>
+                                                                        </p:cellEditor>
+                                                                    </p:column>
+                                                                    <p:column headerText="#{FCMS.Modify}" exportable="false">
+                                                                        <p:rowEditor/>
+                                                                    </p:column>
+                                                                </p:dataTable>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <div class="row"> 
+                                                    <div class="col-md-12"> 
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <div class="form-group textBoxMargin6px">
+                                                                <div class="col-sm-3 col-sm-push-4">
+                                                                    <p:commandButton id="cmdSave" value="#{FCMS.save}" action="#{revenueContractController.saveRevContDeatil()}" 
+                                                                                     class="btn btn-primary" icon="icon-ui-save"
+                                                                                     process="@this" update="dtRevContDetail,PGRevContDetail"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </h:form>
+                            </p:tab>
+                        </p:tabView>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

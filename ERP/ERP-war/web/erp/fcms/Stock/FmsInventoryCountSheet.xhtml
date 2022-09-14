@@ -1,0 +1,116 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li><a href="StockItemInitialBalance.xhtml"><i class="fa fa-circle-o"></i> Stock Item Initial Balance</a></li>
+        <li><a href="StockLedgerCard.xhtml"><i class="fa fa-circle-o"></i> Stock Ledger Card</a></li>
+        <li><a href="FmsStockReport.xhtml"><i class="fa fa-circle-o"></i>  Stock Report</a></li> 
+        <li><a href="StockRevaluation.xhtml"><i class="fa fa-circle-o"></i> Stock Revaluation</a></li> 
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="backface-visibility: hidden;border-color:transparent;background: #ffffff " >
+                <f:facet name="right">
+                    <a href="FmsInventoryCountSheet.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">#{FCMS.Inventory_Count_Sheet}</h3>
+                </div>
+                <div class="panel panel-body">
+                    <div class="panel-body">
+                        <div class="col-md-12" > 
+                            <h:panelGroup id="searchPaydEntryForm" class="col-sm-12">  
+                                <div class="col-md-12 textBoxMargin6px">     
+                                    <div class="form-group">  
+                                        <h:outputLabel for="selectMatByStore" value="#{FCMS.Unbalanced_Material_List_from_MMS}" class="control-label col-sm-6"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">     
+                                    <div class="form-group">  
+                                        <div class="col-sm-8">                                                               
+                                            <p:selectOneListbox id="selectMatByStore" value="#{inventoryCountSheetController.storeInformation.storeId}" class="col-sm-8" style="width: 350px; height: 170px;" filterMatchMode="contains" filter="true"
+                                                                valueChangeListener="#{inventoryCountSheetController.getUnregisteredMartialList}" converter="entConverter" scrollHeight="120">
+                                                <f:selectItem itemLabel="--- Select Store ---" itemValue="" />
+                                                <f:selectItems  value="#{inventoryCountSheetController.unregisteredMartialBYStoreNameList}" var="storeVar"
+                                                                itemLabel="#{storeVar.storeName}" itemValue="#{storeVar.storeId}"/>
+                                                <p:ajax event="valueChange"  process="@this" update=":frmRegisterUI,:frmRegisterUI:tblperiod"/>
+                                            </p:selectOneListbox>
+                                        </div>                               
+                                    </div> 
+                                </div> 
+                                <div class="form-horizontal  col-sm-12">                            
+                                    <div class="form-group">
+                                        <p:dataTable id="tblperiod" value="#{inventoryCountSheetController.fmsStockLedgerCardModel}"
+                                                     rowIndexVar="num" rows="10" selection="#{inventoryCountSheetController.selectedMmsItem}" 
+                                                     rowKey="#{dtStokBalance.slcID}" paginator="true" paginatorPosition="Bottom" rowSelectMode="multiple"
+                                                     var="dtStokBalance" rowsPerPageTemplate="5,10,15"
+                                                      resizableColumns="true" >
+                                            <p:ajax event="rowSelectCheckbox" listener="#{inventoryCountSheetController.check}" />  
+                                            <p:ajax event="rowUnselectCheckbox" listener="#{inventoryCountSheetController.uncheck}" />  
+                                            <p:column selectionMode="multiple" width="70" style="width:16px;text-align:center"/>
+                                            <p:column headerText="#{FCMS.Material_Code}">
+                                                <h:outputText value="#{dtStokBalance.slcMatCode}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Material_Name}">
+                                                <h:outputText value="#{dtStokBalance.slcMatName}"/>
+                                            </p:column>  
+                                            <p:column headerText="#{FCMS.FCMS_Balance_Qty}.">
+                                                <h:outputText value="#{dtStokBalance.slcTotalQuanty}"/>
+                                            </p:column>
+                                            <p:column  headerText="#{FCMS.MMS_Counting_Qty}.">
+                                                <h:outputText value="#{dtStokBalance.ibsCountingValue}"/>
+                                            </p:column>
+                                            <p:column  headerText="#{FCMS.Overage}">
+                                                <h:outputText value="#{dtStokBalance.overage}"/>
+                                            </p:column>
+                                            <p:column  headerText="#{FCMS.Shortage}">
+                                                <h:outputText value="#{dtStokBalance.shortage}"/>
+                                            </p:column>
+
+                                        </p:dataTable>
+                                    </div>
+                                    <div class="col-md-12 textBoxMargin6px">     
+                                        <div class="form-group">  
+                                            <div class="col-sm-8"> 
+                                                <p:commandButton id="btnSavesaveInventoryCountSheet" class=" btn btn-primary"
+                                                                 action="#{inventoryCountSheetController.saveInventoryCountSheet()}"  
+                                                                 validateClient="true"
+                                                                 process="@this,frmRegisterUI"
+                                                                 update=":frmRegisterUI"
+                                                                 value="Save"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>          

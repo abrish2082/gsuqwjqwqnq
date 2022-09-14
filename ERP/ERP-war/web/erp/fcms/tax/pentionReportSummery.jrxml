@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="pentionReportSummery" language="groovy" pageWidth="1100" pageHeight="595" orientation="Landscape" columnWidth="1060" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bb8ebd46-7c5d-45ff-b88b-a01d5145b063">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="9"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="month" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT T1.ID,T1.EMP_ID,  T1.BASIC_SALARY, T1.TIN_NO,SUBSTR(T1.payment_made_for_the_month_of,4,7)payment_made_for_the_month_of,t1.FULL_NAME,nvl(T1.AMOUNT,0) EmployeeContribution ,nvl(T2.AMOUNT,0) EmployeerContribution,nvl(T1.AMOUNT,0)+nvl(T2.AMOUNT,0) TOTAL_AMOUNT
+FROM (
+(SELECT EMP.ID,EMP.TIN_NO, EMP.BASIC_SALARY,pp.payment_made_for_the_month_of, EMP.EMP_ID, EMP.FIRST_NAME||' '||EMP.MIDDLE_NAME||' '||EMP.LAST_NAME FULL_NAME,
+PT.AMOUNT,ED.DESCRIPTION,
+'3'DISP_ORDER FROM  hr_payroll_periods PP INNER JOIN  HR_PAYROLL_MON_TRANSACTIONS PT ON pp.id=pt.payroll_period_id INNER JOIN HR_PAYROLL_EARNING_DEDUCTIONS ED
+ON ED.CODE=PT.EARNING_DED_CODE INNER JOIN HR_EMPLOYEES EMP ON EMP.ID=PT.EMP_ID WHERE
+ ED.CRITERIAS='Pension Deduction' and emp.employment_type='Permanent' )t1
+ left join
+ (
+ SELECT  EMP.ID,EMP.TIN_NO, EMP.BASIC_SALARY, PP.payment_made_for_the_month_of, EMP.EMP_ID, EMP.FIRST_NAME||' '||EMP.MIDDLE_NAME||' '||EMP.LAST_NAME FULL_NAME,PT.AMOUNT,ED.DESCRIPTION,
+ '3'DISP_ORDER FROM  hr_payroll_periods PP INNER JOIN  HR_PAYROLL_MON_TRANSACTIONS PT ON pp.id=pt.payroll_period_id INNER JOIN HR_PAYROLL_EARNING_DEDUCTIONS ED
+ON ED.CODE=PT.EARNING_DED_CODE INNER JOIN HR_EMPLOYEES EMP ON EMP.ID=PT.EMP_ID WHERE
+ ED.CRITERIAS='Pension Addition' and  EMP.employment_type='Permanent' )t2  on T1.EMP_ID=T2.EMP_ID
+ )]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="EMP_ID" class="java.lang.String"/>
+	<field name="BASIC_SALARY" class="java.math.BigDecimal"/>
+	<field name="TIN_NO" class="java.lang.String"/>
+	<field name="PAYMENT_MADE_FOR_THE_MONTH_OF" class="java.lang.String"/>
+	<field name="FULL_NAME" class="java.lang.String"/>
+	<field name="EMPLOYEECONTRIBUTION" class="java.math.BigDecimal"/>
+	<field name="EMPLOYEERCONTRIBUTION" class="java.math.BigDecimal"/>
+	<field name="TOTAL_AMOUNT" class="java.math.BigDecimal"/>
+	<variable name="totalNoEmployee" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_ID}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalGrossSalary" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{BASIC_SALARY}]]></variableExpression>
+	</variable>
+	<variable name="employeeContribution" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYEECONTRIBUTION}.doubleValue()]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<variable name="employeerContribution" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{EMPLOYEERCONTRIBUTION}.doubleValue()]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<variable name="total" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_AMOUNT}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="95" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="6ec3a544-c3b3-43e2-93b1-dbf321af9b7b" x="672" y="43" width="167" height="36"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[pention for the Month of]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="41d6f58e-090b-4a7f-8e4b-2d874842f68a" x="839" y="43" width="100" height="36"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENT_MADE_FOR_THE_MONTH_OF}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="04a58782-875e-48b9-840a-486f7db72949" x="398" y="18" width="100" height="20"/>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pention Summary]]></text>
+			</staticText>
+		</band>
+	</title>
+	<summary>
+		<band height="234" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ae6a764f-5061-4a4e-8601-b5affe4fc775" x="136" y="0" width="266" height="36"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Permanent Employee Gross Salary]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f2a220ae-598f-4566-9c66-0bb3b366d98f" x="610" y="0" width="180" height="36"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employeer Contribution 11%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="585fd311-074e-4683-a629-6b1259b57af1" x="0" y="0" width="136" height="36"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total Number Of Employee]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2c566808-8afb-4a47-8e35-35eccf225f05" x="402" y="0" width="208" height="36"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Employee Contribution 7%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="eaf9c6fa-139d-4945-b0fb-20d805a52b22" x="790" y="0" width="221" height="36"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="ddf418f7-aaf3-49c2-b4fc-fc03caa5ace3" x="0" y="36" width="136" height="35"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{totalNoEmployee}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9fa37770-2ef7-48e7-b26b-8cf8e7f6c435" x="136" y="36" width="266" height="35"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BASIC_SALARY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f7845b49-8ef8-4df3-99fe-c347e637efff" x="402" y="36" width="208" height="35"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEECONTRIBUTION}.doubleValue()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="fb00ed9d-4c39-483a-93a4-9b596799deb5" x="610" y="36" width="180" height="35"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEERCONTRIBUTION}.doubleValue()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="93dd54f6-2b44-4cda-8641-2266c603b3fe" x="790" y="36" width="221" height="35"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<textFieldExpression><![CDATA[$V{total}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="00580281-269e-43a7-9bb3-0352f2dbc0bf" x="55" y="181" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Appeoved By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0222cceb-1b56-46ff-b022-53d74d4a1d1a" x="55" y="150" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Checked By]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2c1ab81f-fd2b-40b7-a575-d9ab5a006b8d" x="55" y="119" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Preapared By]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="c2270c3f-22fe-436d-9862-c5e5def3035e" x="454" y="160" width="123" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="23624591-6e42-4199-81fc-21e279a8f794" x="169" y="161" width="218" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="0f7f46aa-c9fe-4563-a151-935ed56cb6b9" x="169" y="192" width="218" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="660ff2e9-98ca-4da8-9a0f-5925b0fcdec3" x="454" y="82" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Signature]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="b76ef179-6b84-4eae-89e5-e775dd7ac9fd" x="623" y="160" width="100" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="1078dc8f-9693-49ad-bcf0-998844337657" x="232" y="82" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="4a3eacf6-af50-4295-8f57-c93ce0d908b4" x="623" y="129" width="100" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="3aebebdb-ff46-4280-b98d-6d424b0ee65c" x="454" y="130" width="123" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="8b5c6356-4c34-4294-8ab9-1406d465ac7a" x="623" y="82" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="c146852c-9631-4742-bcde-2114f71dd3a3" x="623" y="190" width="100" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="fe451af9-7488-4f6d-b119-91cbf71b7655" x="169" y="131" width="218" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="64bebbd3-3420-4952-86ce-4137dd307c62" x="454" y="191" width="123" height="1"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

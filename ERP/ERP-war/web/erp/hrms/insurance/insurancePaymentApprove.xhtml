@@ -1,0 +1,595 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="insuranceCompany.xhtml"><i class="fa fa-fw"></i> <span> Insurance Company</span></a></li>
+        <li><a href="maintianInjuredEmployee.xhtml"><i class="fa fa-fw"></i> <span> Maintain Employees Accident Information</span></a></li>
+        <li><a href="DiagnosisResult.xhtml"><i class="fa fa-fw"></i><span>Diagnosis Result</span></a></li>
+        <li><a href="insurancePayment.xhtml"><i class="fa fa-fw"></i> <span>Insurance Payment </span></a></li>
+        <li><a href="insurancePaymentApprove.xhtml"><i class="fa fa-fw"></i> <span> Insurance Payment Approve</span></a></li>
+
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:outputLabel id="lblNotf" class="fa fa-bell" value="#{insurancePaymentController.requestNotificationCounter}" style="color: red" />
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotf"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="form-group">
+                            <p:dataTable id="tblnotification" value="#{insurancePaymentController.hrInsurpaymentList}"
+                                         var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                         selection="#{insurancePaymentController.hrInsurancePayment}" rowKey="#{res.id}" class="dataTable">
+                                <p:ajax event="rowSelect" process="@this" listener="#{insurancePaymentController.PaymentapproveDisplayChanged}" 
+                                        update=":frmRequest,:frmSample"/>
+                                <p:column headerText="No.">
+                                    <h:outputText value="#{num + 1}"/>
+                                </p:column>
+                                <p:column headerText="Employee Name" filterMatchMode="startsWith" filterBy="#{res.diagonasisResultId.hrInsuranceInjuredEmployee.empId.firstName}">
+                                    <h:outputText value="#{res.diagonasisResultId.hrInsuranceInjuredEmployee.empId.firstName} 
+                                                  #{res.diagonasisResultId.hrInsuranceInjuredEmployee.empId.middleName} #{res.diagonasisResultId.hrInsuranceInjuredEmployee.empId.lastName}
+                                                  #{res.diagonasisResultId.hrInsuranceInjuredEmployee.fullName}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Percentage Physical Damage"/>
+                                    </f:facet>
+                                    <h:outputText value="#{res.diagonasisResultId.isDisease}"/>
+                                </p:column> 
+
+                            </p:dataTable>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                    </span>
+                    <p:commandLink id="cmlView" class="fa fa-gear" onclick="PF('dlgWorkflow').show();"/>
+                    <span class="ui-separator">
+                    </span>
+                    <p:commandButton id="btnNew" validateClient="true" action="#{insurancePaymentController.createNewAdditionalAmount()}" 
+                                     icon="#{insurancePaymentController.icone}" style="background-color: white" 
+                                     process="@this" update=":frmRequest,:frmSample"
+                                     title="#{insurancePaymentController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                    </span>
+                    <a href="insurancePaymentApprove.xhtml"><i class="fa fa-fw fa-refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <p:commandButton id="btnTrash" type="button" style="background-color: white"  title="Delete" icon="ui-icon-trash"/>
+                    <p:commandButton id="btnPrint" type="button" style="background-color: white"  title="Print" icon="ui-icon-print"/>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmRequest"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup id="pnlSearch" rendered="#{insurancePaymentController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search <small> Insurance Payment Approve ...</small></h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group">
+                                            <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                            <div class="col-sm-3">
+                                                <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                 valueChangeListener="#{insurancePaymentController.filiterByStatus_VclInsurancePayment1}">
+                                                    <f:selectItems value="#{insurancePaymentController.filterByStatus}"/>   
+                                                    <p:ajax event="change" process="@this" update="tblResultList"/>
+                                                </p:selectOneMenu> 
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblResultList" value="#{insurancePaymentController.inpaymentrequestDataModel}"
+                                                         var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                         selection="#{insurancePaymentController.hrInsurancePayment}" rowKey="#{res.id}" class="dataTable">
+                                                <p:ajax event="rowSelect" process="@this" listener="#{insurancePaymentController.PaymentapproveDisplayChanged}" 
+                                                        update=":frmRequest,:frmSample"/>
+                                                <p:column headerText="No.">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Employee Name"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.diagonasisResultId.hrInsuranceInjuredEmployee.empId.firstName} 
+                                                                  #{res.diagonasisResultId.hrInsuranceInjuredEmployee.empId.middleName} #{res.diagonasisResultId.hrInsuranceInjuredEmployee.empId.lastName}
+                                                                  #{res.diagonasisResultId.hrInsuranceInjuredEmployee.fullName}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Percentage Physical Damage"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.diagonasisResultId.isDisease}"/>
+                                                </p:column> 
+
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup id="pnlMainpage" rendered="#{insurancePaymentController.renderPnlCreateAdditional}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Insurance Payment Approve</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <h:panelGroup id="pnlemployeedetaildaily" class="col-sm-12" rendered="#{insurancePaymentController.chooseDailyLabour}">
+                                        <div class="form-group">
+                                            <div class="col-sm-12">
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtempname" class="control-label col-sm-4" value="Employee Name:"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtempname" value="#{insurancePaymentController.hrInsurancePayment.diagonasisResultId.hrInsuranceInjuredEmployee.fullName}"
+                                                                             readonly="true" title="Employee Name"/>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtWage" class="control-label col-sm-4" value="Daily Wage:"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtWage" value="#{insurancePaymentController.hrInsurancePayment.diagonasisResultId.hrInsuranceInjuredEmployee.dailyWage}"
+                                                                             readonly="true" title="Employee Name"/>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtType" class="control-label col-sm-4" value="Class Type"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtType" value="#{insurancePaymentController.hrInsurancePayment.diagonasisResultId.hrInsuranceInjuredEmployee.type}"
+                                                                             readonly="true" title="Employee Name"/>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtAccident" class="control-label col-sm-4" value="Accident Date"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtAccident" value="#{insurancePaymentController.hrInsurancePayment.diagonasisResultId.hrInsuranceInjuredEmployee.accidentDate}"
+                                                                             readonly="true" title="Employee Name"/>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtReported" class="control-label col-sm-4" value="Reported On"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtReported" value="#{insurancePaymentController.hrInsurancePayment.diagonasisResultId.hrInsuranceInjuredEmployee.accidentInformedDate}"
+                                                                             readonly="true" title="Employee Name"/>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlemployeedetail" class="col-sm-12" rendered="#{insurancePaymentController.choosePermanet}">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtempnamepermanent" class="control-label col-sm-4" value="Employee Name:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtempnamepermanent" value="#{insurancePaymentController.hrInsurancePayment.diagonasisResultId.hrInsuranceInjuredEmployee.empId.firstName} #{insurancePaymentController.hrInsurancePayment.diagonasisResultId.hrInsuranceInjuredEmployee.empId.middleName} #{insurancePaymentController.hrInsurancePayment.diagonasisResultId.hrInsuranceInjuredEmployee.empId.lastName}"
+                                                                                     readonly="true" title="Employee Name"/>
+                                                                    </div>
+                                                                </div>                                               
+                                                            </div>
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel class="col-md-4 control-label" value="Off Duty:"/>
+                                                                <div class="col-md-8 textBoxMargin6px">
+                                                                    <p:selectOneRadio id="rdnoffduty" value="#{insurancePaymentController.offduty}" 
+                                                                                      class="col-sm-6" >
+                                                                        <f:selectItem itemLabel="Yes" itemValue="1"/>
+                                                                        <f:selectItem itemLabel="No" itemValue="0"/>
+                                                                        <p:ajax process="@this" event="change" update="frmRequest"/>
+                                                                    </p:selectOneRadio> 
+                                                                </div>                                                                                                                               
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-group required form-horizontal">
+                                                                    <h:outputLabel value="Salary On:" class="col-md-4 control-label"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtSalaryOn" readonly="true" value="#{insurancePaymentController.hrEmployees.basicSalary}" required="true">
+                                                                        </p:inputText>
+                                                                        <p:message for="txtSalaryOn" display="icon"/>  
+                                                                    </div>                                                                                                                               
+                                                                </div>                                                                                          
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-group required form-horizontal">
+                                                                    <h:outputLabel value="Department" class="col-md-4 control-label"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtDirectorate"  readonly="true" value="#{insurancePaymentController.hrEmployees.deptId.depName}" required="true">
+                                                                        </p:inputText>
+                                                                        <p:message for="txtDirectorate" display="icon"/>  
+                                                                    </div>                                                                                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-group required form-horizontal">
+                                                                    <h:outputLabel value="Job Title:" class="col-md-4 control-label"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txttitle" readonly="true" value="#{insurancePaymentController.hrEmployees.jobId.jobTitle}" required="true">
+                                                                        </p:inputText>
+                                                                        <p:message for="txttitle" display="icon"/>  
+                                                                    </div>                                                                                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="class" value="Class Type:" class="col-md-4 control-label" /> 
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="class" readonly="true" value="#{insurancePaymentController.hrEmployees.employmentType}" >
+                                                                        </p:inputText> 
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl1" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">                                                                               
+                                                                    <h:outputLabel  for="txtformedical" class="control-label col-sm-4" value="For Medical:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtformedical" value="#{insurancePaymentController.medicalexpence}"
+                                                                                     readonly="true" title="For Medical"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtcompayment" class="control-label col-sm-4" value="Compensation Payment:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtcompayment" value="#{insurancePaymentController.compensation}"
+                                                                                     readonly="true" title="Compensation Payment"/>
+                                                                    </div>  
+                                                                </div>
+                                                            </div>
+                                                        </div>    
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtcotporation" value="For Company:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtcotporation" value="#{insurancePaymentController.corporation}"
+                                                                                     readonly="true" title="For Corporation"/>
+                                                                    </div> 
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtsickleave" value="For SickLeave:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtsickleave" value="#{insurancePaymentController.salarypaidd}"
+                                                                                     readonly="true" title="For SickLeave"/>
+                                                                    </div> 
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txttotalpayment" value="Total Payment By Insurance:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txttotalpayment" value="#{insurancePaymentController.amountpaid}"
+                                                                                     readonly="true" title="Total Payment By Insurance"/>
+                                                                    </div> 
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <br></br><br></br><br></br><br></br><br></br><br></br>
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-12">                                                                      
+                                                            <div class="form-group form-horizontal">  
+                                                                <p:dataTable id="tblInvoiceDetail" value="#{insurancePaymentController.hrInsurancePaymentDetailmodel}" 
+                                                                             class="dataTable" var="resultDetail" rowIndexVar="rowIndex">                                                                                       
+                                                                    <p:column style="width:100px" >
+                                                                        <f:facet name="header" >No.</f:facet>
+                                                                        <p:outputLabel value="#{rowIndex+1}"/>
+                                                                    </p:column>
+                                                                    <!--                                                                    <p:column headerText="Accident Happened" footerText="Total">
+                                                                                                                                            <h:outputText value="{resultDetail.accidenthappend}"/>
+                                                                                                                                        </p:column>-->
+                                                                    <p:column headerText="Medical Expense" footerText="#{insurancePaymentController.medicalexpence}">
+                                                                        <h:outputText value="#{resultDetail.medicalExpence}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Reciept Number" >
+                                                                        <h:outputText value="#{resultDetail.recieptNo}"/>
+                                                                    </p:column>
+                                                                </p:dataTable>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnldetail" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtInsuranceCompany" class="control-label col-sm-4" value="Insurance Company:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtInsuranceCompany" value="#{insurancePaymentController.hrLuInsurances.insuranceName}"
+                                                                                     validator="#{validatorManagedBean.Remark}" readonly="true" required="true">
+                                                                        </p:inputText>
+                                                                        <p:message for="txtInsuranceCompany" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>   
+                                                            <br></br>
+                                                            <br></br>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group  form-horizontal">
+                                                                    <h:outputLabel for="txtChequeNumber" class="control-label col-sm-4" value="Cheque Number:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtChequeNumber"
+                                                                                     value="#{insurancePaymentController.hrInsurancePayment.checkNo}" readonly="true" />
+                                                                        <p:message for="txtChequeNumber" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtAccounttxttitle" class="control-label col-sm-4" value="Account title:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtAccounttxttitle"
+                                                                                     value="#{insurancePaymentController.hrInsurancePayment.accontTitle}" readonly="true" />
+                                                                        <p:message for="txtAccounttxttitle" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 "> 
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtRecieved" class="control-label col-sm-4" value="Recieved Date:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtRecieved" converter="dateConverter"
+                                                                                     value="#{insurancePaymentController.hrInsurancePayment.recivedDate}" readonly="true"
+                                                                                     onclick="displayCalendar('frmRequest:txtRecieved', 'frmRequest:txtRecieved');"
+                                                                                     required="true" requiredMessage="Enter Recieved date" title="Recieved Date"/>
+                                                                        <p:message for="txtRecieved" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="col-md-12 "> 
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtInsuranceBranch" class="control-label col-sm-4" value="Insurance Branch:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtInsuranceBranch" 
+                                                                                     value="#{insurancePaymentController.hrLuInsuranceBranches.branchName}" readonly="true"/>
+                                                                        <p:message for="txtInsuranceBranch" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 "> 
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtNameOfBank" class="control-label col-sm-4" value="Name Of Bank:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtNameOfBank" 
+                                                                                     value="#{insurancePaymentController.hrInsurancePayment.nameOfBank}" readonly="true"/>
+                                                                        <p:message for="txtNameOfBank" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 "> 
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtBankBranch" class="control-label col-sm-4" value="Bank Branch:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtBankBranch" 
+                                                                                     value="#{insurancePaymentController.hrInsurancePayment.bankBranch}" readonly="true"/>
+                                                                        <p:message for="txtBankBranch" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 "> 
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtAccountNumber" class="control-label col-sm-4" value="Account Number:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtAccountNumber" 
+                                                                                     value="#{insurancePaymentController.hrInsurancePayment.accontNo}" readonly="true"/>
+                                                                        <p:message for="txtAccountNumber" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div> 
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">  
+                                            <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                                <div class="row">
+                                                    <div class="col-md-12">                      
+                                                        <div class="box-body"> 
+                                                            <div class="col-md-6">
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-group required form-horizontal">
+                                                                        <h:outputLabel for="drddecision" class="control-label col-sm-4" value="Decision"/>
+                                                                        <div class="col-md-8 textBoxMargin6px">
+                                                                            <p:selectOneMenu id="drddecision" value="#{insurancePaymentController.hrInsurancePayment.status}" 
+                                                                                             required="true"    requiredMessage="Select Decision" style="width: 100%"  >
+                                                                                <f:selectItem itemLabel="Select One" itemValue=""/>
+                                                                                <f:selectItem itemLabel="Approve" itemValue="1"/>
+                                                                                <f:selectItem itemLabel="Reject" itemValue="2"/>
+                                                                            </p:selectOneMenu>
+                                                                            <p:message for="drddecision" display="icon"/>
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal form-group required">
+                                                                        <p:outputLabel  for="txtComment" class="control-label col-sm-4"
+                                                                                        value="Comment Given:" />
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputTextarea id="txtComment" class="form-control"  value="#{insurancePaymentController.wfHrProcessed.commentGiven}" 
+                                                                                             title="Remark"  required="false"  requiredMessage="Enter Plan" 
+                                                                                             validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"
+                                                                                             onchange="this.value = this.value.trim()"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal form-group required">
+                                                                        <p:outputLabel  for="txtApproved" class="control-label col-sm-4"
+                                                                                        id="lblApproved" value="Processed Date:" />
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText id="txtApproved"  readonly="true"  placeholder="dd/mm/yyyy"
+                                                                                         value="#{insurancePaymentController.wfHrProcessed.processedOn}"  
+                                                                                         title="date"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal form-group">
+                                                                        <p:outputLabel  for="txtprey1" class="control-label col-sm-4"
+                                                                                        id="lblPrepatedy1" value="Processed By:"/>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText  id="txtprey1"   
+                                                                                          value="logedin user"  
+                                                                                          title="descripition"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <h:panelGroup id="pnlworkflow1" class="col-sm-12">
+                                                    <p:dialog id="dlgWorkflow" header="Workflow" widgetVar="dlgWorkflow" height="500"
+                                                              width="1200" modal="true" resizable="false" showEffect="explode">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="box-body ">
+                                                                    <h:form class="form-horizontal" id="frmWorkflow" style="margin-top: 20px;">
+                                                                        <section class="panel panel-info" id="pnl22">
+                                                                            <section class="panel-body">                                       
+                                                                                <div class="col-md-12" >                                       
+                                                                                    <div class="col-sm-12">
+                                                                                        <p:dataTable id="tblWorkflow" value="#{insurancePaymentController.workFlowDataModel}" 
+                                                                                                     var="currentRow"  rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                                                     rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                                                            <p:column headerText="Processed By">
+                                                                                                <h:outputText value="#{currentRow.processedBy}"/> 
+                                                                                            </p:column>
+                                                                                            <p:column >
+                                                                                                <f:facet name="header">
+                                                                                                    <h:outputText value="Decision"/>
+                                                                                                </f:facet>
+                                                                                                <h:outputText value="#{currentRow.action}"/> 
+                                                                                            </p:column>
+                                                                                            <p:column >
+                                                                                                <f:facet name="header">
+                                                                                                    <h:outputText value="Comment Given"/>
+                                                                                                </f:facet>
+                                                                                                <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                                                            </p:column>
+                                                                                            <p:column >
+                                                                                                <f:facet name="header">
+                                                                                                    <h:outputText value="Processed Date"/>
+                                                                                                </f:facet>
+                                                                                                <h:outputText value="#{currentRow.processedOn}"/> 
+                                                                                            </p:column> 
+                                                                                        </p:dataTable>
+                                                                                    </div> 
+                                                                                </div>  
+                                                                            </section>
+                                                                        </section>
+                                                                    </h:form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </p:dialog>
+                                                </h:panelGroup>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+
+
+
+
+
+                                    <h:panelGroup id="pnl4" class="col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="#{insurancePaymentController.saveOrUpdateButton}" 
+                                                                             action="#{insurancePaymentController.saveInsurancePaymentApprove()}" title="Approve"
+                                                                             process="@this,pnlworkflow" class="btn  btn-block btn-primary col-lg-4"                                       
+                                                                             update=":frmRequest"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

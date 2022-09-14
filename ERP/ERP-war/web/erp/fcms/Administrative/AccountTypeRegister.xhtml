@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li>
+            <a href="../../fcms/Administrative/SystemRegistration.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>  System</a>
+        </li>
+        <li>
+            <a href="../../fcms/Administrative/CostCenter.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>  Cost Center</a>
+        </li>        
+        <li>
+            <a href="../../fcms/Administrative/GeneralLedger.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>  General Ledger</a>
+        </li>
+        <li>
+            <a href="../../fcms/Administrative/ChartOfAccounts.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>  Chart of Account</a>
+        </li>   
+        <li>
+            <a href="../../fcms/Administrative/VoucherNumberRangeReg.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>  Voucher Number Range</a>
+        </li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone" action="#{fmsAccountTypeController.createNewAcctType()}" 
+                                     icon="#{fmsAccountTypeController.icone}" validateClient="true" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{fmsAccountTypeController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/Administrative/AccountTypeRegister.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <!-- Search -->
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{fmsAccountTypeController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Search_Account_Types}<small>...</small></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmBankDetail"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblBankDatail" value="#{fmsAccountTypeController.getAcctTypeList()}"  rowIndexVar="num" var="acctTypeVar" selectionMode="single"
+                                                             selection="#{fmsAccountTypeController.selectedAcountType}" rowKey="#{acctTypeVar.id}"
+                                                             rows="15" paginator="true" paginatorPosition="bottom" >
+                                                    <p:ajax event="rowSelect" listener="#{fmsAccountTypeController.populate}" update=":frmRegisterUI,:frmMainUI,:frmToolbar"/>
+                                                    <p:column headerText="#{FCMS.No}." width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="#{FCMS.Account_Type}" filterBy="#{acctTypeVar.type}" filterMatchMode="contains">
+                                                        <h:outputText value="#{acctTypeVar.type}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+        <!-- Bank Register-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl1" sticky="#{fmsAccountTypeController.isSticky}" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{fmsAccountTypeController.renderPnlCreateAccType}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Account_Type_Registration}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="pnlGrpBankRegister" class="col-sm-12">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <p:outputLabel class="control-label col-sm-4" value="#{FCMS.Account_Type}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtAcctType" class="form-control" value="#{fmsAccountTypeController.fmsAccountType.type}" validator="#{validatorManagedBean.Remark}" required="true"/>
+                                                        <p:message for="txtAcctType" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="lblBtnSaveAccountType" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnSaveAccountType" class="btn btn-primary" validateClient="true"   
+                                                                         action="#{fmsAccountTypeController.saveFcmsAccountTypes()}"
+                                                                         process="@this,pnlGrpBankRegister,frmRegisterUI" 
+                                                                         update="pnlGrpBankRegister,frmRegisterUI"                                                  
+                                                                         value="#{fmsAccountTypeController.saveorUpdateBundle}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
+
+
+

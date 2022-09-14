@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+   template="../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">           
+
+        <li><a href="fixedAssetDepreciationCalc.xhtml"><i class="fa fa-circle-o"></i> <span>FA Depreciation Calculation</span></a></li> 
+        <li><a href="depreciationSetupIfrs.xhtml"><i class="fa fa-circle-o"></i> <span>Depreciation SetUp</span></a></li>        
+    </ui:define>
+
+    <ui:define name="contents">    
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white; height: 40">
+                <f:facet name="right">                    
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="fixedAssetDepreciationCalc.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>                 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI1">
+            <div class="box box-primary">
+                <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" >
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Depreciation Calculation</h3>
+
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="form-horizontal  col-sm-12">
+                                    <!--                                    <div class="form-group">
+                                                                            <h:outputLabel class="control-label col-sm-2" for="txtDeprecionType" value="Depreciation Type:"/>
+                                                                            <div class="col-sm-4">
+                                    
+                                                                                <p:selectOneMenu id="txtDeprecionType" value="{depreciationCompCalcControllers.depreciationSetup}" 
+                                                                                              converter="entConverter"   valueChangeListener="{depreciationCompCalcControllers.handleListner}"     style="width: 100%" filter="true" >
+                                                                                    <f:selectItem  itemLabel="select one" itemValue="" noSelectionOption="false"/>
+                                                                                    <f:selectItems value="{depreciationCompCalcControllers.listofGroups}" var="deprList" itemValue="{deprList}" />
+                                                                                     <p:ajax update="@this,:frmCalcDepreciationUI:dtDepreciuationCalc" process="@this,:frmMainUI" event="change"/>
+                                                                                               
+                                                                                </p:selectOneMenu>
+                                                                            </div>
+                                                                        </div>-->
+
+                                    <div class="form-group col-sm-12 textBoxMargin6px">                                                                                                
+                                        <h:outputLabel class="control-label col-sm-2" for="drdFACategory" value="GL Code:"/>
+                                        <div class="col-sm-4">
+                                            <p:selectOneMenu id="drdFACategory"  
+                                                             valueChangeListener="#{depreciationCompCalcControllers.handleSelectGlCode1}"
+                                                             style="width: 100%" required="true" styleClass="noupdate">
+                                                <f:selectItem itemValue="" itemLabel="---select one---" />
+                                                <f:selectItems id="drdFACategory2" var="glCode" itemLabel="#{glCode.generalLedgerCode}" 
+                                                               itemValue="#{glCode.generalLedgerId}" 
+                                                               value="#{depreciationCompCalcControllers.getGlList()}" />
+                                                <p:ajax update="slCode" process="@this" event="change" />
+                                            </p:selectOneMenu>    
+                                            <p:message display="icon"  for="drdFACategory"/>
+                                        </div>
+                                        <h:outputLabel class="control-label col-sm-2" for="slCode" value="SL Code:"/> 
+                                        <div class="col-sm-4">
+                                            <p:selectOneMenu id="slCode"   value="#{depreciationCompCalcControllers.fmsSubsidiaryLedger.subsidiaryId}"
+                                                             style="width: 100%" filter="true"
+                                                             valueChangeListener="#{depreciationCompCalcControllers.getListOfAttributesByCategory(e)}">
+                                                <f:selectItem  itemLabel="---select one---"/> 
+                                                <f:selectItems value="#{depreciationCompCalcControllers.subsideryCodeList}"
+                                                               var="sdlCode" itemLabel="#{sdlCode.subsidiaryCode}" itemValue="#{sdlCode.subsidiaryId}"/>
+                                                <p:ajax update="@this,:frmCalcDepreciationUI" process="@this" event="change"/>
+                                            </p:selectOneMenu> 
+                                            <p:message for="slCode" display="icon" />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </h:panelGroup>
+
+
+
+            </div>
+
+        </h:form>
+        <h:form id="frmCalcDepreciationUI">
+            <div class="box box-primary">
+                <h:panelGroup id="pgAttribute" style="border: 0px; background-color: transparent"  >
+
+                    <div class="box-body">
+                        <div class="row">                      
+                            <div class="col-md-12" > 
+                                <div class="form-horizontal  col-sm-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="dtDepreciuationCalcs" class="dataTable" style="width: 100%" var="fixedAsset" 
+                                                     value="#{depreciationCompCalcControllers.fixedAssets}"    rows="15" paginator="true" paginatorPosition="bottom"
+                                                     scrollable="true"  scrollWidth="auto" scrollHeight="auto" rowIndexVar="num" 
+                                                     >
+                                            <p:column width="40" headerText="No." >
+                                                <h:outputText  value="#{num+1}" />
+                                            </p:column>     
+
+                                            <p:column width="100" headerText="System No." >
+                                                #{fixedAsset.systemNumber}
+                                            </p:column>
+                                            <p:column width="100" headerText="Accumulated Depreciation " >
+                                                #{fixedAsset.accumulatedDepreciation}
+                                            </p:column>                                                                    
+
+                                            <p:column width="100" headerText="Netbook Value" >
+                                                #{fixedAsset.netBookValue}
+                                            </p:column>                                                            
+                                        </p:dataTable>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>
+
+
+

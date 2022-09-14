@@ -1,0 +1,485 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content"> 
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="appealApprove.xhtml"><i class="fa fa-circle-o "></i><span>Appeal Approve</span></a></li> 
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{appealRequestControllers.newSearch()}"
+                                     icon="#{appealRequestControllers.icone}" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmAppealRequest" 
+                                     title="#{appealRequestControllers.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{appealRequestControllers.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{appealRequestControllers.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmToolBar,:frmSearch,:frmAppealRequest" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-gear" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWorkflow" value="#{appealRequestControllers.hrWorkFlowDataModel}"
+                                                                 var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                 rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Decision"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.changedStstus}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Comment Given"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Processed Date"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                        </p:column> 
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>               
+                    <a href="../../hrms/compliantHandling/appealRequest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{appealRequestControllers.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchList">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{appealRequestControllers.valueChangeListnerAppealRequest}">
+                                                                <f:selectItems value="#{appealRequestControllers.populateFilterByStatus}"/>   
+                                                                <p:ajax event="change" process="@this" update=":frmSearch:tblApeal"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblApeal" value="#{appealRequestControllers.appealRequestList}" var="appeal"
+                                                         selection="#{appealRequestControllers.hrAppeals}" selectionMode="single"
+                                                         rows="10" rowsPerPageTemplate="5,10,15"  paginator="true" paginatorPosition="bottom" rowIndexVar="num" rowKey="#{appeal}">
+                                                <p:ajax event="rowSelect" listener="#{appealRequestControllers.populateAppeal}"
+                                                        process="@this" update="@this,:frmToolBar,:frmSearch,:frmAppealRequest"/>
+                                                <p:column headerText="No." style="width:50px;">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Appellant ID" filterMatchMode="contains" filterBy="#{appeal.applicantId.empId}">
+                                                    <h:outputText value="#{appeal.applicantId.empId}"/>
+                                                </p:column>
+                                                <p:column headerText="Appellant Name" filterMatchMode="contains" filterBy="#{appeal.applicantId.firstName}">
+                                                    <h:outputText value="#{appeal.applicantId.firstName} #{appeal.applicantId.middleName} #{appeal.applicantId.lastName}"/>
+                                                </p:column>
+                                                <p:column headerText="Appeal Date">
+                                                    <h:outputText value="#{appeal.appealDate}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>          
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmAppealRequest"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/> 
+            <h:panelGroup id="pnlMainpage" rendered="#{appealRequestControllers.renderPnlCreateAdditional}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Appeal Request</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="nav-tabs-custom">
+                                        <ul class="nav nav-tabs" id="myTab">
+                                            <li class="active" ><a data-toggle="tab" href="#request">Appeal Request Detail</a></li>
+                                            <li ><a data-toggle="tab" href="#attachFile">Supportive Information</a></li>
+                                        </ul>
+                                        <div class="tab-content" id="maintab">
+                                            <div class="tab-pane active" id="request">
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <h:panelGroup id="pnlEmp" class="col-sm-12">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-md-6"> 
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal form-group required">
+                                                                                <h:outputLabel for="txtAppellantName" value="Appellant Name: " class="control-label col-sm-4"/>  
+                                                                                <div class="col-sm-8">
+                                                                                    <p:autoComplete id="txtAppellantName" value="#{appealRequestControllers.hrEmployees.firstName}" 
+                                                                                                    completeMethod="#{appealRequestControllers.SearchByFname}" style="width:100%"
+                                                                                                    required="true" requiredMessage="Enter name to search" placeholder="Enter name to search" 
+                                                                                                    var="empList" itemValue="#{empList.firstName}" itemLabel="#{empList}" forceSelection="true" 
+                                                                                                    size="20" emptyMessage="no data" scrollHeight="300" title="Employee Name"
+                                                                                                    disabled="#{appealRequestControllers.disableEmp}">  
+                                                                                        <p:ajax event="itemSelect" listener="#{appealRequestControllers.getByFirstName}" 
+                                                                                                process="@this" update="pnlEmp"/>     
+                                                                                        <p:column headerText="Employee Name">
+                                                                                            <h:outputText  value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                                                        </p:column>
+                                                                                        <p:column headerText="Employee ID" >
+                                                                                            <h:outputText  value="#{empList.empId}"/>
+                                                                                        </p:column>
+                                                                                    </p:autoComplete> 
+                                                                                    <p:message for="txtAppellantName" display="icon"/>
+                                                                                </div> 
+                                                                            </div>                                                                                          
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtDepartment" value="Department:" class="control-label col-sm-4"/>                                                               
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtDepartment" value="#{appealRequestControllers.hrEmployees.deptId.depName}" 
+                                                                                                 readonly="true" title="Department"/>
+                                                                                </div>
+                                                                            </div>                                                                                          
+                                                                        </div>                                                                                 
+                                                                    </div>
+                                                                    <div class="col-md-6">                                                         
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtEmployeeId" value="Appellant ID:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtEmployeeId" value="#{appealRequestControllers.hrEmployees.empId}" 
+                                                                                                 title="Employee ID" readonly="true"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>     
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtJobTitle" value="Job Title:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtJobTitle" value="#{appealRequestControllers.hrEmployees.jobId.jobTitle}" 
+                                                                                                 title="Job Position" readonly="true"/>
+                                                                                </div>                                                              
+                                                                            </div>
+                                                                        </div>                                                                                                                                                                                                                                               
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section> 
+                                                </section> 
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <h:panelGroup id="pnl3" class="col-sm-12">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-sm-6">   
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal form-group required"> 
+                                                                                <h:outputLabel for="somAppealOn" class="control-label col-sm-4" value="Appeal on: "/> 
+                                                                                <div class="col-sm-8">                                                       
+                                                                                    <p:selectOneMenu id="somAppealOn" value="#{appealRequestControllers.hrAppeals.caseCategory}" converter="entConverter"
+                                                                                                     disabled="#{appealRequestControllers.disableAppealCategory}"
+                                                                                                     valueChangeListener="#{appealRequestControllers.somAppealCategory_processValueChange}" 
+                                                                                                     required="true" requiredMessage="Select appeal on" style="width:100%">
+                                                                                        <f:selectItems value="#{appealRequestControllers.appealCategory}"/>   
+                                                                                        <p:ajax event="change" process="@this" update="pnl3"/>
+                                                                                    </p:selectOneMenu>
+                                                                                    <p:message for="somAppealOn" display="icon"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel binding="#{appealRequestControllers.lblProcessId}" id="lblProcessId" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtProcessId" rendered="#{appealRequestControllers.txtProcessId}"  
+                                                                                                 value="#{appealRequestControllers.txtProcessIdVal}" readonly="true"/>
+                                                                                </div>                                                              
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel binding="#{appealRequestControllers.lblProcessDescOne}" id="lblProcessDescOne" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtProcessDescOne" rendered="#{appealRequestControllers.txtProcessDescOne}" 
+                                                                                                 value="#{appealRequestControllers.txtProcessDescOneVal}" readonly="true"/>
+                                                                                </div>                                                              
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtGround" class="control-label col-sm-4" value="Grounds of Appeal: "/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputTextarea id="txtGround" value="#{appealRequestControllers.hrAppeals.ground}"
+                                                                                                     disabled="#{appealRequestControllers.disableGround}"
+                                                                                                     validator="#{validatorManagedBean.Text}" validatorMessage="Ground of appeal should be text" 
+                                                                                                     required="true" requiredMessage="Enter ground of appeal" class="form-control"
+                                                                                                     rows="1" autoResize="false" placeholder="Grounds of Appeal"/>  
+                                                                                    <p:message for="txtGround" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                       
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                            <div class="form-group form-horizontal"> 
+                                                                                <h:outputLabel for="somCase" class="control-label col-sm-4" value="Case: "/> 
+                                                                                <div class="col-sm-8">                                                       
+                                                                                    <p:selectOneMenu id="somCase" value="#{appealApproveController.hrAppeals.caseId}" 
+                                                                                                     valueChangeListener="#{appealRequestControllers.caseDetails}" style="width:100%"
+                                                                                                     disabled="#{appealRequestControllers.disableCase}" 
+                                                                                                     required="true" requiredMessage="Select case">
+                                                                                        <f:selectItems value="#{appealRequestControllers.caseList}"/>   
+                                                                                        <p:ajax event="change" process="@this" update="pnl3"/>
+                                                                                    </p:selectOneMenu>
+                                                                                    <p:message for="somCase" display="icon"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel binding="#{appealRequestControllers.lblProcessDescTwo}" id="lblProcessDescTwo" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtProcessDescTwo" rendered="#{appealRequestControllers.txtProcessDescTwo}" 
+                                                                                                 value="#{appealRequestControllers.txtProcessDescTwoVal}" readonly="true"/>
+                                                                                </div>                                                              
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel binding="#{appealRequestControllers.lblProcessDescThree}" id="lblProcessDescThree" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtProcessDescThree" rendered="#{appealRequestControllers.txtProcessDescThree}"  
+                                                                                                 value="#{appealRequestControllers.txtProcessDescThreeVal}"  readonly="true"/>
+                                                                                </div>                                                              
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtAppealDate" value="Appeal Date: " class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtAppealDate" value="#{appealRequestControllers.hrAppeals.appealDate}" 
+                                                                                                 disabled="#{appealRequestControllers.disableAppealDate}"
+                                                                                                 onclick="displayCalendar('frmAppealRequest:txtAppealDate', 'frmAppealRequest:txtAppealDate');"
+                                                                                                 converter="dateConverter" required="true" requiredMessage="Enter appeal date" class="form-control"
+                                                                                                 validator="#{validatorManagedBean.Date}" 
+                                                                                                 validatorMessage="Appeal date should be in date format"/>      
+                                                                                    <p:message for="txtAppealDate" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section> 
+                                                </section> 
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">  
+                                                        <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-md-12">                      
+                                                                    <div class="box-body"> 
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group required">
+                                                                                    <h:outputLabel  for="txtComment" class="control-label col-sm-4" value="Comment Given:"/>
+                                                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                                                        <h:inputTextarea id="txtComment"  class="form-control col-md-12" value="#{appealRequestControllers.wfHrProcessed.commentGiven}"
+                                                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only" requiredMessage="Comment is mandatory"
+                                                                                                         required="true" onchange="this.value = this.value.trim()"/>
+                                                                                        <p:message for="txtComment" display="icon"/>
+                                                                                    </div>  
+                                                                                </div> 
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal">
+                                                                                    <p:outputLabel  for="txtApproved" class="control-label col-sm-4" id="lblApproved" value="Processed Date:" />
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:inputText id="txtApproved"  readonly="true"  placeholder="dd/mm/yyyy"
+                                                                                                     value="#{appealRequestControllers.processedDate}"  title="Procced Date"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group">
+                                                                                    <p:outputLabel  for="txtprey1" class="control-label col-sm-4" id="lblPrepatedy1" value="Processed By:"/>
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:inputText  id="txtprey1" value="#{workFlow.userName}" title="Procced By"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <h:panelGroup id="pnlSave" class="col-sm-12">
+                                                    <div class="panel-body col-sm-12">
+                                                        <div class="form-group col-sm-12">
+                                                            <div class="col-sm-6">
+                                                                <div class="col-sm-12 form-horizontal">
+                                                                    <div class="col-sm-4">                                                              
+                                                                    </div>                                                                    
+                                                                    <div class="col-sm-3">
+                                                                        <p:commandButton id="btnSave" value="#{appealRequestControllers.saveOrUpdate}" 
+                                                                                         action="#{appealRequestControllers.saveAppealRequest}" 
+                                                                                         disabled="#{appealRequestControllers.disableBtnSave}" title="Save"
+                                                                                         class="btn  btn-block btn-primary col-lg-2"
+                                                                                         process="@this,pnlMainpage,pnlworkflow,pnlFileUpload" update="frmAppealRequest"/>  
+                                                                    </div>
+                                                                    <div class="col-sm-3">
+                                                                        <p:commandButton id="btnReset" value="Reset"                                           
+                                                                                         action="#{appealRequestControllers.resetAppealRequest()}" 
+                                                                                         title="Clear" class="btn  btn-block btn-primary col-lg-2"   
+                                                                                         process="@this" update="@this,:frmAppealRequest"/> 
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                            </div>
+                                            <div class="tab-pane" id="attachFile">
+                                                <section class="panel panel-info"  >
+                                                    <section class="panel-body" > 
+                                                        <h:panelGroup id="pnlFileUpload" class="col-sm-12">  
+                                                            <div class="row">
+                                                                <div class="col-md-12">                      
+                                                                    <div class="box-body"> 
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal">
+                                                                                    <p:outputLabel  value="Upload File:" class="control-label col-sm-4"/>
+                                                                                    <div class="col-sm-8">            
+                                                                                        <p:panelGrid columns="1" style="float: left;"> 
+                                                                                            <p:fileUpload  id="fileUplod" cancelLabel="#{contenu.annuler}"
+                                                                                                           fileUploadListener="#{appealRequestControllers.uploadListener}"
+                                                                                                           value="#{appealRequestControllers.file}" allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                                                           invalidFileMessage="This type of file is not valid" invalidSizeMessage="The size is not Allowed"
+                                                                                                           multiple="false" mode="advanced" sizeLimit="52428800" auto="true" process="tblSavedDoc" update="tblSavedDoc"/>
+                                                                                            <p:dataTable id="tblSavedDoc"  var="currentRow" value="#{appealRequestControllers.appealFileUploadDataModel}"
+                                                                                                         paginator="true" selectionMode="single" rowKey="#{currentRow.id}" paginatorPosition="bottom"
+                                                                                                         selection="#{appealRequestControllers.appealRequestFileUpload}" rowIndexVar="num"
+                                                                                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                                                         rows="3" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:1000px">
+                                                                                                <p:ajax event="rowSelect" listener="#{appealRequestControllers.onRowSelect}" update="tblSavedDoc"/>
+                                                                                                <f:facet name="header">
+                                                                                                    <p:outputLabel value="Uploaded File List From DBMS"/>
+                                                                                                </f:facet>
+                                                                                                <p:column headerText="No." width="50">
+                                                                                                    <h:outputText value="#{num+1}"/>
+                                                                                                </p:column>
+                                                                                                <p:column id="docNames" headerText="File Name"> 
+                                                                                                    <h:outputText id="txtcoScale" value="#{currentRow.documentId.fileName}" style="text-align: left"/>
+                                                                                                </p:column>
+                                                                                                <p:column headerText="Delete"> 
+                                                                                                    <h:panelGrid style="border: none " columns="2" 
+                                                                                                                 id="pnlGridtblDoccolOptions" >
+                                                                                                        <p:outputPanel id="buttonDetail">
+                                                                                                            <p:commandButton  process="tblSavedDoc" title="#{dmsBundle.delete}" id="docRemove" 
+                                                                                                                              update="tblSavedDoc" immediate="true" ajax="true" 
+                                                                                                                              icon="ui-icon-trash" style="border: none; color: #0B70F9">
+                                                                                                                <p:confirm header="Confirmation" message="Are you sure?"  icon="ui-icon-alert" />
+                                                                                                            </p:commandButton>
+                                                                                                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                                                                                <p:commandButton value="Yes" action="#{appealRequestControllers.remove()}" immediate="true" process="@this" update="tblSavedDoc" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                                                                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                                                                            </p:confirmDialog>
+                                                                                                        </p:outputPanel>
+                                                                                                    </h:panelGrid>
+                                                                                                </p:column> 
+                                                                                            </p:dataTable>
+                                                                                        </p:panelGrid>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>   
+                                                    </section>
+                                                </section>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="box-footer"/>
+                        </div>
+                    </div>
+                </div>             
+            </h:panelGroup>
+        </h:form> 
+    </ui:define>
+</ui:composition>
+

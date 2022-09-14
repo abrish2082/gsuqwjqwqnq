@@ -1,0 +1,712 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li> 
+        <li><a href="finalAward.xhtml"><i class="fa fa-circle-o text"></i> <span> Award</span></a></li>
+        <li><a href="contractAmendment.xhtml"><i class="fa fa-circle-o text"></i> <span> contract Amendment</span></a></li>
+        <li><a href="purchaseOrder.xhtml"><i class="fa fa-circle-o text"></i> <span> Purchase Order</span></a></li> 
+        <li><a href="requestForPayment.xhtml"><i class="fa fa-circle-o text"></i> <span>   Payment Requisition</span></a></li> 
+        <li> <a href="Quotation.xhtml"><i class="fa fa-circle-o text"></i> <span> Quotation</span></a> </li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+
+                    <h:panelGroup id="pnlBackToSearch" rendered="#{contractInformationController.renderpnlToSearchPage}" >
+                        <p:commandButton  id="btnBacktoSarch" action="#{contractInformationController.goBackToSearchPageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                          title="Back to Search" process="@this" update="@this,:frmMainUI, :BidSubmissionMain, :frmSample" style="background-color: white; border-color: white;" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton validateClient="true" action="#{contractInformationController.newBtnAction()}"
+                                     style="background-color: white; border-color: white" icon="#{contractInformationController.icone}"
+                                     title="#{contractInformationController.createOrSearchBundle}" process="@this" update="@this,:frmMainUI, :BidSubmissionMain, :frmSample"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="PGNotification" rendered="#{contractInformationController.renderDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{contractInformationController.contractLis1.size()}" 
+                                       style="color: red;background-color: white; border-color: white"/>
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="#{PRMS.ContractInformation}"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains" converterMessage="entConverter"                                            
+                                                converter="entConverter"  valueChangeListener="#{contractInformationController.RequestListChange}">
+                                <f:selectItems id="selectOneMenuAppListkl" var="purchaseReqlst" 
+                                               value="#{contractInformationController.contractLis1}"
+                                               itemValue="#{purchaseReqlst}" itemLabel="#{purchaseReqlst.contractNo}"/> 
+                                <p:ajax event="valueChange"  update=":BidSubmissionMain,:BidSubmissionMain:contractInfoPanel,:frmSample,:frmMainUI" process="@this," />               
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="#{PRMS.Workflow}"/>
+                        <!--put work flow list here-->
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{contractInformationController.wfPrmsProcessedDModel}"
+                                                             var="currentRow" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" 
+                                                             rowKey="#{currentRow.processedId}" 
+                                                             paginatorPosition="bottom">
+                                                    <!--  
+                                                    <p:column headerText="S/N" width="60">
+                                                       <h:outputText value="{currentRow+1}"/>
+                                                    </p:column>  
+                                                    -->
+                                                    <p:column headerText="#{PRMS.ProcessedBy}">
+                                                        <h:outputText value="#{currentRow.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="#{PRMS.Decision}">
+                                                        <h:outputText value="#{currentRow.decision}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="#{PRMS.ProcessedDate}">
+                                                        <h:outputText value="#{currentRow.processedOn}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="#{PRMS.Comment}">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <a href="contractInformation.xhtml"> <i class="fa fa-fw fa-refresh" title="Refresh"/> </a>
+                    <span class="ui-separator"> <span class="ui-icon ui-icon-grip-dotted-vertical"/> </span>
+                    <a href="http://localhost:8080/ERP-war/erp/prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"/></a>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{contractInformationController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"> Search ... </h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchParty"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="col-sm-6" >
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="#{PRMS.searchingby}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{contractInformationController.papmsContract.columnName}"
+                                                                         valueChangeListener="#{contractInformationController.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{contractInformationController.contractSearchParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblContractNo,txtContractNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblContractNo" class="control-label col-sm-4" value="#{PRMS.SearchBy} #{contractInformationController.papmsContract.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtContractNo" value="#{contractInformationController.papmsContract.columnValue}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group textBoxMarginTop6px"> 
+                                                    <div class="col-lg-2"></div>
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton action="#{contractInformationController.searchContractInfo()}" icon="ui-icon-search" 
+                                                                         process="@this,frmSearchParty" update=":frmMainUI:frmParty" value="#{PRMS.Find}" class="btn btn-primary col-lg-4" />                                                   
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmParty">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblPartyInfo" value="#{contractInformationController.prmsContractModel}" var="ContractList" rows="10" rowIndexVar="no" selection="#{contractInformationController.selectContractInformation}"
+                                                                 rowKey="#{ContractList.contractId}"  selectionMode="single" filteredValue="#{contractInformationController.filteredItems}" paginator="true" paginatorPosition="bottom" editable="true">
+                                                        <p:ajax event="rowSelect" listener="#{contractInformationController.rowSelect}" update=":BidSubmissionMain,:BidSubmissionMain:contractInfoPanel,:frmSample,:frmMainUI,:BidSubmissionMain:currencyPanel,:BidSubmissionMain:currency_Dt" process="@this," /> 
+                                                        <p:column 
+                                                            headerText="#{PRMS.No}" sortBy=" #{no+1}"> #{no+1}
+                                                        </p:column>
+                                                        <p:column  filterMatchMode="contains" filterBy="#{contractInformationController.papmsContract.contractNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.ContractNo}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{ContractList.contractNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.ProcessedDate}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{ContractList.rigisteredDate}">
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.ProcessedBy}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{contractInformationController.logerName}"/>
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>                 
+                                            </div>    
+                                        </div>  
+                                    </div>                           
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="BidSubmissionMain">
+            <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{contractInformationController.renderPnlCreateParty}">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Contract Registration <small></small></h3>                       
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" >  
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="contractInfoPanel" >
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group textBoxMarginTop6px"> 
+                                            <h:outputLabel id="lblQuotationId" class="control-label col-sm-2" value="#{PRMS.ContractorNo}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtInspResNo" class="form-control"   
+                                                             value="#{contractInformationController.generateSpecficationNo()}"  readonly="true"/>
+                                                <p:message for="txtInspResNo" display="icon"/>
+                                            </div>
+                                            <h:outputLabel id="lblInspReqNumber" class="control-label col-sm-2" value=" #{PRMS.AwardNo}" />
+                                            <div class="col-sm-3"> 
+                                                <p:selectOneMenu id="txtawardlist" style="width: 100%" value="#{contractInformationController.papmsAward}" converter="entConverter" 
+                                                                 valueChangeListener="#{contractInformationController.changeEventGetSuppNameAW}" disabled="#{workFlow.readonly}" 
+                                                                 required="true" requiredMessage="The Value is required">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItems  value="#{contractInformationController.prmsAwardsList}" var="award" itemLabel="#{award.awardNo}"/>
+                                                    <p:ajax process="@this" update=":BidSubmissionMain:txtSupplier,:BidSubmissionMain:checklistTbl"  event="change"/>  
+                                                </p:selectOneMenu>
+                                                <p:message for="txtawardlist" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <h:outputLabel id="lblbidNumber"  class="control-label col-sm-2" value="#{PRMS.BidNo}"/>
+                                            <div class="col-sm-3"> 
+                                                <p:selectOneMenu id="txtbidNumbe" style="width: 100%" required="true" value="#{contractInformationController.eepBidReg}"   
+                                                                 converter="entConverter" valueChangeListener="#{contractInformationController.changeEventGetawardNo}" 
+                                                                 disabled="#{workFlow.readonly}" requiredMessage="Please select Bid No">
+                                                    <f:selectItems value="#{contractInformationController.bidReferenceNoFromBidSale()}" />
+                                                    <p:ajax event="change" process="@this" update="txtContractType,txtawardlist,projectNamePanel,txtSuppliertype,contractInfoPanel" />
+                                                </p:selectOneMenu>  
+                                                <p:message for="txtbidNumbe" display="icon"/>
+                                            </div>
+                                            <h:outputLabel id="lblselectOptionContractType" class="control-label col-sm-2" value="#{PRMS.ProcurementType}"/>  
+                                            <div class="col-sm-3">                                    
+                                                <p:inputText id="txtContractType" class="form-control"   
+                                                             value="#{contractInformationController.eepBidReg.bidCategory}"  readonly="true">
+                                                </p:inputText>
+                                            </div> 
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:outputLabel id="lblSupptype" class="control-label col-sm-2" value="#{PRMS.bidType}" />
+                                            <div class="col-sm-3"> 
+                                                <p:inputText id="txtSuppliertype" class="form-control"  required="true" readonly="true"
+                                                             value="#{contractInformationController.eepBidReg.bidType}" />
+                                                <p:message for="txtSuppliertype" display="icon"/>
+                                            </div>
+                                            <h:outputLabel id="lblSuppUser" class="control-label col-sm-2" value="#{contractInformationController.chooserenderForSupplier}"/>
+                                            <div class="col-sm-3"> 
+                                                <p:inputText id="txtSupplier" class="form-control"  required="true" readonly="true"
+                                                             value="#{contractInformationController.papmsAward.suppId.vendorName}" validator="#{validatorManagedBean.Text}"/>
+                                                <p:message for="txtSupplier" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <h:panelGroup style="border: 0px; background-color: transparent"  id="supplierType"  >
+                                            <div class="form-group textBoxMarginTop6px required"> 
+                                                <h:outputLabel id="lblPaymentType" class="control-label col-sm-2" value="#{PRMS.PaymentType}"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="txtPaymentType" value="#{contractInformationController.papmsContract.paymenttype}" 
+                                                                     disabled="#{workFlow.readonly}" style="width: 100%" converter="entConverter" required="true"
+                                                                     requiredMessage="value is required">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                        <f:selectItem itemLabel="Cash" itemValue="Cash" />
+                                                        <f:selectItem itemLabel="Check" itemValue="Check" />
+                                                        <f:selectItem itemLabel="CPO" itemValue="CPO" />
+                                                        <f:selectItem itemLabel="Bank Transfer" itemValue="Bank Transfer" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtPaymentType" display="icon"/>
+                                                </div>
+                                                <h:outputLabel id="lblDelebaryPlace"  class="control-label col-sm-2" value="#{PRMS.DeliveryPlace}"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtDelivertplcs" class="form-control" required="true" readonly="#{workFlow.readonly}" disabled="#{workFlow.readonly}"
+                                                                 requiredMessage="Please enter Delivery Place" value="#{contractInformationController.papmsContract.deliveryPlace}"/>
+                                                    <p:message for="txtDelivertplcs" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:outputLabel id="lbltime" class="control-label col-sm-2" value="#{PRMS.PerformanceGuaranteeAmount}"/>                                            
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtperformanceGarante" class="form-control" 
+                                                             value="#{contractInformationController.papmsContract.performanceGarante}" readonly="#{workFlow.readonly}"/>
+                                                <p:message for="txtperformanceGarante" display="icon"/>
+                                            </div>                                            
+
+                                            <h:outputLabel id="lblContractDateam"  class="control-label col-sm-2" value="#{PRMS.ContractEndDateEthio}"/>                                            
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtContractDateam" value="#{contractInformationController.papmsContract.contractdateam}" 
+                                                             validator="#{validatorManagedBean.Date}" readonly="#{workFlow.readonly}" autocomplete="off" 
+                                                             onclick="displayCalendar('BidSubmissionMain:txtContractDateam', 'BidSubmissionMain:txtContractDateam');"
+                                                             valueChangeListener="#{contractInformationController.contractSigningDateAmChange}"
+                                                             disabled="#{contractInformationController.chooserenderForForInternational}"
+                                                             title="Contract Date" class="form-control" required="true" requiredMessage="Please enter Contract Date." >
+                                                    <p:ajax event="click" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="blur" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="change" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="click" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="select" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="mouseup" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="mousemove" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="mouseout" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="mousedown" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="keyup" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                    <p:ajax event="keydown" update="txtContractPeriod,calRegDate" process="@this"/>
+                                                </p:inputText>
+                                                <p:message for="txtContractDateam" display="icon"/> 
+                                            </div>
+                                        </div>
+
+                                        <h:panelGroup id="forForeignSupplier"  style="border: 0px; background-color: transparent" rendered="#{contractInformationController.chooseselecttOption}">
+                                            <div class="form-group ">
+                                                <h:outputLabel id="lblPaymhhhentType" class="control-label col-sm-2" value="INCOM Term:"/>
+                                                <div class="col-sm-3">                                                    
+                                                    <p:selectOneMenu id="txtPricee"  value="#{contractInformationController.papmsContract.incoTerm}"  style="width: 100%" disabled="#{workFlow.readonly}">
+                                                        <f:selectItem itemLabel="---Select---" itemValue=""/>
+                                                        <f:selectItem itemLabel="FOB" itemValue="FOB"/>
+                                                        <f:selectItem itemLabel="CPT" itemValue="CPT" />
+                                                        <f:selectItem itemLabel="CIP" itemValue="CIP" />
+                                                        <f:selectItem itemLabel="CIF" itemValue="CIF" />
+                                                        <f:selectItem itemLabel="DDP" itemValue="DDP" />
+                                                        <f:selectItem itemLabel="CFR" itemValue="CFR" />
+                                                        <f:selectItem itemLabel="DAT" itemValue="DAT" />
+                                                        <f:selectItem itemLabel="DDU" itemValue="DDU" />
+                                                        <p:ajax update="" process="@this" event="change"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                                <h:outputLabel id="lblRegs"  class="control-label col-sm-2" value="#{PRMS.Contractsigningdate}"  rendered="#{contractInformationController.chooserenderForForInternational}" />                                                
+                                                <div class="col-sm-3">
+                                                    <p:calendar id="calRegDate" required="true" value="#{contractInformationController.papmsContract.contractsigningDate}"
+                                                                valueChangeListener="#{contractInformationController.ContractDateChange}" pattern="yyyy/MM/dd" tabindex="4"  readonly="#{workFlow.readonly}" 
+                                                                rendered="#{contractInformationController.chooserenderForForInternational}" >
+                                                        <f:convertDateTime  pattern="yyyy/MM/dd" />
+                                                        <p:ajax event="dateSelect" process="@this" update="txtContractDateam"/>
+                                                    </p:calendar>
+                                                    <p:message for="calRegDate" display="icon"/>
+                                                </div>
+                                            </div>                                            
+                                        </h:panelGroup>
+                                        <h:panelGroup id="forForeignSupplier2"  style="border: 0px; background-color: transparent"  rendered="#{contractInformationController.chooseselecttOption}">
+                                            <div class="form-group ">
+                                                <h:outputLabel id="lblCurrency" class="control-label col-sm-2" value="#{PRMS.Currency}"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="txtcurrency" style="width: 100%" converter="entConverter" value="#{contractInformationController.fmsLuCurrency}" disabled="#{workFlow.readonly}"> 
+                                                        <f:selectItem noSelectionOption="true" itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{contractInformationController.listOfCur}" itemLabel="#{currency.currency}" var="currency" itemValue="#{currency}"/>
+                                                        <p:ajax event="change" process="@this" update="txtcurrency,:forForeignSupplier2"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                                <h:outputLabel id="lblEndDate"  class="control-label col-sm-2" value="#{PRMS.ContractEndDate}" rendered="#{contractInformationController.chooserenderForForInternational}"/>                                                
+                                                <div class="col-sm-3">                                   
+                                                    <p:calendar id="txtendDate"   required="true"   readonly="#{workFlow.readonly}" value="#{contractInformationController.papmsContract.contractendDate}"  
+                                                                valueChangeListener="#{contractInformationController.ContractEndDateChange}" requiredMessage="Please Enter Contract End Date" pattern="yyyy/MM/dd" tabindex="4" rendered="#{contractInformationController.chooserenderForForInternational}">
+                                                        <f:convertDateTime  pattern="yyyy/MM/dd" />
+                                                        <p:ajax event="dateSelect" process="@this" update="txtcontractenddateam"/>
+                                                    </p:calendar>
+                                                    <p:message for="txtendDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <h:outputLabel id="lblContractName"   class="control-label col-sm-2" value="#{PRMS.ContractorName}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtContractName" class="form-control" value="#{contractInformationController.papmsContract.contractName}" readonly="#{workFlow.readonly}"/>
+                                                <p:message for="txtContractName" display="icon"/>
+                                            </div>
+                                            <h:outputLabel id="lblPrNum"  class="control-label col-sm-2" value="#{PRMS.ContractPeriodTo}" rendered="true"/>
+                                            <div class="col-sm-2">
+                                                <p:inputText id="txtContractPeriod"  class="form-control" required="true" requiredMessage="Please enter Contract Period To"
+                                                             value="#{contractInformationController.papmsContract.contractPeriodTo}" 
+                                                             readonly="#{workFlow.readonly}" disabled="#{contractInformationController.disableBefrDay}"> 
+                                                    <p:ajax event="keyup" process="@this,txtContractDateam,calRegDate" update="txtcontractenddateam,txtendDate" 
+                                                            listener="#{contractInformationController.calc_()}" />
+                                                </p:inputText>
+                                                <p:message for="txtContractPeriod" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p:selectOneMenu id="txtContractPeriodType" value="#{contractInformationController.papmsContract.contractperiodtype}" 
+                                                                 style="width: 100%" valueChangeListener="#{contractInformationController.ContPeriodTChange}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Day" itemValue="day" />
+                                                    <f:selectItem itemLabel="Month" itemValue="month" />
+                                                    <f:selectItem itemLabel="Year" itemValue="year"/>
+                                                    <p:ajax event="change" process="@this,txtContractDateam,calRegDate" update="txtContractPeriod"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:panelGroup id="projectNamePanel">
+                                                <h:outputLabel id="lblProject" class="control-label col-sm-2" value="#{PRMS.ProjectName/WorkUnit}" rendered="true" />
+                                                <div class="col-sm-3"> 
+                                                    <p:inputText id="txtProject"  class="form-control"  rendered="true" value="#{contractInformationController.eepProject.projectName}" readonly="true"/>
+                                                    <p:message for="txtProject" display="icon"/>
+                                                </div>
+                                                <h:outputLabel id="lblCommencementDate"  class="control-label col-sm-2" value="#{PRMS.CommencementDate}"  rendered="#{contractInformationController.chooserenderForForInternational}" />
+                                                <div class="col-sm-3">
+                                                    <p:calendar id="txtcalDeliveryDatee" required="true" value="#{contractInformationController.papmsContract.commencmentDate}"   
+                                                                valueChangeListener="#{contractInformationController.CommencemntDateChange}" rendered="#{contractInformationController.chooserenderForForInternational}"
+                                                                readonly="#{workFlow.readonly}" pattern="yyyy/MM/dd" tabindex="4" requiredMessage="Please enter Commencement Date">
+                                                        <f:convertDateTime  pattern="yyyy/MM/dd" />
+                                                        <p:ajax event="dateSelect" process="@this" update="txtContractPeriod,txtcommencementdateam"/>
+                                                    </p:calendar>
+                                                    <p:message for="txtcalDeliveryDatee" display="icon"/>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <h:outputLabel id="lblDocument"  class="control-label col-sm-2" value="#{PRMS.ContractNo}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtDocumentId" class="form-control" required="true" value="#{contractInformationController.papmsContract.documentId}" readonly="#{workFlow.readonly}"
+                                                             requiredMessage="Please enter Contract No"/>
+                                                <p:message for="txtDocumentId" display="icon"/>
+                                            </div>
+                                            <h:outputLabel id="lblCommencement"  class="control-label col-sm-2" value="#{PRMS.CommencementDateEthio}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtcommencementdateam" value="#{contractInformationController.papmsContract.commencementdateam}" 
+                                                             validator="#{validatorManagedBean.Date}"  autocomplete="off" readonly="#{workFlow.readonly}"
+                                                             onclick="displayCalendar('BidSubmissionMain:txtcommencementdateam', 'BidSubmissionMain:txtcommencementdateam');"
+                                                             title="Commencement Date" valueChangeListener="#{contractInformationController.CommencemntDateAmChange}"
+                                                             disabled="#{contractInformationController.chooserenderForForInternational}"
+                                                             class="form-control" required="true" requiredMessage="Please enter Commencement Date.">                                                   
+                                                    <p:ajax event="click" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="blur" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="change" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="click" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="select" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="mouseup" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="mousemove" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="mouseout" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="mousedown" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="keyup" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                    <p:ajax event="keydown" update="txtContractPeriod,txtcalDeliveryDatee" process="@this"/>
+                                                </p:inputText>
+                                                <p:message for="txtcommencementdateam" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <h:outputLabel id="lblContractAmount" class="control-label col-sm-2" value="#{PRMS.ContractAmount}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtContractAmount" class="form-control"  required="true" readonly="#{workFlow.readonly}" requiredMessage="Please enter Contract Amount" 
+                                                             rendered="false" value="#{contractInformationController.papmsContract.contractamount}" validator="#{validatorManagedBean.Double}"/>
+                                                <p:message for="txtContractAmount" display="icon"/>
+                                                <p:commandButton id="btnCurrency" value="Add New Currency Information" process="@this,btnCurrency" update="currencyPanel"  disabled="#{workFlow.readonly}"
+                                                                 action="#{contractInformationController.buttonAction}" style="width: 100%"/> 
+                                                <h:panelGroup id="currencyPanel">
+                                                    <p:dataTable id="currency_Dt" value="#{contractInformationController.prmsContractCurrencyModel}" 
+                                                                 style="margin-bottom:20px;"  lazy="true" var="rowContacttwo" rowKey="#{rowContacttwo.id}" editable="true">
+                                                        <p:ajax event="rowEdit" listener="#{contractInformationController.onRowSelectCurr}" update="currency_Dt"/>  
+                                                        <p:column headerText="Currency" id="currName" rendered="false">
+                                                            <p:selectOneMenu id="txtcurrency_list" style="width: 100%" required="true" valueChangeListener="#{contractInformationController.changeEventCurrencyID}"
+                                                                             value="#{contractInformationController.fmsLuCurrency}" converter="entConverter" disabled="#{workFlow.readonly}">
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItems  value="#{contractInformationController.fmsLuCurrencyList}" var="curr" itemLabel="#{curr.currency}" itemValue="#{curr}"/>
+                                                                <p:ajax process="@this" update="@this,currency_Dt"  event="change"/>  
+                                                            </p:selectOneMenu>
+                                                        </p:column>
+                                                        <p:column headerText="#{PRMS.Currency}" rendered="true">
+
+                                                            <p:selectOneMenu id="txtcurrency_l" style="width: 100%" required="true" valueChangeListener="#{contractInformationController.changeEventCurrencyID2}"
+                                                                             value="#{rowContacttwo.currencyId}"  converter="entConverter" disabled="#{workFlow.readonly}">
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItems value="#{contractInformationController.fmsLuCurrencyList}" var="curr" itemLabel="#{curr.currency}" itemValue="#{curr}"/>
+                                                                <p:ajax process="@this" update="@this,currency_Dt"  event="change"/>  
+                                                            </p:selectOneMenu>
+
+                                                        </p:column>
+
+                                                        <p:column headerText="#{PRMS.Amount}">
+                                                            <p:inplace>
+                                                                <h:inputText id="txtSequence" value="#{rowContacttwo.amount}" class="form-control" required="true" validator="#{validatorManagedBean.Double}"
+                                                                             valueChangeListener="#{contractInformationController.amountVlc}" readonly="#{workFlow.readonly}">
+                                                                    <p:ajax event="blur" update="@this"/>
+                                                                </h:inputText>
+                                                            </p:inplace>
+                                                        </p:column>
+                                                        <p:column headerText="">
+                                                            <p:commandButton value="#{PRMS.Delete}" styleClass="btn btn-primary" action="#{contractInformationController.buttonActionDelete}"
+                                                                             process="@this,:BidSubmissionMain:btnCurrency" update=":BidSubmissionMain:currency_Dt" disabled="#{workFlow.readonly}" />
+                                                        </p:column>
+                                                    </p:dataTable>  
+                                                </h:panelGroup> 
+                                            </div>  
+
+                                            <h:outputLabel id="lblContractEndDateam"  class="control-label col-sm-2" value="#{PRMS.ContractEndDateEthio}" />
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtcontractenddateam" value="#{contractInformationController.papmsContract.contractenddateam}" 
+                                                             validator="#{validatorManagedBean.Date}" autocomplete="off" type="datetime" 
+                                                             onclick="displayCalendar('BidSubmissionMain:txtcontractenddateam', 'BidSubmissionMain:txtcontractenddateam');" 
+                                                             title="Contract End Date" class="form-control" valueChangeListener="#{contractInformationController.ContractEndDateAmChange}"
+                                                             disabled="true" required="true" 
+                                                             requiredMessage="Please enter Contract End Date." readonly="#{workFlow.readonly}" />
+                                                <p:ajax event="click" process="@this"/>
+                                                <p:message for="txtcontractenddateam" display="icon"/> 
+                                            </div>                                            
+                                        </div>   
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>  
+                    </div> 
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Contract File:*</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="panel-body">
+                                    <p:panelGrid columns="1" style="float: left;"> 
+                                        <p:fileUpload  id="fileUplod" cancelLabel="#{contenu.annuler}"
+                                                       fileUploadListener="#{contractInformationController.uploadListener}"
+                                                       value="#{contractInformationController.prmsLuDmArchive}" allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                       invalidFileMessage="This type of file is not valid" invalidSizeMessage="The size is not Allowed"
+                                                       multiple="false" mode="advanced" sizeLimit="52428800" auto="true" process="tblSavedDoc" update="tblSavedDoc"/>
+                                        <p:dataTable id="tblSavedDoc"  var="currentRow" rowIndexVar="current" value="#{contractInformationController.prmsLuDmArchiveDataModel}"
+                                                     paginator="true" selectionMode="single" rowKey="#{currentRow.id}"
+                                                     selection="#{contractInformationController.prmsLuDmArchiveSelection}"
+                                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                     rowsPerPageTemplate="5,10,15" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:1100px">
+                                            <p:ajax event="rowSelect" listener="#{contractInformationController.onRowSelect}" update="tblSavedDoc" />
+                                            <p:column id="docNames"   style="border: none; font-size: 10px; text-align: left;"> 
+                                                <h:outputText id="txtcoScale" value="#{currentRow.fileName}"/>
+                                            </p:column>
+                                            <p:column  style="border: none; font-size: 10px; text-align: left;">
+                                                <h:panelGrid style="border: none " columns="2" id="pnlGridtblDoccolOptions">
+                                                    <p:commandButton process="@this,tblSavedDoc"  update="tblSavedDoc" icon="ui-icon-arrowthickstop-1-s"  ajax="false">
+                                                        <p:fileDownload value="#{contractInformationController.fileDownload}" />
+                                                    </p:commandButton>
+                                                    <p:outputPanel id="buttonDetail">
+                                                        <p:commandButton  process="tblSavedDoc" title="#{dmsBundle.delete}" id="docRemove" update="tblSavedDoc" immediate="true" 
+                                                                          ajax="true" icon="ui-icon-trash" style="border: none; color: #0B70F9">
+                                                            <p:confirm header="Confirmation" message="Are you sure?"  icon="ui-icon-alert" />
+                                                        </p:commandButton>
+                                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                            <p:commandButton value="#{PRMS.Yes}" action="#{contractInformationController.remove(rowselect)}" immediate="true" process="@this" update="tblSavedDoc" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                            <p:commandButton value="#{PRMS.No}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                        </p:confirmDialog>
+                                                    </p:outputPanel>
+                                                </h:panelGrid>
+                                            </p:column>  
+                                        </p:dataTable>
+                                    </p:panelGrid>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Contract Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="panel-body">
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="checklistTbl" >
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="submissionDt" value="#{contractInformationController.prmsContractDetailModel}" 
+                                                                 rowIndexVar="rowContact" var="contact" paginator="true" paginatorPosition="bottom" editable="true">
+                                                        <p:ajax event="rowEdit" listener="#{contractInformationController.onContactRowEdit}" update="submissionDt" />
+                                                        <p:ajax event="rowEditCancel" listener="#{contractInformationController.onContactRowCancel}" update="submissionDt" />
+                                                        <p:column headerText="No." style="width: 60px"> #{rowNum+1} </p:column>
+                                                        <p:column headerText="#{PRMS.ItemName}" rendered="#{contractInformationController.chooserenderForDataTableItem}">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.itemId.matName}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="form" value="#{contact.itemId.matName}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="#{contractInformationController.chooserenderForcol1}"  rendered="#{contractInformationController.chooserenderForDataTableService}">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.serviceWorkId.serviceName}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="form2" value="#{contact.serviceWorkId.serviceName}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>                                                   
+                                                        <p:column headerText="#{PRMS.Quantity}">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output">
+                                                                    <h:outputText value="#{contact.quantity}" />
+                                                                </f:facet>
+                                                                <f:facet name="input"><p:inputText id="submission" value="#{contact.quantity}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="#{PRMS.UnitPrice}">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.unitPrice}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="alternate" value="#{contact.unitPrice}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="#{PRMS.TotalPrice}">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.totals}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="total" value="#{contact.totals}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                            <h:panelGroup id="totalCalcul">
+                                                <div class="form-group">        
+                                                    <div class="col-sm-8 col-sm-push-7">
+                                                        <div class="form-horizontal  col-sm-12">      
+                                                            <div class="form-group"> 
+                                                                <h:outputLabel id="lblPurcasdfahaseType" class="control-label col-sm-4" value="#{PRMS.TotalSum}"/>
+                                                                <div class="col-sm-6">
+                                                                    <h:outputLabel id="lblvaluessss" class="control-label" value="#{contractInformationController.totalSum}"/>
+                                                                </div> 
+                                                            </div>           
+                                                            <div class="form-group"> 
+                                                                <h:outputLabel id="lblPaseType" class="control-label col-sm-4" value="#{PRMS.TotalVat}"/>
+                                                                <div class="col-sm-6">
+                                                                    <h:outputLabel id="lblvaluessssssss" class="control-label" value="#{contractInformationController.totalvat}"/>
+                                                                </div> 
+                                                            </div>
+                                                            <div class="form-group"> 
+                                                                <h:outputLabel id="lblPudfrcasdfahaseType" class="control-label col-sm-4" value="#{PRMS.GrandTotal}"/>
+                                                                <div class="col-sm-6">
+                                                                    <h:outputLabel id="lblvaluedfssss" class="control-label" value="#{contractInformationController.groundTotal}"/>
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">  
+                                                    <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-md-12">                      
+                                                                <div class="box-body"> 
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel  class="control-label col-sm-4" value="#{PRMS.Decision}"  rendered="#{contractInformationController.renderDecision}"/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <p:selectOneMenu id="drddecision" value="#{contractInformationController.wfPrmsProcessed.decision}" required="true" 
+                                                                                                     requiredMessage="Select Decision" style="width: 100%" valueChangeListener="#{contractInformationController.handleDecision}"
+                                                                                                     rendered="#{contractInformationController.renderDecision}">
+                                                                                        <f:selectItem itemLabel="---Select---" itemValue=""/>
+                                                                                        <f:selectItem itemLabel="Approved" itemValue="Approve"/>
+                                                                                        <f:selectItem itemLabel="Rejected" itemValue="Reject"/>
+                                                                                    </p:selectOneMenu>
+                                                                                    <p:message for="drddecision" display="icon"/>
+                                                                                </div>  
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal form-group">
+                                                                                <p:outputLabel  for="txtComment" class="control-label col-sm-4" value="#{PRMS.Comment}" rendered="#{contractInformationController.renderDecision}"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputTextarea id="txtComment" class="form-control" value="#{contractInformationController.wfPrmsProcessed.commentGiven}" rendered="#{contractInformationController.renderDecision}"
+                                                                                                     title="Remark"  required="false"  requiredMessage="Enter Plan"  validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                                                </div> 
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal form-group">
+                                                                                <p:outputLabel  for="txtProcessedBy" class="control-label col-sm-4" value="#{PRMS.ProcessedBy}"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText  id="txtProcessedBy" readonly="true" class="form-control" value="#{contractInformationController.userName}"  title="descripition"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="form-group form-horizontal ">
+                                                                            <p:outputLabel  for="calprocessed" id="lblApproved" value="#{PRMS.ProcessedDate}"  class="control-label col-sm-4" />
+                                                                            <div class="col-sm-8">
+                                                                                <p:calendar id="calprocessed" placeholder="yyyy/mm/dd" pattern="yyyy/mm/dd" autocomplete="off" value="#{contractInformationController.wfPrmsProcessed.processedOn}" required="true" requiredMessage="Processed Date is Required">
+                                                                                    <f:convertDateTime pattern="yyyy/mm/dd"/>
+                                                                                </p:calendar>
+                                                                                <p:message for="calprocessed" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>                 
+                                                </section>
+                                            </section>
+                                            <h:panelGroup id="localSuppSave">
+                                                <div class="form-group textBoxMarginTop6px "> 
+                                                    <div class="col-lg-2" />
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnlocalsave" value="#{contractInformationController.saveorUpdateBundle} #{PRMS.save}" icon="ui-icon-new" validateClient="true" class="btn btn-primary col-lg-4"  
+                                                                         process="@this,checklistTbl,contractInfoPanel,pnlworkflow,currencyPanel" update="@this,:BidSubmissionMain" 
+                                                                         action="#{contractInformationController.saveContractInfo()}" /> 
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

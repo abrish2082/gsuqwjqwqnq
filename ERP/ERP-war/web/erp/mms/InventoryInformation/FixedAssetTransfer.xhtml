@@ -1,0 +1,585 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">        
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+            </div>
+        </h:form>
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li><a href="mmsLostFixedAsset.xhtml"><i class="fa fa-circle-o"></i> <span>Lost Fixed Asset</span></a></li> 
+        <li><a href="stockItemLost.xhtml"><i class="fa fa-circle-o"></i> <span>Lost Stock Item </span></a></li> 
+        <li><a href="FixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Return </span></a></li> 
+        <li><a href="NonFixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Non Fixed Asset Return </span></a></li> 
+        <li><a href="StockDisposal.xhtml"><i class="fa fa-circle-o"></i> <span> Stock Disposal </span></a></li> 
+        <li><a href="FixedAssetItemDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Disposal Collection</span></a></li> 
+        <li><a href="Disposal.xhtml "><i class="fa fa-circle-o"></i> <span>Fixed Asset Disposal</span></a></li> 
+        <li><a href="InventoryBalanceSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Balance Sheet</span></a></li> 
+        <li><a href="InventoryCountSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Count Sheet</span></a></li> 
+        <li><a href="NeedAssessment.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment</span></a></li> 
+        <li><a href="NeedAssessmentCollected.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment Collected</span></a></li> 
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackSarch" rendered="#{fixedAssetTransferController.renderpnlToSearchPage}">
+                    <p:commandButton id="btnBackToSearch" action="#{fixedAssetTransferController.goBackToSearchpageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="Back to Search" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew" action="#{fixedAssetTransferController.createNewTransferInfo()}" icon="#{fixedAssetTransferController.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white" rendered="#{fixedAssetTransferController.isRenderCreate}" 
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{fixedAssetTransferController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{fixedAssetTransferController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{fixedAssetTransferController.mmsTrList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Transfer List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{fixedAssetTransferController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="srListVar" value="#{fixedAssetTransferController.mmsTrList}"
+                                                            itemValue="#{srListVar}"  itemLabel="#{srListVar.transferNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI, :frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{fixedAssetTransferController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>                         
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{fixedAssetTransferController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.decision}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                        <a href="../../mms/InventoryInformation/FixedAssetTransfer.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                        <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>       
+         <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{fixedAssetTransferController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Search}...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                       <div class="form-group textBoxMargin6px"> 
+                                           <h:outputLabel class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="txtPartyName" value="#{fixedAssetTransferController.columnNameResolver.col_Name_FromTable}"
+                                                                 valueChangeListener="#{fixedAssetTransferController.changeEventColumnName}" converter="entConverter"
+                                                                 style="width: 100%">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue=""/>
+                                                    <f:selectItems value="#{fixedAssetTransferController.columnNameResolverList}" var="TransferFAColName"
+                                                                   itemValue="#{TransferFAColName.col_Name_FromTable}"    itemLabel="#{TransferFAColName.parsed_Col_Name}"/>
+                                                                  
+                                                    <p:ajax event="change" process="@this" update="lblColumnName,txtColumnValue"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblColumnName" class="control-label col-sm-2" value=" #{fixedAssetTransferController.columnNameResolver.parsed_Col_Name}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtColumnValue" class="form-control" value="#{fixedAssetTransferController.transferEntity.columnValue}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="findbtn" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSearch" class="btn btn-primary" action="#{fixedAssetTransferController.searchTransferInformation1()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="#{MMS.find}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo"  var="TransferInfo" rows="5" 
+                                                             style="font-family: Cambria; "  
+                                                             rowIndexVar="num"   
+                                                             selection="#{fixedAssetTransferController.hpSelect}"
+                                                             rowKey="#{TransferInfo.transferId}"  selectionMode="single" 
+                                                             value="#{fixedAssetTransferController.mmsTransferSearchInfoDataModel}"
+                                                             class="dataTable"
+                                                             paginator="true" paginatorPosition="bottom">
+                                                    <p:ajax event="rowSelect" listener="#{fixedAssetTransferController.rowSelect}" update=":frmRegisterUI, :frmMainUI, :frmToolbar, :frmRegisterUI:frmMaterialInfo" />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Transfer_Number}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{TransferInfo.transferNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Prepared_by}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{TransferInfo.preparedBy}"/>
+                                                    </p:column>                                                 
+                                                </p:dataTable>
+                                            </div>                
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" life="3500" autoUpdate="true" />
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{fixedAssetTransferController.renderPnlCreateTransfer}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Transfer_Registration}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <p:outputLabel class="control-label col-sm-2" value="#{MMS.Transfer_Type}:"/>                                      
+                                            <div class="form-group textBoxMargin6px">                                         
+                                                    <p:selectOneRadio id="CkeckMovementType" layout="grid" columns="2" value="#{fixedAssetTransferController.transferEntity.selectOpt}" class="col-sm-4"
+                                                                      valueChangeListener="#{fixedAssetTransferController.changeTransferType}" required="true" requiredMessage="Please Chose One">
+                                                        <div class="col-sm-12">
+                                                            <f:selectItem itemLabel="#{MMS.Work_unit_to_Work_unit}" itemValue="1" />
+                                                        </div>
+                                                        <div class="col-sm-12">                                                                                             
+                                                            <f:selectItem itemLabel="#{MMS.Employee_to_Employee}" itemValue="2" />   
+                                                        </div>
+                                                        <p:ajax process="CkeckMovementType" update=":frmRegisterUI:registerUI"  event="valueChange" />  
+                                                    </p:selectOneRadio>  
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Transfer_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtGatePassNumber" readonly="true"  
+                                                             value="#{fixedAssetTransferController.generateLostItemNo()}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">                                           
+                                            <p:outputLabel  class="control-label col-sm-2" value="#{MMS.Transfer_Department}:" rendered="#{fixedAssetTransferController.renderDept}"  /> 
+                                            <div class="col-sm-3">
+                                                <p:inputText   id="drdDirectorate" class="form-control" required="true" 
+                                                               requiredMessage="Department is required" placeholder="Use Only From + Button" onmousedown="return false;"
+                                                               value="#{fixedAssetTransferController.hrDepartmentsEntity.depName}"  rendered="#{fixedAssetTransferController.renderDept}">                                                   
+                                                </p:inputText>
+                                                <p:message for="drdDirectorate" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p:commandButton id="btnTree1" onclick="PF('dlgDptT').show();"  partialSubmit="true" style="background: transparent;" value="+"  rendered="#{fixedAssetTransferController.renderDept}"/>
+                                            </div>
+
+                                            <p:outputLabel  class="control-label col-sm-2" value="#{MMS.Received_Department}:" rendered="#{fixedAssetTransferController.renderDept}"  /> 
+                                            <div class="col-sm-3">
+                                                <p:inputText   id="drdDirec1" class="form-control" required="true" 
+                                                               requiredMessage="Department is required" placeholder="Use Only From + Button" onmousedown="return false;"
+                                                               value="#{fixedAssetTransferController.hrDepartmentsEntity3.depName}"  rendered="#{fixedAssetTransferController.renderDept}">                                                
+                                                </p:inputText>
+
+                                                <p:message for="drdDirec1" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p:commandButton id="btnTree2" onclick="PF('dlgDptR').show();"  partialSubmit="true" style="background: transparent;" value="+"  rendered="#{fixedAssetTransferController.renderDept}"  />
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="form-group textBoxMargin6px "> 
+                                            <h:outputLabel class="control-label col-sm-2" value="Transfer From:" rendered="#{fixedAssetTransferController.renderPerson}"/>
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="SearchCounter1"  emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;"
+                                                                readonly="false"  converter="entConverter"
+                                                                rendered="#{fixedAssetTransferController.renderPerson}"
+                                                                value="#{fixedAssetTransferController.hrEmployeesEntity}"
+                                                                completeMethod="#{fixedAssetTransferController.searchEmployeeInformation}"
+                                                                var="empInfoEntitys"  itemValue="#{empInfoEntitys}" itemLabel="#{empInfoEntitys.firstName}"   size="15"> 
+                                                    <f:facet name="itemtip" >
+                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">                        
+                                                            <h:outputText value="first Name " />
+                                                            <h:outputText value="#{empInfoEntitys.firstName}" />
+                                                            <h:outputText value="Emp ID: " />
+                                                            <h:outputText value="#{empInfoEntitys.empId}" />
+                                                            <h:outputText value="Department: " />
+                                                            <h:outputText value="#{empInfoEntitys.deptId.depName}" />
+                                                        </h:panelGrid>
+                                                    </f:facet>
+                                                    <p:ajax  event="itemSelect" listener="#{fixedAssetTransferController.handleSelectTransferInfo22}" process="@this" update="@this,drdDirectorate3,frmMaterialInfo" />  
+                                                </p:autoComplete>     
+                                                <p:message for="SearchCounter1" display="icon" />
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2" value="Transfer To:" rendered="#{fixedAssetTransferController.renderPerson}"/>
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="SearchCounter12"  emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;"
+                                                                readonly="false"  
+                                                                converter="entConverter"
+                                                                value="#{fixedAssetTransferController.hrEmployeesEntity2}"
+                                                                rendered="#{fixedAssetTransferController.renderPerson}"
+                                                                completeMethod="#{fixedAssetTransferController.searchEmployeeInformation2}"
+                                                                var="empInfoEntitys2"  itemValue="#{empInfoEntitys2}" itemLabel="#{empInfoEntitys2.firstName}"   size="15"> 
+                                                    <f:facet name="itemtip" >
+                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">                        
+                                                            <h:outputText value="first Name " />
+                                                            <h:outputText value="#{empInfoEntitys2.firstName}" />
+                                                            <h:outputText value="ID: " />
+                                                            <h:outputText value="#{empInfoEntitys2.empId}" />
+                                                            <h:outputText value="Department: " />
+                                                            <h:outputText value="#{empInfoEntitys2.deptId.depName}" />
+                                                        </h:panelGrid>
+                                                    </f:facet>
+                                                    <p:ajax  event="itemSelect" listener="#{fixedAssetTransferController.handleSelectTransferInfo2}" process="@this" update="drdDirect4" />  
+                                                </p:autoComplete>     
+                                                <p:message for="SearchCounter12" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel class="control-label col-sm-2" value="Transfer Department:" rendered="#{fixedAssetTransferController.renderPerson}"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="drdDirectorate3" 
+                                                             value="#{fixedAssetTransferController.hrDepartmentsEntity3.depName}"
+                                                             rendered="#{fixedAssetTransferController.renderPerson}"
+                                                             readonly="true"
+                                                             class="form-control"/>
+                                             
+                                            </div>
+                                        </div>
+                                        <p:dialog id="dlgDptT" header="Departments" widgetVar="dlgDptT" height="300" width="500" showEffect="explode">
+                                            <h:panelGrid columns="3" style="border-color: #ffffff ">
+                                                <p:tree value="#{fixedAssetTransferController.root2}" var="node" style="border: transparent; width: 100%"
+                                                        selectionMode="single" selection="#{fixedAssetTransferController.selectedNode}" >
+                                                    <p:ajax event="select" listener="#{fixedAssetTransferController.onNodeSelect1}" process="@this" 
+                                                            update=":frmRegisterUI:drdDirectorate,:frmRegisterUI:stName2"/>
+                                                    <p:treeNode>
+                                                        <h:outputText value="#{node}" />
+                                                    </p:treeNode>
+                                                </p:tree>                                       
+                                            </h:panelGrid>
+                                        </p:dialog>          
+                                        <p:dialog id="dlgDptR" header="Departments" widgetVar="dlgDptR" height="300" width="500" showEffect="explode">
+                                            <h:panelGrid columns="3" style="border-color: #ffffff ">
+                                                <p:tree value="#{fixedAssetTransferController.root2}" var="nodes" style="border: transparent; width: 100%"
+                                                        selectionMode="single" selection="#{fixedAssetTransferController.selectedNode}" >
+                                                    <p:ajax event="select" listener="#{fixedAssetTransferController.onNodeSelect}" process="@this" 
+                                                            update=":frmRegisterUI:drdDirec1"/>
+                                                    <p:treeNode>
+                                                        <h:outputText value="#{nodes}" />
+                                                    </p:treeNode>
+                                                </p:tree>                                       
+                                            </h:panelGrid>
+                                        </p:dialog>                                           
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Fixed_Asset_Transfer_Detail}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmMaterialInfo"  >
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel id="lblTagNo"  for="stName2"  class="control-label col-sm-2" value="#{MMS.Tag_No}:"/>
+                                            <div class="col-sm-4 ">
+                                                <p:selectOneMenu id="stName2" value="#{fixedAssetTransferController.fixedAssetRegDtlEntity}"  style="width: 100%"  filter="true" filterMatchMode="contains"
+                                                                 valueChangeListener="#{fixedAssetTransferController.handleTagNo}" converter="entConverter"
+                                                                 required="true" requiredMessage="Tag No is required" disabled="#{workFlow.readonly}">
+
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                    <f:selectItems value="#{fixedAssetTransferController.fixedAssetDtlList}" var="listSt" itemLabel="#{listSt.tagNo}" itemValue="#{listSt}" />
+                                                    <p:ajax  process="@this" update="@this,frmMaterialInfo" event="change" />
+                                                </p:selectOneMenu> 
+                                                <p:message for="stName2" display="icon"/>
+                                            </div>
+                                            <h:outputLabel id="txtItemName" class="control-label col-sm-2" value="#{MMS.Item_Name}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="lblMatCode" 
+                                                             value="#{fixedAssetTransferController.transferDtlEntity.itemName}"
+                                                             readonly="true"
+                                                             validator="#{validatorManagedBean.Text}"
+                                                             />
+                                                <p:message for="lblMatCode" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  for="txtQuantity"  class="control-label col-sm-2" value="#{MMS.Description}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtQuantity"                                              
+                                                               value="#{fixedAssetTransferController.transferDtlEntity.description}"
+                                                               />
+                                                <p:message for="txtQuantity" display="icon" />
+                                            </div>
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Book_Value}:"/>
+                                            <div class="col-sm-4 ">
+                                                <p:inputText   id="txtUnit" required="true" 
+                                                               readonly="true"
+                                                               requiredMessage="Book Value is required"
+                                                               value="#{fixedAssetTransferController.transferDtlEntity.bookValue}"
+                                                               validator="#{validatorManagedBean.Number}"
+
+
+                                                               />
+                                                <p:message for="txtUnit" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel for="txtDescription" class="control-label col-sm-2" value="#{MMS.Remark}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtDescription"     
+                                                                 value="#{fixedAssetTransferController.transferDtlEntity.remark}"
+                                                                 validator="#{validatorManagedBean.Remark}"
+                                                                 readonly="#{workFlow.readonly}"/>
+                                            </div>
+                                            <h:outputLabel for="txtAccCode" class="control-label col-sm-2" value="#{MMS.Account_Code}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtAccCode"  
+                                                             value="#{fixedAssetTransferController.fixedAssetRegDtlEntity.accountCode.generalLedgerCode}"
+                                                             readonly="true"/>
+                                                <p:message for="txtAccCode" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnAdd1" class="btn btn-primary" action="#{fixedAssetTransferController.addtoTransferInfoDetail}" icon="ui-icon-add" validateClient="true" 
+                                                                 process="frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmMaterialInfo"
+                                                                 value="#{fixedAssetTransferController.addOrModifyBundle}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br></br>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblMaterial" value="#{fixedAssetTransferController.mmsTransferInfoDtlDataModel}" rowIndexVar="rowContact" var="transferDtl"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowEdit"  update="" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{rowContact+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Tag_No}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{transferDtl.tagNo}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{transferDtl.itemName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Book_Value}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{transferDtl.bookValue}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Description}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{transferDtl.description}"/>
+                                                    </p:column>
+                                                    <p:column headerText="#{MMS.Remark}">
+                                                        <p:cellEditor>
+                                                            <f:facet name="output"><h:outputText value="#{transferDtl.remark}" /></f:facet>
+                                                            <f:facet name="input"><p:inputText id="remarkd" value="#{transferDtl.remark}" style="width:100%"/></f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Account_Code}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{transferDtl.accountCode}"/>
+                                                    </p:column>
+
+                                                    <p:column headerText="#{MMS.Option}">
+                                                        <p:commandLink action="#{fixedAssetTransferController.editDataTable}" value="Edit" 
+                                                                       process="@this,:frmRegisterUI:tblMaterial"
+                                                                       update="@this,:frmRegisterUI:frmMaterialInfo"/>
+                                                    </p:column> 
+
+                                                </p:dataTable>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmApproverInfo">
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel for="txtRequestedBy" class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtRequestedBy" 
+                                                             value="#{fixedAssetTransferController.userName}"
+                                                             required="true"
+                                                             requiredMessage="Prepared By is required" readonly="true"/>
+                                                <p:message for="txtRequestedBy" display="icon" />
+                                            </div>
+                                            <h:outputLabel for="txtAcceptedDate" class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4 required">
+                                                <p:inputText id="txtAcceptedDate" class="form-control" value="#{fixedAssetTransferController.workFlow.processedOn}"
+                                                             required="true"  requiredMessage="Processed On is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtAcceptedDate', 'frmRegisterUI:txtAcceptedDate');" />                                                                                                                                                    
+                                                <p:message for="txtAcceptedDate" display="icon"/>
+                                            </div>
+
+                                        </div>
+                                     
+                                       <h:panelGroup id="padding">
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="Decicsion:" rendered="#{fixedAssetTransferController.renderDecision}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{fixedAssetTransferController.selectedValue}" rendered="#{fixedAssetTransferController.renderDecision}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                        <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                    </p:selectOneMenu>   
+                                                </div> 
+                                                <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="comment:" rendered="#{fixedAssetTransferController.renderDecision}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{fixedAssetTransferController.workFlow.commentGiven}"  rendered="#{fixedAssetTransferController.renderDecision}"/>     
+                                                </div> 
+
+                                            </div>
+
+
+                                        </h:panelGroup>
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="btnsave" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSave" class=" btn btn-primary" action="#{fixedAssetTransferController.saveFATransfer()}" icon="ui-icon-new" validateClient="true" 
+                                                                 process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmApproverInfo"  
+                                                                 update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI ,:frmToolbar" 
+                                                                 value="#{fixedAssetTransferController.saveorUpdateBundle}"/> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

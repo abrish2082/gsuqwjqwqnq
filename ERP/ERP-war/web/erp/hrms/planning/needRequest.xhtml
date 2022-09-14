@@ -1,0 +1,486 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">  
+        <li><a href="demandAndSupplyAnalysis.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Demand and Supply Analysis</span></a></li>
+        <li><a href="annualRecruitmentAndPromotion.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Annual Recruitment Promotion</span></a></li>       
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right"> 
+                    <h:panelGroup id="pnlWfIcon"  rendered="#{needRequestController.pnlrWfIcon}"> 
+                       
+                        <p:outputLabel id="lblNotWF" value=" " class="fa fa-fw fa-gear" style="color: #245269" title="WorkFlow" />
+                        <span class="ui-separator">
+
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+
+                    <p:overlayPanel widgetVar="lblNotWF" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotWF"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="box-body">
+                            <div class="col-md-12">                                       
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblHistory" value="#{needRequestController.workFlowDataModel}"
+                                                     var="WF" class="dataTable" rowKey="#{WF.workflowId}" widgetVar="tblNeedRequestDetail"
+                                                     rowIndexVar="num" editable="true">      
+                                            <p:column headerText="No." style="width:40px">
+                                                <h:outputText value="#{num + 1}"/>
+                                            </p:column>                                                                
+                                            <p:column headerText="Processed By">
+                                                <h:outputText value="#{WF.processedBy}"/>
+                                            </p:column>
+                                            <p:column headerText="Processed On">
+                                                <h:outputText value="#{WF.processedOn}"/>
+                                            </p:column>
+                                            <p:column headerText="Comment Given">
+                                                <h:outputText value="#{WF.commentGiven}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>        
+                        </div>
+
+                    </p:overlayPanel>
+                    <h:panelGroup id="pnlPlus"  rendered="#{needRequestController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{needRequestController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white"  title="New Or Search"
+                                         process="@this" update="@this,:frmNeedRequest,frmSample" 
+                                         />
+                        <span class="ui-separator">
+
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton validateClient="true" action="#{needRequestController.btnNewOrSearch()}"
+                                     icon="#{needRequestController.icone}" style="background-color: white"  title="New Or Search"
+                                     process="@this" update="@this,:frmNeedRequest,frmSample" 
+                                     />
+                    <span class="ui-separator">
+
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="needRequest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a  href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmNeedRequest"> 
+            <p:growl id="growl"  autoUpdate="true" severity="information,fatal" showDetail="true" /> 
+            <h:panelGroup id="pnlSearch" style="border: 0px; background-color: transparent" rendered="#{needRequestController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search ...</h3>
+                            </div>
+                            <section class="panel panel-info">
+                                <section class="panel-body">
+                                    <h:panelGroup id="searchpnl" class="col-sm-12">   
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                <div class="form-group form-horizontal">                                                                
+                                                    <h:outputLabel for="txtcriteria" value="Criteria :" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtcriteria" 
+                                                                         required="true" requiredMessage="Select Year" style="width:100%"
+                                                                         valueChangeListener="#{needRequestController.filiterByStatus_Vcl}">
+                                                            <f:selectItems value="#{needRequestController.filterByStatus}"/>
+                                                            <p:ajax event="change" process="@this " update="tblNeedRequest"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtcriteria" display="icon"/>
+                                                    </div>
+                                                </div>                                                                                         
+                                            </div> 
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                <div class="form-group form-horizontal">                                                                
+                                                    <h:outputLabel for="txtYear" value="Year:" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtYear" value="#{needRequestController.hrHrpRecruitments.planningYear}"
+                                                                         filterMatchMode="contains" filter="true" required="true"
+                                                                         valueChangeListener="#{needRequestController.SearchyearVlc}"
+                                                                         requiredMessage="Select Year" style="width:100%">
+                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                            <f:selectItems value="#{demandAndSupplyAnalysisController.budgetYears}" var="yearlist" itemValue="#{yearlist}" itemLabel="#{yearlist}"  />
+                                                            <p:ajax event="change" process="@this " update="tblNeedRequest"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtYear" display="icon"/>
+                                                    </div>
+                                                </div>                                                                                         
+                                            </div> 
+                                        </div>
+                                    </h:panelGroup>
+                                </section>
+                            </section>
+                            <div class="box-body">                                
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblNeedRequest" value="#{needRequestController.recruitmentDataModel}"
+                                                         var="needReq" class="dataTable" selectionMode="single" rowKey="#{needReq.id}"
+                                                         widgetVar="tblNeedRequest" rowIndexVar="num" editable="true" rows="10" paginator="true" paginatorPosition="bottom">    
+                                                <p:ajax event="rowSelect" listener="#{needRequestController.resultdisplayChanged}"
+                                                        process="@this,tblNeedRequest" update=":frmNeedRequest,:frmSample"/>     
+                                                <p:column headerText="No." style="width:40px">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>                                                                
+                                                <p:column headerText="Year">
+                                                    <h:outputText value="#{needReq.planningYear}"/>
+                                                </p:column> 
+                                                <p:column headerText="Department">
+                                                    <h:outputText value="#{needReq.deptId.depName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Request Date">
+                                                    <h:outputText value="#{needReq.requestDate}"/>
+                                                </p:column> 
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+            <h:panelGroup id="pnlMainpage" rendered="#{needRequestController.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">HR Need Request</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl1" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="somYear" class="control-label col-sm-4" value="Year:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu id="somYear" value="#{needRequestController.hrHrpRecruitments.planningYear}"
+                                                                                         filterMatchMode="contains" filter="true" required="true" 
+
+                                                                                         requiredMessage="Select Year" style="width:100%">
+                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                            <f:selectItems value="#{needRequestController.budgetYears}"/>
+                                                                            <p:ajax event="change" process="@this"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="somYear" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>   
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtDepartment" class="control-label col-sm-4" value="Department:"/>
+                                                                    <div class="col-sm-6">
+                                                                        <p:inputText id="txtDepartment" value="#{needRequestController.hrDepartments.depName}"
+                                                                                     title="Department" required="true" requiredMessage="select Department" placeholder="Use Only From + Button" onmousedown="return false;"/>
+                                                                        <p:message for="txtDepartment" display="icon"/>
+                                                                    </div>
+                                                                    <div class="col-sm-1">
+                                                                        <p:commandButton id="btnTree" onclick="PF('dlg').show();" value=" + " partialSubmit="true" style="background: transparent;" 
+                                                                                         title="Choose Departmnet"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <p:dialog id="dlg" header="Department List" widgetVar="dlg" height="300" width="500" showEffect="explode">
+                                                                <h:panelGrid columns="3">
+                                                                    <p:tree value="#{needRequestController.root}" var="nodes" style="border: transparent; width: 100%"
+                                                                            selectionMode="single" selection="#{needRequestController.selectedNode}">
+                                                                        <p:ajax event="select" listener="#{needRequestController.onNodeSelect}" process="@this" 
+                                                                                update=":frmNeedRequest:txtDepartment,:frmNeedRequest:sonJob"/>
+                                                                        <p:treeNode>
+                                                                            <h:outputText value="#{nodes}"/>
+                                                                        </p:treeNode>
+                                                                    </p:tree>                                       
+                                                                </h:panelGrid>
+                                                            </p:dialog>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl2" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal">       
+                                                                    <h:outputLabel for="sonJob" class="control-label col-sm-4" value="Job Title:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu id="sonJob" value="#{needRequestController.hrJobTypes.id}" style="width:100%"                                                
+                                                                                         valueChangeListener="#{needRequestController.jobTitleListener}" converter="entConverter" 
+                                                                                         required="true" requiredMessage="Select Job Titel">  
+                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                            <f:selectItems value="#{needRequestController.allJobTypes}" var="listofJobs" itemValue="#{listofJobs.id}" itemLabel="#{listofJobs}"/>                                                             
+                                                                            <p:ajax event="change" process="@this" update="txtJobGrade,txtNoOfPosition"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="sonJob" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtNoOfPosition" class="control-label col-sm-4" value="No. of Employees Needed:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtNoOfPosition" value="#{needRequestController.noOfPosition}" 
+                                                                                     title="No.of Employees Needed" required="true" requiredMessage="number of employee needed" />                                                                                    
+                                                                        <p:message for="txtNoOfPosition" display="icon"/>
+                                                                    </div>                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <br></br>
+
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal">                                                                
+                                                                    <h:outputLabel for="txtHowtobefilled" value="How to be filled: " class="control-label col-sm-4"/>
+                                                                    <div class="col-md-8">
+                                                                        <p:selectOneMenu id="txtHowtobefilled" value="#{needRequestController.hrHrpRecruitmentRequest.howToBeFilled}"
+                                                                                         requiredMessage="Select How To be filled" style="width:100%" required="true"> 
+                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>   
+                                                                            <f:selectItem itemLabel="Internal Recruitment" itemValue="Internal Recruitment"/>
+                                                                            <f:selectItem itemLabel="External Recruitment" itemValue="External Recruitment"/>
+                                                                            <p:ajax event="change" process="@this"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="txtHowtobefilled" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                         
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal">                                                                
+                                                                    <h:outputLabel for="txtWhentobefilled" value="When to be filled:"  class="control-label col-sm-4"/>
+                                                                    <div class="col-md-8">
+                                                                        <p:selectOneMenu id="txtWhentobefilled" value="#{needRequestController.hrHrpRecruitmentRequest.months}" 
+                                                                                         requiredMessage="Select Month" style="width:100%" required="true"> 
+                                                                            <f:selectItems value="#{needRequestController.months}"/>                                                                       
+                                                                            <p:ajax event="change" process="@this"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="txtWhentobefilled" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                         
+                                                            </div>
+                                                            <div class="col-sm-12 textBoxMargin6px">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <center>
+                                                                        <p:commandButton id="btnAdd" value="#{needRequestController.addorUpdate}" class="btn  btn-block btn-primary col-sm-4 "
+                                                                                         action="#{needRequestController.addRequest()}"  
+                                                                                         process="@this,pnl2" style="margin-top: 10px"
+                                                                                         update="@this,pnl2,tblNeedRequestDetail,"/>
+                                                                    </center>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtJobGrade" class="control-label col-sm-4" value="Job Grade:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtJobGrade" value="#{needRequestController.hrJobTypes.jobGradeId.gradeId}" 
+                                                                                     title="Job Grade" readonly="true"/>
+                                                                        <p:message for="txtJobGrade" display="icon"/>
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="txtReasonForRequest" class="control-label col-sm-4" value="Reason for Request:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtReasonForRequest" value="#{needRequestController.hrHrpRecruitmentRequest.vacancySource}" 
+                                                                                         title="Reason for Request" class="form-control" required="true" requiredMessage="Enter Reason for Request"
+                                                                                         rows="1" cols="2" autoResize="false" />
+                                                                        <p:message for="txtReasonForRequest" display="icon"/>
+                                                                    </div>                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtPosition" class="control-label col-sm-4" value="No. of Position:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtPosition" value="#{needRequestController.hrHrpRecruitmentRequest.numberRequestedPosition}" 
+                                                                                     title="No. of Position" class="form-control" required="true" requiredMessage="Enter No. of Position"/>
+                                                                        <p:message for="txtPosition" display="icon"/>
+                                                                    </div>                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtRemark" class="control-label col-md-4" value="Remark:"/> 
+                                                                    <div class="col-md-8">
+                                                                        <p:inputTextarea id="txtRemark" value="#{needRequestController.hrHrpRecruitmentRequest.remark}" class="form-control "
+                                                                                         autoResize="true" title="Remark" />
+                                                                        <p:message for="txtRemark" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup id="pnl4" class="col-sm-12 "> 
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-12">                                                                      
+                                                            <div class="form-group form-horizontal"> 
+                                                                <p:dataTable id="tblNeedRequestDetail" value="#{needRequestController.recruitmentRequestDataModel}"
+                                                                             var="needReq" class="dataTable" rowKey="#{needReq.id}" widgetVar="tblNeedRequestDetail"
+                                                                             rowIndexVar="num" editable="true">      
+                                                                    <p:column headerText="No." style="width:40px">
+                                                                        <h:outputText value="#{num + 1}"/>
+                                                                    </p:column>                                                                
+                                                                    <p:column headerText="Job Title">
+                                                                        <h:outputText value="#{needReq.jobId.jobTitle}"/>
+                                                                    </p:column> 
+                                                                    <p:column headerText="Job Grade">
+                                                                        <h:outputText value="#{needReq.jobId.jobGradeId.gradeId.grade}"/>
+                                                                    </p:column> 
+                                                                    <p:column headerText="Reason for Request">
+                                                                        <h:outputText value="#{needReq.vacancySource}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="How to be filled">
+                                                                        <h:outputText value="#{needReq.howToBeFilled}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="No. of position">
+                                                                        <h:outputText value="#{needReq.numberRequestedPosition}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Month">
+                                                                        <h:outputText value="#{needReq.months}"/>
+                                                                    </p:column> 
+                                                                    <p:column headerText="Remark">
+                                                                        <h:outputText value="#{needReq.remark}"/>
+                                                                    </p:column> 
+                                                                    <p:column headerText="Option">
+                                                                        <p:commandLink action="#{needRequestController.editDataTable()}" value="Edit" 
+                                                                                       process="@this,:frmNeedRequest:tblNeedRequestDetail"
+                                                                                       update="@this,:frmNeedRequest:pnl2"/>
+                                                                    </p:column>   
+                                                                </p:dataTable>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <div class="col-sm-8">
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                </div>
+                                            </h:panelGroup>
+
+                                        </section>                                       
+                                    </section>
+
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlwf" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="txtxreqdate" class="control-label col-sm-4" value="Prepared On: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtxreqdate" value="#{needRequestController.hrHrpRecruitments.requestDate}"
+                                                                                     onclick="displayCalendar('frmNeedRequest:txtxreqdate', 'frmNeedRequest:txtxreqdate');"
+                                                                                     title="prepared on" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                        <p:message for="txtxreqdate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtPreparedBY" class="control-label col-sm-4"  value="Prepared By:"/>
+
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtPreparedBY" value="#{needRequestController.fullName}"
+                                                                                     title="txtPreparedBY" readonly="true" />
+                                                                        <p:message for="txtPreparedBY" display="icon"/>
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="SomeComment" class="control-label col-sm-4"  value="Comment Given:"/>
+
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="SomeComment" value="#{needRequestController.wfHrProcessed.commentGiven}"
+                                                                                         title="SomeComment"  class="form-control"/>
+                                                                        <p:message for="SomeComment" display="icon"/>
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+
+                                        </section>
+                                    </section>
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <h:panelGroup id="btnupdt" rendered="#{needRequestController.pnlupdate}">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="#{needRequestController.saveorUpdateBundle}" 
+                                                                             action="#{needRequestController.saveHRNeedRequest}"
+                                                                             process="@this,:frmNeedRequest:pnl1,pnlwf" class="btn  btn-block btn-primary col-lg-4"
+                                                                             update=":frmNeedRequest"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>   
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

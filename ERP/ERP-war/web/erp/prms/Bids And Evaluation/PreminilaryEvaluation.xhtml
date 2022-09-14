@@ -1,0 +1,523 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-dashboard "></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="BidCriteria.xhtml"><i class="fa fa-circle-o "></i> <span>Bid’s Criteria</span></a></li> 
+        <li><a href="BidRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Bid Registration</span></a></li> 
+        <li><a href="BidRegistrationAmend.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Amendment</span></a></li> 
+        <li><a href="TechnicalEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Technical Evaluation</span></a></li> 
+        <li><a href="FinancialEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Financial Evaluation</span></a></li> 
+        <li><a href="PRMSEvaluationResult.xhtml"><i class="fa fa-circle-o"></i><span>Evaluation Result</span></a></li>
+        <li><a href="PostQualification.xhtml"><i class="fa fa-circle-o "></i><span>Bids Post Qualification</span></a></li>
+
+
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmPreliminaryEvaluat"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right" >
+
+                    <h:panelGroup id="pnlBackToSearch" rendered="#{preminilaryController.renderpnlToSearchPage}" >
+                        <p:commandButton  id="btnBacktoSarch" action="#{preminilaryController.goBackToSearchPageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                          title="Back to Search" process="@this" update="@this, :frmMainUI, :frmpremineryPlan, :frmPreliminaryEvaluat"  style="background-color: white; border-color: white;" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew" action="#{preminilaryController.createPremilaryPlan()}" icon="#{preminilaryController.icone}"  validateClient="true" 
+                                     process="@this" update="@this, :frmMainUI, :frmpremineryPlan, :frmPreliminaryEvaluat" style="background-color: white; border-color: white;"
+                                     title="#{preminilaryController.createOrSearchBundle}"  rendered="#{preminilaryController.isCreateButton}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="PGNotification" rendered="#{preminilaryController.isDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{preminilaryController.requestNotificationCounter}" 
+                                       style="color: red;background-color: white; border-color: white"/>
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Preminilary"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{preminilaryController.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="preNo"
+                                               value="#{preminilaryController.preminilaryEvaluationList}"
+                                               itemValue="#{preNo}" itemLabel="#{preNo.preliminarEvalNo}"/>               
+                                <p:ajax event="valueChange"  update=":frmPreliminaryEvaluat,:frmMainUI,:frmPreliminaryEvaluat,:frmpremineryPlan,:frmpremineryPlan:bidRegTblPanel,:frmpremineryPlan:txtbidCriteria"/>                            
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress"
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 200px" >
+                        <p:outputLabel id="lblFaWf" value="#{PRMS.Workflow}"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWf" value="#{preminilaryController.workFlowDataModel}" rowIndexVar="num" var="wfVar" 
+                                                             rows="10" paginator="true" paginatorPosition="bottom" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="#{PRMS.ProcessedBy}">
+                                                        <h:outputText value="#{wfVar.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="#{PRMS.ProcessedDate}">
+                                                        <h:outputText value="#{wfVar.processedOn}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="#{PRMS.Decision}">
+                                                        <h:outputText value="#{wfVar.decision}" /> 
+                                                    </p:column>
+
+                                                    <p:column headerText="#{PRMS.Comment}">
+                                                        <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/Bids And Evaluation/PreminilaryEvaluation.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{preminilaryController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchPreliminaryEvaluation"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="col-sm-6" >
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="#{PRMS.searchingby}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{preminilaryController.prmsPreminirayEval.columnName}"
+                                                                         valueChangeListener="#{preminilaryController.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{preminilaryController.preminilaryEvaluationSearchParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblBidAmendNo,txtBidAmendNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblBidAmendNo" class="control-label col-sm-4" value="#{PRMS.SearchBy} #{preminilaryController.prmsPreminirayEval.columnName}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtBidAmendNo" value="#{preminilaryController.prmsPreminirayEval.columnValue}"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnFind" icon="ui-icon-search" action="#{preminilaryController.search_PreliminaryEvalution()}"
+                                                                         process="@this,frmSearchPreliminaryEvaluation" update=":frmMainUI:frmPreliminaryEva"
+                                                                         value="Find" class="btn btn-primary col-lg-4"/>            
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmPreliminaryEva">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblBidCriteria"  var="preLiminaryEvaluation" rows="15" rowKey="#{preLiminaryEvaluation.id}"
+                                                                 value="#{preminilaryController.preminilaryEvaluationMdl}" class="dataTable" rowIndexVar="num"
+                                                                 selectionMode="single"  selection="#{preminilaryController.preminilaryEvaluationSelected}"
+                                                                 paginator="true" paginatorPosition="bottom" >
+                                                        <p:ajax event="rowSelect" listener="#{preminilaryController.rowSelect}" 
+                                                                update=":frmPreliminaryEvaluat,:frmMainUI,:frmPreliminaryEvaluat,:frmpremineryPlan,:frmpremineryPlan:bidRegTblPanel,:frmpremineryPlan:txtbidCriteria" 
+                                                                />   
+                                                        <p:column headerText="No" >
+                                                            #{num+1}
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.PreliminaryEvaluationNo}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{preLiminaryEvaluation.preliminarEvalNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.BidNo}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{preLiminaryEvaluation.bidId}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.ProcessedDate}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{preLiminaryEvaluation.dateRigistered}"><f:convertDateTime  pattern="MM/dd/yyyy" /></h:outputText>
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmpremineryPlan">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="actionPlnpanel" rendered="#{preminilaryController.renderPnlCreateParty}"  >
+                <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+                <div class="box box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Preliminary Evaluation</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" > 
+
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="preminilaryinfo" >
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="#{PRMS.searchingby}"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{preminilaryController.prmsPreminirayEval.columnName}"
+                                                                     valueChangeListener="#{preminilaryController.selectedParamChangeEvent}" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{preminilaryController.preminilaryEvaluationList}"
+                                                                       var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                        <p:ajax event="change" process="@this," update="lblpreminilary,txtpreminilary"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                <h:outputLabel id="lblpreminilary" class="control-label col-sm-4" value="#{PRMS.SearchBy} #{preminilaryController.prmsPreminirayEval.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtpreminilary" value="#{preminilaryController.prmsPreminirayEval.columnValue}"/>
+                                                    </div>
+                                                </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                <p:outputLabel id="lblPreliminaryEvaluationNo" class="control-label col-sm-4"  value="#{PRMS.PreliminaryEvaluationNo}" />
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtPreliminaryEvaluationNo" value="#{preminilaryController.generatePrelmnryNo()}" readonly="true"
+                                                                 >
+                                                    </p:inputText>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+
+                                                <p:outputLabel id="lblActionPlan" class="control-label col-sm-4" value="#{PRMS.BidNo}"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="drdSelectBidNo" rendered="true" style="width: 100%"  required="true" requiredMessage="Value is required"
+                                                                     valueChangeListener="#{preminilaryController.valueChangeBidNo}" converter="entConverter"
+                                                                     value="#{preminilaryController.prmsPreminirayEval.bidId}" disabled="#{workFlow.readonly}" >
+                                                        <f:selectItems  value="#{preminilaryController.getBidNo()}"/>
+                                                        <p:ajax event="change" process="@this" update="txtbidCriteria,txtstartdate" />
+                                                    </p:selectOneMenu>
+                                                    <p:message display="icon" for="drdSelectBidNo"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblRegDate" class="control-label col-sm-4"  value="#{PRMS.ProcessedDate}"/>
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="txtDateRegist" required="true" requiredMessage="Value is required" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" disabled="#{workFlow.readonly}"
+                                                                value="#{preminilaryController.prmsPreminirayEval.dateRigistered}" mindate="today" maxdate="today" readonly="#{workFlow.readonly}"
+                                                                >
+                                                    </p:calendar>
+                                                    <p:message display="icon" for="txtDateRegist"/>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Preliminary Evaluation Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" > 
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="actionPlandetailPnl" >
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+
+                                                <p:outputLabel id="lblstartdat" class="control-label col-sm-4"  value="#{PRMS.BidderName}"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="txtstartdate" style="width: 100%" required="true" converter="entConverter" requiredMessage="Value is required"
+                                                                     value="#{preminilaryController.prmsSupplyProfile}" disabled="#{workFlow.readonly}">
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItems value="#{preminilaryController.prmsSupplyProfileList}" var="supplieName"
+                                                                       itemLabel="#{supplieName.vendorName}" itemValue="#{supplieName}" />
+                                                    </p:selectOneMenu>
+                                                    <p:message display="icon" for="txtstartdate"/>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <h:outputLabel value="#{PRMS.Criteria}" class="control-label col-sm-4" id="lbltaskDesciption" />
+                                                <div class="col-sm-8">
+                                                    <p:panel  id="bidCriteria" 
+                                                              style="border-color: #163758;background-color: white;overflow: auto;border-style: outset;height: 100px" >
+                                                        <p:selectManyCheckbox  id="txtbidCriteria" value="#{preminilaryController.selectedBidCriteria}" required="true" requiredMessage="Value is required"
+                                                                               disabled="#{workFlow.readonly}"
+                                                                               style="overflow: auto" layout="grid" columns="1"  >
+
+                                                            <f:selectItems   id="selectbBidcriteria" value="#{preminilaryController.prmsBidList}" 
+                                                                             var="eee" itemLabel="#{eee.bidCriteriaId}" itemValue="#{eee.bidCriteriaId}"
+                                                                             >
+
+                                                            </f:selectItems>
+
+                                                        </p:selectManyCheckbox>
+
+                                                    </p:panel>
+                                                    <p:message display="icon" for="txtbidCriteria" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+
+                                                <div class="col-lg-4" ></div>
+                                                <div class="col-sm-8">
+                                                    <p:commandButton id="btnAdd" icon="ui-icon-add" validateClient="true" action="#{preminilaryController.addToDataTable()}" disabled="#{workFlow.readonly}"
+                                                                     process="@this,actionPlandetailPnl,preminaryTable" update="preminaryTable,actionPlandetailPnl" class="btn btn-primary col-sm-4" value="#{preminilaryController.addOrUpdateBundle}" />            
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <h:outputLabel value="#{PRMS.BidderCode}" class="control-label col-sm-4" />
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtSupplierCode" required="true" class="form-control" validator="#{validatorManagedBean.Codes}" requiredMessage="Value is required"
+                                                                 value="#{preminilaryController.preminilaryEvalutionDt.supplierCode}" disabled="#{workFlow.readonly}"/>
+                                                    <p:message display="icon" for="txtSupplierCode" />
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <h:outputLabel value="#{PRMS.Remark}" class="control-label col-sm-4" />
+                                                <div class="col-sm-8">
+                                                    <p:inputTextarea id="remark" class="form-control" validator="#{validatorManagedBean.Text}" autoResize="false"
+                                                                     value="#{preminilaryController.preminilaryEvalutionDt.remark}" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!--                                            <div class="col-sm-6">
+                                                                                        <div class="form-horizontal col-sm-12">
+                                                                                            <h:outputLabel value="Result:" class="control-label col-sm-4" id="lblresult" />
+                                                                                            <div class="col-sm-8">
+                                                                                                <p:selectOneRadio id="txtresult" value="{preminilaryController.fail}" >
+                                                                                                    <f:selectItem itemLabel="Passed" itemValue="Passed"  />
+                                                                                                    <p:spacer width="200px"/>
+                                                                                                    <f:selectItem itemLabel="Failed" itemValue="Failed" />
+                                                                                                </p:selectOneRadio>
+                                                                                            </div>
+                                                                                        </div>
+                                        
+                                                                                    </div>-->
+
+
+
+                                    </div>
+
+                                </h:panelGroup>
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="bidRegTblPanel">
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable  id="preminaryTable" rowIndexVar="currents" paginator="true" paginatorPosition="bottom" 
+                                                              rows="10" value="#{preminilaryController.preminilaryEvalutionDtMdl}"  class="datatable"
+                                                              var="preliminary"  
+                                                              lazy="true"  scrollHeight="true" editable="true">
+
+
+                                                    <p:ajax event="rowEdit" listener="#{preminilaryController.edit()}"
+                                                            update="preminaryTable,:frmpremineryPlan:actionPlandetailPnl" /> 
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="No" />
+                                                        </f:facet>
+                                                        #{currents+1}
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{PRMS.BidderName}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{preliminary.supplierId.vendorName}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{PRMS.BidderCode}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{preliminary.supplierCode}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{PRMS.Criteria}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{preliminary.bidCriteria}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{PRMS.CriteriaResult}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{preliminary.criteriaResult}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{PRMS.Remark}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{preliminary.remark}" />
+                                                    </p:column>
+
+                                                    <p:column >                                                                                                 
+                                                        <p:commandLink value="Edit" action="#{preminilaryController.edit(event)}" disabled="#{workFlow.readonly}"
+                                                                       update="preminaryTable,:frmpremineryPlan:actionPlandetailPnl"
+                                                                       process="@this" >
+                                                        </p:commandLink>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class=" col-sm-6">
+                                            <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <p:outputLabel  for="txtProcessedBy" class="control-label col-sm-4"
+                                                                    value="#{PRMS.ProcessedBy}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText  id="txtProcessedBy" readonly="true" value="#{preminilaryController.userName}" title="descripition"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <h:outputLabel  class="control-label col-sm-4" value="#{PRMS.Decision}" rendered="#{preminilaryController.isDecision}"/> 
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drddecision" value="#{preminilaryController.wfPrmsProcessed.decision}" valueChangeListener="#{preminilaryController.handleselectOptions}"
+                                                                         required="true"  rendered="#{preminilaryController.isDecision}"  requiredMessage="Select Decision" style="width: 100%">                                                                                        
+                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Approve" itemValue="Approved"/>
+                                                            <f:selectItem itemLabel="Reject" itemValue="Rejected"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="drddecision" display="icon"/>                                                                                    
+                                                    </div>  
+                                                </div>
+                                            </div>
+                                            <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnSave" icon="ui-icon-new" validateClient="true" process="@this,frmpremineryPlan:preminilaryinfo,frmpremineryPlan:bidRegTblPanel"
+                                                                         update="frmpremineryPlan:preminilaryinfo,frmpremineryPlan:bidRegTblPanel"
+                                                                         class="btn btn-primary col-lg-4" action="#{preminilaryController.save_preminaryEvaluation()}"
+                                                                         value="#{preminilaryController.saveorUpdateBundle} #{PRMS.save}"/> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class=" col-sm-6">
+                                            <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <p:outputLabel class="control-label col-sm-4"
+                                                                   value="#{PRMS.ProcessedDate}" />
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtDateProceesed" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" required="true" requiredMessage="Value is required" disabled="#{workFlow.readonly}"
+                                                                    value="#{preminilaryController.wfPrmsProcessed.processedOn}" mindate="today" maxdate="today" readonly="#{workFlow.readonly}"
+                                                                    >
+
+                                                        </p:calendar>
+                                                        <p:message for="txtDateProceesed" display="icon"/>  
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <p:outputLabel  for="txtComment" class="control-label col-sm-4"
+                                                                    value="#{PRMS.Comment}" rendered="#{preminilaryController.isCommentGiven}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputTextarea id="txtComment" class="form-control"  value="#{preminilaryController.wfPrmsProcessed.commentGiven}" 
+                                                                         title="Remark"  required="false"  requiredMessage="Enter Plan" rendered="#{preminilaryController.isCommentGiven}"
+                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

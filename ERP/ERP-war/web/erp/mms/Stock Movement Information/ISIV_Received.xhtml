@@ -1,0 +1,508 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+
+
+        <li><a href="MmsSIV.xhtml"><i class="fa fa-circle-o"></i> <span>Store Issue Voucher</span></a></li> 
+        <li><a href="GatePassInformation.xhtml"><i class="fa fa-circle-o"></i> <span>GatePass Information</span></a></li> 
+        <li><a href="ISIV.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV (For Issue)</span></a></li> 
+        <li><a href="MmsGRN.xhtml"><i class="fa fa-circle-o"></i> <span>Goods Receiving Note</span></a></li> 
+        <li><a href="RMG.xhtml"><i class="fa fa-circle-o"></i> <span>Received Manufactured Goods</span></a></li>
+
+    </ui:define>
+
+    <ui:define name="contents">   
+
+
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{isivReceivedController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch" action="#{isivReceivedController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>                  
+                    <p:commandButton id="btnNew" action="#{isivReceivedController.createNewIsivInfo()}" icon="#{isivReceivedController.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{isivReceivedController.createOrSearchBundle}"  />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{isivReceivedController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{isivReceivedController.mmsIsivRList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell"
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Local Per Diem Request List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{isivReceivedController.onSelectisivRRequest}" scrollHeight="400">
+                                            <f:selectItems  var="isivRListVar" value="#{isivReceivedController.mmsIsivRList}"
+                                                            itemValue="#{isivRListVar}"  itemLabel="#{isivRListVar.receivingTransferNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWf" value="#{isivReceivedController.workflowDataModel}" rowIndexVar="num" var="wfVar" 
+                                                             rows="10" paginator="true" paginatorPosition="bottom" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{wfVar.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{wfVar.processedOn}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Decision">
+                                                        <h:outputText value="#{wfVar.wfDecison}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>        
+                    <a href="../../mms/Stock Movement Information/ISIV_Received.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{isivReceivedController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                       
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"        
+                                                                   converter="entConverter"  value="#{isivReceivedController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{isivReceivedController.columnNameChangeEvent}"> 
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{isivReceivedController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2"  value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{isivReceivedController.isivReceivedEntity.columnValue}"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnFind" class="btn btn-primary" action="#{isivReceivedController.searchIsivInformation()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{isivReceivedController.mmsIsivReceivedSearchDataModel}" var="IsivInfo" rows="5" selectionMode="single"
+                                                             selection="#{isivReceivedController.selectedItem}" rowKey="#{IsivInfo.recievingId}"  rowIndexVar="num"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowSelect" listener="#{isivReceivedController.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Received_By_ISIV_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{IsivInfo.receivingTransferNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Issued_By_ISIV_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{IsivInfo.transferId.transferNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.From_Store}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{IsivInfo.transferId.fromStore}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.To_Store}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{IsivInfo.receivingStoreId}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{isivReceivedController.renderPnlCreateISIV}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Inter Store Issue Voucher(For Receiving)</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel id="lbl_contratNumber"  class="control-label col-sm-2"  value="#{MMS.Receving_ISIV_No}:"/>
+                                            <div class="col-sm-4 ">
+                                                <p:inputText   id="txttransferNo"  readonly="true" requiredMessage="Isiv number is required"       
+                                                               value="#{isivReceivedController.isivReceivedEntity.receivingTransferNo}" />
+                                                <p:message for="txttransferNo" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px required">   
+                                            <h:outputLabel  for="selectStoreInfoList" class="control-label col-sm-2"  value="#{MMS.Store_Name}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="selectStoreInfoList" style="width: 100%"  required="true"  requiredMessage="Store Name Is required"
+                                                                   disabled="#{workFlow.readonly}"   value="#{isivReceivedController.storeEntity.storeId}"
+                                                                   valueChangeListener="#{isivReceivedController.handleSelectStoreName}" 
+                                                                   > 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuQualification" 
+                                                                   value="#{isivReceivedController.storeList}" var="store" itemLabel="#{store.storeName}" itemValue="#{store.storeId}"
+                                                                   />
+                                                    <p:ajax update="selectStoreInfoList,selectoneISIVNoList" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectStoreInfoList" display="icon"/>
+                                            </div>
+                                            <h:outputLabel  for="selectoneISIVNoList" class="control-label col-sm-2" value="#{MMS.Isiv_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="selectoneISIVNoList" style="width: 100%"  required="true"  requiredMessage="ISIV No Is required"
+                                                                   disabled="#{workFlow.readonly}"   value="#{isivReceivedController.isivEntity.transferNo}"
+                                                                   valueChangeListener="#{isivReceivedController.handleSelectIsivNo}" 
+                                                                   > 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuIsivNOs" 
+                                                                   value="#{isivReceivedController.isIVNoList}" var="store" itemLabel="#{store.transferNo}"
+                                                                   />
+                                                    <p:ajax update="frmGatePassDtlInfo,frmMaterialInfo" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectoneISIVNoList" display="icon"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">   
+
+                                            <h:outputLabel id="lbl-transferedBy" class="control-label col-sm-2" value="#{MMS.Transfered_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtTransferedBy" 
+                                                               readonly="true"
+
+                                                               value="#{isivReceivedController.isivEntity.transferedBy}" />
+                                            </div>  
+                                            <h:outputLabel for="txtTransferedDate" class="control-label col-sm-2"  value="#{MMS.Transfer_Date}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtTransferedDate"  value="#{isivReceivedController.isivEntity.transferDate}"
+                                                             required="false" readonly="true" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtTransferedDate', 'frmRegisterUI:txtTransferedDate');" />                                                                                                                                                    
+                                                <p:message for="txtTransferedDate" display="icon"/>
+                                            </div>  
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl-fromStore" class="control-label col-sm-2" value="#{MMS.From_Store}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtFromStore" 
+                                                               readonly="true"
+
+                                                               value="#{isivReceivedController.isivEntity.fromStore.storeName}" />
+                                            </div>
+
+                                            <h:outputLabel id="lbl-transporter" class="control-label col-sm-2" value="#{MMS.Transporters}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtTransporter" 
+                                                               readonly="true"
+
+                                                               value="#{isivReceivedController.isivEntity.transferedBy}" />
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl-SrNumber" class="control-label col-sm-2"  value="#{MMS.SR_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtSrNumber" 
+                                                               readonly="true"
+
+                                                               value="#{isivReceivedController.isivEntity.storeReqId.srNo}" />
+                                            </div>
+
+                                            <h:outputLabel id="lbl-driverName" class="control-label col-sm-2"  value="#{MMS.Driver_Name}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtDriverName" 
+                                                               readonly="true"
+
+                                                               value="#{isivReceivedController.isivEntity.driverName}" />
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px">
+
+
+                                            <h:outputLabel id="lbl-paletNo" class="control-label col-sm-2"  value="#{MMS.Plate_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtplateNo" 
+                                                               readonly="true"
+
+                                                               value="#{isivReceivedController.isivEntity.plateNo}" />
+                                            </div>
+
+
+                                        </div>
+
+
+
+
+
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">ISIV Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmMaterialInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tbldataModel" var="isivDetail" value="#{isivReceivedController.isivReceviedDetailsModel}"   
+                                                             rowIndexVar="num" paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowEdit"  update="" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{isivDetail.materialId.matCode}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{isivDetail.materialId.matName}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Unit_Measure}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{isivDetail.materialId.unitOfMeasure}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Price}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{isivDetail.unitPrice}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{isivDetail.quantity}"/>
+                                                    </p:column>
+
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmApproverInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">  
+                                            <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-2"  value="#{MMS.Processed_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby"   
+                                                               value="#{isivReceivedController.userName}" readonly="true" 
+                                                               required="true" requiredMessage="prepared is required"
+                                                               />                                             
+                                            </div>  
+
+
+                                            <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="#{MMS.Decision}:" rendered="#{isivReceivedController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{isivReceivedController.selectedValue}" 
+                                                                 required="true" requiredMessage="Decision is Required" rendered="#{isivReceivedController.renderDecision}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>   
+                                                <p:message for="drdDecision" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required"> 
+                                            <h:outputLabel for="txtApprovedDate" class="control-label col-sm-2"  value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtApprovedDate" class="form-control" value="#{isivReceivedController.wfMmsProcessed.processedOn}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtApprovedDate', 'frmRegisterUI:txtApprovedDate');" />                                                                                                                                                    
+                                                <p:message for="txtApprovedDate" display="icon"/>
+                                            </div> 
+                                            <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2"  value="#{MMS.comment}:" rendered="#{isivReceivedController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{isivReceivedController.wfMmsProcessed.commentGiven}"  rendered="#{isivReceivedController.renderDecision}"/>     
+                                            </div>   
+
+                                        </div>                                                                                                 
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="noremeaa"  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnSaveButton" class="btn btn-primary"
+                                                                  disabled="{isivReceivedController.disableButtonUpdate}" 
+                                                                  value="#{isivReceivedController.saveorUpdateBundle}"
+                                                                  action="#{isivReceivedController.saveIsivReceived()}"  
+                                                                  process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo,:frmRegisterUI:frmApproverInfo"  
+                                                                  update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo,:frmRegisterUI,:frmToolbar"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>        

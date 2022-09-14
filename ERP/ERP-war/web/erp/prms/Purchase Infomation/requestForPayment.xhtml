@@ -1,0 +1,739 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml" title="Go to Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li>
+            <a href="finalAward.xhtml"><i class="fa  fa-circle-o"></i> Award</a>
+        </li>
+        <li>
+            <a href="contractInformation.xhtml"><i class="fa  fa-circle-o"></i>Contract Information</a>
+        </li>
+        <li>
+            <a href="contractAmendment.xhtml"><i class="fa fa-circle-o"></i>Contract Amendment</a>
+        </li>
+        <li>
+            <a href="purchaseOrder.xhtml"><i class="fa  fa-circle-o"></i>Purchase Order</a>
+        </li>
+
+        <li>
+            <a href="Quotation.xhtml"><i class="fa  fa-circle-o"></i>Quotation</a>
+        </li>
+
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color: white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackToSearch" rendered="#{requestForPaymentController.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{requestForPaymentController.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                         process="@this" update="@this,:frmMainUI, :BidSubmissionMain, :frmSample"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="pGAddNew" rendered="#{requestForPaymentController.isRenderCreate}">
+                        <p:commandButton id="btnNew" action="#{requestForPaymentController.createNewParty()}" icon="#{requestForPaymentController.icone}" 
+                                         style="background-color: white;border-color: white" rendered="#{requestForPaymentController.isRenderCreate}" 
+                                         process="@this" update="@this,:frmMainUI, :BidSubmissionMain, :frmSample"
+                                         title="#{requestForPaymentController.createOrSearchBundle}" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PDforApprover" rendered="#{requestForPaymentController.renderDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{requestForPaymentController.requestNotificationCounter}"  style="color: red;background-color: white;border-color: white "/>
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Payment Requests"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{requestForPaymentController.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="paymentReqlst"
+                                               value="#{requestForPaymentController.requestList}"
+                                               itemValue="#{paymentReqlst}" itemLabel="#{paymentReqlst.reqPaymentNo}"/>               
+                                <p:ajax event="valueChange"  process="@this," update=":BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:frmSample,:frmMainUI" />  
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{requestForPaymentController.wfPrmsProcessedDModel}"
+                                                             var="currentRow" rowIndexVar="num"  rows="5" paginator="true"
+                                                             rowKey="#{currentRow}" paginatorPosition="bottom" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{currentRow.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{currentRow.processedOn}" >
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputText>
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="requestForPayment.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{requestForPaymentController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" >
+                                <h:form id="frmSearchParty"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="form-group"> 
+                                                <h:outputLabel id="lblSearchingBy" class="control-label col-sm-2" value="Searching By:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{requestForPaymentController.prmsPaymentRequisition.columnName}"
+                                                                     valueChangeListener="#{requestForPaymentController.selectedParamChangeEvent}" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{requestForPaymentController.requestForPaymentSearchParameterLst}"
+                                                                       var="colsNameList" itemLabel="#{colsNameList}"/>
+                                                        <p:ajax event="change" process="@this," update="lblsearchColValue,txtsearchColValue"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                            <div class="form-group"> 
+                                                <h:outputLabel id="lblsearchColValue" class="control-label col-sm-2" value="Search By #{requestForPaymentController.prmsPaymentRequisition.columnName}:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtsearchColValue" class="form-control" value="#{requestForPaymentController.prmsPaymentRequisition.columnValue}"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group textBoxMarginTop6px"> 
+
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnFind" action="#{requestForPaymentController.searchPaymentRequestInfo}" icon="ui-icon-search" 
+                                                                     process="@this,frmSearchParty" update=":frmMainUI:frmParty" 
+                                                                     value="Find" class="btn btn-primary col-lg-4" />            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmParty">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblPartyInfo" value="#{requestForPaymentController.prmsPaymentRequisitions}" var="requestForPay" rows="10" 
+                                                                 selection="#{requestForPaymentController.selectPayment}"
+                                                                 rowKey="#{requestForPay.paymentReqId}"  selectionMode="single" 
+                                                                 paginator="true" paginatorPosition="bottom" editable="true"
+                                                                 rowsPerPageTemplate="5,10,15" rowIndexVar="count" 
+                                                                 paginatorTemplate="{CurrentPageReport} {PreviousPageLink} {FirstPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+                                                        <p:ajax event="rowSelect" listener="#{requestForPaymentController.rowSelect}" process="@this," 
+                                                                update=":BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:frmSample,:frmMainUI" />  
+                                                        <p:column headerText="No">
+                                                            #{count+1}
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Requisition No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{requestForPay.reqPaymentNo}"/>
+                                                        </p:column>
+                                                        <p:column headerText="Purchase Type">
+                                                            <h:outputText value="#{requestForPay.purchaseType}"/>
+                                                        </p:column>
+                                                        <p:column headerText="Payment Type">
+                                                            <h:outputText value="#{requestForPay.paymentType}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Prepared By" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{requestForPay.preparedBy}"/>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                </div>                 
+                                            </div>    
+                                        </div>  
+                                    </div>                           
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="BidSubmissionMain">
+            <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{requestForPaymentController.renderPnlCreateParty}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Payment Requisition</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="checkListInfoPanel" >
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group textBoxMarginTop6px required"> 
+                                            <h:outputLabel  id="lblRequestforPay" class="col-sm-2" style="text-align: right" value="Requisition No:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtPaymentNo" 
+                                                             value="#{requestForPaymentController.generateSpecficationNo()}" readonly="true"/>
+
+                                            </div> 
+                                            <p:outputLabel  id="lblIssuedDate" class="control-label col-sm-2" value=" Effective Date:"/>
+                                            <div class="col-sm-3">                                   
+                                                <p:calendar id="txtcalIssuedDate" required="true"  mindate="today" readonlyInput="true" readonly="#{workFlow.readonly}"                   
+                                                            value="#{requestForPaymentController.prmsPaymentRequisition.isuedDate}"                   
+                                                            pattern="yyyy/MM/dd" tabindex="4" requiredMessage="Effective Date value is Required">
+                                                    <f:convertDateTime  pattern="yyyy/MM/dd" />
+                                                </p:calendar>
+                                                <p:message display="icon" for="txtcalIssuedDate" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <p:outputLabel id="lblPayment" value="Payment For:" class="control-label col-sm-2"/>
+                                            <div class="col-sm-3">
+                                                <p:selectOneRadio id="rdbPaymentMeth" style="width: 100%;columns: 2" value="#{requestForPaymentController.checkAsBidPayment}" required="true" requiredMessage="Payment For is required"
+                                                                  valueChangeListener="#{requestForPaymentController.changeBidAndProforma}" disabled="#{requestForPaymentController.disableWhenUpdating}">
+                                                    <f:selectItem itemLabel="Bid" itemValue="bid"/>
+                                                    <f:selectItem itemLabel="Proforma" itemValue="proforma"/>
+                                                    <p:ajax event="change" update=":BidSubmissionMain,pgBid,txtBidNo,txtQuatationNo,pGContractOrPO,InvoiceNosPG,BidSubmissionMain" process="@this,pGContractOrPO,pgBid"/>
+                                                </p:selectOneRadio>
+                                                <p:message display="icon" for="rdbPaymentMeth"/>
+                                            </div>
+                                            <p:outputLabel  id="lblPaymentType"  class="control-label col-sm-2" value="Payment Type:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtpayType" class="form-control"  disabled="true" rendered="#{requestForPaymentController.renderBid}" 
+                                                             value="#{requestForPaymentController.prmsContract.paymenttype}"/>
+                                                <p:selectOneMenu id="selectPaymentType" style="width: 100%" required="true" requiredMessage="Payment Type Value is Required"
+                                                                 value="#{requestForPaymentController.prmsPaymentRequisition.paymentType}"  rendered="#{requestForPaymentController.renderProforma}"
+                                                                 valueChangeListener="#{requestForPaymentController.forBankChanges}">  
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Cash" itemValue="Cash" />
+                                                    <f:selectItem itemLabel="Bank Transfer" itemValue="Bank Transfer" />
+                                                    <f:selectItem itemLabel="Check" itemValue="Check" />
+                                                    <p:ajax event="valueChange" update="forBank"/>
+                                                </p:selectOneMenu>
+                                                <p:message display="icon" for="selectPaymentType"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <h:panelGroup id="pgBid">
+                                                <h:outputLabel  id="lblBidNo" class="control-label col-sm-2" value="Bid No:" rendered="#{requestForPaymentController.renderBid}"/>
+                                                <h:outputLabel  id="lblQuatationNo" class="control-label col-sm-2" value="Proforma No:" rendered="#{requestForPaymentController.renderProforma}"/>
+                                                <div class="col-sm-3"> 
+                                                    <p:selectOneMenu id="txtBidNo" style="width: 100%" rendered="#{requestForPaymentController.renderBid}"
+                                                                     value="#{requestForPaymentController.prmsBid}" converter="entConverter" 
+                                                                     disabled="#{requestForPaymentController.disableWhenUpdating}" required="true" requiredMessage="Bid No is Required"
+                                                                     valueChangeListener="#{requestForPaymentController.changesInBidNo}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{requestForPaymentController.bidContractedList}"  
+                                                                       var="bidNo" itemLabel="#{bidNo.refNo}" itemValue="#{bidNo}"/>
+                                                        <p:ajax event="change" process="@this" update="txtContractNo,selectBudgetyear,txtBidType,InvoiceNosPG,txtPurchaseTypeBid,GrnStatus"/>
+                                                    </p:selectOneMenu> 
+                                                    <p:message display="icon" for="txtBidNo"  rendered="#{requestForPaymentController.renderBid}"/>
+
+                                                    <p:selectOneMenu id="txtQuatationNo" style="width: 100%" rendered="#{requestForPaymentController.renderProforma}"
+                                                                     value="#{requestForPaymentController.prmsQuotation}" converter="entConverter"
+                                                                     disabled="#{requestForPaymentController.disableWhenUpdating}" required="true" requiredMessage="Proforma No is Required"
+                                                                     valueChangeListener="#{requestForPaymentController.changesProformaNumber}">
+                                                        <f:selectItem  itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{requestForPaymentController.proformaLists}" 
+                                                                       var="proformaNo" itemLabel="#{proformaNo.quotationNo}" itemValue="#{proformaNo}"/>
+                                                        <p:ajax event="change" update="txtpoNo,selectBudgetyear,txtPurchaseTypeProforma,txtPurchaser" process="@this"/>
+                                                    </p:selectOneMenu> 
+                                                    <p:message display="icon" for="txtQuatationNo" rendered="#{requestForPaymentController.renderProforma}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup id="forBank">
+                                                <h:outputLabel  id="lblBankName" class="col-sm-2" style="text-align: right" value="Bank Name:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="txtBankName" style="width: 100%" disabled="#{requestForPaymentController.renderWhenBank}" 
+                                                                     value="#{requestForPaymentController.fmsBank}" converter="entConverter" >
+                                                        <f:selectItems value="#{requestForPaymentController.listOfVendorName}" />
+                                                    </p:selectOneMenu> 
+                                                </div>
+                                            </h:panelGroup>
+
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <p:outputLabel id="lblPurchaseType" value="Purchase Type:" class="control-label col-sm-2" />
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtPurchaseTypeBid" class="form-control" readonly="true" rendered="#{requestForPaymentController.renderBid}"
+                                                             value="#{requestForPaymentController.prmsBid.bidCategory}"/>
+                                                <p:inputText id="txtPurchaseTypeProforma" class="form-control" readonly="true" rendered="#{requestForPaymentController.renderProforma}"
+                                                             value="#{requestForPaymentController.prmsQuotation.purchaseType}"/>
+                                            </div>
+                                            <p:outputLabel id="lblRequestedAmnt" value="Requested Amount:" class="control-label col-sm-2"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtRequestedAmnt" class="form-control" readonly="#{workFlow.readonly}" 
+                                                             value="#{requestForPaymentController.prmsPaymentRequisition.requestedAmount}">
+                                                    <p:ajax event="keyup" listener="#{requestForPaymentController.limitValueLessthanContractAmount()}"/>
+                                                </p:inputText>                                               
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <p:outputLabel id="lblBidType" value="Bid Type:" class="control-label col-sm-2" rendered="#{requestForPaymentController.renderBid}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtBidType" class="form-control" readonly="true" rendered="#{requestForPaymentController.renderBid}"
+                                                             value="#{requestForPaymentController.prmsBid.bidType}"/>
+                                            </div>
+
+
+                                            <h:panelGroup id="projectPG">
+                                                <p:outputLabel id="lblProjectName" value="Project Name:" class="control-label col-sm-2"
+                                                               rendered="#{requestForPaymentController.renderProjectNames}"/> 
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtProjectName" value="#{requestForPaymentController.prmsContract.projectId}"
+                                                                 class="form-control" readonly="true"
+                                                                 rendered="#{requestForPaymentController.renderProjectNames}"/>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <!--                                            <h:outputLabel  id="lblGrnNo" class="control-label col-sm-2" value="GRN No:"/>
+                                                                                        <div class="col-sm-3"> 
+                                                                                            <p:selectOneMenu id="txtGrnNumber" style="width: 100%" required="true"
+                                                                                                             value="{requestForPaymentController.prmsPaymentRequisition.grnId}" converter="entConverter" 
+                                                                                                             valueChangeListener="{requestForPaymentController.grnNoChangeEvent}">
+                                                                                                <f:selectItem itemLabel=" Select One " itemValue=""/>
+                                                                                                <f:selectItems value="{requestForPaymentController.populategrnNoLists}" var="grNo" itemLabel="#{grNo.grnNo}"  />
+                                                                                                <p:ajax event="valueChange" update="txtpoNo"/>
+                                                                                            </p:selectOneMenu>   
+                                                                                            <p:message display="icon" for="txtGrnNumber"/>
+                                                                                        </div>-->
+                                            <p:outputLabel id="lblPurchaser" class="control-label col-sm-2" value="Purchaser:" rendered="#{requestForPaymentController.renderProforma}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtPurchaser" class="form-control" rendered="#{requestForPaymentController.renderProforma}"
+                                                             value="#{requestForPaymentController.prmsQuotation.purchaser}" readonly="true"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px"> 
+                                            <h:panelGroup id="pGContractOrPO">
+                                                <h:outputLabel  id="lblContractNo"  class="control-label col-sm-2" value="Contract No:" rendered="#{requestForPaymentController.contNoList}"/>
+                                                <h:outputLabel  id="lblContractNoUp"  class="control-label col-sm-2" value="Contract No:" rendered="#{requestForPaymentController.contNoTxt}"/>
+                                                <h:outputLabel  id="lblPoNo" class="control-label col-sm-2" value="PO No:" rendered="#{requestForPaymentController.renderProforma}"/>
+                                                <div class="col-sm-3"> 
+                                                    <p:selectOneMenu id="txtContractNo" style="width: 100%" rendered="#{requestForPaymentController.contNoList}"
+                                                                     value="#{requestForPaymentController.prmsContract}" converter="entConverter" 
+                                                                     valueChangeListener="#{requestForPaymentController.changesForContctNo}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{requestForPaymentController.contractList}"  
+                                                                       var="contNo" itemLabel="#{contNo.contractNo}" itemValue="#{contNo}"/>
+                                                        <p:ajax event="change" update="txtSupp,txtamount,projectPG,txtpayType,txtGrn,forBank" process="@this"/>
+                                                        <p:message display="icon" for="txtContractNo"/>
+                                                    </p:selectOneMenu>
+                                                    <p:inputText id="txtContractNoUp" value="#{requestForPaymentController.prmsContract.contractNo}" readonly="true" class="form-control"
+                                                                 rendered="#{requestForPaymentController.contNoTxt}"/>
+                                                    <p:selectOneMenu id="txtpoNo" style="width: 100%" rendered="#{requestForPaymentController.poNolist}"
+                                                                     value="#{requestForPaymentController.prmsPurchaseOrder}"  converter="entConverter"  
+                                                                     valueChangeListener="#{requestForPaymentController.changesForPoNo}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{requestForPaymentController.purchaseOrderList}" 
+                                                                       var="POs" itemLabel="#{POs.pacNo}" itemValue="#{POs}"/>
+                                                        <p:ajax event="change" update="txtSupp,txtamount"/>
+                                                    </p:selectOneMenu>
+                                                    <p:inputText id="txtpoNoUp" value="#{requestForPaymentController.prmsPurchaseOrder}" readonly="true" class="form-control"
+                                                                 rendered="#{requestForPaymentController.poNoTxt}"     />
+                                                    <p:message for="txtpoNo" display="icon"/>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:outputLabel  id="lblamount"  class="control-label col-sm-2" value="Total Amount:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtamount"  readonly="true" validator="#{validatorManagedBean.Number}"
+                                                             class="form-control"
+                                                             value="#{requestForPaymentController.prmsPaymentRequisition.totalAmount}"/>
+
+                                            </div>
+                                        </div>
+
+                                        <!--                                        <div class="form-group textBoxMarginTop6px">
+                                                                                    <p:outputLabel id="lblContOrPO" value="Agreement Type:" class="control-label col-sm-2"/>
+                                                                                    <div class="col-sm-3">
+                                                                                        <p:selectOneRadio id="rdbContOrPO" style="width: 100%;columns: 2" value="{requestForPaymentController.checkAsByContract}"
+                                                                                                          valueChangeListener="{requestForPaymentController.changeToContractOrPO}">
+                                                                                            <f:selectItem itemLabel="Contract" itemValue="contract"/>
+                                                                                            <f:selectItem itemLabel="Purchase Order" itemValue="po"/>
+                                                                                            <p:ajax event="change" update="pGContractOrPO,txtContractNo,txtpoNo" process="@this"/>
+                                                                                        </p:selectOneRadio>
+                                        
+                                                                                    </div>
+                                                                                </div>-->
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:outputLabel  id="lblSupp" class="control-label col-sm-2" value="Supplier:"/>
+                                            <div class="col-sm-3"> 
+                                                <p:inputText id="txtSupp" style="width: 100%" value="#{requestForPaymentController.prmsSupplyProfile}"
+                                                             readonly="true" class="form-control"/>
+                                                <!--<f:selectItems value="{requestForPaymentController.getListOfSupplier()}" />-->
+
+                                                <!--                                                <p:message display="icon" for="txtSupp"/>-->
+                                            </div>
+                                            <p:outputLabel id="lblRemainingAmnt" value="Remaining Amount:" class="control-label col-sm-2"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtRemainingAmnt" readonly="true" class="form-control"
+                                                             value="#{requestForPaymentController.remainingAmount}"/>
+                                            </div>
+                                        </div>
+                                        <!--<div class="form-group textBoxMarginTop6px">--> 
+                                        <!--                                            <h:outputLabel id="lblrquest" for="txtrquest" class="control-label col-sm-2" value="PR No:*"/>
+                                                                                    <div class="col-sm-3"> 
+                                                                                        <p:selectOneMenu id="txtrquest" style="width: 100%" 
+                                                                                                         value="{requestForPaymentController.prmsPaymentRequisition.rquestId}" converter="entConverter"  >
+                                                                                            <f:selectItems value="{requestForPaymentController.PRNumberList}" />
+                                                                                        </p:selectOneMenu>   
+                                                                                        <p:message for="txtrquest" display="icon"/>
+                                                                                    </div>-->
+                                        <!--                                            <h:outputLabel  id="lblModeOfPayment" class="control-label col-sm-2" value="Mode Of Payment:*"/>
+                                                                                    <div class="col-sm-3">
+                                                                                        <p:selectOneMenu id="selectModeofpayment" style="width: 100%" value="{requestForPaymentController.prmsPaymentRequisition.paymentMode}" required="true" >  
+                                                                                            <f:selectItem itemLabel="select one" itemValue="" noSelectionOption="true"/>
+                                                                                            <f:selectItem itemLabel="TT" itemValue="TT" />
+                                                                                            <f:selectItem itemLabel="CPO" itemValue="CPO" />
+                                                                                            <f:selectItem itemLabel="LC" itemValue="LC" />
+                                                                                            <f:selectItem itemLabel="Check" itemValue="Check" />
+                                        
+                                                                                            <p:ajax update="selectModeofpayment" process="@this" event="change" />
+                                                                                        </p:selectOneMenu>
+                                                                                        <p:message display="icon" for="selectModeofpayment"/>
+                                        
+                                                                                    </div> -->
+                                        <!--</div>--> 
+                                        <div class="form-group textBoxMarginTop6px required"> 
+                                            <h:outputLabel  id="lblBudgetyear" class="col-sm-2" style="text-align: right" value="Budget year:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="selectBudgetyear" style="width: 100%" class="form-control" readonly="true"
+                                                             value="#{requestForPaymentController.prmsPaymentRequisition.bugetYear}"/>
+                                            </div>
+                                            <p:outputLabel   id="lblEndUserr" class="control-label col-sm-2" value="Department:"/>
+                                            <div class="col-sm-3"> 
+                                                <div class="col-sm-10"> 
+                                                    <p:inputText id="txtendUser" value="#{requestForPaymentController.hrDepartments.depName}" requiredMessage="Department Value is Required"
+                                                                 required="true" onmousedown="return false;" placeholder="Use Only From + Button" class="form-control" title="Please Click on + to Insert the value">
+                                                    </p:inputText>
+                                                    <p:message for="txtendUser" display="icon"/>
+                                                </div>
+                                                <div class="col-sm-1">
+                                                    <p:commandButton  id="cmdDepart" onclick="PF('dlgEepDep').show();" value="+" partialSubmit="true"
+                                                                      title="click here to choose Department" style="background: transparent" disabled="#{workFlow.readonly}"/>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <h:panelGroup id="GrnStatus">
+
+
+                                            <div class="form-group textBoxMarginTop6px"> 
+                                                <h:outputLabel  id="lblModelNo" class="control-label col-sm-2" value="GRN No:" rendered="#{requestForPaymentController.hideGrn}"/>
+                                                <div class="col-sm-3"> 
+                                                    <p:selectOneMenu id="txtGrn" value="#{requestForPaymentController.mmsGrn}" style="width: 100%" converter="entConverter" 
+                                                                     rendered="#{requestForPaymentController.hideGrn}" valueChangeListener="#{requestForPaymentController.getStoreName}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{requestForPaymentController.populategrnNoLists}" 
+                                                                       var="grnNo" itemLabel="#{grnNo.grnNo}" itemValue="#{grnNo}"/>
+                                                        <p:ajax event="valueChange" update="txtStoreName" process="@this"/>
+                                                    </p:selectOneMenu>
+
+                                                </div>
+                                                <p:outputLabel id="lblStoreName" class="control-label col-sm-2" value="Store Name:"
+                                                               rendered="#{requestForPaymentController.hideGrn}"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtStoreName" style="width: 100%" class="form-control"  readonly="true"
+                                                                 rendered="#{requestForPaymentController.hideGrn}" value="#{requestForPaymentController.mmsGrn.storeId.storeName}">
+                                                    </p:inputText>
+                                                </div>
+                                                <!--                                            <h:outputLabel  id="lblBudgetTItle" class="control-label col-sm-2" value="Budget Title:*"/>
+                                                                                            <div class="col-sm-3">
+                                                                                                <p:selectOneMenu id="selectBudgetTItle" style="width: 100%" required="true" 
+                                                                                                                 value="{requestForPaymentController.prmsPaymentRequisition.budgetTitle}" >
+                                                                                                    <f:selectItem itemLabel="select one" itemValue="" noSelectionOption="true"/>
+                                                                                                    <f:selectItem itemLabel="capital Budget" itemValue="capital Budget" />
+                                                                                                    <f:selectItem itemLabel="Opretional Budget " itemValue="Opretional Budget" />
+                                                                                                    <p:ajax update="selectBudgetTItle" process="@this" event="change" />
+                                                                                                </p:selectOneMenu>
+                                                                                                <p:message display="icon" for="selectBudgetTItle"/>
+                                                                                            </div>-->
+                                            </div> 
+                                        </h:panelGroup>
+                                        <div class="form-group textBoxMarginTop6px required"> 
+                                            <p:outputLabel id="lblPaidAmnt" value="Paid Amount:" class="col-sm-2" style="text-align: right"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtPaidAmnt"  class="form-control" value="#{requestForPaymentController.prmsPaymentRequisition.paidAmount}" readonly="#{workFlow.readonly}" placeholder="0.0">
+                                                    <p:ajax event="keyup" listener="#{requestForPaymentController.remainAmountChanging}" update="txtRemainingAmnt"/>
+                                                </p:inputText>
+                                            </div>
+
+                                            <p:outputLabel  id="lblCheckReciever" class="control-label col-sm-2" value=" Recieved By:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtCheckReciever" class="form-control" required="true" validator="#{validatorManagedBean.Text}"
+                                                             requiredMessage="Recieved By Value is Required" readonly="#{workFlow.readonly}"
+                                                             value="#{requestForPaymentController.prmsPaymentRequisition.paymentRecievedBy}"/>
+                                                <p:message display="icon" for="txtCheckReciever"/>
+                                            </div>
+
+                                        </div>
+                                        <p:dialog id="dlgEepDep" widgetVar="dlgEepDep"  width="500" height="300" header="Departments" showEffect="explode">
+                                            <p:panelGrid columns="3">
+                                                <p:tree var="DepValue" value="#{requestForPaymentController.parent}" selection="#{requestForPaymentController.selected}" selectionMode="single"
+                                                        style="border: transparent; width: 100%">
+                                                    <p:ajax event="select" process="@this" listener="#{requestForPaymentController.whenSelected}"
+                                                            update=":BidSubmissionMain:txtendUser"/>
+                                                    <p:treeNode>
+                                                        <h:outputText value="#{DepValue}"/>
+                                                    </p:treeNode>
+                                                </p:tree>
+                                            </p:panelGrid>
+                                        </p:dialog>
+                                        <h:panelGroup id="InvoiceNosPG">
+                                            <div class="form-group textBoxMarginTop6px">   
+                                                <p:outputLabel  id="lblCreditInvoiceNo"  class="control-label col-sm-2" value="Credit Invoice No:"
+                                                                rendered="#{requestForPaymentController.whenInternationalBid}"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtCreditInvoiceNo" class="form-control"   validator="#{validatorManagedBean.Number}"
+                                                                 value="#{requestForPaymentController.prmsPaymentRequisition.creditInvoiceNo}"
+                                                                 requiredMessage="Credit Invoice No Value is Required" readonly="#{workFlow.readonly}"
+                                                                 rendered="#{requestForPaymentController.whenInternationalBid}"/>
+
+                                                </div>
+                                                <h:outputLabel  id="lblCommercialInvoiceNo"  class="control-label col-sm-2" value="Commercial Invoice No:"
+                                                                rendered="#{requestForPaymentController.whenInternationalBid}"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtCommercialInvoiceNo" class="form-control" readonly="#{workFlow.readonly}"
+                                                                 rendered="#{requestForPaymentController.whenInternationalBid}"
+                                                                 value="#{requestForPaymentController.prmsPaymentRequisition.commerciaInvoiceNo}"/>
+                                                    <p:message display="icon" for="txtCommercialInvoiceNo"/>
+                                                </div>
+
+                                            </div>
+                                        </h:panelGroup>
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <p:outputLabel  id="lblIssueStatus" class="control-label col-sm-2" value="Issue Status:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtStatus" class="form-control" required="true" validator="#{validatorManagedBean .Text}"
+                                                             value="#{requestForPaymentController.prmsPaymentRequisition.issueStatus}" 
+                                                             requiredMessage="Issue Status Value is Required" readonly="#{workFlow.readonly}"/>
+                                                <p:message display="icon" for="txtStatus"/>
+                                            </div>
+                                            <p:outputLabel  id="lblDocument"  class="control-label col-sm-2" value="Document attached:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtDocument" class="form-control" required="true" validator="#{validatorManagedBean.Text}"
+                                                             requiredMessage="Document Attached Value is Required" readonly="#{workFlow.readonly}"
+                                                             value="#{requestForPaymentController.prmsPaymentRequisition.supportiveDocument}"/>
+                                                <p:message display="icon" for="txtDocument"/>
+                                            </div>
+                                        </div>  
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <p:outputLabel  id="lblIssuedBy" class="control-label col-sm-2" value="Issued By:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtIssuedBy" class="form-control" required="true" validator="#{validatorManagedBean.Text}"
+                                                             value="#{requestForPaymentController.prmsPaymentRequisition.paymentIssuedBy}"
+                                                             requiredMessage="Issued By Value is Required" readonly="#{workFlow.readonly}"/>
+                                                <p:message display="icon" for="txtIssuedBy"/>
+                                            </div>
+                                            <p:outputLabel  id="lblPaymentFor" class="control-label col-sm-2" value="Payment Reason:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputTextarea id="txtPaymentFor" class="form-control" required="true" validator="#{validatorManagedBean.Text}"
+                                                                 requiredMessage="Payment Reason Value is Required" readonly="#{workFlow.readonly}"
+                                                                 value="#{requestForPaymentController.prmsPaymentRequisition.paymentReason}"/>
+                                                <p:message display="icon" for="txtPaymentFor" />
+                                            </div>
+
+
+                                        </div> 
+                                        <div class="form-group textBoxMarginTop6px"> 
+                                            <!-- <h:outputLabel  id="lblPrepared" class="control-label col-sm-2" value="Prepared By: "/>
+                                             <div class="col-sm-3">
+                                                 <p:inputText id="txtPrepared" class="form-control"   validator="{validatorManagedBean .Text}"
+                                                              value="{requestForPaymentController.prmsPaymentRequisition.preparedBy}"/>
+ 
+                                             </div>-->
+                                            <!--                                            <h:outputLabel  id="lblApprovedDat" class="control-label col-sm-2" value="Prepared Date: "/>
+                                                                                        <div class="col-sm-3">                                   
+                                                                                            <p:calendar id="calApprovedDat"       mindate="today"  maxdate="today"  readonlyInput="true"             
+                                                                                                        value="{requestForPaymentController.prmsPaymentRequisition.preparedDate}"                    
+                                                                                                        pattern="yyyy/MM/dd" tabindex="4">
+                                                                                                <f:convertDateTime  pattern="yyyy/MM/dd" />
+                                                                                                <p:ajax event="dateSelect" />
+                                                                                            </p:calendar>
+                                                                                            <p:message display="icon" for="calApprovedDat"/>
+                                                                                        </div>-->
+
+                                        </div>
+
+                                        <!--                                        <div class="form-group textBoxMarginTop6px">
+                                                                                    <h:outputLabel  id="lblPreparerRepark"  class="control-label col-sm-2" value="Prepared Remark:"/>
+                                                                                    <div class="col-sm-3">
+                                                                                        <p:inputTextarea id="txtPreparerRemark"  class="form-control"  validator="{validatorManagedBean .Remark}"
+                                                                                                         value="{requestForPaymentController.prmsPaymentRequisition.preparedRemark}"/>
+                                                                                        <p:message display="icon" for="txtPreparerRemark"/>
+                                                                                    </div>
+                                                                                </div>-->
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <h:outputLabel class="col-sm-2" style="text-align: right" value="Processed By:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtProcessedBy" class="form-control" readonly="true"
+                                                             value="#{requestForPaymentController.userName}"/>
+                                            </div>
+                                            <p:outputLabel  id="lblProccessedDat" class="control-label col-sm-2" value="Processed Date: "/>
+                                            <div class="col-sm-3">                                   
+                                                <p:calendar id="calProccessedDat" readonlyInput="true" required="true" requiredMessage="Please Enter the Processed Date"         
+                                                            value="#{requestForPaymentController.wfPrmsProcessed.processedOn}"                    
+                                                            pattern="dd/MM/yyyy" tabindex="4" placeholder="dd/mm/yyyy">
+                                                    <f:convertDateTime  pattern="dd/MM/yyyy" />
+                                                </p:calendar>
+                                                <p:message display="icon" for="calProccessedDat"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <h:outputLabel class="control-label col-sm-2" value="Decision:"  rendered="#{requestForPaymentController.renderDecision}"/>
+                                            <div class="col-sm-3">
+                                                <p:selectOneMenu id="drdDecision" value="#{requestForPaymentController.wfPrmsProcessed.decision}" style="width: 100%"
+                                                                 valueChangeListener="#{requestForPaymentController.handleselectOptions}"  
+                                                                 rendered="#{requestForPaymentController.renderDecision}" required="true" requiredMessage="Please Give a Decision">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>
+                                                <p:message display="icon" for="drdDecision"/>
+                                            </div>
+                                            <h:outputLabel  id="lblPreparerRepark"  class="col-sm-2" style="text-align: right" value="Comment Given:"  rendered="#{requestForPaymentController.renderDecision}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputTextarea id="txtComment"  class="form-control"  validator="#{validatorManagedBean.Remark}"
+                                                                 value="#{requestForPaymentController.wfPrmsProcessed.commentGiven}" rendered="#{requestForPaymentController.renderDecision}"/>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <section class="panel panel-info ">
+                                        <section class="panel-body " >
+                                            <h:panelGroup id="pnlworkflow">
+                                                <div class="row">
+                                                    <div class="col-sm-12 form-horizontal">                      
+                                                        <div class="box-body"> 
+                                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                <div class="col-sm-6" >
+                                                                    <!--                                                                    <div class="form-horizontal col-sm-12">
+                                                                                                                                            <p:outputLabel id="lblprocessedBy"  for="txtprocessedBy" class="control-label col-sm-2" value="Processed By:"/>
+                                                                                                                                            <div class="col-sm-4">
+                                                                                                                                                <p:inputText  id="txtprocessedBy" value="logedin user" readonly="true" title="processer" class="form-control"/>
+                                                                                                                                            </div>
+                                                                                                                                            <p:outputLabel  for="txtApproved" class="control-label col-sm-2" id="lblApproved" value="Processed Date:" />
+                                                                                                                                            <div class="col-sm-4">                                   
+                                                                                                                                                <p:calendar id="txtApproved" value="{requestForPaymentController.wfPrmsProcessed.processedOn}"                   
+                                                                                                                                                            pattern="yyyy/MM/dd" tabindex="4" mindate="{requestForPaymentController.minForApp()}" autocomplete="off" >
+                                                                                                                                                    <f:convertDateTime  pattern="yyyy/MM/dd"/>
+                                                                                                                                                </p:calendar>
+                                                                                                                                                <p:message display="icon" for="txtApproved"/>
+                                                                                                                                            </div>
+                                                                                                                                        </div>-->
+                                                                </div>
+                                                            </div>
+
+
+                                                            <!--                                                            <div class="col-sm-10 textBoxMarginTop6px">
+                                                            
+                                                                                                                            <p:outputLabel  for="txtDecision" id="lblDecision" value="Decision:"  class="control-label col-sm-4" />
+                                                                                                                            <div class="col-sm-4"> 
+                                                                                                                                <p:selectOneMenu id="txtDecision" value="{requestForPaymentController.wfPrmsProcessed.decision}"  style="width: 100%">
+                                                                                                                                    <f:selectItem itemLabel=" Select One " itemValue=""/>
+                                                                                                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                                                                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                                                                                                </p:selectOneMenu>
+                                                                                                                            </div>
+                                                                                                                            <h:outputLabel  id="lblApproveByremark"  class="control-label col-sm-2" value=" Approver Remark:"/>
+                                                                                                                            <div class="col-sm-4">
+                                                                                                                                <p:inputTextarea id="txtApproveByremark"  class="form-control"   validator="{validatorManagedBean .Remark}"
+                                                                                                                                                 value="{requestForPaymentController.prmsPaymentRequisition.approverRemark}"/>
+                                                                                                                                <p:message display="icon" for="txtApproveByremark"/>
+                                                                                                                            </div>
+                                                                                                                        </div>-->
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+                                        </section>
+                                    </section>                  
+                                    <div class="form-group textBoxMarginTop6px "> 
+                                        <div class="col-lg-2" />
+                                        <div class="col-sm-3">
+                                            <p:commandButton id="btnSave" value="#{requestForPaymentController.saveorUpdateBundle}" icon="ui-icon-new" validateClient="true" 
+                                                             class="btn btn-primary col-lg-4" 
+                                                             process="@this,checkListInfoPanel"  
+                                                             update=" checkListInfoPanel"  
+                                                             action="#{requestForPaymentController.savePaymentRequestInfo()}" />  
+
+                                        </div>
+                                    </div>
+
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </h:panelGroup>
+
+        </h:form>
+    </ui:define>
+</ui:composition>          

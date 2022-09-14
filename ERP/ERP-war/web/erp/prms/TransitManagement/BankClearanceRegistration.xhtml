@@ -1,0 +1,492 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="PortEntry.xhtml"><i class="fa fa-circle-o"></i> <span>Port Registration</span></a></li> 
+        <li><a href="serviceProvider.xhtml"><i class="fa fa-circle-o "></i> <span>Service Provider</span></a></li> 
+        <li><a href="ForeignExchange.xhtml"><i class="fa fa-circle-o "></i> <span>Foreign Currency Exchange</span></a></li>
+        <li><a href="InsuranceRegistrationForm.xhtml"><i class="fa fa-circle-o "></i> <span>Insurance Information</span></a></li> 
+        <li><a href="LCInformation.xhtml"><i class="fa fa-circle-o "></i> <span>Letter Of Credit Information</span></a></li> 
+        <li><a href="LCRegAmendment.xhtml"><i class="fa fa-circle-o "></i> <span>Letter Of Credit Amendment </span></a></li> 
+
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSample">
+            <p:toolbar style="background-color: white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackToSearch" rendered="#{BCR_BankClearanceRegistrationController.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{BCR_BankClearanceRegistrationController.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                         process="@this" update=":frmMainUI,:BankClearnceMain,:frmSample"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PgCreate" rendered="#{BCR_BankClearanceRegistrationController.isRenderCreate}">
+                        <p:commandButton id="btnNew" action="#{BCR_BankClearanceRegistrationController.createNewParty()}" 
+                                         style="background-color: white;border-color: white"
+                                         icon="#{BCR_BankClearanceRegistrationController.icone}" validateClient="true"
+                                         process="@this" update="@this,:frmMainUI,:BankClearnceMain,:frmSample"
+                                         title="#{BCR_BankClearanceRegistrationController.createOrSearchBundle}"
+                                         rendered="#{BCR_BankClearanceRegistrationController.isRenderCreate}"/>
+
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PDforApprover" rendered="#{BCR_BankClearanceRegistrationController.isrenderDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell-o" value="#{BCR_BankClearanceRegistrationController.requestNotificationCounter}"
+                                       title="Notification" style="color: red;background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Bank Clearance"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{BCR_BankClearanceRegistrationController.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="bankClearancelst"
+                                               value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistList}"
+                                               itemValue="#{bankClearancelst}" itemLabel="#{bankClearancelst.clearanceNo}"/>               
+                                <p:ajax event="valueChange" update=":BankClearnceMain,:BankClearnceMain:registerUI,:frmSample,:frmMainUI" process="@this" />                            
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 200px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="dtWorkflow" paginator="true" paginatorPosition="bottom" var="num" rows="3" rowIndexVar="rowName" 
+                                                             value="#{BCR_BankClearanceRegistrationController.wfPrmsProcessedDModel}"
+                                                             rowKey="#{num}" resizableColumns="true" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{sn+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{num.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{num.processedOn}">
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputText>
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{num.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="BankClearanceRegistration.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"> <i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup id="mainUI" rendered="#{BCR_BankClearanceRegistrationController.renderPnlManPage}" style="border: 0px; background-color: transparent" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Searching By Clearance No:</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h:form id="frmSearchParty">
+                                    <div class="panel-body">
+                                        <div class="form-horizontal">
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel class="control-label col-sm-2" value="Searching By:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="drdSearchBy" style="width: 100%" value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistration.columnName}"
+                                                                     valueChangeListener="#{BCR_BankClearanceRegistrationController.selectedParamChangeEvent}" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{BCR_BankClearanceRegistrationController.bankClearanceSearchParameterLst}"
+                                                                       var="paramLists" itemLabel="#{paramLists}"/>
+                                                        <p:ajax event="change" process="@this" update="lblsearchName,txtsearchValue"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div> 
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="lblsearchName" class="control-label col-sm-2" value="Search By #{BCR_BankClearanceRegistrationController.bankClearanceRegistration.columnName}:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtsearchValue" class="form-control" value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistration.columnValue}"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <div class="col-sm-4 col-sm-push-2">
+                                                    <p:commandButton id="btnFind" action="#{BCR_BankClearanceRegistrationController.findBankClearanceInfo()}" icon="ui-icon-search" 
+                                                                     process="@this ,frmSearchParty" update=":frmMainUI:frmParty" class="btn btn-primary"
+                                                                     value="Find"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:form>
+
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmParty">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblBankClearanceInfo" value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistModel}"
+                                                                 var="BCRInfoList" rows="10" selection="#{BCR_BankClearanceRegistrationController.bankClearanceSelection}" 
+                                                                 selectionMode="Single" 
+                                                                 rowKey="#{BCRInfoList.clearanceNo}"
+                                                                 paginator="true" paginatorPosition="bottom" editable="true" rowIndexVar="BCList"
+                                                                 rowsPerPageTemplate="5,10,15"
+                                                                 paginatorTemplate="{CurrentPageReport} {PreviousPageLink} {FirstPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+                                                        <p:ajax event="rowSelect" listener="#{BCR_BankClearanceRegistrationController.onRowSelect}" 
+                                                                update=":BankClearnceMain,:BankClearnceMain:registerUI,:frmSample,:frmMainUI" process="@this" />  
+                                                        <p:column headerText="S.No" sortBy="#{BCList+1}">
+                                                            #{BCList+1}
+                                                        </p:column>
+                                                        <p:column sortBy="#{BCRInfoList.clearanceNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Clearance No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{BCRInfoList.clearanceNo}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{BCRInfoList.letterOfCreditNo.lcNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Lc Number" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{BCRInfoList.letterOfCreditNo.lcNo}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{BCRInfoList.declarationNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Declaration Number:" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{BCRInfoList.declarationNo}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{BCRInfoList.registeredDate}">
+                                                            <f:facet name="header">
+                                                                <h:outputLabel value="Registration Date"/>
+                                                            </f:facet>
+                                                            <h:outputLabel value="#{BCRInfoList.registeredDate}">
+                                                                <f:convertDateTime pattern="dd/MMM/yyy"/>
+                                                            </h:outputLabel>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                </div>                 
+                                            </div>    
+                                        </div>  
+                                    </div>                           
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <div class="row">
+            <div class="col-md-12">
+                <h:form id="BankClearnceMain">
+                    <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,fatal" />
+                    <h:panelGroup id="registerUI" rendered="#{BCR_BankClearanceRegistrationController.renderPnlCreateParty}" style="border: 0px; background-color: transparent">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title">Declaration Settlement(Bank Clearance) Registration</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row"> 
+                                    <div class="col-md-12"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel id="lblClearanceNo" for="lblClearanceNo" class="control-label col-sm-2" value="Clearance Number:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtClearanceNo" readonly="true"
+                                                                 value="#{BCR_BankClearanceRegistrationController.generateclearanceNo()}"/>
+                                                </div>
+                                                <p:outputLabel id="lblRegDate" class="control-label col-sm-2" value="Registration Date:"/>
+                                                <div class="col-sm-3">
+                                                    <p:calendar id="RegDate" required="true" requiredMessage="Please Enter Registration Date" placeholder="dd/mm/yyyy" readonlyInput="true"                        
+                                                                value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistration.registeredDate}"                    
+                                                                pattern="dd/MM/yyyy" tabindex="4" maxdate="today" mindate="today" autocomplete="off" disabled="#{workFlow.readonly}">
+
+                                                        <f:convertDateTime  pattern="dd/MM/yyyy" />
+                                                    </p:calendar>
+                                                    <p:message  for="RegDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <!--                                            <div class="form-group textBoxMargin6px">
+                                                                                            <p:outputLabel id="lblItemName" class="control-label col-sm-2" for="txtGoodsName" value="Goods Name:"/>
+                                                                                            <div class="col-sm-3">
+                                                                                                <p:inputTextarea id="txtGoodsName" class="form-control" required="true" requiredMessage="Please Enter Goods Name" autoResize="false"
+                                                                                                                 value="{BCR_BankClearanceRegistrationController.bankClearanceRegistration.goodsName}"/>
+                                                                                                <p:message for="txtGoodsName" display="icon"/>
+                                                                                            </div>
+                                                                                            <p:outputLabel id="lblBillType" class="control-label col-sm-2" for="selectBillType" value="Bill Type:"/>
+                                                                                            <div class="col-sm-3">
+                                                                                                <p:selectOneRadio id="selectBillType" class="col-sm-4" required="true" style="width: 50%" columns="2"
+                                                                                                                  value="{BCR_BankClearanceRegistrationController.checkAWBbillType}"
+                                                                                                                  valueChangeListener="{BCR_BankClearanceRegistrationController.changecheckAWBbillType}">
+                                                                                                    <f:selectItem itemLabel="AWB" itemValue="AWB"/>
+                                                                                                    <f:selectItem itemLabel="BL" itemValue="BL"/>
+                                                                                                    <p:ajax event="valueChange" process="@this,selectBillType"/>
+                                                                                                </p:selectOneRadio >
+                                                                                                <p:message for="selectBillType" display="icon"/>
+                                                                                            </div>
+                                                                                        </div>-->
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel  id="lblLCNo" class="control-label col-sm-2" value="LC Number:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="LcNo" style="width: 100%" required="true" requiredMessage="Please Select LC Number"
+                                                                     converter="entConverter" disabled="#{BCR_BankClearanceRegistrationController.disableLCNo}"  
+                                                                     value="#{BCR_BankClearanceRegistrationController.prmsLcRigistration}"
+                                                                     valueChangeListener="#{BCR_BankClearanceRegistrationController.getLcAmount}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" noSelectionOption="true"/>
+                                                        <f:selectItems value="#{BCR_BankClearanceRegistrationController.lcNoLists}"
+                                                                       var="LcNo" itemLabel="#{LcNo.lcNo}" itemValue="#{LcNo}"/>
+                                                        <p:ajax update="txtLCAmount,txtSupplierName,txtContractNo,txtBankPermitNo,txtContractNo,txtPermitAmount" process="@this" event="change"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="LcNo" display="icon"/>
+                                                </div>
+
+
+                                                <!--                                                <p:outputLabel id="lblBillNo" for="txtBillNo" class="control-label col-sm-2" value="Bill Number:"/>
+                                                                                                <div class="col-sm-3">
+                                                                                                    <h:inputText id="txtBillNo" class="form-control" required="true" requiredMessage="Please Enter Bill Number"
+                                                                                                                 value="{BCR_BankClearanceRegistrationController.bankClearanceRegistration.billNo}"
+                                                                                                                 validatorMessage="Please Enter without space and special character">
+                                                                                                        <f:validateRegex pattern="^[a-zA-Z0-9]+$" />
+                                                                                                    </h:inputText>
+                                                                                                    <p:message for="txtBillNo" display="icon"/>
+                                                                                                </div>-->
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+                                                <p:outputLabel id="lblContractNo" class="control-label col-sm-2"  for="txtContractNo" value="Contract No:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtContractNo" readonly="true"
+                                                                 value="#{BCR_BankClearanceRegistrationController.prmsLcRigistration.contractId.contractNo}"/>
+                                                    <p:message for="txtContractNo" display="icon"/>
+
+                                                </div> 
+                                                <p:outputLabel id="lblPermitAmount" class="control-label col-sm-2" value="Permit amount:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtPermitAmount" autocomplete="off" readonly="true"
+                                                                 value="#{BCR_BankClearanceRegistrationController.prmsLcRigistration.permitAmount}"
+
+                                                                 converterMessage="Please Use only double Integers">
+                                                        <p:ajax event="keyup" update="txtClearedAmount" listener="#{BCR_BankClearanceRegistrationController.handleupdateTotal}"/>
+                                                        <p:ajax event="change" update="txtClearedAmount" listener="#{BCR_BankClearanceRegistrationController.handleupdateTotal}"/>
+                                                    </p:inputText>
+                                                    <p:message for="txtPermitAmount" display="icon"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel id="lblSupplierName"  class=" col-sm-2" style="text-align: right"  value="Supplier Name:" />
+                                                <div class="col-sm-3"> 
+                                                    <p:inputText id="txtSupplierName" readonly="true" 
+                                                                 value="#{BCR_BankClearanceRegistrationController.prmsLcRigistration.contractId.suppId.vendorName}"/>
+                                                    <p:message for="txtSupplierName" display="icon"/>
+                                                </div>
+                                                <p:outputLabel id="lblInvoiceAmount" class="control-label col-sm-2" value="Invoice Amount:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtInvoiceAmount" class="form-control" autocomplete="off" readonly="#{workFlow.readonly}"
+                                                                 value="#{BCR_BankClearanceRegistrationController.invoice}"
+                                                                 required="true" requiredMessage="Please Enter Invoice Amount"
+                                                                 validator="#{validatorManagedBean.Double}"
+                                                                 converterMessage="Please Use Only Double Integers">
+                                                        <p:ajax event="keyup" update="txtClearedAmount" listener="#{BCR_BankClearanceRegistrationController.handleupdateTotal}"/>
+                                                    </p:inputText>
+                                                    <p:message for="txtInvoiceAmount" display="icon"/>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+                                                <p:outputLabel id="lblLCAmount" class="control-label col-sm-2" value="LC Amount:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtLCAmount" requiredMessage="Please Enter LC Amount" placeholder="0.00" readonly="true"
+                                                                 validator="#{validatorManagedBean.Double}"
+                                                                 value="#{BCR_BankClearanceRegistrationController.prmsLcRigistration.lcAmount}"/>
+                                                    <p:message for="txtLCAmount" display="icon"/>
+                                                </div>
+                                                <p:outputLabel id="lblClearedAmount" class="control-label col-sm-2" value="Cleared amount:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtClearedAmount" readonly="true" placeholder="0.00"
+                                                                 converterMessage="dgdgs"
+                                                                 value="#{BCR_BankClearanceRegistrationController.cleared}">
+
+                                                        <f:validateRegex pattern="^-?\d*\.?\d*"/>
+                                                    </p:inputText>
+                                                    <p:message for="txtClearedAmount" display="icon"/>
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+
+                                                <p:outputLabel id="lblBankPermitNo" class="control-label col-sm-2" value="Bank Permit No:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtBankPermitNo" requiredMessage="Please Enter Bank Permit Number" readonly="true"
+                                                                 value="#{BCR_BankClearanceRegistrationController.prmsLcRigistration.foreignId.feNumber}"
+                                                                 validatorMessage="Please Enter without space and special character" >
+                                                        <f:validateRegex pattern="^[a-zA-Z0-9]+$" />
+                                                    </p:inputText>
+                                                    <p:message for="txtBankPermitNo" display="icon"/>
+                                                </div>
+                                                <h:outputLabel id="lblDeliveredBy" class="control-label col-sm-2" value="Delivered By:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtDeliveredBy" class="form-control" validator="#{validatorManagedBean.Text}" validatorMessage="Please enter more words"
+                                                                 value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistration.deliveredBy}" readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="txtDeliveredBy" display="icon"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+                                                <p:outputLabel id="lblDeclarationNo" class="control-label col-sm-2" value="Declaration Number:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtDeclarationNo" class="form-control" readonly="#{workFlow.readonly}"
+                                                                 value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistration.declarationNo}"/>
+                                                </div>
+                                                <p:outputLabel id="lblInvoiceNo" class="control-label col-sm-2" value="Commercial Invoice Number:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtInvoiceNo" class="form-control" readonly="#{workFlow.readonly}" 
+                                                                 value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistration.invoiceNo}"/>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel id="lblAttachment" class="control-label col-sm-2" value="Attachment:"/>
+                                                <div class="col-sm-3">
+                                                    <p:fileUpload id="fileUpload" allowTypes="/(\.|\/)(gif|jpe?g|png|docx|doc|xlsx)$/" invalidFileMessage="You Entered Invalid file type" disabled="#{workFlow.readonly}" 
+                                                                  sizeLimit="100000" invalidSizeMessage="File Size is Exceeded" auto="true" fileLimit="1" fileLimitMessage="Is impossible to upload more than one file"
+                                                                  mode="advanced" dragDropSupport="false" value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistration.attachmentRefNumber}"
+                                                                  process="@this,dtFileUploading" update="dtFileUploading" fileUploadListener="#{BCR_BankClearanceRegistrationController.fileUploadListener}">
+                                                    </p:fileUpload>
+                                                    <p:dataTable id="dtFileUploading" paginator="true" paginatorPosition="bottom" var="currentRow" rowIndexVar="currentRows" styleClass="table-no-select-all"
+                                                                 value="#{BCR_BankClearanceRegistrationController.prmsLuDmArchivesDModel}" rowKey="#{currentRow.documentId}" 
+                                                                 selection="#{BCR_BankClearanceRegistrationController.prmsLuDmArchiveSelection}" selectionMode="single">
+                                                        <p:ajax event="rowSelect" listener="#{BCR_BankClearanceRegistrationController.whenrowSelected}"/>
+                                                        <f:facet name="header">
+                                                            <p:outputLabel value="Files From Database"/>
+                                                        </f:facet>
+                                                        <p:column headerText="File Name">
+                                                            <h:outputLabel id="lblFileName" value="#{currentRow.fileName}"/>
+                                                        </p:column>
+                                                        <p:column headerText="Download">
+                                                            <p:commandButton id="cmdDownload" icon="ui-icon-arrowthickstop-1-s" ajax="false" title="Download"
+                                                                             update="dtFileUploading" process="@this,dtFileUploading" immediate="true">
+                                                                <p:fileDownload id="fileDown" value="#{BCR_BankClearanceRegistrationController.downloading}"/>
+                                                            </p:commandButton>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                </div>
+                                                <h:outputLabel id="lblRemark" class="control-label col-sm-2" value="Remark:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputTextarea id="txtRemark" class="form-control" autoResize="false" readonly="#{workFlow.readonly}"  
+                                                                     value="#{BCR_BankClearanceRegistrationController.bankClearanceRegistration.remark}"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <section class="panel panel-info col-sm-12" >
+                                                    <section class="panel panel-info  col-sm-12">
+                                                        <h:panelGroup id="PGworkFlow"  >
+                                                            <div class="form-group  form-horizontal" >
+                                                                <div class="form-group textBoxMargin6px ">
+                                                                    <p:outputLabel id="lblApproverName" class="control-label col-sm-2" value="Processed By:"/>
+                                                                    <div class="col-sm-3">
+                                                                        <p:inputText id="txtApproverName" value="#{BCR_BankClearanceRegistrationController.userName}" readonly="true"/>
+                                                                    </div>
+                                                                    <p:outputLabel id="lblApprovedDate" value="Processed On:" class="control-label col-sm-2"/>
+                                                                    <div class="col-sm-3">
+                                                                        <p:calendar id="calApprovedDate" placeholder="dd/MM/yyyy"  pattern="dd/MM/yyyy" mindate="today" maxdate="today"
+                                                                                    value="#{BCR_BankClearanceRegistrationController.wfPrmsProcessed.processedOn}" required="true" requiredMessage="Please Enter Processed Date">
+                                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                        </p:calendar>
+                                                                        <p:message display="icon" for="calApprovedDate"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group textBoxMargin6px">
+                                                                    <p:outputLabel id="lblDecision" value="Decision:" class="control-label col-sm-2" rendered="#{BCR_BankClearanceRegistrationController.isrenderDecision}"/>
+                                                                    <div class="col-sm-3">
+                                                                        <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{BCR_BankClearanceRegistrationController.wfPrmsProcessed.decision}" required="true" requiredMessage="Please Select a Decision"
+                                                                                         valueChangeListener="#{BCR_BankClearanceRegistrationController.handleDecisionOptions}" rendered="#{BCR_BankClearanceRegistrationController.isrenderDecision}">
+                                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                            <f:selectItem itemLabel="Approve" itemValue="Approved"/>
+                                                                            <f:selectItem itemLabel="Reject" itemValue="Rejected"/>
+
+                                                                        </p:selectOneMenu> 
+                                                                        <p:message display="icon" for="drdDecision"/>
+                                                                    </div>
+                                                                    <p:outputLabel id="lblApproverRemark" class="control-label col-sm-2" value="Comment Given:" rendered="#{BCR_BankClearanceRegistrationController.isrenderDecision}"/>
+                                                                    <div class="col-sm-3">
+                                                                        <p:inputTextarea id="txtApproverRemark" class="form-control" value="#{BCR_BankClearanceRegistrationController.wfPrmsProcessed.commentGiven}" rendered="#{BCR_BankClearanceRegistrationController.isrenderDecision}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section> 
+                                            </div>
+
+
+                                            <div class="form-group textBoxMargin6px">
+                                                <div class="col-sm-3 col-sm-push-2">
+                                                    <p:commandButton  id="btnSave" class="btn btn-primary col-lg-4"                       
+                                                                      value="#{BCR_BankClearanceRegistrationController.saveorUpdateBundle}" 
+                                                                      action="#{BCR_BankClearanceRegistrationController.saveBankClearanceInfo()}" 
+                                                                      process="@this,registerUI" 
+                                                                      update="registerUI,:frmSample" />                     
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>           
+                        </div>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

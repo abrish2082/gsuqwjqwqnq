@@ -1,0 +1,560 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+            </div>
+        </h:form>
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li><a href="InventoryBalanceSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Balance Sheet</span></a></li> 
+        <li><a href="NeedAssessment.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment</span></a></li> 
+        <li><a href="NeedAssessmentCollected.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment Collected</span></a></li> 
+        <li><a href="stockItemLost.xhtml"><i class="fa fa-circle-o"></i> <span>Lost Stock Item</span></a></li> 
+        <li><a href="mmsLostFixedAsset.xhtml"><i class="fa fa-refresh"></i> <span>Lost Fixed Asset</span></a></li> 
+        <li><a href="FixedAssetTransfer.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Transfer</span></a></li> 
+        <li><a href="FixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Return </span></a></li> 
+        <li><a href="NonFixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Non Fixed Asset Return</span></a></li> 
+        <li><a href="FixedAssetItemDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Disposal Collection</span></a></li> 
+        <li><a href="Disposal.xhtml  "><i class="fa fa-circle-o"></i> <span>Fixed Asset Disposal</span></a></li> 
+        <li><a href="StockDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Stock Item Disposal</span></a></li> 
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackSarch" rendered="#{inventoryCountManagedBean.renderpnlToSearchPage}">
+                        <p:commandButton id="btnBackToSearch" action="#{inventoryCountManagedBean.goBackToSearchpageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="Back To Search" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew" action="#{inventoryCountManagedBean.createNewInvCountInfo()}" icon="#{inventoryCountManagedBean.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{inventoryCountManagedBean.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>   
+                    <h:panelGroup id="pnlGNotifica" rendered="#{inventoryCountManagedBean.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{inventoryCountManagedBean.mmsInventoryCountingList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Inventory Count Number List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{inventoryCountManagedBean.onSelectIcsRequest}" scrollHeight="400">
+                                            <f:selectItems  var="IcsListVar" value="#{inventoryCountManagedBean.mmsInventoryCountingList}"
+                                                            itemValue="#{IcsListVar}"  itemLabel="#{IcsListVar.inventoryCountNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{inventoryCountManagedBean.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{inventoryCountManagedBean.workflowDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.wfDecison}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>         
+                        <a href="../../mms/InventoryInformation/InventoryCountSheet.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                        <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{inventoryCountManagedBean.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Search}...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="txtPartyName" value="#{inventoryCountManagedBean.columnNameResolver.col_Name_FromTable}"
+                                                                     valueChangeListener="#{inventoryCountManagedBean.changeEventColumnName}" 
+                                                                     style="width: 100%">
+                                                        <f:selectItem itemLabel="--- #{MMS.select} ---" itemValue=""/>
+                                                        <f:selectItems value="#{inventoryCountManagedBean.columnNameResolverList}" var="CountFAColName"
+                                                                       itemValue="#{CountFAColName.col_Name_FromTable}" itemLabel="#{CountFAColName.parsed_Col_Name}"/>
+                                                        <p:ajax event="change" process="@this" update="frmSearchGatePass"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="lblColumnName" class="control-label col-sm-2" value="#{inventoryCountManagedBean.columnNameResolver.parsed_Col_Name}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtColumnValue" class="form-control" value="#{inventoryCountManagedBean.inventoryCountEntity.columnValue}"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="findbtn" class="control-label col-sm-2"/>
+                                                <div class="col-sm-4">
+                                                    <p:commandButton id="btnSearch" class="btn btn-primary" action="#{inventoryCountManagedBean.searchInventoryByParameter()}" icon="ui-icon-search" 
+                                                                     process="@this,frmSearchGatePass" update="frmSearchGatePass,:frmMainUI:mainUI"
+                                                                     value="#{MMS.find}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>              
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblinventoryInfo" value="#{inventoryCountManagedBean.mmsInventorySearchInfoDataModel}" var="inventoryInfo" rows="5" 
+                                                             selectionMode="single" class="dataTable" rowIndexVar="num"
+                                                             selection="#{inventoryCountManagedBean.selectedInventorycount}" rowKey="#{inventoryInfo.inventoryCountId}" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowSelect" listener="#{inventoryCountManagedBean.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.S_No}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Store_Name}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{inventoryInfo.workUnit.storeName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Budget_Year}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{inventoryInfo.budgetYear}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Inventory_No}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{inventoryInfo.inventoryCountNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Count_Date}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{inventoryInfo.countedDate}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl" showDetail="true" severity="information,fatal" autoUpdate="true" />
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{inventoryCountManagedBean.renderPnlCreateInvCount}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Inventory_Count_Sheet}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Inventory_Count_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtInventoryNumber" readonly="true"  
+                                                             value="#{inventoryCountManagedBean.generateInventoryNo()}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  for="selectWorkUnit" class="control-label col-sm-2" value="#{MMS.Store_Name}:"/>
+                                            <div class="col-sm-4">                                  <!--disabled not important-->
+                                                <p:selectOneMenu   id="selectWorkUnit"   required="true" requiredMessage="Store is required" style="width: 100%;" disabled="#{workFlow.readonly}"
+                                                                   value="#{inventoryCountManagedBean.storeInfoEntity.storeName}"  
+                                                                   valueChangeListener="#{inventoryCountManagedBean.handleSelectStoreName}" >  
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue="" />  
+                                                    <f:selectItems id="selectOneMenuWorkUnit" 
+                                                                   value="#{inventoryCountManagedBean.storeList}" var="stVar" itemLabel="#{stVar.storeName}  " itemValue="#{stVar}" />
+                                                    <p:ajax update="selectWorkUnit,txtLocation,txtRegion,txtStoreMan,frmMaterialInfo" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectWorkUnit" display="icon"/>
+                                            </div>     
+                                            <h:outputLabel id="lblLocation" class="control-label col-sm-2"  value="#{MMS.WareHouse}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtLocation" 
+                                                             value="#{inventoryCountManagedBean.storeInfoEntity.warehouseId.name}" 
+                                                             required="true" requiredMessage="WareHouse is required"
+                                                             readonly="true"
+                                                             />
+                                                <p:message for="txtLocation" display="icon"/>
+                                            </div> 
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lblRegion" class="control-label col-sm-2"  value="#{MMS.Region}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtRegion" 
+                                                             value="#{inventoryCountManagedBean.storeInfoEntity.region}" 
+                                                            
+                                                             readonly="true"
+                                                             ><p:ajax></p:ajax> </p:inputText>
+                                                <p:message for="txtRegion" display="icon"/>
+                                            </div>
+                                            <h:outputLabel for="txtCountDate" class="control-label col-sm-2" value="#{MMS.Count_Date}:"/>                                                                        
+                                            <div class="col-sm-4 required">
+                                                <p:inputText id="txtCountDate"  value="#{inventoryCountManagedBean.inventoryCountEntity.countedDate}" readonly="#{workFlow.readonly}"
+                                                             required="true" validator="#{validatorManagedBean.Date}" requiredMessage="Date is required"
+                                                             onclick="displayCalendar('frmRegisterUI:txtCountDate', 'frmRegisterUI:txtCountDate');" />                                                                                                                                                    
+                                                <p:message for="txtCountDate" display="icon"/>
+                                            </div> 
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lblStoreman" class="control-label col-sm-2"  value="#{MMS.Store_Man}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtStoreMan" 
+                                                             value="#{inventoryCountManagedBean.storeInfoEntity.storeAdmin.firstName}" 
+                                                            
+                                                             readonly="true"/>
+                                                <p:message for="txtStoreMan" display="icon"/>
+                                            </div>
+                                            <h:outputLabel id="lbl_CountType" value="#{MMS.Count_Type}:" class="control-label col-sm-2"  /> 
+                                            <div class="col-sm-4 required">
+                                                <p:selectOneRadio id="CountType"  required="true" requiredMessage="Count type required" value="#{inventoryCountManagedBean.inventoryCountEntity.countType}"
+                                                                  disabled="#{workFlow.readonly}"   valueChangeListener="#{inventoryCountManagedBean.handleselectOptions}" >
+                                                    <f:selectItem itemLabel="#{MMS.Periodic} " itemValue="1"  />
+                                                    <f:selectItem itemLabel="#{MMS.Perpetual} " itemValue="2" />    
+                                                </p:selectOneRadio>
+                                                <p:message for="CountType" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lblBudgetYear" class="control-label col-sm-2" value="#{MMS.Budget_Year}:"/>
+
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtbudgetyear1"  
+                                                             value="#{inventoryCountManagedBean.activeperiod}" 
+                                                            
+                                                             readonly="true"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Inventory_Detail}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmMaterialInfo"  >
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Item_Name}:"/>
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="searchItemNames" required="true" requiredMessage="Item Name is required"
+                                                                value="#{inventoryCountManagedBean.itemRegEntity.matName}" 
+                                                                completeMethod="#{inventoryCountManagedBean.itemInformationList}" 
+                                                                disabled="#{workFlow.readonly}"  
+                                                                style="width: 100%;"
+                                                                var="mat" itemValue="#{mat.matName}" itemLabel="#{mat}" forceSelection="true" 
+                                                                emptyMessage="no data">  
+                                                    <p:ajax event="itemSelect"  process="@this" listener="#{inventoryCountManagedBean.getMmsItemInformation}"
+                                                            update="txtCatName,searchItemNames,txtUnit"/>  
+                                                    <p:column headerText="Item Name" >
+                                                        <h:outputText  value="#{mat.matName}" />
+                                                    </p:column>
+                                                </p:autoComplete>   
+                                                <p:message for="searchItemNames" display="icon" />
+                                            </div>
+                                            <h:outputLabel id="lblCatName"  class="control-label col-sm-2" value="#{MMS.Item_Code}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtCatName"  readonly="true"  
+
+                                                               value="#{inventoryCountManagedBean.itemRegEntity.matCode}"
+                                                               />
+                                                <p:message for="txtCatName" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel id="lblquantity" class="control-label col-sm-2" value="#{MMS.Quantity}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtquantity" class="form-control" readonly="#{workFlow.readonly}"
+                                                               required="true" requiredMessage="Quantity is required" converterMessage="Enter Numbers Only"
+                                                               value="#{inventoryCountManagedBean.inventorydetail.quantity}"/>
+                                                <p:message for="txtquantity" display="icon"/>
+                                            </div>
+                                            <h:outputLabel  for="txtUnit"  class="control-label col-sm-2" value="#{MMS.Unit_Measure}:"/>
+                                            <div class="col-sm-4 required">
+                                                <p:inputText   id="txtUnit" 
+                                                               readonly="true"
+                                                               value="#{inventoryCountManagedBean.itemRegEntity.unitOfMeasure}"
+                                                               required="true"
+
+                                                               />
+                                                <p:message for="txtUnit" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel for="txtRemark" class="control-label col-sm-2" value="#{MMS.Remark}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtRemark" class="form-control" style="width: 100%;"
+                                                                 value="#{inventoryCountManagedBean.inventorydetail.remark}"/>
+                                                <p:message for="txtRemark" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px ">
+                                            <h:outputLabel  class="control-label col-sm-2" />
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="buttonadd" class="btn btn-primary" value="#{inventoryCountManagedBean.addOrModifyBundle}" action="#{inventoryCountManagedBean.addinventoryCountDetail()}" readonly="#{workFlow.readonly}"
+                                                                 process="frmMaterialInfo" 
+                                                                 update=":frmRegisterUI:frmTblMaterialInfo,frmMaterialInfo"  />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable paginatorPosition="bottom" paginator="true" id="tblInventoryCountSheetDetail" value="#{inventoryCountManagedBean.inventoryCountAddDetailDataModel}" 
+                                                             selectionMode="single" class="dataTable"
+                                                             selection="#{inventoryCountManagedBean.selectedInventorycountDetail}" rowKey="#{IcsInfoDtl.itemCode}" 
+                                                             rowIndexVar="num"  rows="10"  var="IcsInfoDtl">
+                                                    <p:ajax event="rowSelect" listener="#{inventoryCountManagedBean.onRowPopulate}" update=":frmRegisterUI" /> 
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.S_No}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{IcsInfoDtl.itemCode.matCode}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{IcsInfoDtl.itemCode.matName}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Measure}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{IcsInfoDtl.itemCode.unitMeasure1}"  />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Quantity}"/>
+                                                        </f:facet>  
+                                                        <p:cellEditor>
+                                                            <f:facet name="output">
+                                                                <h:outputText value="#{IcsInfoDtl.quantity}"  />
+                                                            </f:facet>
+                                                            <f:facet name="input">
+                                                                <p:inputText  id="inp" required="true" value="#{IcsInfoDtl.quantity}" style="width: 96%" 
+                                                                              >
+                                                                    <f:validateLength minimum="1" />
+                                                                </p:inputText>
+                                                            </f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Remark}"/>
+                                                        </f:facet>
+                                                        <p:cellEditor>
+                                                            <f:facet name="output">
+                                                                <h:outputText value="#{IcsInfoDtl.remark}"  />
+                                                            </f:facet>
+                                                            <f:facet name="input">
+                                                                <p:inputTextarea  id="rema" required="true" value="#{IcsInfoDtl.remark}" style="width: 96%" 
+                                                                                  >
+                                                                    <f:validateLength minimum="1" />
+                                                                </p:inputTextarea>
+                                                            </f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                </p:dataTable> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Counting_Committee}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmApproverInfo">
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">   
+                                            <h:panelGroup id="testpanel">
+                                                <p:outputLabel id="lbl_committe" class="control-label col-sm-2" value="#{MMS.Committee}:" 
+                                                               />
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdCommitte" value="#{inventoryCountManagedBean.hrcommittesEntity.committeeName}" style="width: 100%" 
+                                                                     required="true" requiredMessage="comitte is required" filter="true" filterMatchMode="contains" disabled="#{workFlow.readonly}"
+                                                                     valueChangeListener="#{inventoryCountManagedBean.handleSelectCommittee}"  >
+                                                        <f:selectItem itemLabel="--- #{MMS.select} ---" itemValue="" /> 
+                                                        <f:selectItems id="selectOneMenuISivNumber" 
+                                                                       value="#{inventoryCountManagedBean.committees}" var="com" itemLabel="#{com.committeeName}" itemValue="#{com.committeeName}"
+                                                                       />
+                                                        <p:ajax  event="change" process="@this" update="drdCommitte,drdComitteeMembers" />
+                                                    </p:selectOneMenu> 
+                                                    <p:message for="drdCommitte" display="icon"/>
+                                                </div>                                            
+                                                <p:outputLabel id="lbl_ComitteeMembers" class="control-label col-sm-2" value="#{MMS.Committee_Members}:" />
+                                                <div class="col-sm-4 required">
+                                                    <p:selectManyMenu id="drdComitteeMembers" value="#{inventoryCountManagedBean.selectedMembers}" 
+                                                                      required="true" requiredMessage="Committee members are required" style="width: 100%"
+                                                                      scrollHeight="100"  filter="true" filterMatchMode="contains" showCheckbox="true">
+                                                        <f:selectItems value="#{MMS.Select}" var="committee" itemLabel="#{committee.empId.firstName}"/>                                                                                                                                       
+                                                    </p:selectManyMenu>
+                                                    <p:message for="drdComitteeMembers" display="icon"/>                                                                                                              
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-2"  value="#{MMS.Prepared_by}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby" 
+                                                               value="#{inventoryCountManagedBean.userName}" readonly="true"
+                                                               required="true" requiredMessage="prepared is required"
+                                                               />                                             
+                                            </div> 
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel for="txtApprovedDate" class="control-label col-sm-2" value="#{MMS.Prepared_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtApprovedDate" class="form-control" value="#{inventoryCountManagedBean.wfMmsProcessed.processedOn}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtApprovedDate', 'frmRegisterUI:txtApprovedDate');" />                                                                                                                                                    
+                                                <p:message for="txtApprovedDate" display="icon"/>
+                                            </div> 
+                                        </div>  
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="Decicsion:" rendered="#{inventoryCountManagedBean.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{inventoryCountManagedBean.selectedValue}" rendered="#{inventoryCountManagedBean.renderDecision}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>   
+                                            </div> 
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="comment:" rendered="#{inventoryCountManagedBean.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{inventoryCountManagedBean.wfMmsProcessed.commentGiven}"  rendered="#{rmgController.renderDecision}"/>     
+                                            </div> 
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="saveButton" class="btn btn-primary"
+                                                                  value="#{inventoryCountManagedBean.saveorUpdateBundle}" 
+                                                                  action="#{inventoryCountManagedBean.saveInventoryCountSheet()}" 
+                                                                  process="@this,frmGatePassDtlInfo,frmTblMaterialInfo,frmApproverInfo" 
+                                                                  update="frmGatePassDtlInfo,frmTblMaterialInfo,frmApproverInfo,:frmToolbar"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

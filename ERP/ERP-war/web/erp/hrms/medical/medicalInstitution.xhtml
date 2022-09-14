@@ -1,0 +1,293 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Go to Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="medicalCreditBill.xhtml"><i class="fa fa-circle-o "></i><span>Medical Credit Bill Request</span></a></li>
+        <li><a href="medicaCreditBillApprove.xhtml"><i class="fa fa-circle-o "></i><span>Medical Credit Bill Approve</span></a></li>
+        <li><a href="medicalCashRefund.xhtml"><i class="fa fa-circle-o "></i><span>Medical Cash Refund Request</span></a></li>
+        <li><a href="medicalCashRefundApprove.xhtml"><i class="fa fa-circle-o "></i><span>Medical Cash Refund Approve</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{medicalInstitutionController.btnNewOrSearch()}"
+                                     icon="#{medicalInstitutionController.icone}" title="#{medicalInstitutionController.newOrSearch}"
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmMedicalInstitution"
+                                     style="background-color: white;border-color: white"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{medicalInstitutionController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{medicalInstitutionController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmToolBar,:frmSearch,:frmMedicalInstitution" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup> 
+                    <a href="../../hrms/medical/medicalInstitution.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{medicalInstitutionController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-sm-6"> 
+                                            <div class="form-horizontal col-md-12">
+                                                <div class="form-group">
+                                                    <h:outputLabel for="srcInstitutionName" value="Institution Name:" class="control-label col-sm-3"/>                                                          
+                                                    <div class="col-sm-6">  
+                                                        <p:selectOneMenu id="srcInstitutionName" value="#{medicalInstitutionController.srcmedicalInstitutions.name}"
+                                                                         valueChangeListener="#{medicalInstitutionController.findByInstitutionName}" 
+                                                                         filterMatchMode="startsWith" filter="true" style="width: 100%">
+                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                            <f:selectItems value="#{medicalInstitutionController.institutionName}"/>
+                                                            <f:selectItem itemLabel="Load all" itemValue="Load all"/>
+                                                            <p:ajax event="change" process="@this" update=":frmSearch:tblMedInstList"/>
+                                                        </p:selectOneMenu>                                                       
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblMedInstList" value="#{medicalInstitutionController.medInstDataModel}" widgetVar="instType"
+                                                         var="institution" selectionMode="single" rowIndexVar="num" rows="10" rowsPerPageTemplate="5,10,15" paginator="true" paginatorPosition="bottom"
+                                                         selection="#{medicalInstitutionController.medicalInstitutions}" rowKey="#{institution.id}" class="dataTable">
+                                                <p:ajax event="rowSelect" listener="#{medicalInstitutionController.medicalInstDisplayChanged}" 
+                                                        process="@this,tblMedInstList" update=":frmToolBar,:frmSearch,:frmMedicalInstitution"/>
+                                                <p:column headerText="No." style="width: 60px;">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Institution Name">
+                                                    <h:outputText value="#{institution.name}"/>
+                                                </p:column> 
+                                                <p:column filterBy="#{institution.type}" headerText="Institution Type" filterMatchMode="contains">
+                                                    <f:facet name="filter">
+                                                        <p:selectOneMenu onchange="PF('instType').filter()">
+                                                            <f:selectItems value="#{medicalInstitutionController.inst_Type}"/>
+                                                        </p:selectOneMenu> 
+                                                    </f:facet>
+                                                    <h:outputText value="#{institution.type}"/>
+                                                </p:column>
+                                                <p:column headerText="Tin Number">                
+                                                    <h:outputText value="#{institution.tinNumber}"/>
+                                                </p:column>
+                                                <p:column headerText="Address">                
+                                                    <h:outputText value="#{institution.address}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmMedicalInstitution"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup id="pnlMainpage" rendered="#{medicalInstitutionController.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Medical Institution Registration</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <h:panelGroup id="pnl1" class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="col-sm-12">
+                                                <div class="col-md-6"> 
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="rbnInstitutionType" class="control-label col-sm-4" value="Institution Type: " title="Institution Type"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneRadio id="rbnInstitutionType" class="col-sm-8"
+                                                                                  value="#{medicalInstitutionController.medicalInstitutions.type}">
+                                                                    <f:selectItem itemLabel="Hospital/Clinic" itemValue="Hospital"/>
+                                                                    <f:selectItem itemLabel="Pharmacy" itemValue="Pharmacy"/>
+                                                                    <p:ajax process="@this" event="change"/>
+                                                                </p:selectOneRadio>
+                                                                <p:message for="rbnInstitutionType" display="icon"/>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal form-group required">
+                                                            <h:outputLabel for="txtInstitutionName" class="control-label col-sm-4" value="Institution Name: "/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtInstitutionName" value="#{medicalInstitutionController.medicalInstitutions.name}" 
+                                                                             validator="#{validatorManagedBean.Text}" validatorMessage="Institution name must be a string"
+                                                                             class="form-control" required="true" requiredMessage="Enter institution name" title="Institution Name"/>
+                                                                <p:message for="txtInstitutionName" display="icon"/>
+                                                            </div>
+                                                        </div>                                            
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal form-group required">                                                                               
+                                                            <h:outputLabel  for="txtBankName" class="control-label col-sm-4" value="Bank: "/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtBankName" value="#{medicalInstitutionController.hrLuBanks.bankName}" 
+                                                                                 valueChangeListener="#{medicalInstitutionController.BankChanged}"
+                                                                                 required="true" requiredMessage="Select bank" style="width:100%">
+                                                                    <f:selectItems value="#{medicalInstitutionController.listOfBanks}"/>
+                                                                    <p:ajax event="change" onstart="true" process="@this" update="txtBankBranch"/> 
+                                                                </p:selectOneMenu>
+                                                                <p:message for="txtBankName" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal form-group">                                                                               
+                                                            <h:outputLabel  for="txtBankBranch" class="control-label col-sm-4" value="Bank Branch:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtBankBranch" value="#{medicalInstitutionController.bankBranches.branchName}"
+                                                                                 valueChangeListener="#{medicalInstitutionController.BankBranchChanged}" 
+                                                                                 requiredMessage="Select bank branch" style="width:100%">
+                                                                    <f:selectItems value="#{medicalInstitutionController.branchByBank}"/>                                                           
+                                                                </p:selectOneMenu>
+                                                                <p:message for="txtBankBranch" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div> 
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal form-group">
+                                                            <h:outputLabel for="txtAccountNumber" class="control-label col-sm-4" value="Account Number:"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtAccountNumber" value="#{medicalInstitutionController.medicalInstitutions.accountNumber}" 
+                                                                             validator="#{validatorManagedBean.Number}" validatorMessage="Account number should be number"
+                                                                             title="Account number" requiredMessage="Enter account number" class="form-control"/>
+                                                                <p:message for="txtAccountNumber" display="icon"/>
+                                                            </div>  
+                                                        </div>
+                                                    </div>
+                                                </div>    
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="rbnPartner" class="control-label col-sm-4" value="Partner: " title="Partner"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneRadio id="rbnPartner" class="col-sm-8"
+                                                                                  value="#{medicalInstitutionController.medicalInstitutions.partner}">
+                                                                    <f:selectItem itemLabel="Primary Partner" itemValue="Primary Partner"/>
+                                                                    <f:selectItem itemLabel="Partner" itemValue="Partner"/>
+                                                                    <p:ajax process="@this" event="change"/>
+                                                                </p:selectOneRadio>
+                                                                <p:message for="rbnPartner" display="icon"/>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtTinNumber" class="control-label col-sm-4" value="Tin Number:"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtTinNumber" value="#{medicalInstitutionController.medicalInstitutions.tinNumber}"
+                                                                             validator="#{validatorManagedBean.Number}" validatorMessage="Tin number should be a number" 
+                                                                             required="false" title="Tin Number" requiredMessage="Enter tin number" class="form-control"/>
+                                                                <p:message for="txtTinNumber" display="icon"/>
+                                                            </div>  
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal form-group required">
+                                                            <h:outputLabel for="txtSpeciliazation" class="control-label col-sm-4" value="Specialization: "/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputTextarea id="txtSpeciliazation" value="#{medicalInstitutionController.medicalInstitutions.specialization}"
+                                                                                 rows="1" cols="3" autoResize="false" title="Speciliazation" class="form-control"
+                                                                                 required="true" validator="#{validatorManagedBean.Text}" requiredMessage="Enter specialization " 
+                                                                                 validatorMessage="Specialization should be string"/>
+                                                                <p:message for="txtSpeciliazation" display="icon"/>
+                                                            </div>
+                                                        </div>                                            
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal form-group required">
+                                                            <h:outputLabel for="txtAddress" class="control-label col-sm-4" value="Address: "/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputTextarea id="txtAddress" value="#{medicalInstitutionController.medicalInstitutions.address}" title="Address" 
+                                                                                 autoResize="false" class="form-control" required="true" requiredMessage="Enter address"
+                                                                                 rows="1" cols="3" validator="#{validatorManagedBean.Text}" validatorMessage="Address should be string"/>
+                                                                <p:message for="txtAddress" display="icon"/>
+                                                            </div>
+                                                        </div>                                            
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="rbnStatus" class="control-label col-sm-4" value="Status: " title="Status"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneRadio id="rbnStatus" value="#{medicalInstitutionController.medicalInstitutions.status}"
+                                                                                  class="col-sm-6">
+                                                                    <f:selectItem itemLabel="Active" itemValue="1"/>
+                                                                    <f:selectItem itemLabel="Inactive" itemValue="0"/>
+                                                                    <p:ajax process="@this" event="change"/>
+                                                                </p:selectOneRadio>
+                                                                <p:message for="rbnStatus" display="icon"/>
+                                                            </div>
+                                                        </div>                                               
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4">                                                              
+                                                    </div>                                                                    
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnSave" value="#{medicalInstitutionController.saveOrUpdate}" 
+                                                                         action="#{medicalInstitutionController.saveMedicalInstitution}" 
+                                                                         process="@this,pnl1" class="btn  btn-block btn-primary col-lg-4"                                       
+                                                                         update=":frmMedicalInstitution"/>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                         action="#{medicalInstitutionController.resetMedicalInstitution()}" title="Reset"
+                                                                         process="@this" update=":frmMedicalInstitution"/> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

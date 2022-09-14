@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content"> 
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="preserviceCourses.xhtml"><i class="fa fa-circle-o"></i><span>Pre Service Course</span></a></li>
+        <li><a href="preserviceTrainees.xhtml"><i class="fa fa-circle-o"></i><span>Pre Service Trainees</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmTop"> 
+            <p:toolbar style="background-color:white;border-color: white ; margin-bottom: 10px">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{hrTraineeResultController.newOrSearchPage()}"
+                                     icon="#{hrTraineeResultController.icone}" style="background-color: white; border-color: white"
+                                     title="#{hrTraineeResultController.createOrSearchBundle}" process="@this" update="@this,:frmPreService"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{hrTraineeResultController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{hrTraineeResultController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmPreService,:frmTop" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup> 
+                    <a href="../../hrms/training/preserviceTraineesResult.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>  
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>  
+        <h:form id="frmPreService">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>    
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlSearch" rendered="#{hrTraineeResultController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">  
+                            <div class="box-header with-border">                                
+                                <h2 class="box-title"><h:outputLabel value="#{hrTraineeResultController.headerTitle}"/></h2>
+                            </div>
+                            <div class="box-body ">
+                                <div class="col-md-12" >                                        
+                                    <div class="col-sm-12">
+                                        <div class="col-sm-6" > 
+                                            <div class="form-horizontal col-md-12 textBoxMargin6px">
+                                                <h:outputLabel value="Year:" class="col-sm-4 control-label"/>                                               
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="txtSrchYear" style="width:100%" value="#{hrTraineeResultController.hrTdPsvcTrainees.yearOfTraining}"
+                                                                     valueChangeListener="#{hrTraineeResultController.findByYear}" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                        <f:selectItems value="#{hrTraineeResultController.hrTdyearList}" var="yeas" itemLabel="#{yeas}" itemValue="#{yeas}"/>
+                                                        <p:ajax event="change" process="@this,txtSrchYear"  update=":frmPreService:tblUniversityList,drdsBatch"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                        </div>  
+                                        <div class="col-sm-6">
+                                            <div class="form-horizontal col-md-12 textBoxMargin6px">
+                                                <h:outputLabel value=" Batch Code:" class="col-sm-4 control-label"/>                                               
+                                                <div class="col-sm-8">  
+                                                    <p:selectOneMenu  id="drdsBatch" style="width:100%;" value="#{hrTraineeResultController.hrTdPsvcTrainees.batchCode}"
+                                                                      valueChangeListener="#{hrTraineeResultController.BachCode_vcl}">      
+                                                        <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                        <f:selectItems  value="#{hrTraineeResultController.hrTdBachCodeList}" var="cat" itemLabel="#{cat.batchCode}" itemValue="#{cat.batchCode}"/>                                                                        
+                                                        <p:ajax event="change"  process="@this" update="tblUniversityList"/>
+                                                    </p:selectOneMenu>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>               
+                    </div>
+                </div>                
+            </h:panelGroup>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlDtSearch" rendered="#{hrTraineeResultController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary "> 
+                            <div class="box-body ">
+                                <div class="col-md-12" >  
+                                    <div class="col-md-12" style="margn-top: 30px;">
+                                        <div class="form-group ">
+                                            <p:dataTable id="tblUniversityList" value="#{hrTraineeResultController.hrtdResultList}"
+                                                         var="uni" selectionMode="single" rowIndexVar="num"  class="dataTable" 
+                                                         selection="#{hrTraineeResultController.hrTdPsvcResults}" rowKey="#{uni.id}" 
+                                                         rows="10" rowsPerPageTemplate="5,10,15"  paginator="true" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" process="@this" listener="#{hrTraineeResultController.populate}"
+                                                        update=":frmPreService,:frmTop"/>
+                                                <p:column style="width:80px;">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="No" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{num+1}"/> 
+                                                </p:column>  
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Year"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{uni.traineeDetailId.traineeId.yearOfTraining}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Name"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{uni.traineeDetailId.firstNameEng}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Bach Code"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{uni.traineeDetailId.traineeId.batchCode}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>                   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+            <h:panelGroup id="pnlMasters" rendered="#{hrTraineeResultController.renderPnlCreateGatePass}">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div class="box box-primary "> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title">
+                                    <h3 class="box-title" style="margin-left: 15px;">Electro Mechanics Trainees Result</h3>   
+                                </h3>                       
+                            </div>
+                            <h:panelGroup id="pnlMaster">
+                                <div class="box-body">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal form-group required">
+                                                    <h:outputLabel for="txtFdate" value="From Date: " class="col-sm-4 control-label"/> 
+                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                        <p:inputText id="txtFdate" value="#{hrTraineeResultController.hrTdPsvcResults.fromDate}"
+                                                                     onclick="displayCalendar('frmPreService:txtFdate', 'frmPreService:txtFdate');"
+                                                                     required="true" requiredMessage="Please Enter Date"  title="Date"
+                                                                     validator="#{validatorManagedBean.Date}" validatorMessage="Please Enter Date Only"/>
+                                                        <p:message for="txtFdate" display="icon"/>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px"> 
+                                                <div class="form-group form-horizontal form-group required">
+                                                    <h:outputLabel for="drdSemester" value="Semester: " class="col-sm-4 control-label" />    
+                                                    <div class="col-sm-8">  
+                                                        <p:selectOneMenu  id="drdSemester" value="#{hrTraineeResultController.hrTdPsvcResults.semister}"  
+                                                                          style="width:100%;" required="true"  requiredMessage="Please Enter Semister">
+                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="I" itemValue="1" />
+                                                            <f:selectItem itemLabel="II" itemValue="2" />
+                                                            <f:selectItem itemLabel="III" itemValue="3" />
+                                                            <f:selectItem itemLabel="IV" itemValue="4" />
+                                                        </p:selectOneMenu>
+                                                        <p:message for="drdSemester" display="icon"/> 
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal form-group required">
+                                                    <h:outputLabel for="txtTdate" class="col-md-4 control-label" value="End Date: "/>
+                                                    <div class="col-sm-8"> 
+                                                        <p:inputText id="txtTdate" value="#{hrTraineeResultController.hrTdPsvcResults.toDate}"
+                                                                     onclick="displayCalendar('frmPreService:txtTdate', 'frmPreService:txtTdate');"
+                                                                     required="true" requiredMessage="Please Enter Date" title="Date"
+                                                                     validator="#{validatorManagedBean.Date}" validatorMessage="Please Enter Date Only"/>
+                                                        <p:message for="txtTdate" display="icon"/>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-body"> 
+                                <section class="panel panel-info">
+                                    <section class="panel-body"> 
+                                        <div class="row">
+                                            <div class="col-md-12">   
+                                                <div class="box-body">
+                                                    <h:panelGroup id="pnlDetails">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <h:outputLabel  for="drdName" class="control-label col-sm-4" value="Trainee Name: "/>
+                                                                <div class="col-sm-8 textBoxMargin6px">
+                                                                    <p:selectOneMenu id="drdName" style="width:100%" value="#{hrTraineeResultController.hrTdPsvcTraineeDetails}" required="true" 
+                                                                                     requiredMessage="Select Trainees Name" converter="entConverter"
+                                                                                     valueChangeListener="#{hrTraineeResultController.findByTrainerName}">
+                                                                        <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                        <f:selectItems value="#{hrTraineeResultController.hrTrainerslist}" var="course"
+                                                                                       itemLabel="#{course.firstNameEng}" itemValue="#{course}"/>
+                                                                        <p:ajax event="change" process="@this" update="pnlDetails,txtFull,txtTraineeNo,txtSex"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message for="drdName" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtFull"  value="Full Name:" class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8 textBoxMargin6px">  
+                                                                    <p:inputText id="txtFull" value="#{hrTraineeResultController.hrTdPsvcTraineeDetails.firstNameEng} #{hrTraineeResultController.hrTdPsvcTraineeDetails.middleNameEng} #{hrTraineeResultController.hrTdPsvcTraineeDetails.lastNameEng}" class="col-sm-4" readonly="true"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <h:outputLabel  for="drdTrain" class="control-label col-sm-4" value="Training: "/>
+                                                                <div class="col-sm-8 textBoxMargin6px">
+                                                                    <p:selectOneMenu id="drdTrain" style="width:100%" value="#{hrTraineeResultController.hrTdPsvcCourses}" required="true" 
+                                                                                     converter="entConverter" requiredMessage="Select Enter Training">
+                                                                        <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                        <f:selectItems value="#{hrTraineeResultController.hrTrainingCourselist}" var="course"
+                                                                                       itemLabel="#{course.courseName}" itemValue="#{course}"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message for="drdTrain" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <h:outputLabel  for="txtResulet" class="control-label col-sm-4" value="Result: "/>
+                                                                <div class="col-sm-8 textBoxMargin6px">
+                                                                    <h:inputText id="txtResulet"  class="form-control col-md-12" required="true" requiredMessage="Please Enter Result"
+                                                                                 value="#{hrTraineeResultController.hrTdPsvcResultDetails.result}"
+                                                                                 validator="#{validatorManagedBean.Number}" converterMessage="Please Enter Number Only"/>
+                                                                    <p:message for="txtResulet" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <h:outputLabel for="drdDecision" value="Decision: " class="control-label col-sm-4"/>    
+                                                                <div class="col-sm-8 textBoxMargin6px">  
+                                                                    <p:selectOneMenu  id="drdDecision" value="#{hrTraineeResultController.hrTdPsvcResultDetails.decision}"  
+                                                                                      style="width:100%;" required="true"  requiredMessage="Please Enter Semister">
+                                                                        <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Failed" itemValue="Failed" />
+                                                                        <f:selectItem itemLabel="Passed" itemValue="Passed" />
+                                                                    </p:selectOneMenu>
+                                                                    <p:message for="drdDecision" display="icon"/> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-4">                                                              
+                                                            </div> 
+                                                            <div class="col-sm-3 textBoxMargin6px">
+                                                                <p:commandButton class="btn  btn-block btn-primary col-sm-4 " id="btnAdd" 
+                                                                                 value="#{hrTraineeResultController.addorUpdate}"  
+                                                                                 action="#{hrTraineeResultController.addPreserviceTraineeResult()}" 
+                                                                                 process="@this,pnlDetails,txtResulet,drdDecision" update="tblTraineeList,pnlDetails"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group">
+                                                                    <h:outputLabel for="txtTraineeNo" class="col-md-4 control-label" value="Trainees No:"/>
+                                                                    <div class="col-sm-8"> 
+                                                                        <p:inputText id="txtTraineeNo"  value="#{hrTraineeResultController.hrTdPsvcTraineeDetails.traineeNo}" readonly="true"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group">
+                                                                    <h:outputLabel for="txtSex" class="col-md-4 control-label" value="Sex:"/>
+                                                                    <div class="col-sm-8"> 
+                                                                        <p:inputText id="txtSex"  value="#{hrTraineeResultController.hrTdPsvcTraineeDetails.sex}" readonly="true"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtRemark" value="Remark:" class="col-sm-4 control-label"/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                                        <h:inputTextarea id="txtRemark" class="form-control col-md-12" value="#{hrTraineeResultController.hrTdPsvcResultDetails.remark}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>    
+                                                    <div style="margin-top: 55px;" class="form-group">
+                                                        <p:dataTable id="tblTraineeList"   value="#{hrTraineeResultController.hrResultDetailsDatamodel}" 
+                                                                     var="stud"  rowIndexVar="num" rowKey="#{stud}" class="dataTable"  selectionMode="single"
+                                                                     rows="10" paginator="true" paginatorPosition="bottom" selection="#{hrTraineeResultController.hrTdPsvcResultDetails}"> 
+                                                            <p:ajax event="rowSelect" process="@this" listener="#{hrTraineeResultController.selectedStudent}"
+                                                                    update=":frmPreService"/>
+                                                            <p:column style="width:80px;">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="No"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{num+1}"/> 
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Courses"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText  value="#{stud.trainingId.courseName}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Result"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText  value="#{stud.result}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Decision"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText  value="#{stud.decision}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Remark"/>                                                        
+                                                                </f:facet>
+                                                                <h:outputText  value="#{stud.remark}"/>
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                        </div>       
+                                    </section>
+                                </section>
+                                <section class="panel panel-info">
+                                    <section class="panel-body"> 
+                                        <div class="row">
+                                            <div class="col-md-12">   
+                                                <div class="box-body">
+                                                    <div class="col-md-6">
+                                                        <div class="col-sm-12 textBoxMargin6px">                                            
+                                                            <div class="col-sm-4">
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel  for="txtOn" class="control-label col-sm-4" value="Prepard On:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtOn" value="#{hrTraineeResultController.hrTdPsvcResults.preparedOn}"
+                                                                                     placeholder="dd/mm/yyyy" converter="dateConverter" readonly="true" title="Prepared Date"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  for="txtBy" class="control-label col-sm-4" value="Prepard By:"/>
+                                                                <div class="col-sm-8 textBoxMargin6px">
+                                                                    <p:inputText id="txtBy" value="#{workFlow.userName}" 
+                                                                                 readonly="true"/> 
+                                                                </div>  
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </section>
+                                <h:panelGroup id="pnlSave">
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4">                                                              
+                                                    </div>                                                                    
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                         value="#{hrTraineeResultController.saveOrUpdateButton}"
+                                                                         action="#{hrTraineeResultController.savePreserviceTraineeResult()}"
+                                                                         process="@this,tblTraineeList,pnlMaster,txtOn" update=":frmPreService"/>              
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                         action="#{hrTraineeResultController.resetPreserviceTraineeResult()}"
+                                                                         process="@this,tblTraineeList,pnlMaster,txtOn" update=":frmPreService"/>         
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>        
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

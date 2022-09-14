@@ -1,0 +1,364 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="resultDisplay.xhtml"><i class="fa fa-fw fa-refresh"></i> <span>Refresh Page</span></a></li>
+        <li><a href="evaluationCriteria.xhtml"><i class="fa fa-circle-o "></i> <span>Evaluation Criteria</span></a></li>
+        <li><a href="evaluationSession.xhtml"><i class="fa fa-circle-o "></i> <span>Evaluation Session</span></a></li>
+        <li><a href="evaluationResult.xhtml"><i class="fa fa-circle-o "></i> <span>EvaluationResult</span></a></li>  
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSearch"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{resultDisplayController.resultInfo()}"
+                                     icon="#{resultDisplayController.icone}" style="background-color: white" 
+                                     process="@this" update="@this,:frmEvaluationResultDisplay" 
+                                     value="#{resultDisplayController.newOrSearch}"/>
+                    <span class="ui-separator">
+                    </span>
+                    <p:commandButton id="btnOpen" value="Open"  icon="ui-icon-folder-open" style="background-color: white"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <p:commandButton id="btnDisk" type="button" style="background-color: white" title="Save" icon="ui-icon-disk"/>
+                    <p:commandButton id="btnTrash" type="button" style="background-color: white"  title="Delete" icon="ui-icon-trash"/>
+                    <p:commandButton id="btnPrint" type="button" style="background-color: white"  title="Print" icon="ui-icon-print"/>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmEvaluationResultDisplay"> 
+            <p:growl id="growl" autoUpdate="true" severity="information,error"/>
+            <h:panelGroup id="pnlSearch" rendered="#{resultDisplayController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="col-md-12">                                        
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6"> 
+                                                <div class="form-horizontal col-md-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel for="srcEmpId" value="Employee Id:" class="control-label col-sm-4"/>                                                          
+                                                        <div class="col-sm-8">  
+                                                            <p:inputText id="srcEmpId" value="#{resultDisplayController.hrEmployees.empId}"
+                                                                         title="Employee Id" class="form-control"/>
+                                                            <p:message for="srcEmpId" display="icon"/>                                                        
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">                                        
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6"> 
+                                                <div class="form-horizontal col-md-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel for="srcEmpName" value="Employee Name:" class="control-label col-sm-4"/>                                                          
+                                                        <div class="col-sm-8">  
+                                                            <p:inputText id="srcEmpName" value="#{resultDisplayController.hrEmployees.firstName}"
+                                                                         title="Name of Employee" class="form-control"/>
+                                                            <p:message for="srcEmpName" display="icon"/>                                                        
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12"> 
+                                        <div class="col-md-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-md-4">                                                    
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnSearch" value="Search" class="btn  btn-block btn-primary col-lg-4" icon="ui-icon-search"
+                                                                     action="#{resultDisplayController.displayResult}"
+                                                                     process="@this,:frmEvaluationResultDisplay:srcEmpId,:frmEvaluationResultDisplay:srcEmpName"
+                                                                     update=":frmEvaluationResultDisplay:tblResultDisplayList"/>
+                                                </div>                                                
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblResultDisplayList" value="#{resultDisplayController.evaluationResultDataModel}"
+                                                         var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                         selection="#{resultDisplayController.hrEvaluationResult}" rowKey="#{res.id}" class="dataTable">
+                                                <p:ajax event="rowSelect" process="@this,tblResultDisplayList" listener="#{resultDisplayController.resultdisplayChanged}" 
+                                                        update=":frmEvaluationResultDisplay,:frmSearch"/>
+                                                <p:column headerText="No.">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Employee id"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.empId.empId}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Employee Name"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.empId}"/>
+                                                </p:column> 
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Department"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.empId.deptId.depName}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Job Titel"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.empId.jobId.jobTitle}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Year"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.sessionId.sessionYear}"/>
+                                                </p:column> 
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Term"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.sessionId.term}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+            <h:panelGroup id="pnlMainpage" rendered="#{resultDisplayController.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h1 class="box-title">EvaluationResult Display</h1>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl1" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtYear" class="control-label col-sm-4" value="Year:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtYear" value="#{resultDisplayController.hrEvaluationSessions.sessionYear}" 
+                                                                                     title="Year" readonly="true"/>
+                                                                        <p:message for="txtYear" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <br></br>
+                                                            <br></br>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="calStartDate" class="control-label col-sm-4" value="Start Date:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calStartDate" value="#{resultDisplayController.hrEvaluationSessions.startDate}" 
+                                                                                     title="Start Date" readonly="true"/>
+                                                                        <p:message for="calStartDate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>    
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtTerm" class="control-label col-sm-4" value="Term:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtTerm" value="#{resultDisplayController.hrEvaluationSessions.term}" 
+                                                                                     title="Term" readonly="true"/>
+                                                                        <p:message for="txtTerm" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <br></br>
+                                                            <br></br>   
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="calEndDate" class="control-label col-sm-4" value="End Date:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calEndDate" value="#{resultDisplayController.hrEvaluationSessions.endDate}"  
+                                                                                     title="End Date" readonly="true"/>
+                                                                        <p:message for="calEndDate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl2" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtFullName" value="Full Name:" class="control-label col-sm-4"/>  
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtFullName" value="#{resultDisplayController.employeeName}" 
+                                                                                     title="Full Name" readonly="true"/>
+                                                                        <p:message for="txtFullName" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <br></br>
+                                                            <br></br>
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtEmployeeId" class="control-label col-sm-4" value="Employee Id:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtEmployeeId" value="#{resultDisplayController.hrEvaluationResult.empId.empId}" 
+                                                                                     title="Employee Id" readonly="true"/>
+                                                                        <p:message for="txtEmployeeId" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <br></br>
+                                                            <br></br>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtEvaluatedby" class="control-label col-sm-4" value="Evaluated by:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtcalEvaluatedby" value="#{resultDisplayController.evaluatorEmployee}" 
+                                                                                     title="Evaluated by" readonly="true"/>
+                                                                        <p:message for="txtcalEvaluatedby" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtDepartment" class="control-label col-sm-4" value="Department:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtDepartment" value="#{resultDisplayController.hrEvaluationResult.empId.deptId.depName}" 
+                                                                                     title="Department" readonly="true"/>
+                                                                        <p:message for="txtDepartment" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <br></br>
+                                                            <br></br>
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtPosition" class="control-label col-sm-4" value="Job Title:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtPosition" value="#{resultDisplayController.hrJobTypes.jobTitle}" 
+                                                                                     title="Job Position" readonly="true"/>
+                                                                        <p:message for="txtPosition" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <br></br>
+                                                            <br></br>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="calEvaluationDate" class="control-label col-sm-4" value="Evaluation Date:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calEvaluationDate" value="#{resultDisplayController.hrEvaluationResult.evaluationDate}"  
+                                                                                     title="Evaluation Date" readonly="true"/>
+                                                                        <p:message for="calEvaluationDate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div> 
+                                                    </div>  
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section> 
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl3" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-12">                                                                      
+                                                            <div class="form-group form-horizontal">  
+                                                                <p:dataTable id="tblResultDetail" value="#{resultDisplayController.resultListDataModel}" 
+                                                                             styleClass="dataTable" var="resultDetail" rowIndexVar="rowIndex">                                                                                       
+                                                                    <p:column headerText="No.">
+                                                                        <h:outputText value="#{rowIndex+1}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Criteria">
+                                                                        <h:outputText value="#{resultDetail.evaluationCriteriaId}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Weight"  footerText="Total Value">
+                                                                        <h:outputText value="#{resultDetail.evaluationCriteriaId.weight}%"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Value" footerText="#{resultDisplayController.total}">
+                                                                        <h:outputText value="#{resultDetail.evaluationValue}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Level">
+                                                                        <h:outputText value="#{resultDetail.evaluationLevel}"/>
+                                                                    </p:column>
+                                                                </p:dataTable>
+                                                                <br></br>               
+                                                                <!--<div style="margin-left: 650px; font-family: fantasy; size: 16px;">
+                                                                    <p:outputLabel id="lblTotalValue" style="right:  200px;" value="Total Value &nbsp;&nbsp;"/>                     
+                                                                    <p:outputLabel id="lblTotalValue1" value="#{resultDisplayController.total}"
+                                                                                   style="width: 140px; background-color:#9acfea"/>                       
+                                                                </div> -->  
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                </div>
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="btn-primary btn-primary">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-4">                                                              
+                                                            </div>                                                                    
+                                                            <div class="col-sm-3">
+                                                               <!-- <li><a href="evaluationSession.xhtml"><input id="btnComplain" value="Complain" title="You can Complain" 
+                                                                                                             class="btn  btn-block btn-primary col-lg-4"/></a></li>-->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>     
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

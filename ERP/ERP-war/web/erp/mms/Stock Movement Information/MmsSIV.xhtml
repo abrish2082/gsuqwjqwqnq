@@ -1,0 +1,497 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+
+        <li><a href="GatePassInformation.xhtml"><i class="fa fa-circle-o"></i> <span>GatePass Information</span></a></li> 
+        <li><a href="ISIV.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV (For Issue)</span></a></li> 
+        <li><a href="ISIV_Received.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV(For Receiving)</span></a></li> 
+        <li><a href="MmsGRN.xhtml"><i class="fa fa-circle-o"></i> <span>Goods Receiving Note</span></a></li> 
+        <li><a href="RMG.xhtml"><i class="fa fa-circle-o"></i> <span>Received Manufactured Goods</span></a></li>
+
+    </ui:define>
+
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{sivController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch" action="#{sivController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>
+                   
+                    <p:commandButton  id="btnButton" action="#{sivController.createNewSIVInfo()}" icon="#{sivController.icone}" validateClient="true" 
+                                      style="background-color: white;border-color: white"
+                                      process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                      title="#{sivController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+
+                    <h:panelGroup id="pnlGNotifica" rendered="#{sivController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{sivController.mmsSivList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Store Issue Voucher List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{sivController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="sivListVar" value="#{sivController.mmsSivList}"
+                                                            itemValue="#{sivListVar}"  itemLabel="#{sivListVar.sivNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI, :frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="pnlWorkflow" rendered="#{sivController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{sivController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.wfDecison}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <a href="../../mms/Stock Movement Information/MmsSIV.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{sivController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+
+
+                                    <div class="form-horizontal  col-sm-12">                                 
+                                     <div class="form-group  textBoxMargin6px">   
+                                         <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"        
+                                                                   converter="entConverter"  value="#{sivController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{sivController.columnNameChangeEvent}"> 
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{sivController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{sivController.siv.columnValue}"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnFind" class="btn btn-primary" action="#{sivController.searchSivInformation()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find"/>            
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{sivController.mmsSivSearchInfoDataModel}" var="sivInfo" rows="5" selectionMode="single"
+                                                             selection="#{sivController.selectedItem}" rowKey="#{sivInfo.sivId}" rowIndexVar="num"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowSelect" listener="#{sivController.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar,:frmRegisterUI:searchSrNumber" />        
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.S_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.SIV_NO}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivInfo.sivNo}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.SR_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivInfo.srNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Department}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivInfo.storeReqId.deptId.depName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Requisition_Date}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivInfo.dates}">
+                                                            <f:convertDateTime pattern="yyyy/MMM/dd"/>
+                                                        </h:outputText>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Prepared_by}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivInfo.preparedBy}"/>
+                                                    </p:column>
+
+
+                                                </p:dataTable>
+
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{sivController.renderPnlCreateSIV}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Store Issue Voucher</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px"> 
+
+                                            <p:outputLabel id="lblsivNo" class="control-label col-sm-2" value="#{MMS.SIV_NO}:" /> 
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtsivNo"  readonly="true"
+                                                             requiredMessage="SIV Number is required"
+                                                             value="#{sivController.siv.sivNo}"><p:ajax></p:ajax></p:inputText>
+                                                <p:message for="txtsivNo" display="icon" />
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  id="lbl_selectStoreInfoList1" class="control-label col-sm-2"  value="#{MMS.Store_Name}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="selectStoreInfoList1" style="width: 100%"  required="true"  requiredMessage="Store Name Is required"
+                                                                   value="#{sivController.storeEntity.storeId}" disabled="#{workFlow.readonly}"
+                                                                   valueChangeListener="#{sivController.handleSelectStoreNameSIV}" 
+                                                                   > 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuQualification2" 
+                                                                   value="#{sivController.storeList}" var="store" itemLabel="#{store.storeName}" itemValue="#{store.storeId}"/>
+                                                    <p:ajax update="searchSrNumber" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectStoreInfoList1" display="icon"/>
+
+                                            </div>
+                                            <p:outputLabel id="lblsrNo" class="control-label col-sm-2" value="#{MMS.SR_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="searchSrNumber" disabled="#{workFlow.readonly}"
+                                                                 style="width: 100%;" converter="entConverter"
+                                                                 value="#{sivController.storeRequisitionEntity}" 
+                                                                 required="true" requiredMessage="Store requisiton number is required"
+                                                                 filter="true" filterMatchMode="contains"
+                                                                 valueChangeListener="#{sivController.getSelectedSRInfo}"    > 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItems id="selectOneMenuBidNumber" value="#{sivController.srList}"
+                                                                   var="sr" itemLabel="#{sr.srNo}" itemValue="#{sr}" />
+                                                    <p:ajax event="change"
+                                                            update="frmGatePassDtlInfo,frmMaterialInfo,:frmRegisterUI:txtApprovedDate"
+                                                            process="searchSrNumber"/>
+                                                </p:selectOneMenu>  
+                                                <p:message for="searchSrNumber" display="icon"/>
+                                            </div>  
+
+
+                                        </div>  
+
+                                        <div class="form-group textBoxMargin6px">  
+                                            <h:outputLabel for="txtRequestedDate" class="control-label col-sm-2"  value="#{MMS.Requisition_Date}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtRequestedDate"  value="#{sivController.storeRequisitionEntity.requestedDate}"
+                                                             readonly="true"/>                                                                                                                                                    
+                                                <p:message for="txtRequestedDate" display="icon"/>
+                                            </div> 
+
+
+                                            <h:outputLabel for="txtRequestingDep" class="control-label col-sm-2"  value="#{MMS.Department}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtRequestingDep"  value="#{sivController.storeRequisitionEntity.deptId.depName}"
+                                                             readonly="true"/>                                                                                                                                                    
+                                                <p:message for="txtRequestingDep" display="icon"/>
+                                            </div> 
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <p:outputLabel id="lblissuedTo" class="control-label col-sm-2" value="#{MMS.Receiver}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtissuedTo"  readonly="true"
+                                                             value="#{sivController.storeRequisitionEntity.requesterName}" />
+
+                                            </div>
+
+
+
+                                        </div>
+
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Store Issue Voucher Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+                                <h:panelGroup id="frmMaterialInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="grnDataModel" var="sivResultDtl" value="#{sivController.sivDetailsModel}"  
+                                                             rowIndexVar="num" paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowEdit"  update="" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>  
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivResultDtl.itemId.matCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivResultDtl.itemId.matName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Measure}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivResultDtl.itemId.unitOfMeasure}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Unit_Price}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivResultDtl.unitPrice}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Deducted_Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivResultDtl.quantity}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Total_cost}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivResultDtl.totalPrice}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Grn_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sivResultDtl.grnId.grnNo}"/>
+                                                    </p:column>
+
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+                                <h:panelGroup id="frmApproverInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+
+                                        <div class="form-group textBoxMargin6px required">   
+
+                                            <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-2"   value="#{MMS.Prepared_by}:"/>
+
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby"  
+                                                               value="#{sivController.userName}" 
+                                                               readonly="true"/>                                             
+                                            </div>
+
+                                            <h:outputLabel for="txtApprovedDate" class="control-label col-sm-2" value="#{MMS.Prepared_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtApprovedDate" class="form-control" value="#{sivController.wfMmsProcessed.processedOn}" 
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtApprovedDate', 'frmRegisterUI:txtApprovedDate');" />                                                                                                                                                    
+                                                <p:message for="txtApprovedDate" display="icon"/>
+                                            </div> 
+
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px required">  
+
+                                            <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2"  value="#{MMS.Decision}:" rendered="#{sivController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{sivController.selectedValue}" 
+                                                                 required="true" requiredMessage="Decicsion is required" rendered="#{sivController.renderDecision}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>   
+                                            </div> 
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px">  
+                                            <h:outputLabel  class="control-label col-sm-2" /> 
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnSave" class="btn btn-primary" 
+                                                                  validateClient="true" 
+                                                                  disabled="#{sivController.disableButtonUpdate}"
+                                                                  value="#{sivController.saveorUpdateBundle}" 
+                                                                  action="#{sivController.saveSiv()}"
+                                                                  process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo,:frmRegisterUI:frmApproverInfo"  
+                                                                  update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo,:frmRegisterUI" 
+                                                                  />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

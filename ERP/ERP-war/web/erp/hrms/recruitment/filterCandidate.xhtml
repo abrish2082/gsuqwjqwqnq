@@ -1,0 +1,473 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="recruitmentRequests.xhtml">Recruitment Request</a></li> 
+        <li><a href="recruitmentApprove.xhtml">Recruitment Approve</a></li>
+        <li><a href="maintainAdvertisement.xhtml">Maintain Advertisement</a></li>
+        <li><a href="candidateRegistration.xhtml">Candidate Registration</a></li>
+        <li><a href="assessmentWeight.xhtml">Assessment Weight</a></li>
+        <li><a href="shortlistCandidates.xhtml">Shortlist Candidates</a></li>
+        <li> <p:commandLink partialSubmit="true" process="@this" update=":frmFilter:dlgExamResult" action="#{filterCandidateController.cmdlExamResult()}" >Assessment Result</p:commandLink></li>
+        <li> <p:commandLink partialSubmit="true" process="@this" update=":frmFilter:dlgFilterCriteria" action="#{filterCandidateController.popUpCriteria()}" >Filter Criteria</p:commandLink></li>
+    </ui:define>
+    <ui:define name="contents">     
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton validateClient="true" action="#{filterCandidateController.btnSearch()}"
+                                     icon="ui-icon-search" style="background-color: white;border-color: white" 
+                                     process="@this" update=":frmFilter,frmSample" title="Search"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <p:commandLink id="cmdlWf" class="fa fa-fw fa-gear"
+                                   title="Work flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdlWf" 
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work flow"/>
+                        <p:dataTable id="tblWorkflow" value="#{filterCandidateController.workflowDataModel}"
+                                     var="currentRow" selectionMode="single" class="dataTable" rows="10" paginator="true"
+                                     rowKey="#{currentRow}" paginatorPosition="bottom">
+                            <p:column headerText="Processed By">
+                                <h:outputText value="#{currentRow.processedBy}"/> 
+                            </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="Status"/>
+                                </f:facet>
+                                <h:outputText value="#{currentRow.changedStstus}"/> 
+                            </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="Processed Date"/>
+                                </f:facet>
+                                <h:outputText value="#{currentRow.processedOn}" converter="dateConverter"/> 
+                            </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="Comment Given"/>
+                                </f:facet>
+                                <h:outputText value="#{currentRow.commentGiven}"/> 
+                            </p:column>
+                        </p:dataTable>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="filterCandidate.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>                        
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form> 
+        <h:form id="frmFilter">    
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>  
+            <h:panelGroup id="inputShortlist" rendered="#{filterCandidateController.renderPnlSearch}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header">
+                                <h3 class="box-title">Search <small>Filtered Candidates ...</small></h3>                     
+                            </div>    
+                            <div class="box-body panel-primary" >
+                                <div class="box-body ">
+                                    <div class="col-md-12 textBoxMarginTop6px" >  
+                                        <div class="col-md-2">                                        
+                                        </div>
+                                        <div class="col-md-8">
+                                            <h:selectBooleanCheckbox id="ckbShortListed" binding="#{filterCandidateController.ckbShortListed}" 
+                                                                     style="margin-right: 15px"
+                                                                     value="#{filterCandidateController.ckbShortListedSelected}"
+                                                                     valueChangeListener="#{filterCandidateController.ckbShortListed_vcl}">
+                                                <p:ajax event="change"
+                                                        process="@this"
+                                                        update="ckbFiltered"/>
+                                            </h:selectBooleanCheckbox> 
+                                            <h:outputLabel id="lblShortlisted" value="Shortlisted"/>
+
+                                           
+
+                                            <h:selectBooleanCheckbox id="ckbFiltered" binding="#{filterCandidateController.ckbFiltered}"
+                                                                     style="margin-right: 15px; margin-left: 30px"
+                                                                     value="#{filterCandidateController.ckbFilteredSelected}"
+                                                                     valueChangeListener="#{filterCandidateController.ckbFiltered_vcl}">
+                                                <p:ajax event="change"
+                                                        process="@this" 
+                                                        update="ckbShortListed"/>
+                                            </h:selectBooleanCheckbox>
+                                            <h:outputLabel id="lblFiltered" value="Filtered"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class=" col-sm-12">
+                                    <div class="col-sm-6">
+                                        <div class="col-sm-12 form-horizontal form-group">
+                                            <h:outputLabel for="somBatchCode" class="control-label col-sm-4" value="Vacancy No:"/>
+                                            <div class="col-sm-6">
+                                                <p:selectOneMenu id="somBatchCode" style="width:100%"
+                                                                 value="#{filterCandidateController.hrAdvertisements.id}"
+                                                                 valueChangeListener="#{filterCandidateController.bachCode_vcl}">
+                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                    <f:selectItems value="#{filterCandidateController.bachCodes}" var="bc" itemLabel="#{bc.batchCode}" itemValue="#{bc.id}"/>   
+                                                    <p:ajax event="change" process="@this" update=":frmFilter:tblJobList"/>
+                                                </p:selectOneMenu> 
+                                            </div> 
+                                        </div>
+                                    </div>
+                                </div>                                
+                            </div>                         
+                        </div> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header">
+                                <h3 class="box-title">Advertised Jobs<small></small></h3>                       
+                            </div>    
+                            <div class="box-body panel-primary" >
+                                <div class="col-md-12" >  
+                                    <div class="col-md-12" style="margn-top: 30px;">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblJobList" value="#{filterCandidateController.hrAdvertisedJobsDataModel}"
+                                                         var="job" selectionMode="single" rowIndexVar="num"  class="dataTable" 
+                                                         rowKey="#{job.id}"
+                                                         rows="5" paginator="true" paginatorPosition="bottom" editable="true">
+                                                <p:ajax event="rowSelect" process="@this,tblJobList" listener="#{filterCandidateController.advertizedJobs}"
+                                                        update=":frmFilter,:frmSample" />     
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Job Code"/>                                                        
+                                                    </f:facet>
+                                                    <h:outputText  value="#{job.jobId.jobCode}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Job Title"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{job.jobId.jobTitle}" />
+                                                </p:column>    
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>  
+            <h:panelGroup id="pnlMain" rendered="#{filterCandidateController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Filter Candidates</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl2" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-12">                                                                      
+                                                            <div class="form-group form-horizontal">  
+                                                                <p:dataTable id="tblFilteredCandidate" value="#{filterCandidateController.filterCandidateDataModel}"
+                                                                             var="flcList" rowIndexVar="num" class="dataTable"
+                                                                             rows="10" paginator="true" paginatorPosition="bottom" editable="true" tableStyle="width:auto"> 
+                                                                    <p:ajax event="rowSelect" process="@this,tblFilteredCandidate" listener="#{filterCandidateController.advertisedJobs}"
+                                                                            update=":frmFilter,:frmSample" />
+                                                                    <p:column style="width:40px">
+                                                                        <h:selectBooleanCheckbox id="ckbApproved" value="#{hrCandidateSelectedController.hrCandidateSelected.approved}">
+                                                                            <p:ajax listener="#{filterCandidateController.rowSelector()}" 
+                                                                                    update=":frmFilter:dlgExamResult, :frmFilter:txtShortlistRecommendation, :frmFilter:txtShortlistRemark,:frmFilter:btnSave"/>
+                                                                        </h:selectBooleanCheckbox>
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Candidate Code"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.candidateId}" />
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Candidate Name"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.firstName}   #{flcList.middleName}   #{flcList.lastName}"  />
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Sex"/>
+                                                                        </f:facet>
+                                                                        <h:outputText  value="#{flcList.sex}"/>
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Age"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.age}"/>
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Written (#{filterCandidateController.hrExamPercentages.writtenPercentage}%)"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.examResult}" />
+                                                                    </p:column>  
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Interview (#{filterCandidateController.hrExamPercentages.interviewPercentage}%)"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.interviewResult}"  />
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Practical (#{filterCandidateController.hrExamPercentages.practicalPercentage}%)"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.practicalResult}"  />
+                                                                    </p:column>  
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Other (#{filterCandidateController.hrExamPercentages.otherPercentage}%)"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.otherResult}"  />
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Total (#{filterCandidateController.hrExamPercentages.totalPercentage}%)"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.totalResult}"  />
+                                                                    </p:column>  
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Recommendation"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.filiterRecommendation}"  />
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Remark"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{flcList.filiterRemark}"  />
+                                                                    </p:column>  
+                                                                   
+                                                                </p:dataTable> 
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlWorkflow" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtShortlistRemark" class="control-label col-sm-4" value="Remark:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtShortlistRemark" value="#{filterCandidateController.hrCandidateSelected.shortlistRemark}"
+                                                                                         rows="1" autoResize="false" title="Comment"  class="form-control"
+                                                                                         validator="#{validatorManagedBean.Remark}"/>
+                                                                        <p:message for="txtShortlistRemark" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group required form-horizontal">
+                                                                    <h:outputLabel for="txtProcessedBy" value="Processed By: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtProcessedBy" value="#{workFlow.userName}" 
+                                                                                     title="Your name" readonly="true"/>
+                                                                        <p:message for="txtProcessedBy" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtShortlistRecommendation" class="control-label col-sm-4" value="Recommendation:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtShortlistRecommendation" value="#{filterCandidateController.hrCandidateSelected.filiterRecommendation}"
+                                                                                         rows="1" autoResize="false" title="Comment" class="form-control"
+                                                                                         validator="#{validatorManagedBean.Remark}"/>
+                                                                        <p:message for="txtShortlistRecommendation" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtProcessedDate" value="Processed Date: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtProcessedDate" value="#{filterCandidateController.wfHrProcessed.processedOn}"
+                                                                                     converter="dateConverter" readonly="true" title="processed On"
+                                                                                     validator="#{validatorManagedBean.Date}" validatorMessage="processed date should be in date format"/>
+                                                                        <p:message for="txtProcessedDate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <h:panelGroup id="pnlSave" class="col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="Save" class="btn  btn-block btn-primary col-lg-4"
+                                                                             action="#{filterCandidateController.saveFilterCandidates}"
+                                                                             disabled="#{filterCandidateController.disableSubmit}" title="Save"
+                                                                             process="@this,:frmFilter" update=":frmFilter:tblFilteredCandidate"/>
+                                                        </div>
+                                                       
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+            <p:dialog id="dlgExamResult" header="Assessment Result" widgetVar="dlgExamResult" height="450" width="600" showEffect="explode" visible="#{filterCandidateController.renderExamResultPopup}">
+                <h:panelGroup id="pnlDegreeExam" >  
+                    <div class="panel-heading textBoxMargin6px">
+                        <h:outputLabel class=" box-title col-md-8 textBoxMargin6px" value="#{filterCandidateController.candidateName}"/>
+                    </div>
+                    <div class="panel-body panel-primary">
+                        <div class="col-md-12 form-horizontal" >
+                            <div class="col-md-12 textBoxMargin6px"> 
+                                <h:outputLabel for="txtWrittenExam" class="control-label col-md-4" value="Written:"/>
+                                <div class="col-md-8 textBoxMargin6px" >
+                                    <h:inputText id="txtWrittenExam"  class="form-control" value="#{filterCandidateController.hrCandidateSelected.examResult}" 
+                                                 validatorMessage="Invalid number format"/>                                                     
+                                </div>
+                                <h:outputLabel for="txtInterviewResult" class="control-label col-md-4" value="Interview:"/>
+                                <div class="col-md-8 textBoxMargin6px" >                              
+                                    <h:inputText id="txtInterviewResult"  class="form-control" value="#{filterCandidateController.hrCandidateSelected.interviewResult}"/>                        
+                                </div>                
+                                <h:outputLabel for="txtPracticalExam" class="control-label col-md-4" value="Practical:"/>
+                                <div class="col-md-8 " >
+                                    <h:inputText id="txtPracticalExam"  class="form-control textBoxMargin6px"  value="#{filterCandidateController.hrCandidateSelected.practicalResult}"/> 
+                                </div>  
+                                <h:outputLabel for="txtOther" class="control-label col-md-4 " value="Other:"/> 
+                                <div class="col-md-8 textBoxMargin6px" > 
+                                    <h:inputText id="txtOther"  class="form-control" value="#{filterCandidateController.hrCandidateSelected.otherResult}"/>                                                                                                                                                    
+                                    <p:message for="txtOther" display="icon" />
+                                </div>
+                                <h:outputLabel for="txtFilterRecommandation" class="control-label col-md-4 " value="Recommandation:"/> 
+                                <div class="col-md-8 textBoxMargin6px" > 
+                                    <h:inputTextarea id="txtFilterRecommandation" value="#{filterCandidateController.hrCandidateSelected.filiterRecommendation}"
+                                                     rows="1" class="col-sm-12 form-control"/>                                                                                                                                                    
+                                    <p:message for="txtFilterRecommandation" display="icon" />
+                                </div>
+                                <h:outputLabel for="txtFilterRemark" class="control-label col-md-4 " value="Remark:"/> 
+                                <div class="col-md-8 textBoxMargin6px" > 
+                                    <h:inputTextarea id="txtFilterRemark" value="#{filterCandidateController.hrCandidateSelected.filiterRemark}"
+                                                     rows="1" class="col-sm-12 form-control"/>                                                                                                                                                    
+                                    <p:message for="txtFilterRemark" display="icon" />
+                                </div>
+                            </div> 
+                        </div>  
+                        <div class="col-sm-12">
+                            <div class="col-sm-12"> 
+                                <div class="col-sm-4">                                                              
+                                </div>                                                                    
+                                <div class="col-sm-3">                                                       
+                                    <p:commandButton id="btnSaveAssResult" class="btn  btn-block btn-primary col-lg-4"
+                                                     action="#{filterCandidateController.btnSaveAssessmentResult_action}"
+                                                     disabled="#{filterCandidateController.disableSubmit}"
+                                                     process=":frmFilter:dlgExamResult" update=":frmFilter:tblFilteredCandidate"                                                                      
+                                                     value="Save"/>                                                       
+                                </div>
+                                <div class="col-sm-3" >                                                       
+                                    <p:commandButton id="btnAddLanguage" class="btn btn-block btn-primary col-sm-4 "
+                                                     action="#{filterCandidateController.btnResetAssessmentResult_action}"
+                                                     process=":frmFilter:dlgExamResult" update="pnlDegreeExam" 
+                                                     value="Reset"></p:commandButton> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </p:dialog>
+            <p:dialog id="dlgFilterCriteria" header="Filter Criteria" widgetVar="dlgFilterCriteria" height="450" width="600" showEffect="explode"
+                      visible="#{filterCandidateController.renderFilterCriteriaPopup}">
+                <h:panelGroup id="pnlFilterCriteria" > 
+                    <div class="box-body panel-primary">
+                        <div class="box-heading textBoxMargin6px">
+                            <h:outputLabel class=" box-title col-md-8 textBoxMargin6px" value="Display only:"/>
+                        </div> 
+                        <div class="box-body col-md-12">
+                            <h:outputLabel id="lblWrittenExamTaken" value="Written Exam Taken"/>
+                            <h:selectBooleanCheckbox id="ckbWrittenExamTaken" binding="#{filterCandidateController.ckbWrittenExamTaken}">
+                                <p:ajax update=":frmFilter:tblFilteredCandidate"/>
+                            </h:selectBooleanCheckbox>
+                            <h:outputLabel id="lblPracticalExamTaken" value="Practical Exam Taken"/>
+                            <h:selectBooleanCheckbox id="ckbPracticalExamTaken" binding="#{filterCandidateController.ckbPracticalExamTaken}">
+                                <p:ajax update=":frmFilter:tblFilteredCandidate"/>
+                            </h:selectBooleanCheckbox>
+                            <h:outputLabel id="lblInterviewExamTaken" value="Interview Exam Taken"/>
+                            <h:selectBooleanCheckbox id="ckbInterviewExamTaken" binding="#{filterCandidateController.ckbInterviewExamTaken}">
+                                <p:ajax update=":frmFilter:tblFilteredCandidate"/>
+                            </h:selectBooleanCheckbox>
+                        </div>
+                        <div class="col-md-12 textBoxMargin6px">
+                            <h:outputLabel for="txtWrittenResultCriteria" class="control-label col-sm-4" value="Written Result >="/>
+                            <div class="col-sm-6 textBoxMargin6px">
+                                <p:inputText id="txtWrittenResultCriteria" class="col-sm-12 form-control" value="#{filterCandidateController.writtenResultCriteria}"/>
+                            </div>
+                            <h:outputLabel for="txtInterviewResultCriteria" class="control-label col-sm-4" value="Interview Result >="/>
+                            <div class="col-sm-6 textBoxMargin6px">
+                                <p:inputText id="txtInterviewResultCriteria" class="col-sm-12 form-control" value="#{filterCandidateController.interviewResultCriteria}"/>
+                            </div>
+                            <h:outputLabel for="txtPracticalResultCriteria" class="control-label col-sm-4" value="Practical Result >="/>
+                            <div class="col-sm-6 textBoxMargin6px">
+                                <p:inputText id="txtPracticalResultCriteria" class="col-sm-12 form-control" value="#{filterCandidateController.practicalResultCriteria}"/>
+                            </div>                                                                            
+                        </div>
+                        <div class="col-sm-12"> 
+                            <div class="col-sm-4">                                                              
+                            </div>                                                                    
+                            <div class="col-sm-3">                                                       
+                                <p:commandButton id="btnFilter" class="btn  btn-block btn-primary col-lg-4"                                                                      
+                                                 value="Submit" action="#{filterCandidateController.saveFilterFilterCriteria}"
+                                                 process=":frmFilter:dlgFilterCriteria" update=":frmFilter:tblFilteredCandidate"/>                                                      
+                            </div>
+                            <div class="col-sm-3" >                                                       
+                                <p:commandButton id="btnCare" class="btn btn-block btn-primary col-sm-4 "
+                                                 value="Reset" action="#{filterCandidateController.btnResetFilterCriteria}"
+                                                 process=":frmFilter:dlgFilterCriteria" update=":frmFilter:tblFilteredCandidate"/>
+                            </div> 
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </p:dialog>
+        </h:form> 
+    </ui:define>
+</ui:composition>
+

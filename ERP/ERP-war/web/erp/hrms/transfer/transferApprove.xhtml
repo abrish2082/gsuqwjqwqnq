@@ -1,0 +1,524 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Go to Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>  
+        <li><a href="transferRequest.xhtml"><span>Transfer Request</span></a></li>
+        <li><a href="internalMovement.xhtml" title="Internal Movement"><span>Direct Assignment</span></a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{transferApproveController.searchPage()}"
+                                     icon="ui-icon-search" title="Search" style="background-color: white; border-color: white" 
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmTransfer"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                        <span class="NotificationText"> #{transferApproveController.transferList.size()} </span>
+                    <p:commandLink id="cmdLNotification" class="fa fa-fw fa-bell" title="Notification"/>
+                    <p:overlayPanel widgetVar="widNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLNotification"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="col-md-12 textBoxMargin6px">     
+                            <div class="form-group">  
+                                <div class="col-sm-8">                                                               
+                                    <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                        converter="entConverter" valueChangeListener="#{transferApproveController.populateNotification}" scrollHeight="400">
+                                        <f:selectItems value="#{transferApproveController.transferList}" var="reqList"
+                                                       itemValue="#{reqList}" itemLabel="#{reqList.requesterId.empId} => (#{reqList.requesterId.firstName} #{reqList.requesterId.middleName})"/> 
+                                        <p:ajax event="valueChange"  process="@this"  update="@this,:frmTransfer,:frmSearch"/>
+                                    </p:selectOneListbox>
+                                </div>                               
+                            </div> 
+                        </div> 
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <p:commandLink id="cmlWorkflow" class="fa fa-fw fa-wordpress" onclick="PF('dlgWorkflow').show();" title="Workflow"/> 
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/transfer/transferApprove.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{transferApproveController.chooseMainPage}" style="border: 0px; background-color: transparent">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title" title="Search transfer on approve">Search <small>Transfer</small> ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchList">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{transferApproveController.findByStatus}">
+                                                                <f:selectItems value="#{transferApproveController.filterByStatus}"/>   
+                                                                <p:ajax event="change" process="@this" update=":frmSearch:tblRequestList"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12" >
+                                        <div class="form-group">
+                                            <p:dataTable id="tblRequestList" value="#{transferApproveController.transferDataModel}" paginator="true"
+                                                         var="rqst" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" rowsPerPageTemplate="10,20,30"
+                                                         selection="#{transferApproveController.hrTransferRequests}" rowKey="#{rqst.id}" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" process="@this,tblRequestList" listener="#{transferApproveController.populateDatatable}"
+                                                        update=":frmToolBar,:frmSearch,:frmTransfer"/>
+                                                <p:column headerText="No." style="width:60px;">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Employee Name" filterMatchMode="contains" filterBy="#{rqst.requesterId.firstName}">
+                                                    <h:outputText value="#{rqst.requesterId.firstName} #{rqst.requesterId.middleName} #{rqst.requesterId.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Employee Id" filterMatchMode="contains" filterBy="#{rqst.requesterId.empId}">
+                                                    <h:outputText value="#{rqst.requesterId.empId}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Request Date"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{rqst.requestDate}"/>
+                                                </p:column>
+                                                <p:column headerText="Transfer Type" filterMatchMode="contains" filterBy="#{rqst.transferTypeId.transferType}">
+                                                    <h:outputText value="#{rqst.transferTypeId.transferType}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>          
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmTransfer"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainpage" style="border: 0px; background-color: transparent" rendered="#{transferApproveController.chooseCreatePage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Transfer Approve</h3>
+                            </div>
+                            <div class="box-body ">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl1" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmployeeName" value="Employee Name:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmployeeName" value="#{transferApproveController.emp}"
+                                                                                             title="Employee Name" readonly="true"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJob" value="Job Title:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJob" value="#{transferApproveController.hrJobTypes.jobTitle}"
+                                                                                             title="Job Position" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmpType" value="Employee Type:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmpType" value="#{transferApproveController.hrEmployees.employmentType}" 
+                                                                                             title="Employee Type" readonly="true"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                                                                                                                
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmployeeId" value="Employee ID:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmployeeId" value="#{transferApproveController.hrEmployees.empId}" 
+                                                                                             title="Employee Id"  readonly="true"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>  
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSalary" class="control-label col-sm-4" value="Salary:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSalary" value="#{transferApproveController.hrEmployees.basicSalary}"
+                                                                                             readonly="true" required="true" title="Employee Salary"/>
+                                                                            </div>                                                                
+                                                                        </div>                                            
+                                                                    </div>   
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">                                                                
+                                                                            <h:outputLabel for="txtHiredDate"  class="control-label col-sm-4" value="Hired Date:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtHiredDate"  value="#{transferApproveController.hrEmployees.hireDate}" title="Hire Date" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtHiredDate" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>                                                                                                                                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section> 
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl7" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-sm-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txttra1" class="control-label col-sm-4" value="Transfer Type:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txttra1" value="#{transferApproveController.hrLuTransferTypes.transferType}"
+                                                                                             required="true" title="Transfer Type" readonly="true"/>                                    
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px"><div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="calRequsetdate1" value="Request Date:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="calRequsetdate1" value="#{transferApproveController.hrTransferRequests.requestDate}" 
+                                                                                             readonly="true" requiredMessage="Enter Request Date." title="Request Date"/>
+                                                                                <p:message for="calRequsetdate1" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                                                                                       
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtReason" class="control-label col-sm-4" value="Reason:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="txtReason" value="#{transferApproveController.hrTransferRequests.reason}"
+                                                                                                 rows="1" cols="5" autoResize="false" title="Reason for Transfer" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txstartdate" class="control-label col-sm-4" value="Start Date:"
+                                                                                           rendered="#{transferApproveController.chooseTemporary}"/>  
+                                                                            <div class="col-sm-8"> 
+                                                                                <p:inputText id="txstartdate" value="#{transferApproveController.hrTransferRequests.startDate}"
+                                                                                             required="false" title="Start Date" readonly="true"  rendered="#{transferApproveController.chooseTemporary}"/>                                                                   
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>    
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txenddate" class="control-label col-sm-4" value="End Date:"
+                                                                                           rendered="#{transferApproveController.chooseTemporary}"/>  
+                                                                            <div class="col-sm-8"> 
+                                                                                <p:inputText id="txenddate" value="#{transferApproveController.hrTransferRequests.endDate}"
+                                                                                             required="false" title="End Date" readonly="true"  rendered="#{transferApproveController.chooseTemporary}"/>                                                                   
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl2" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-sm-6"> 
+                                                                    <div class="box-header">
+                                                                        <h1 class="box-title" style="font-weight: bold; margin-left: 250px"> From </h1>                       
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtwork" class="control-label col-sm-4" value="Department:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtwork" value="#{transferApproveController.hrDepartments.depName}"
+                                                                                             title="Transfer Work Unit" readonly="true"/>
+                                                                            </div>                  
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSystem2" class="control-label col-sm-4" value="System:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSystem2" value="#{transferApproveController.system}"
+                                                                                             title="System" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtCostCenter2" class="control-label col-sm-4" value="Cost Center:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtCostCenter2" value="#{transferApproveController.costCenter}"
+                                                                                             title="Cost Center"
+                                                                                             readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPayLocation2" class="control-label col-sm-4" value="Pay Location:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPayLocation2" value="#{transferApproveController.payLocation}"
+                                                                                             title="Pay Location"
+                                                                                             readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPayGroup2" class="control-label col-sm-4" value="Pay Group:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPayGroup2" value="#{transferApproveController.payGroup}" 
+                                                                                             title="Pay Group"
+                                                                                             readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-6"> 
+                                                                    <div class="box-header">
+                                                                        <h1 class="box-title" style="font-weight: bold; margin-left: 250px"> To </h1>                       
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtworkunit" class="control-label col-sm-4" value="Department:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtworkunit" value="#{transferApproveController.transferTo.depName}"
+                                                                                             required="true" title="New transfer work unit" readonly="true" placeholder="New department"/>
+                                                                                <p:message for="txtworkunit" display="icon"/>
+                                                                            </div>                  
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSystem" class="control-label col-sm-4" value="System:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSystem" value="#{transferApproveController.system}" 
+                                                                                             title="System" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtCostCenter" class="control-label col-sm-4" value="Cost Center:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtCostCenter" value="#{transferApproveController.costCenter}"
+                                                                                             title="Cost Center" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPayLocation" class="control-label col-sm-4" value="Pay Location:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPayLocation" value="#{transferApproveController.payLocation}" 
+                                                                                             title="Pay Location" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPayGroup" class="control-label col-sm-4" value="Pay Group:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPayGroup" value="#{transferApproveController.payGroup}"
+                                                                                             title="Pay Group" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div> 
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <section class="panel panel-info">                                   
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl6" class="col-sm-12">
+                                                        <div class="col-sm-12">
+                                                            <div class="col-sm-6"> 
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal form-group required">
+                                                                        <h:outputLabel for="txtDecsion" class="control-label col-sm-4" value="Decision: "/> 
+                                                                        <div class="col-sm-8">  
+                                                                            <p:selectOneMenu id="txtDecsion" value="#{transferApproveController.hrTransferRequests.status}" 
+                                                                                             valueChangeListener="#{transferApproveController.handleselectOptions}"
+                                                                                             required="true" requiredMessage="Select decision type" style="width:100%">        
+                                                                                <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                                <f:selectItem itemLabel="Approve" itemValue="1"/>
+                                                                                <f:selectItem itemLabel="Reject" itemValue="2"/>
+                                                                                <!-- <f:selectItem itemLabel="Resubmit" itemValue="3"/>
+                                                                                 <f:selectItem itemLabel="Forwared" itemValue="3"/>-->
+                                                                                <p:ajax process="@this" event="change"/>
+                                                                            </p:selectOneMenu>  
+                                                                            <p:message for="txtDecsion" display="icon"/>
+                                                                        </div> 
+                                                                    </div>                                            
+                                                                </div>   
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtCommentGiven" class="control-label col-sm-4" value="Comment Given:"/> 
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputTextarea id="txtCommentGiven" value="#{transferApproveController.wfHrProcessed.commentGiven}"
+                                                                                             validator="#{validatorManagedBean.Text}" rows="2" cols="3" autoResize="false"
+                                                                                             title="Remark" class="form-control" requiredMessage="Remark can not be empty"/> 
+                                                                            <p:message for="txtCommentGiven" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                            
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6"> 
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal form-group required">
+                                                                        <h:outputLabel for="txtApproveBy" class="control-label col-sm-4" value="Approved By: "/> 
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText id="txtApproveBy" value="#{workFlow.userName}"
+                                                                                         title="Approve By" readonly="true"/>
+                                                                            <p:message for="txtApproveBy" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                            
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px"><div class="form-group form-horizontal form-group required">
+                                                                        <h:outputLabel for="calApprovedate" value="Processed Date: " class="control-label col-sm-4"/>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText id="calApprovedate" value="#{transferApproveController.wfHrProcessed.processedOn}" converter="dateConverter"  
+                                                                                         onclick="displayCalendar('frmTransfer:calApprovedate', 'frmTransfer:calApprovedate');" 
+                                                                                         required="true" requiredMessage="Enter approved date" title="Approved Date" class="form-control"/>
+                                                                            <p:message for="calApprovedate" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                                                                                       
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px"><div class="form-group form-horizontal form-group required">
+                                                                        <h:outputLabel for="txtEffectiveDate" value="Effective Date: " class="control-label col-sm-4"/>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText id="txtEffectiveDate" value="#{transferApproveController.hrTransferRequests.effectiveDate}" class="form-control" 
+                                                                                         onclick="displayCalendar('frmTransfer:txtEffectiveDate', 'frmTransfer:txtEffectiveDate');" 
+                                                                                         required="true" requiredMessage="Enter effective date." title="Effective Date" converter="dateConverter"/>
+                                                                            <p:message for="txtEffectiveDate" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                                                                                       
+                                                                </div>
+                                                            </div>
+                                                        </div>                                                                                                       
+                                                        <p:dialog id="dlgWorkflow" header="Workflow" widgetVar="dlgWorkflow" height="400"
+                                                                  width="1300" modal="true" resizable="false" showEffect="explode">
+                                                            <p:dataTable id="tblWorkflow" value="#{transferApproveController.workflowDataModel}" 
+                                                                         var="currentRow" selectionMode="single" class="dataTable" scrollable="true"
+                                                                         rowIndexVar="num" rowKey="#{currentRow}" paginatorPosition="bottom" scrollHeight="160">
+                                                                <p:column headerText="No." style="width: 50px">                
+                                                                    <h:outputText value="#{num+1}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Processed By">
+                                                                    <h:outputText value="#{currentRow.processedBy}"/> 
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Decision"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{currentRow.decision}"/> 
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Processed Date"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{currentRow.processedOn}"/> 
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Comment Given"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                                </p:column> 
+                                                            </p:dataTable>
+                                                        </p:dialog>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <h:panelGroup id="pnlSave" class="col-sm-12">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" value="Save" class="btn  btn-block btn-primary col-lg-4"  
+                                                                                     action="#{transferApproveController.saveTransferApprove()}" title="Approve"
+                                                                                     disabled="#{transferApproveController.disableBtn}"
+                                                                                     process="@this,pnlMainpage" update=":frmTransfer,:frmToolBar"/>    
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+

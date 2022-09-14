@@ -1,0 +1,411 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li>
+            <a href="../../fcms/Loan/DisbursementReg.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>  Loan Disbursement</a>
+        </li>               
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone" validateClient="true" action="#{loanRegController.createNewLoanView()}"
+                                     icon="#{loanRegController.icone}"  class="toolBarButton" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmMainUI,:lblheadeTitle,:frmLoanAgreement,:frmMainUI:frmLoanSearch:loanTable" 
+                                     title="#{loanRegController.createOrSearchBundle}" 
+                                     />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/Loan/LoanAgreementReg.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh" ></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-header" >
+                        <h3 class="box-title"> <h:outputLabel id="lblheadeTitle"  value="#{loanRegController.headerTitle}" /></h3> 
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body ">
+                        <div class="box-body ">
+                            <h:form id="frmMainUI">
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{loanRegController.renderPnlManPage}">
+                                    <div class="col-md-12" > 
+                                        <h:form id="frmLoanSearch"> 
+                                            <div class="panel-body">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group"> 
+                                                        <p:outputLabel class="control-label col-sm-2" value="#{FCMS.Loan_No}. :"/>                                                        
+                                                        <div class="col-sm-4">
+                                                            <p:inputText id="cccode" class="form-control" value="#{loanRegController.fmsLoan.loanNo}" title="Loancode" 
+                                                                         style="width: 100%" validator="#{validatorManagedBean.Remark}">
+                                                            </p:inputText>
+                                                        </div>
+                                                    </div>                                                                
+                                                </div>
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group"> 
+                                                        <div class="col-sm-2">
+
+                                                        </div>
+                                                        <div class="col-sm-2">
+                                                            <p:commandButton id="btnSearch" class="btn  btn-block btn-primary col-lg-4" action="#{loanRegController.loanSearch()}"
+                                                                             value="#{FCMS.Find}" process="@this,cccode" update="@this,:frmMainUI,loanTable"></p:commandButton>
+                                                        </div>                                                                
+                                                    </div>                                                                
+                                                </div>
+                                                <div class="col-md-12 " style="padding-top: 20px">
+                                                    <p:dataTable id="loanTable" var="loanvar" value="#{loanRegController.loanDatamodel}" 
+                                                                 selectionMode="single" rows="10" rowIndexVar="num" paginator="true" paginatorPosition="bottom"
+                                                                 rowsPerPageTemplate="5,10,15"
+                                                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                 selection="#{loanRegController.selectedLoan}" rowKey="#{loanvar.loanId}">
+                                                        <p:ajax event="rowSelect" listener="#{loanRegController.populate}" process="@(form)" update="@(form),:lblheadeTitle" />
+                                                        <p:column headerText="#{FCMS.Loan_No}.">
+                                                            <h:outputText value="#{loanvar.loanNo}" />
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Lender}">
+                                                            <h:outputText value="#{loanvar.lender}" />
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Loan_Amount}">
+                                                            <h:outputText value="#{loanvar.loanAmount}" converter="#{loanRegController.numberConverter}" />
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Loan_Amount_In_Birr}">
+                                                            <h:outputText value="#{loanvar.loanAmountInBirr}" converter="#{loanRegController.numberConverter}" />
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Currency}">
+                                                            <h:outputText value="#{loanvar.currencyId}" />
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Grace_Period}">
+                                                            <h:outputText value="#{loanvar.gracePeriodEndDate}" />
+                                                        </p:column>                                                        
+                                                        <p:column headerText="#{FCMS.No_of_Installment}">
+                                                            <h:outputText value="#{loanvar.noInstallment}" />
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                </h:panelGroup>
+                            </h:form>
+                            <h:form id="frmLoanAgreement"  > 
+                                <h:panelGroup id="pnlLoanReg" style="border: 0px; background-color: transparent"  rendered="#{loanRegController.renderPnlCreateGatePass}">
+                                    <section class="panel panel-info"  >
+                                        <section class="panel-body" >
+                                          <h:form id="frmLoReg">
+                                          <h:panelGroup id="pnltransm" class="col-sm-12">
+                                            
+                                            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>    
+                                            <div id="mainform" class="col-md-12" style="float: right; padding-bottom: 20px;">
+                                                <div class="form-group required col-sm-10">
+                                                    <div class="form-horizontal col-sm-6"  >                                        
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Loan_No}. :</label>
+                                                        <div class="col-sm-6">
+                                                            <p:inputText id="loanno" class="form-control" style="width: 100%" value="#{loanRegController.fmsLoan.loanNo}"
+                                                                         validator="#{validatorManagedBean.Remark}" required="true" requiredMessage="Value is Required.">
+                                                            </p:inputText>
+                                                            <p:message for="loanno" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label id="lblLender" class="col-sm-6 control-label" >#{FCMS.Lender}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:inputText id="lender" class="form-control" style="width: 100%" value="#{loanRegController.fmsLoan.lender}"
+                                                                         validator="#{validatorManagedBean.Text}" required="true" requiredMessage="Value is Required.">
+                                                            </p:inputText>
+                                                            <p:message for="lender" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>                                                
+                                                <div class="form-group required col-sm-10">                                            
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="amount" class="col-sm-6 control-label" >#{FCMS.Loan_Amount}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:inputText id="amount" class="form-control" value="#{loanRegController.fmsLoan.loanAmount}"
+                                                                         converter="#{loanRegController.numberConverter}" style="width: 100%" converterMessage="Value must be a number"
+                                                                         validator="#{validatorManagedBean.Money}" required="true" requiredMessage="Value is Required." />                                           
+                                                            <p:message for="amount" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="currency" class="col-sm-6 control-label" >#{FCMS.Currency}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:selectOneMenu id="currency" value="#{loanRegController.fmsLuCurrency.currency}"        
+                                                                             validatorMessage="Insert correct value type"
+                                                                             style="width: 100%" required ="true"
+                                                                             requiredMessage="Value is Required"
+                                                                             valueChangeListener="#{loanRegController.currencyCalc}">
+                                                                <f:selectItems id="lstAccountCode" value="#{loanRegController.currency}"/>  
+                                                                <p:ajax id="currselectone" event="change" process="@this,amount" update="@this,lblamtinBirr"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="currency" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-10">
+                                                    <div class="form-horizontal form-group required col-sm-6"  >
+                                                        <label for="lblxRate" class="col-sm-6 control-label" >#{FCMS.Exchange_Rate}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:inputText id="lblxRate" class="form-control" value="#{loanRegController.fmsLoan.exchangeRate}"
+                                                                         required="true" requiredMessage="Value is Required." converterMessage="Value must be a number">
+                                                                <p:ajax id="ajxRate" event="blur" listener="#{loanRegController.exchangeRateCalc}"
+                                                                        process="@this,amount" update="@this,lblamtinBirr"/>
+                                                            </p:inputText>                                           
+                                                            <p:message for="lblxRate" display="icon"/>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-horizontal  col-sm-6"  >
+                                                        <label for="lblamtinBirr" class="col-sm-6 control-label" >#{FCMS.Loan_Amount_In_Birr}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:inputText id="lblamtinBirr" converter="#{loanRegController.numberConverter}" style="width: 100%"
+                                                                         value="#{loanRegController.fmsLoan.loanAmountInBirr}"
+                                                                         validator="#{validatorManagedBean.Money}" readonly="true" />                                           
+                                                            <p:message for="lblamtinBirr" display="icon"/>
+                                                        </div>
+
+                                                    </div>                                                    
+                                                </div>                                 
+                                                <div class="form-group required col-sm-10">
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Loan_Date}:</label>
+                                                        <div class="col-sm-6">                                            
+                                                            <p:calendar id="loandate" navigator="true" value="#{loanRegController.fmsLoan.loanDate}" required="true" requiredMessage="Value is Required.">
+                                                            </p:calendar>
+                                                            <p:message for="loandate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Grace_Period_End_Date}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:calendar id="graceperiod" navigator="true" value="#{loanRegController.fmsLoan.gracePeriodEndDate}" required="true" requiredMessage="Value is Required.">
+                                                            </p:calendar>
+                                                            <p:message for="graceperiod" display="icon"/>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group required col-sm-10">                                   
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Commencement_Date}:</label>
+                                                        <div class="col-sm-6">  
+                                                            <p:calendar id="commdate" required="true" requiredMessage="Value is Required." navigator="true" value="#{loanRegController.fmsLoan.principalRepaymentDate}">
+                                                                <p:ajax event="dateSelect" process="@this" listener="#{loanRegController.commencementlistener}" />
+                                                            </p:calendar>
+                                                            <p:message for="commdate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Due_Date}:</label>
+                                                        <div class="col-sm-6">  
+                                                            <p:calendar id="priduedate" required="true" requiredMessage="Value is Required." navigator="true" value="#{loanRegController.fmsLoan.principalDueDate}">
+                                                                <p:ajax event="dateSelect" process="@this" listener="#{loanRegController.duedatelistener}" />
+                                                            </p:calendar>
+                                                            <p:message for="priduedate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                                <div class="form-group col-sm-10">   
+                                                    <div class="form-horizontal form-group required col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Frequency}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:selectOneMenu id="frequency" required="true" requiredMessage="Value is Required." style="width: 100%" converter="entConverter"  value="#{loanRegController.fmsLoan.frequency}">
+                                                                <f:selectItems value="#{loanRegController.getFrequency()}"></f:selectItems>
+                                                                <p:ajax event="change" process="@this" update="installment" listener="#{loanRegController.installmetcal}"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="priduedate" display="icon"/>
+                                                        </div>
+                                                    </div>                                                
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="installment" class="col-sm-6 control-label" >#{FCMS.No_of_Installment}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:inputText id="installment" style="width: 100%" readonly="true" value="#{loanRegController.fmsLoan.noInstallment}"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group required col-sm-10">
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Loan_Group}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:selectOneMenu id="loang" required="true" requiredMessage="Value is Required." style="width: 100%" converter="entConverter"
+                                                                             value="#{loanRegController.fmsLoan.loanGroup}">
+                                                                <f:selectItems value="#{loanRegController.getLoanGroupList()}"></f:selectItems>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="loang" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Payment_Method}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:selectOneMenu id="paymeth" required="true" requiredMessage="Value is Required." style="width: 100%" converter="entConverter"  value="#{loanRegController.fmsLoan.payMethod}">
+                                                                <f:selectItems value="#{loanRegController.getPaymentMethod()}"></f:selectItems>
+                                                            </p:selectOneMenu>  
+                                                            <p:message for="paymeth" display="icon"/>
+                                                        </div>
+                                                    </div>   
+                                                </div>   
+                                                <div class="form-group required col-sm-10">
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Interest_Start_Date}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:calendar id="duedate" navigator="true" value="#{loanRegController.fmsLoan.interestRepaymentDate}" required="true" requiredMessage="Value is Required."/>
+                                                            <p:message for="duedate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Interest_Due_Date}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:calendar id="intduedate" navigator="true" value="#{loanRegController.fmsLoan.interestDueDate}" required="true" requiredMessage="Value is Required."/>
+                                                            <p:message for="intduedate" display="icon"/>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-10">
+                                                    <div class="form-horizontal col-sm-6"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Description}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:inputTextarea id="txtDesc" style="width: 100%" class="form-control" value="#{loanRegController.fmsLoan.description}"/>
+                                                            <p:message for="txtDesc" display="icon"/>
+                                                        </div>
+                                                    </div> 
+                                                    <div class="form-horizontal col-sm-6 form-group required"  >
+                                                        <label for="lblUnitName" class="col-sm-6 control-label" >#{FCMS.Interest_Rule}:</label>
+                                                        <div class="col-sm-6">
+                                                            <p:selectOneMenu id="intRule" required="true" requiredMessage="Value is Required." style="width: 100%" converter="entConverter"
+                                                                             value="#{loanRegController.fmsLoan.interestRule}">
+                                                                <f:selectItems value="#{loanRegController.getInterestRule()}"></f:selectItems>
+                                                            </p:selectOneMenu>  
+                                                            <p:message for="paymeth" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                               
+                                                </div>
+                                          </h:panelGroup>
+                                            </h:form>
+                                        </section>
+                                    </section>
+                            
+
+                                                <h:form id="frmLoanDetailReg">
+                                                    <h:panelGroup id="pnlbudgetDetail" class="col-sm-12">
+                                                        <section class="panel panel-info"  >
+                                                            <section class="panel-body" >  
+                                                                <p:growl id="growl2" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+                                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                    <div class="form-horizontal form-group required col-sm-6" style="padding-bottom: 10px;" >
+                                                                        <label for="drpPrj" class="col-sm-4 control-label">#{FCMS.Project_Name} :</label>  
+                                                                        <div class="col-sm-6">                                             
+                                                                            <p:selectOneMenu id="drpPrj" value="#{loanRegController.fmsLoanDetail.projectIdFk}"
+                                                                                             converter="entConverter" style="width: 100%" required="true" 
+                                                                                             requiredMessage="Project Name is Required"
+                                                                                             valueChangeListener="#{loanRegController.ProjectListener}">
+                                                                                <f:selectItems id="lstAccountCode" value="#{loanRegController.projectList}"/>  
+                                                                                <p:ajax id="glselectone" process="@this" update="@this,loanDetTable,txtProjTitle"/>
+                                                                            </p:selectOneMenu>
+                                                                            <p:message for="drpPrj" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                                                
+                                                                    <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                                        <label  class="col-sm-4">#{FCMS.Project_Description}:</label>  
+                                                                        <div class="col-sm-6">   
+                                                                            <p:inputText id="txtProjTitle"
+                                                                                         value="#{loanRegController.pmsCreateProjects.description}"                                                                             
+                                                                                         style="width: 100%" readonly="true">
+                                                                            </p:inputText>
+
+                                                                        </div>
+                                                                    </div> 
+                                                                </div>
+                                                                <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                                    <div class="form-horizontal col-sm-12" style="padding-bottom: 10px;" >
+                                                                        <div class="col-sm-2"></div>
+                                                                        <div class="col-sm-2">
+                                                                            <p:commandButton id="btnAdd" value="#{FCMS.Add}" class="btn  btn-block btn-primary col-lg-4"
+                                                                                             action="#{loanRegController.addProjectsOnLoan()}"  
+                                                                                             process="@this,pnlbudgetDetail" update="pnlbudgetDetail"/>
+                                                                        </div>                                                                
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group required col-sm-12">
+                                                                    <div class="col-md-12 " style="padding-top: 20px">
+                                                                        <p:dataTable id="loanDetTable" var="loand" value="#{loanRegController.fmsLoanDetailsDataModel}"  
+                                                                                     rows="10" rowIndexVar="num" paginator="true" paginatorPosition="bottom" rowKey="#{loand.projectIdFk}"
+                                                                                     selectionMode="single" selection="#{loanRegController.selectedfmsLoanDetail}" >
+                                                                            <p:ajax event="rowSelect" process="@this" listener="#{loanRegController.detailTablePopulate}" update="@(form)" />                                                                      
+                                                                            <p:column headerText="#{FCMS.No}.">
+                                                                                <h:outputText value="#{num+1}" />
+                                                                            </p:column>
+                                                                            <p:column headerText="#{FCMS.Project_Name}">
+                                                                                <h:outputText value="#{loand.projectIdFk}" />
+                                                                            </p:column>
+                                                                            <p:column headerText="#{FCMS.Requested_Amount}">
+                                                                                <h:outputText value="#{loand.projectIdFk.description}" />
+                                                                            </p:column>
+                                                                        </p:dataTable>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="mainform" class="col-md-12" style="float: right; padding-bottom: 20px;">
+                                                                    <div class="form-horizontal col-md-10" >                                     
+                                                                        <div class="col-sm-12">     
+                                                                            <div class="col-sm-3">                                                              
+                                                                            </div>
+
+                                                                            <div class="col-sm-2">
+
+                                                                            </div>
+                                                                            <div class="col-sm-3">                                                              
+                                                                            </div>
+                                                                        </div>
+                                                                    </div></div>
+                                                            </section>
+                                                        </section>
+                                                    </h:panelGroup>
+                                                </h:form>
+
+
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <div class="col-sm-5"></div>
+                                                    <div class="col-sm-4">
+                                                        <p:commandButton id="btnloansave" class="btn  btn-block btn-primary col-lg-4" value="#{loanRegController.buttval}"
+                                                                         process="@this,:frmLoanAgreement:frmLoReg" update="@(form)" action="#{loanRegController.CreateLoan()}"/>
+
+                                                    </div>
+                                                </div> 
+
+                                </h:panelGroup>              
+                            </h:form> 
+
+                        </div>  
+                    </div>
+                    <div class="box-footer ">                       
+                    </div>
+                </div>                   
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,638 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+
+
+
+        <li><a href="MmsSIV.xhtml"><i class="fa fa-circle-o"></i> <span>Store Issue Voucher</span></a></li> 
+        <li><a href="GatePassInformation.xhtml"><i class="fa fa-circle-o"></i> <span>GatePass Information</span></a></li> 
+        <li><a href="ISIV.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV (For Issue)</span></a></li> 
+        <li><a href="ISIV_Received.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV(For Receiving)</span></a></li> 
+        <li><a href="RMG.xhtml"><i class="fa fa-circle-o"></i> <span>Received Manufactured Goods</span></a></li>
+
+    </ui:define>
+
+    <ui:define name="contents">   
+
+
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{gRNController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch" action="#{gRNController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>
+                    <p:commandButton  id="btnNew" action="#{gRNController.createNewGRNInfo()}" icon="#{gRNController.icone}" validateClient="true" 
+                                      style="background-color: white;border-color: white"
+                                      process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                      title="#{gRNController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{gRNController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{gRNController.mmsGrnsList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Goods Receiving List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{gRNController.onSelectGRnRequest}" scrollHeight="400">
+                                            <f:selectItems  var="GrnListVar" value="#{gRNController.mmsGrnsList}"
+                                                            itemValue="#{GrnListVar}"  itemLabel="#{GrnListVar.grnNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{gRNController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{gRNController.workflowDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.wfDecison}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../mms/Stock Movement Information/MmsGRN.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{gRNController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"        
+                                                                   converter="entConverter"  value="#{gRNController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{gRNController.columnNameChangeEvent}"> 
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{gRNController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{gRNController.mmsgrn.columnValue}"/>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnFind"  class="btn btn-primary" action="#{gRNController.searchGrnInformation()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find" />            
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+
+
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{gRNController.mmsGRNSearchInfoDataModel}" var="GrnInfo" rows="5" selectionMode="single"
+                                                             selection="#{gRNController.selectedItem}" rowKey="#{GrnInfo.grnId}" rowIndexVar="num"
+                                                             paginator="true" paginatorPosition="bottom" editable="true"> 
+
+                                                    <p:ajax event="rowSelect" listener="#{gRNController.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.GR_N}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{GrnInfo.grnNo}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Received_Date}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{GrnInfo.regDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Receiving_Store}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{GrnInfo.storeId.storeName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Commercial_Invoice_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{GrnInfo.commercialInvoiceNo}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" style="position: top;">
+                                                    <p:commandButton id="btnYes" value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                    <p:commandButton id="btnNo"  value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                </p:confirmDialog>
+                                            </div>                 
+                                        </div>    
+
+
+
+                                    </div>  
+
+
+
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{gRNController.renderPnlCreateGRN}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Goods Receiving Note</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Grn_No}:"/> 
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtGrnNo"     readonly="true" requiredMessage="GRN No is required"
+                                                             value="#{gRNController.mmsgrn.grnNo}"   
+                                                             />
+                                                <p:message for="txtGrnNo" display="icon" />
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel id="lbl_GrnType"  value="#{MMS.GRN_Type}:" class="control-label col-sm-2"  /> 
+                                                <div class="col-sm-4">
+                                                    <p:selectOneRadio id="requisitionType"  required="true" requiredMessage="Grn type is required" value="#{gRNController.mmsgrn.grnType}"
+                                                                      valueChangeListener="#{gRNController.handleselectOptions}" >
+                                                        <f:selectItem itemLabel="Financial " itemValue="1"  />
+                                                        <f:selectItem itemLabel="Non Financial " itemValue="2" />    
+
+                                                    </p:selectOneRadio>
+                                                    <p:message for="requisitionType" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px required">
+                                            <p:outputLabel  value="#{MMS.Entery_Type}:" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneRadio id="rdEnteryType" value="#{gRNController.mmsgrn.enteryType}"
+                                                                  valueChangeListener="#{gRNController.changeOnEntryType}"
+                                                                  required="true" requiredMessage="Select Entery Type">
+                                                    <f:selectItem itemLabel="Stock" itemValue="Stock"/>
+                                                    <f:selectItem  itemLabel="Department" itemValue="Department"/>
+                                                    <p:ajax event="change" process="@this" update="btnTree"/>
+                                                </p:selectOneRadio>
+                                                <p:message for="rdEnteryType" display="icon"/>
+                                            </div>
+                                            <p:outputLabel id="lblDept" value="#{MMS.Department}:" class="control-label col-sm-2"  /> 
+                                            <div class="col-sm-2">
+                                                <p:inputText id="txtDept" value="#{gRNController.hrDepartments.depName}"
+                                                             readonly="true" placeholder="Use Only From + Button" onmousedown="return false;">
+                                                    <p:ajax event="change"/>
+                                                </p:inputText>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <p:commandButton id="btnTree" onclick="PF('dlg').show();"  partialSubmit="true" style="background: transparent;" title="Choose Departmnet" value="+"
+                                                                 disabled="#{gRNController.isStockSelected}" readonly="#{workFlow.readonly}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  textBoxMargin6px required">   
+                                            <p:outputLabel  id="lbl_inspectionResult" class="control-label col-sm-2"  value="#{MMS.Inspection_Id}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="selectBidNumber" converter="entConverter"
+                                                                 style="width: 100%;"
+                                                                 required="true" requiredMessage="Inspection Number is required"
+                                                                 value="#{gRNController.inspection}"  
+                                                                 valueChangeListener="#{gRNController.getSelectedInspNumberInfo}"  >     
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItems id="selectOneMenuBidNumber" 
+                                                                   value="#{gRNController.inspectionList}" var="listSt" itemLabel="#{listSt.inspectionNo}" itemValue="#{listSt}"/>
+                                                    <p:ajax event="change"  onstart="true" 
+                                                            update="frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo"
+                                                            process="@this"/>
+                                                </p:selectOneMenu>       
+                                                <p:message for="selectBidNumber" display="icon"/>
+                                            </div>  
+                                            <h:outputLabel  for="lblreceivignstores" class="control-label col-sm-2" value="#{MMS.Store_Name}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="lblreceivignstores" style="width: 100%"  required="true"  requiredMessage="Store Name Is required"
+                                                                   converter="entConverter"  value="#{gRNController.storeInfoEntity}"
+                                                                   valueChangeListener="#{gRNController.handleSelectStoreNameMain}" 
+                                                                   > 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuQualification" 
+                                                                   value="#{gRNController.storeList}" var="store" itemLabel="#{store.storeName}" itemValue="#{store}"/>
+                                                    <p:ajax update="lblreceivignstores,frmMaterialInfo1" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="lblreceivignstores" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <p:dialog id="dlg" header="Department List" widgetVar="dlg" height="300" width="500" showEffect="explode">
+                                            <h:panelGrid columns="3">
+                                                <p:tree value="#{gRNController.root}" var="nodes" style="border: transparent; width: 100%"
+                                                        selectionMode="single" selection="#{gRNController.selectedNode}" >
+                                                    <p:ajax event="select" listener="#{gRNController.onNodeSelect}" process="@this" update=":frmRegisterUI:txtDept"/>
+
+                                                    <p:treeNode>
+                                                        <h:outputText value="#{nodes}"/>
+                                                    </p:treeNode>
+                                                </p:tree>                                       
+                                            </h:panelGrid>
+                                        </p:dialog>
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel id="lbl_contractDeliveryDate" class="control-label col-sm-2" value="#{MMS.Received_Date}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtreceivingDate" class="form-control" 
+                                                             value="#{gRNController.mmsgrn.regDate}"    readonly="#{workFlow.readonly}"
+                                                             required="true"   requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtreceivingDate', 'frmRegisterUI:txtreceivingDate');" />                                                                                                                                                    
+                                                <p:message for="txtreceivingDate" display="icon"/>
+                                            </div>       
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">GRN Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+                                <h:panelGroup id="frmMaterialInfo1"  >
+
+                                    <div class="form-horizontal col-sm-12"> 
+
+
+                                        <div class="form-group textBoxMargin6px">
+
+
+
+                                            <p:outputLabel id="AdminSearch" value="#{MMS.Material_List}:" class="control-label col-sm-2"  /> 
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="searchBystoreNames" emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;" 
+                                                                converter="entConverter"
+                                                                value="#{gRNController.itemRegEntity}"
+                                                                completeMethod="#{gRNController.searchMatInformationByPrefix}"
+                                                                required="true" requiredMessage="mat code is required "
+                                                                var="storeInfoEntitys"  itemValue="#{storeInfoEntitys}" itemLabel="#{storeInfoEntitys.matCode}"   size="15"> 
+
+                                                    <f:facet name="itemtip" >
+                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">                        
+                                                            <h:outputText value="Material Name " />
+                                                            <h:outputText value="#{storeInfoEntitys.matName}" />
+
+                                                            <h:outputText value="Material Code: " />
+                                                            <h:outputText value="#{storeInfoEntitys.matCode}" />
+
+
+                                                        </h:panelGrid>
+                                                    </f:facet>
+                                                    <p:ajax  event="itemSelect" listener="#{gRNController.handleSelectItemName}" process="@this" update="txtCatName,txtUnit" />  
+                                                </p:autoComplete>     
+                                                <p:message for="searchBystoreNames" display="icon"/>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel id="lblCatName"  class="control-label col-sm-2"  value="#{MMS.Item_Name}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtCatName"  readonly="true"  
+                                                                   required="true" requiredMessage="Item List must have Item Name"
+                                                                   value="#{gRNController.itemRegEntity.matName}"
+                                                                   />
+                                                    <p:message for="txtCatName" display="icon"/>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px">
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <h:outputLabel id="lblquantity" class="control-label col-sm-2" value="#{MMS.Quantity}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtquantity" class="form-control" readonly="#{workFlow.readonly}"
+                                                               required="true" requiredMessage="Quantity is required" converterMessage="Enter Numbers Only"
+                                                               value="#{gRNController.mmsGrnDetail.receivedQuantity}"/>
+                                                <p:message for="txtquantity" display="icon"/>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel  for="txtUnit"  class="control-label col-sm-2"  value="#{MMS.Unit_Of_Measure}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtUnit" 
+                                                                   readonly="true"
+                                                                   value="#{gRNController.itemRegEntity.unitOfMeasure}"
+                                                                   required="true"
+
+                                                                   />
+                                                    <p:message for="txtUnit" display="icon"/>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel for="txtRemark" class="control-label col-sm-2" value="#{MMS.Remark}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtRemark" class="form-control" style="width: 100%;"
+                                                                 value="#{gRNController.mmsGrnDetail.remark}"/>
+
+                                                <p:message for="txtRemark" display="icon" />
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel id="lblUnitPrice" class="control-label col-sm-2" value="#{MMS.Unit_Price}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtUnitPrice" class="form-control" readonly="#{workFlow.readonly}"
+                                                                   required="true" requiredMessage="Quantity is required" converterMessage="Enter Numbers Only"
+                                                                   value="#{gRNController.mmsGrnDetail.unitPrice}"/>
+                                                    <p:message for="txtUnitPrice" display="icon"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px ">
+                                            <h:outputLabel  class="control-label col-sm-2" />
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="buttonadd" class="btn btn-primary" value="Add" action="#{gRNController.addGrnDetail()}" disabled="false"
+                                                                 process="frmMaterialInfo1" 
+                                                                 update=":frmRegisterUI:frmMaterialInfo,frmMaterialInfo1"
+                                                                 />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+
+
+                                <h:panelGroup id="frmMaterialInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="grnDataModel" var="grnResultDtl" value="#{gRNController.grnDetailDataModel}"  
+                                                             rowIndexVar="num" paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowEdit"  update="" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>  
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{grnResultDtl.itemId.matCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{grnResultDtl.itemId.matName}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Unit_Of_Measure}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{grnResultDtl.itemId.unitOfMeasure}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Price}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{grnResultDtl.unitPrice}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Quantity_Received}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{grnResultDtl.receivedQuantity}"/>
+                                                    </p:column>
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Description}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{grnResultDtl.remark}"/>
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+
+
+
+
+                                <h:panelGroup id="frmApproverInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">   
+                                            <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby" 
+                                                               value="#{gRNController.userName}"  readonly="true"
+                                                               required="true" requiredMessage="prepared is required"
+                                                               />                                             
+                                            </div>
+
+                                            <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2"  value="#{MMS.Decision}:" rendered="#{gRNController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{gRNController.selectedValue}" rendered="#{gRNController.renderDecision}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>   
+                                            </div> 
+                                        </div> 
+
+                                        <div class="form-group textBoxMargin6px">   
+                                            <h:outputLabel for="txtApprovedDate" class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtApprovedDate" class="form-control" value="#{gRNController.wfMmsProcessed.processedOn}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtApprovedDate', 'frmRegisterUI:txtApprovedDate');" />                                                                                                                                                    
+                                                <p:message for="txtApprovedDate" display="icon"/>
+                                            </div>                                                                                                                                                                                                                                                       
+                                            <h:outputLabel id="lbl_prepareRemxasrk1"  class="control-label col-sm-2" value="#{MMS.comment}:" rendered="#{gRNController.renderDecision}" />
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtprepttareRemassrk1"  class="form-control" rendered="#{gRNController.renderDecision}"
+                                                                 value="#{gRNController.wfMmsProcessed.commentGiven}" 
+                                                                 validator="#{validatorManagedBean.Remark}"/>     
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="noremeaa"  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnSaveButton" class="btn btn-primary"
+                                                                  value="#{gRNController.saveorUpdateBundle}" 
+                                                                  disabled="{gRNController.disableButtonUpdate}"
+                                                                  action="#{gRNController.saveGrn()}"
+                                                                  process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo,:frmRegisterUI:frmApproverInfo"  
+                                                                  update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo,:frmRegisterUI,:frmToolbar"  />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>                                      

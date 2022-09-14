@@ -1,0 +1,752 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+
+
+
+        <li><a href="NeedAssessmentCollected.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment Collected</span></a></li> 
+        <li><a href="InventoryCountSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Count Sheet</span></a></li> 
+        <li><a href="InventoryBalanceSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Balance Sheet</span></a></li> 
+        <li><a href="stockItemLost.xhtml"><i class="fa fa-circle-o"></i> <span>Lost Stock Item</span></a></li> 
+
+        <li><a href="mmsLostFixedAsset.xhtml"><i class="fa fa-refresh"></i> <span>Lost Fixed Asset</span></a></li> 
+        <li><a href="FixedAssetTransfer.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Transfer</span></a></li> 
+
+        <li><a href="FixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Return </span></a></li> 
+        <li><a href="NonFixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Non Fixed Asset Return</span></a></li> 
+        <li><a href="FixedAssetItemDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Disposal Collection</span></a></li> 
+        <li><a href="Disposal.xhtml  "><i class="fa fa-circle-o"></i> <span>Fixed Asset Disposal</span></a></li> 
+        <li><a href="StockDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Stock Item Disposal</span></a></li> 
+
+    </ui:define>
+    <ui:define name="contents">   
+
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">                  
+                    <p:commandButton id="btnNew" action="#{needAssessmentController.createNewNeedAssesmentInfo()}" icon="#{needAssessmentController.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{needAssessmentController.createOrSearchBundle}" />
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+
+                    <h:panelGroup id="pnlGNotifica" rendered="#{needAssessmentController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{needAssessmentController.mmsNsList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Need Assessment List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{needAssessmentController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="nAListVar" value="#{needAssessmentController.mmsNsList}"
+                                                            itemValue="#{nAListVar}"  itemLabel="#{nAListVar.assessmetnId}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmMainUI,:frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="pnlWorkflow" rendered="#{needAssessmentController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{needAssessmentController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.wfDecison}" /> 
+                                                        </p:column>
+
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../mms/InventoryInformation/NeedAssessment.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{needAssessmentController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmSearchGatePass"> 
+
+
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"        
+                                                                   converter="entConverter"  value="#{needAssessmentController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{needAssessmentController.columnNameChangeEvent}"> 
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{needAssessmentController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2" 
+                                                            value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{needAssessmentController.needAssessmentEntity.columnValue}"/>
+                                            </div>
+
+                                        </div>
+
+                                       
+
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnFindInfo" class="btn btn-primary" action="#{needAssessmentController.searchNeedAssesmentByParameter()}" icon="ui-icon-search" 
+                                                                  process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                  value="Find" />            
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </h:panelGroup>
+                            </div>
+                        </div>
+
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{needAssessmentController.mmsNeedSearchInfoDataModel}" var="NeedInfo" rows="5" 
+                                                             selectionMode="single" class="dataTable"
+                                                             selection="#{needAssessmentController.selectedrow}" rowKey="#{NeedInfo.assessmetnId}" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowSelect" listener="#{needAssessmentController.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Department}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{NeedInfo.departmentId.depName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Budget_Year}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{NeedInfo.budgetYearId.budgetYear}"/>
+                                                    </p:column>
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Processed_By}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{NeedInfo.processedBy}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Processed_On}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{NeedInfo.processedOn}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>                 
+                        </div>    
+                    </div>  
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl" showDetail="true" severity="information,fatal" life="3500" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{needAssessmentController.renderPnlCreateGatePass}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Need Assessment</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">   
+                                            <p:outputLabel id="lbl_PurchaseType" value="#{MMS.Purchase_Type}:" class="control-label col-sm-2"  /> 
+                                            <div class="col-sm-4">
+                                                <p:selectOneRadio id="txtPurchaseType"  required="true" requiredMessage="Purchase type is required" value="#{needAssessmentController.needAssessmentEntity.purchaseType}"
+                                                                  disabled="#{workFlow.readonly}"         valueChangeListener="#{needAssessmentController.handleselectOptions}" >
+                                                    <f:selectItem itemLabel="Goods" itemValue="Goods"  />
+                                                    <f:selectItem itemLabel="Service" itemValue="Service" /> 
+                                                    <f:selectItem itemLabel="Work" itemValue="Work" /> 
+
+                                                    <p:ajax event="change" process="@this" update=":frmRegisterUI"/>
+                                                </p:selectOneRadio>
+                                                <p:message for="txtPurchaseType" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">   
+                                            <p:outputLabel id="lbl_Department" class="control-label col-sm-2" value="#{MMS.Department}:"/> 
+                                            <div class="col-sm-3">
+                                                <p:inputText   id="txtDepartment" required="true" disabled="true"
+                                                               readonly="#{workFlow.readonly}"  requiredMessage="Department is required"
+                                                               value="#{needAssessmentController.hrDepartmentsEntity.depName}"  />
+                                                <p:message for="txtDepartment" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p:commandButton  id="btnTree" onclick="PF('dlgDpt').show();" process="@this"  disabled="#{workFlow.readonly}" partialSubmit="true" style="background: transparent;" value="+"/>
+                                            </div>
+                                            <p:outputLabel class="control-label col-sm-2" value="Store Name:" rendered="#{needAssessmentController.renderForGoods}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="selectStoreList" style="width: 100%"  required="true"  requiredMessage="Store Name Is required" rendered="#{needAssessmentController.renderForGoods}"
+                                                                   disabled="#{workFlow.readonly}"  value="#{needAssessmentController.storeInfoEntity.storeId}" filter="true" filterMatchMode="startsWith"
+                                                                   valueChangeListener="#{needAssessmentController.handleSelectStoreName}" > 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuQualification" 
+                                                                   value="#{needAssessmentController.storeList}" var="store" itemLabel="#{store.storeName}" itemValue="#{store.storeId}"
+                                                                   />
+                                                    <p:ajax update="selectStoreList,frmMaterialInfo" process=":frmRegisterUI:selectStoreList" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectStoreList" display="icon"/>
+
+                                            </div>
+                                        </div>  
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <p:outputLabel  id="lblBudgetYear" class="control-label col-sm-2"  value="#{MMS.Budget_Year}:"/>
+                                            <div class="col-sm-4">
+
+                                                <p:selectOneMenu   id="selectStoreInfoList"  style="width: 100%;" required="true" requiredMessage="Budget Year is Required"
+                                                                   disabled="#{workFlow.readonly}"      value="#{needAssessmentController.fmsLubudgetYear.budgetYear}"
+                                                                   valueChangeListener="#{needAssessmentController.handleSelectYear}" >          
+                                                    <f:selectItems id="selectOneMenuYearInfo" 
+                                                                   value="#{needAssessmentController.activeYearList}" />
+                                                    <p:ajax update="tblNeedAssessDetail"
+                                                            process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectStoreInfoList" display="icon" />                                           
+                                            </div>
+                                        </div>
+                                        <p:dialog id="dlgDpt" header="Departments" widgetVar="dlgDpt" height="300" width="500" showEffect="explode"  >
+                                            <h:panelGrid columns="3" style="border-color: #ffffff " > 
+                                                <p:tree value="#{needAssessmentController.root2}" var="nodes" style="border: transparent; width: 100%" 
+                                                        selectionMode="single" selection="#{needAssessmentController.selectedNode}" >
+                                                    <p:ajax event="select" listener="#{needAssessmentController.onNodeSelect}" process="@this" 
+                                                            update=":frmRegisterUI:txtDepartment,:frmRegisterUI:selectStoreList"/>
+                                                    <p:treeNode>
+                                                        <h:outputText value="#{nodes}" />
+                                                    </p:treeNode>
+                                                </p:tree>                                       
+                                            </h:panelGrid>
+                                        </p:dialog>    
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Item Information</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="frmMaterialInfo" rendered="#{needAssessmentController.renderForGoods}" >
+
+                                    <div class="form-horizontal col-sm-12">
+
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.General_Ledger}:"/>
+                                            <div class="col-sm-4">                                             
+                                                <p:selectOneMenu id="drpGLGoods" value="#{needAssessmentController.fmsGeneralLedgerEntity}"     
+                                                                 requiredMessage="Value is Required" validatorMessage="Insert correct value type" disabled="#{workFlow.readonly}"
+                                                                 converter="entConverter" style="width: 100%" required="true" filter="true" filterMatchMode="startsWith"
+                                                                 valueChangeListener="#{needAssessmentController.GLListener}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItems id="lstAccountCode" value="#{needAssessmentController.generalLedgersList}" 
+                                                                   var="gl" itemLabel="#{gl.generalLedgerCode}" itemValue="#{gl}"/>  
+                                                    <p:ajax id="glselectone" process="@this" update="@this,selectOneItemNameList,txtBudgetAmountGoods"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="drpGLGoods" display="icon"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Budget_Amount}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtBudgetAmountGoods"  readonly="true"  placeholder="0.00"
+                                                             value="#{needAssessmentController.operatingBudgetDetail.approvedAmount}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Item_List}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="selectOneItemNameList"  converter="entConverter"
+                                                                 disabled="#{workFlow.readonly}"    style="width: 100%;" value="#{needAssessmentController.itemRegstrationEntity}"
+                                                                 valueChangeListener="#{needAssessmentController.handleSelectItemName}" filterMatchMode="contains" filter="true" required="true" requiredMessage="Item Name is Required:*" >
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItems id="selectItemListBoxGrnMatCodeList" var="matcodes"   value="#{needAssessmentController.itemNameList}"  itemLabel="#{matcodes.matName}" itemValue="#{matcodes}" />                            
+                                                    <p:ajax update="selectOneItemNameList,txtCatName,txtUnit" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectOneItemNameList" display="icon"/>
+                                            </div>
+
+                                            <h:outputLabel id="lblCatName"  class="control-label col-sm-2"  value="#{MMS.Item_Information}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtCatName"  readonly="true" 
+
+                                                               value="#{needAssessmentController.itemRegstrationEntity.matSubcategory.subCatDescription}"
+                                                               />
+                                                <p:message for="txtCatName" display="icon"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <p:outputLabel id="lblquantity"  class="control-label col-sm-2" value="#{MMS.Quantity}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtquantity" class="form-control" 
+                                                               readonly="#{workFlow.readonly}"   required="true" requiredMessage="Quantity is required"
+                                                               value="#{needAssessmentController.needAssessmentDtlEntity.quantity}"
+                                                               validator="#{validatorManagedBean.Number}"
+                                                               converterMessage="Pls Enter Only Digits"/>
+                                                <p:message for="txtquantity" display="icon"/>
+                                            </div>
+                                            <h:outputLabel  for="txtUnit"  class="control-label col-sm-2"  value="#{MMS.Unit_Measure}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtUnit" 
+                                                               readonly="true"
+                                                               value="#{needAssessmentController.itemRegstrationEntity.unitOfMeasure}"
+
+
+                                                               />
+                                                <p:message for="txtUnit" display="icon"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnAddNeedAssesment" class="btn btn-primary" value="Add" process="frmMaterialInfo" action="#{needAssessmentController.addeedAssessmentDtlInfoDetail()}" validateClient="true" 
+                                                                  disabled="#{workFlow.readonly}" update=":frmRegisterUI:frmTblMaterialInfo,frmMaterialInfo"/>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="frmMaterialInfo2" rendered="#{needAssessmentController.renderForService}" >
+
+                                    <div class="form-horizontal col-sm-12"> 
+
+
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.General_Ledger}:"/>
+                                            <div class="col-sm-4">                                             
+                                                <p:selectOneMenu id="drpGL" value="#{needAssessmentController.fmsGeneralLedgerEntity}"      disabled="#{workFlow.readonly}"
+                                                                 requiredMessage="Value is Required" validatorMessage="Insert correct value type" 
+                                                                 converter="entConverter" style="width: 100%" required="true"
+                                                                 valueChangeListener="#{needAssessmentController.GLListener}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItems id="lstAccountCodes" value="#{needAssessmentController.generalLedgersList}" 
+                                                                   var="gl" itemLabel="#{gl.generalLedgerCode}" itemValue="#{gl}"/>  
+                                                    <p:ajax id="glselectone" process="@this" update="@this,selectOneServiceList,txtBudgetAmount"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="drpGL" display="icon"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Budget_Amount}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtBudgetAmount"  readonly="true"  placeholder="0.00"
+                                                             value="#{needAssessmentController.operatingBudgetDetail.approvedAmount}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Service_List}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="selectOneServiceList"  converter="entConverter" disabled="#{workFlow.readonly}"
+                                                                 style="width: 100%;" value="#{needAssessmentController.serviceAndWorkEntity}"
+                                                                 valueChangeListener="#{needAssessmentController.handleSelectService}" filterMatchMode="contains" filter="true" required="true" requiredMessage="Service Name is Required" >
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItems id="selectserviceList" var="services"   value="#{needAssessmentController.servicelist}"  itemLabel="#{services.serviceName}" itemValue="#{services}" />                            
+                                                    <p:ajax update="@this," process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectOneServiceList" display="icon"/>
+                                            </div>
+
+                                            <p:outputLabel id="lblquantity2" class="control-label col-sm-2" value="#{MMS.Quantity}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtquantity2" class="form-control" readonly="#{workFlow.readonly}"
+                                                               required="true" requiredMessage="Quantity is required"
+                                                               value="#{needAssessmentController.needAssessmentServiceEntity.quantity}"
+                                                               validator="#{validatorManagedBean.Number}"
+                                                               converterMessage="Pls Enter Only Digits"/>
+                                                <p:message for="txtquantity2" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnAddNeedAssesment2" class="btn btn-primary" value="Add" process="frmMaterialInfo2" action="#{needAssessmentController.addServiceAssessmentDtl()}" validateClient="true" 
+                                                                 disabled="#{workFlow.readonly}"   update=":frmRegisterUI:frmTblMaterialInfo2,frmMaterialInfo2"/>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="frmMaterialInfo3" rendered="#{needAssessmentController.renderForWork}" >
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.General_Ledger}:"/>
+                                            <div class="col-sm-4">                                             
+                                                <p:selectOneMenu id="drpGLWork" value="#{needAssessmentController.fmsGeneralLedgerEntity}"    
+                                                                 requiredMessage="Value is Required" validatorMessage="Insert correct value type" disabled="#{workFlow.readonly}"
+                                                                 converter="entConverter" style="width: 100%" required="true"
+                                                                 valueChangeListener="#{needAssessmentController.GLListener}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItems id="lstAccountCodess" value="#{needAssessmentController.generalLedgersList}" 
+                                                                   var="gl" itemLabel="#{gl.generalLedgerCode}" itemValue="#{gl}"/>  
+                                                    <p:ajax id="glselectone" process="@this" update="@this,selectOneWorkList,txtBudgetAmountWork"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="drpGLWork" display="icon"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Budget_Amount}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtBudgetAmountWork"  readonly="true"  placeholder="0.00"
+                                                             value="#{needAssessmentController.operatingBudgetDetail.approvedAmount}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Work_List}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="selectOneWorkList"  converter="entConverter" disabled="#{workFlow.readonly}"
+                                                                 style="width: 100%;" value="#{needAssessmentController.serviceAndWorkEntity}"
+                                                                 valueChangeListener="#{needAssessmentController.handleSelectWork}" filterMatchMode="contains" filter="true" required="true" requiredMessage="Work Name is Required" >
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItems id="selectWorkList" var="Works"   value="#{needAssessmentController.workList}"  itemLabel="#{Works.workName}" itemValue="#{Works}" />                            
+                                                    <p:ajax update="selectOneWorkList" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectOneWorkList" display="icon"/>
+                                            </div>
+                                            <p:outputLabel id="lblquantity3"  class="control-label col-sm-2"  value="#{MMS.Quantity}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtquantity3" class="form-control" readonly="#{workFlow.readonly}"
+                                                               required="true" requiredMessage="Quantity is required"
+                                                               value="#{needAssessmentController.needAssessmentServiceEntity.quantity}"
+                                                               validator="#{validatorManagedBean.Number}"
+                                                               converterMessage="Pls Enter Only Digits"/>
+                                                <p:message for="txtquantity3" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnAddNeedAssesment3" class="btn btn-primary" value="Add" process="frmMaterialInfo3" action="#{needAssessmentController.addServiceAssessmentDtl()}" validateClient="true" 
+                                                                 disabled="#{workFlow.readonly}" update=":frmRegisterUI:frmTblMaterialInfo3,frmMaterialInfo3"/>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo" rendered="#{needAssessmentController.renderForGoods}">
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable paginatorPosition="bottom" paginator="true" id="tblNeedAssessDetail" 
+                                                             value="#{needAssessmentController.papmsNeedAssessDetailDataModel}"  
+                                                             selectionMode="single" class="dataTable"
+                                                             selection="#{needAssessmentController.selectedRowForDetail}" rowKey="#{needAssDetial.itemId.matCode}" 
+                                                             rowIndexVar="num"  rows="5"  var="needAssDetial">
+
+                                                    <p:ajax event="rowSelect" listener="#{needAssessmentController.updateDetail}" update=":frmRegisterUI:frmMaterialInfo" /> 
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column > 
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.itemId.matCode}" />
+                                                    </p:column>
+
+                                                    <p:column > 
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.itemId.matName}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Information}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.itemId.matSubcategory.subCatDescription}"/> 
+                                                    </p:column>
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Price}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.itemId.unitOfMeasure}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.quantity}"/>
+                                                    </p:column>
+                                                </p:dataTable> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo2" rendered="#{needAssessmentController.renderForService}">
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable paginatorPosition="bottom" paginator="true" id="tblNeedAssessDetail2" 
+                                                             value="#{needAssessmentController.mmsNeedAssessServiceDataModel}"  
+                                                             selectionMode="single" class="dataTable"
+                                                             selection="#{needAssessmentController.selectedServiceRowForDetail}" rowKey="#{needAssDetial.serviceId.serviceName}" 
+                                                             rowIndexVar="num"  rows="5"  var="needAssDetial">
+
+                                                    <p:ajax event="rowSelect" listener="#{needAssessmentController.updateDetail}" update=":frmRegisterUI:frmMaterialInfo2" /> 
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column > 
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Service_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.serviceId.serviceName}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.quantity}"/>
+                                                    </p:column>
+                                                </p:dataTable> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo3" rendered="#{needAssessmentController.renderForWork}">
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable paginatorPosition="bottom" paginator="true" id="tblNeedAssessDetail3" 
+                                                             value="#{needAssessmentController.mmsNeedAssessWorkDataModel}"  
+                                                             selectionMode="single" class="dataTable"
+                                                             selection="#{needAssessmentController.selectedServiceRowForDetail}" rowKey="#{needAssDetial.serviceId.workName}" 
+                                                             rowIndexVar="num"  rows="5"  var="needAssDetial">
+
+                                                    <p:ajax event="rowSelect" listener="#{needAssessmentController.updateDetail}" update=":frmRegisterUI:frmMaterialInfo3" /> 
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.S_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column > 
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Work_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.serviceId.workName}" />
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{needAssDetial.quantity}"/>
+                                                    </p:column>
+                                                </p:dataTable> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">preparer Information</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="frmApproverInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required"> 
+
+                                            <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-2"   value="#{MMS.Processed_By}:"/>
+
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby"  
+                                                               value="#{needAssessmentController.userName}" readonly="true" 
+                                                               required="true" requiredMessage="prepared is required"
+                                                               />                                             
+                                            </div>
+
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtAcceptedDate" class="form-control" value="#{needAssessmentController.wfMmsProcessed.processedOn}"
+                                                             required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtAcceptedDate', 'frmRegisterUI:txtAcceptedDate');" />                                                                                                                                                    
+                                                <p:message for="txtAcceptedDate" display="icon"/>
+                                            </div> 
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px">  
+
+                                            <h:outputLabel id="lbl_prepareRemxasrk1"  class="control-label col-sm-2" value="#{MMS.comment}:" rendered="#{needAssessmentController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtprepttareRemassrk1"  class="form-control"
+                                                                 value="#{needAssessmentController.wfMmsProcessed.commentGiven}" rendered="#{needAssessmentController.renderDecision}"
+                                                                 validator="#{validatorManagedBean.Remark}"/>     
+                                            </div>
+
+                                            <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="#{MMS.Decision}:" rendered="#{needAssessmentController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{needAssessmentController.selectedValue}" rendered="#{needAssessmentController.renderDecision}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>   
+                                            </div>                                         
+                                        </div>                                                                                  
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="saveButtonNeed" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnSaveButton" class="btn btn-primary" validateClient="true"
+                                                                  value="#{needAssessmentController.saveorUpdateBundle}" 
+                                                                  action="#{needAssessmentController.saveNeedAssessment()}" 
+                                                                  process="@this,frmGatePassDtlInfo,frmTblMaterialInfo,frmApproverInfo"
+                                                                  update="frmGatePassDtlInfo,frmTblMaterialInfo,:frmRegisterUI,:frmToolbar"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="penalitys.xhtml"><i class="fa fa-circle-o "></i> <span>Penalty Registration </span></a></li> 
+        <li><a href="penalityForOffenseType.xhtml"><i class="fa fa-circle-o "></i><span> Penalty for Offense  </span></a></li>  
+        <li> <a href="disciplineRequest.xhtml"><i class="fa fa-circle-o "></i> <span> Discipline Request</span> </a> </li>
+        <li><a href="disciplineApprove.xhtml"><i class="fa fa-circle-o "></i> <span>Discipline Approve </span> </a> </li>  
+        <li><a href="adjudicateDisciplineAppeal.xhtml"><i class="fa fa-circle-o "></i> <span>Adjudicate Discipline Appeal</span> </a> </li> 
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" action="#{offenceTypesControllers.createNewAdditionalAmount()}" 
+                                     style="background-color: white; border-color: white" 
+                                     icon="#{offenceTypesControllers.icone}" validateClient="true" 
+                                     process="@this" update="@this,:frmOffense,:frmSample"
+                                     title="#{offenceTypesControllers.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{offenceTypesControllers.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{offenceTypesControllers.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmOffense,:frmSample" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <a href="displineOffenseType.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-body ">
+                        <h:form id="frmOffense">
+                            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>   
+                            <h:panelGroup id="pnlOffenceDataTable" rendered="#{offenceTypesControllers.renderPnlManPage}">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Search...  <small></small></h3>   
+                                </div> 
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <div class="col-md-12">                                        
+                                                <div class="col-sm-12">
+                                                    <div class="col-sm-6"> 
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">   
+                                                                <p:outputLabel  value="Search By: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="columnName" value="#{offenceTypesControllers.columnNameResolver.col_Name_FromTable}" 
+                                                                                     valueChangeListener="#{offenceTypesControllers.selectedParamChangeEvent}"
+                                                                                     style="width:100%">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{offenceTypesControllers.columnNameResolverList}"
+                                                                                       var="offence" itemLabel="#{offence.parsed_Col_Name}" itemValue="#{offence.col_Name_FromTable}" /> 
+                                                                        <p:ajax event="change" process="@this" update="columnName,lbOffenceType,autoOffenceType"/>
+                                                                    </p:selectOneMenu> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12 "> 
+                                                                <h:outputLabel id="lbOffenceType" class="control-label col-sm-4" value="#{offenceTypesControllers.columnNameResolver.parsed_Col_Name}:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:autoComplete id="autoOffenceType"  style="width: 100%;" value="#{offenceTypesControllers.offenceTypes.columnValue}"
+                                                                                    completeMethod="#{offenceTypesControllers.searchByOffenceName}" var="offenceNameList" converter="entConverter"
+                                                                                    itemValue="#{offenceNameList}" itemLabel="#{offenceNameList.offenceCode}" 
+                                                                                    forceSelection="true" size="20" emptyMessage="no data" scrollHeight="500">  
+                                                                        <p:ajax event="itemSelect" listener="#{offenceTypesControllers.getByOffenceName}" 
+                                                                                process="@this" update="dtOffenceDT,:frmSample"/>
+                                                                    </p:autoComplete>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">                                       
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <br></br>
+                                                    <div class="box box-primary ">
+                                                        <p:dataTable  id="dtOffenceDT" value="#{offenceTypesControllers.offenceNameList}" var="offence"  selectionMode="single"
+                                                                      paginator="true" paginatorPosition="bottom"  rows="10" rowsPerPageTemplate="5,10,15"
+                                                                      selection="#{offenceTypesControllers.offenceTypes}" rowIndexVar="num"  rowKey="#{offence.id}">
+                                                            <p:ajax event="rowSelect" listener="#{offenceTypesControllers.populate}" process="@this" update=":frmOffense,:frmSample" />
+                                                            <f:facet name="header">
+                                                                <p:outputLabel value="" style=" font-size: 16px;"/>
+                                                            </f:facet>
+                                                            <p:column headerText="No." width="50">
+                                                                <h:outputText value="#{num+1}"/>
+                                                            </p:column>
+                                                            <p:column headerText="Offence Code">
+                                                                <h:outputText value="#{offence.offenceCode}" />
+                                                            </p:column>
+
+                                                            <p:column headerText="Offence Name">
+                                                                <h:outputText value="#{offence.offenceName}" />
+                                                            </p:column>
+                                                            <p:column headerText="Description">
+                                                                <h:outputText value="#{offence.description}" />
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </div>
+                                                </div>
+                                            </div>   
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                            <h:panelGroup id="pnlOffence"  rendered="#{offenceTypesControllers.renderPnlCreateAdditional}">
+                                <div class="box-header">
+                                    <h3 class="box-title">Offense Registration </h3>  
+                                </div>
+                                <section class="panel panel-info"  >
+                                    <section class="panel-body" >  
+                                        <div class="row">
+                                            <div class="col-md-12">                      
+                                                <div class="box-body"> 
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <p:outputLabel  value="Offence Code: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtCode" value="#{offenceTypesControllers.offenceTypes.offenceCode}"  validator="#{validatorManagedBean.Codes}"
+                                                                                 required="true" requiredMessage="Please fill Offence Code."  class="form-control" />
+                                                                    <p:message for="txtCode" display="icon"/> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <p:outputLabel   value="Offence Name: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtname" value="#{offenceTypesControllers.offenceTypes.offenceName}"  validator="#{validatorManagedBean.FullName}"
+                                                                                 required="true" requiredMessage="Please fill Offence Name." class="form-control" />
+                                                                    <p:message for="txtname" display="icon"/> 
+                                                                </div>  
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <p:outputLabel value="Description: " class="control-label col-sm-4"/>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputTextarea id="txtdesc" value="#{offenceTypesControllers.offenceTypes.description}" validator="#{validatorManagedBean.Remark}"
+                                                                                             class="form-control" rows="1" cols="5" autoResize="false"  />
+
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <p:outputLabel   value="Phase Out Time (Month): " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtPhaseOutTime" value="#{offenceTypesControllers.offenceTypes.phaseoutPeriod}"  validator="#{validatorManagedBean.Remark}"
+                                                                                 required="true" requiredMessage="Please fill PhaseOutTime." class="form-control" />
+                                                                    <p:message for="txtPhaseOutTime" display="icon"/> 
+                                                                </div>
+                                                            </div>    
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <p:outputLabel  value="Weight: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtWeight" value="#{offenceTypesControllers.offenceTypes.weghit}"   validator="#{validatorManagedBean.Number}"
+                                                                                 required="true" requiredMessage="Please fill Weight:"  class="form-control" converterMessage="Please enter numbers only."/>
+                                                                    <p:message for="txtWeight" display="icon"/> 
+                                                                </div>
+                                                            </div>    
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </section>
+                            </h:panelGroup>
+                            <h:panelGroup id="pnlSaveEmp" rendered="#{offenceTypesControllers.renderPnlCreateAdditional}">
+                                <div class="panel-body col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <div class="col-sm-4"></div>                                           
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnSavea" value="#{offenceTypesControllers.saveOrUpdateButton}" 
+                                                                     action="#{offenceTypesControllers.saveOffence}"  
+                                                                     class="btn  btn-block btn-primary col-lg-4"
+                                                                     process="@this,:frmOffense:pnlOffence" update="@this,:frmOffense"  />
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnReset" value="Reset" 
+                                                                     action="#{offenceTypesControllers.clearOffence}"
+                                                                     class="btn  btn-block btn-primary col-lg-4" 
+                                                                     process="@this" update="@this,frmOffense"  /> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </h:form>
+                    </div>
+                </div>                   
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

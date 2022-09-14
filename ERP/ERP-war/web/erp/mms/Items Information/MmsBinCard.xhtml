@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+
+
+
+        <li><a href="MmsInspection.xhtml"><i class="fa fa-circle-o"></i> <span>Inspection</span></a></li> 
+        <li><a href="MmsItemRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Item Registration</span></a></li> 
+
+
+
+
+    </ui:define>
+    <ui:define name="contents">
+
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnAddItemCode"  style="background-color: white;border-color: white" partialSubmit="true" class="btn btn-primary" icon="ui-icon-plus" onclick="PF('dig1').show();" title="Add itmes to bin card"
+                                     />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/Items Information/MmsBinCard.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <p:growl id="growl" showDetail="true" severity="information,fatal" autoUpdate="true" />
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Items Bin Card</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px"> 
+                                <h:panelGroup id="frmSearchGatePass"> 
+
+
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"                                                                     
+                                                                   converter="entConverter"  value="#{bincardController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{bincardController.columnNameChangeEvent}"> 
+
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{bincardController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{bincardController.binCardEntity.columnValue}"/>
+                                            </div>
+                                        </div>   
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-3">
+                                                <p:commandButton id="btnFindInfo" class="btn btn-primary" icon="ui-icon-search" action="#{bincardController.searchBinCardInformation()}"
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find" />            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px"> 
+                                <h:form id="frmGatepass">   
+
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{bincardController.binCardDataModel}" var="binCardInfo" rows="5"  filteredValue="#{bincardController.filteredItems}"
+                                                             rowIndexVar="num"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowSelect"  update=":frmMainUI, :frmToolbar" />      
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="S.No" value="#{MMS.S_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column  filterMatchMode="contains" filterBy="#{binCardInfo.materialId.matCode}">
+                                                        <f:facet name="header">
+                                                            <h:outputText value="S.No" value="#{MMS.Item_Code}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{binCardInfo.materialId.matCode}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{binCardInfo.materialId.matName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Current_Quantity}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{binCardInfo.currentQuantity}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Initial_Quantity}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{binCardInfo.initalQuantity}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Store_Name}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{binCardInfo.storeId.storeName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Reorder_Level}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{binCardInfo.materialId.reorderLevel}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Minimum_Level}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{binCardInfo.minimumLevel}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Maximum_Level}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{binCardInfo.maximumLevel}"/>
+                                                    </p:column>
+
+
+                                                </p:dataTable>
+
+                                            </div>                 
+                                        </div>    
+
+
+
+                                    </div>  
+
+
+
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p:dialog id="dig1" header="Add Item To Bincard"  widgetVar="dig1" height="260" width="650" showEffect="explode" resizable="false" >
+                    <h:panelGroup id="pnlAddItem" class="col-sm-12">
+                        <div class="col-md-12 textBoxMargin6px ">                                                                
+                            <div class="form-group form-horizontal required">
+                                <h:outputLabel for="storeSearch" class="control-label col-sm-4" value="Store:"/>
+                                <div class="col-sm-8">
+                                    <p:selectOneMenu id="storeSearch" value="#{bincardController.storeEntity}"
+                                                     filterMatchMode="contains" filter="true" converter="entConverter"
+                                                     valueChangeListener="#{bincardController.handleSelectStoreChange}" required="true"
+                                                     requiredMessage="Value is required: Select Store" style="width: 100%">
+                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                        <f:selectItems value="#{bincardController.storeList}" var="sys" itemLabel="#{sys.storeName}" itemValue="#{sys}" />
+                                        <p:ajax event="change" process="@this" update="ItemcodeSearch"/>
+                                    </p:selectOneMenu> 
+                                    <p:message for="storeSearch" display="icon"/>   
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 textBoxMargin6px required">                                                                
+                            <div class="form-group form-horizontal required">
+                                <h:outputLabel for="ItemcodeSearch" class="control-label col-sm-4" value="#{MMS.Item_Code}:"/>
+                                <div class="col-sm-8">
+                                    <p:selectOneMenu id="ItemcodeSearch"  value="#{bincardController.itemRegistrationEntity}" style="width: 100%" required="true" requiredMessage="Item code is required"
+                                                     converter="entConverter"  filterMatchMode="contains" filter="true"
+                                                     valueChangeListener="#{bincardController.handleSelectItemCode}" 
+                                                     >
+                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                        <f:selectItems value="#{bincardController.unregisteredItemCodes}" var="items" itemLabel="#{items.matCode} " itemValue="#{items}"/>
+                                        <p:ajax event="change" process="@this" />
+                                    </p:selectOneMenu>
+                                    <p:message for="ItemcodeSearch" display="icon"/> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 textBoxMargin6px">
+                            <div class="form-group form-horizontal required">
+                                <h:outputLabel class="control-label col-sm-4" value="#{MMS.Initial_Quantity}:"/>
+                                <div class="col-sm-8"> 
+                                    <p:inputText   id="txtInitalQty" value="#{bincardController.initialQuantity}"  
+                                                   required="true" requiredMessage="Initial Quantity is required"
+                                                   validator="#{validatorManagedBean.Number}"
+                                                   class="form-control" converterMessage="Pls Use Only Digit Numbers"
+                                                   />
+                                    <p:message for="txtInitalQty" display="icon"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 textBoxMargin6px">                                                                
+                            <div class="form-group form-horizontal">
+                                <h:outputLabel id="buttonaddDtl" class="control-label col-sm-4"/>
+                                <div class="col-sm-8">
+                                    <p:commandButton id="btnAddA" class="btn btn-primary" value="Add" validateClient="true" 
+                                                     process="dig1"  update="dig1,:frmMainUI" 
+                                                     action="#{bincardController.saveUnregisteredMaterials()}"/> 
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </p:dialog>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

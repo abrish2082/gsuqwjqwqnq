@@ -1,0 +1,1616 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="BidCriteria.xhtml"><i class="fa fa-circle-o "></i> <span>Bid’s Criteria</span></a></li> 
+        <li><a href="BidRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Bid Registration</span></a></li> 
+        <li><a href="PreminilaryEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Preliminary Evaluation</span></a></li> 
+        <li><a href="TechnicalEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Technical Evaluation</span></a></li> 
+        <li><a href="FinancialEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Financial Evaluation</span></a></li> 
+        <li><a href="PRMSEvaluationResult.xhtml"><i class="fa fa-circle-o"></i><span>Evaluation Result</span></a></li>
+        <li><a href="PostQualification.xhtml"><i class="fa fa-circle-o "></i><span>Bids Post Qualification</span></a></li>
+
+
+    </ui:define>
+    <ui:define name="contents">
+
+        <h:form id="frmBid"> 
+            <p:toolbar style="background-color: white;border-color: white" >
+                <f:facet name="right">
+
+                    <h:panelGroup id="pnlBackToSearch" rendered="#{bidAmendmentContoller.renderpnlToSearchPage}" >
+                        <p:commandButton  id="btnBacktoSarch" action="#{bidAmendmentContoller.goBackToSearchPageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                          title="Back to Search" process="@this" update="@this,:frmMainUI, :manifrmBidUi, :frmBid"  style="background-color: white; border-color: white;" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton  action="#{bidAmendmentContoller.amendBid()}" validateClient="true" style="background-color: white; border-color: white;"
+                                      icon="#{bidAmendmentContoller.icone}" rendered="#{bidAmendmentContoller.isCreateButton}"
+
+                                      title="#{bidAmendmentContoller.createOrSearchBundle}" process="@this" update="@this,:frmMainUI, :manifrmBidUi, :frmBid"  />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="PGNotification" rendered="#{bidAmendmentContoller.isDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{bidAmendmentContoller.requestNotificationCounter}" 
+                                       style="color: red;background-color: white; border-color: white"/>
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Bid Amendment"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{bidAmendmentContoller.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="bidAmend"
+                                               value="#{bidAmendmentContoller.prmsBidAmendLst}"
+                                               itemValue="#{bidAmend}" itemLabel="#{bidAmend.amendNo}"/>               
+                                <p:ajax event="valueChange" update=":manifrmBidUi,:frmMainUI,:frmBid" />                            
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress"
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 200px" >
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWf" value="#{bidAmendmentContoller.workFlowModel}" rowIndexVar="num" var="wfVar" 
+                                                             rows="10" paginator="true" paginatorPosition="bottom" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{wfVar.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{wfVar.processedOn}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Decision">
+                                                        <h:outputText value="#{wfVar.decision}" /> 
+                                                    </p:column>
+
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/Bids And Evaluation/BidRegistrationAmend.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{bidAmendmentContoller.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchParty"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="col-sm-6" >
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="Searching By:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{bidAmendmentContoller.prmsBidAmend.columnName}"
+                                                                         valueChangeListener="#{bidAmendmentContoller.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{bidAmendmentContoller.bidAmendmentSearchParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblBidAmendNo,txtBidAmendNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblBidAmendNo" class="control-label col-sm-4" value="Search By #{bidAmendmentContoller.prmsBidAmend.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtBidAmendNo" value="#{bidAmendmentContoller.prmsBidAmend.columnValue}"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-sm-8">
+
+                                                        <p:commandButton  icon="ui-icon-search" action="#{bidAmendmentContoller.search_BidAmendment()}"
+                                                                          process="@this,frmSearchParty" update=":frmMainUI:frmmarket:tblBidregSearch" class="btn btn-primary col-lg-4"
+                                                                          value="Find" />            
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmmarket"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblBidregSearch"  var="bidamned" rows="15"
+                                                                 selection="#{bidAmendmentContoller.prmsBidAmendSelect}"
+                                                                 rowKey="#{bidamned.id}"  selectionMode="single" 
+                                                                 value="#{bidAmendmentContoller.bidAmendModel}" rowIndexVar="num"
+                                                                 paginator="true" paginatorPosition="bottom" >
+                                                        <p:ajax  event="rowSelect" listener="#{bidAmendmentContoller.rowSelect}" update=":manifrmBidUi,:frmMainUI,:frmBid" />   
+                                                        <p:column headerText="No">
+                                                            #{num+1}
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Bid No" />
+                                                            </f:facet>
+                                                            <h:outputText value="${bidamned.refNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Amendment No" />
+                                                            </f:facet>
+                                                            <h:outputText value="${bidamned.amendNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Bid Type" />
+                                                            </f:facet>
+                                                            <h:outputText value="${bidamned.bidType}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Bid Reg Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="${bidamned.bidRegDate}"><f:convertDateTime  pattern="MM/dd/yyyy" /></h:outputText>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Bid Open Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="${bidamned.bidOpenDateTime}"><f:convertDateTime  pattern="MM/dd/yyyy" /></h:outputText>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Bid Close Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="${bidamned.bidCloseDateTime}"><f:convertDateTime  pattern="MM/dd/yyyy" /></h:outputText>
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+        <h:form id="manifrmBidUi">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="bidUi" rendered="#{bidAmendmentContoller.renderPnlCreateParty}" >
+                <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Bid Amendment and Clarification Registration</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" > 
+
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="bidPanelInfo">
+                                    <div class="col-sm-6" >
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblType" value="Bid Type:" class="control-label col-sm-4"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu disabled="#{workFlow.readonly}" required="true" requiredMessage="Value is required" value="#{bidAmendmentContoller.prmsBidAmend.type}"
+                                                                     valueChangeListener="#{bidAmendmentContoller.changeBidType}"  id="drdPurchaseType" style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItem itemLabel="Amend" itemValue="Amend"  />
+                                                        <f:selectItem itemLabel="Clarification" itemValue="Clarification"  />
+                                                        <p:ajax  event="change"  process="@this" update="bidPanelInfo"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message display="icon" for="drdPurchaseType" />
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblbidNum" value="Bid No:"  class="control-label col-sm-4"/>
+
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="txtbidNum" required="true" style="width: 100%" converter="entConverter" requiredMessage="Value is required"
+                                                                     value="#{bidAmendmentContoller.prmsBidAmend.bidId}" disabled="#{workFlow.readonly}"
+                                                                     valueChangeListener="#{bidAmendmentContoller.valueChangeBidNo}">
+                                                        <f:selectItem itemLabel="--- Select One ---"/>
+                                                        <f:selectItems value="#{bidAmendmentContoller.prmsBidLst}" var="bidNo" itemLabel="#{bidNo}" />
+                                                        <p:ajax event="valueChange" process="@this" update="amnedDtlTbl,bidPanelInfo,txtNuAmendedBidNo,ServiceTable,manifrmBidUi"  />
+                                                    </p:selectOneMenu>
+                                                    <p:message display="icon" for="txtbidNum" />
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.clarification}" id="ClarificationPnl">
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <p:outputLabel id="lblCalarificatinNo" class="control-label col-sm-4"  value="Clarification No:" />
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCalarificatinNo" readonly="true"  value="#{bidAmendmentContoller.generateBidClarificationNum()}" 
+                                                                     >
+                                                        </p:inputText>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.amendment}" id="amendedaPnl">
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="bidCriteriaPael"  >
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel id="lblCriteriaNo" class="control-label col-sm-4"  value="Bid Amend No:" />
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtCriteriaNo" readonly="true"  value="#{bidAmendmentContoller.generateBidAmendNum()}" 
+                                                                         >
+                                                            </p:inputText>
+
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <h:outputLabel id="lblNuAmendedBidNo" value="Amended No:" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtNuAmendedBidNo"  style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                         value="#{bidAmendmentContoller.prmsBidAmend.amendNumRef}"
+                                                                         valueChangeListener="#{bidAmendmentContoller.valueChangeBidNoForBoth}" 
+                                                                         >
+                                                            <f:selectItem itemLabel="--- Select One ---"/>
+                                                            <f:selectItems value="#{bidAmendmentContoller.prmsBidAmendLst}" var="amendNum" 
+                                                                           />
+                                                            <p:ajax event="valueChange" process="@this" update="amnedDtlTbl,bidPanelInfo,txtNuAmendedBidNo" />
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtNuAmendedBidNo" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        </h:panelGroup>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblpurchasemethd" class="control-label col-sm-4" value="Procurement Method:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="txtpurchasemethd" value="#{bidAmendmentContoller.prmsBidAmend.purchaseMethd}" requiredMessage="Value is required"
+                                                                     style="width: 100%" required="true" valueChangeListener="#{bidAmendmentContoller.changeDocumentFee}"
+                                                                     disabled="#{workFlow.readonly}">
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItem itemLabel="Open Bid" itemValue="Open Bid"/>
+                                                        <f:selectItem itemLabel="Two Step Bid" itemValue="Two Step Bid"/>
+                                                        <f:selectItem itemLabel="Restricted Bid" itemValue="Restricted Bid"/>
+                                                        <f:selectItem itemLabel="Request For Proposal" itemValue="diect Purchase"/>
+                                                        <f:selectItem itemLabel="Direct Purchase" itemValue="diect Purchase"/>
+                                                        <p:ajax event="change" update="txtbiddocument" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtpurchasemethd" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="form-horizontal col-sm-12">
+                                                <h:outputLabel id="lblbidtype" class="control-label col-sm-4" value="Market Approach:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="txtbidtype" required="true" valueChangeListener="#{bidAmendmentContoller.valueChangeMarketApp}" 
+                                                                     requiredMessage="Value is required"
+                                                                     value="#{bidAmendmentContoller.prmsBidAmend.bidType}" style="width: 100%" disabled="#{workFlow.readonly}" >
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItem itemLabel="Local" itemValue="local" />
+                                                        <f:selectItem itemLabel="Internation" itemValue="international" />
+                                                        <p:ajax event="change" process="@this" update="manifrmBidUi" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtbidtype"  display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="form-horizontal col-sm-12">
+                                                <h:outputLabel id="lblbidcat" class="control-label col-sm-4" value="Procurement Category:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="txtbidcat" required="true" value="#{bidAmendmentContoller.prmsBidAmend.bidCatId}" requiredMessage="Value is required"
+                                                                     valueChangeListener="#{bidAmendmentContoller.changeWork}" style="width: 100%" disabled="true" >
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItem itemLabel="Goods" itemValue="Goods"/>
+                                                        <f:selectItem itemLabel="Work" itemValue="Work"/>
+                                                        <f:selectItem itemLabel="Service" itemValue="Service"/>
+                                                        <p:ajax update="txtbiddocument,preBidMeetingDate,txtSiteVistDte,txtminuteno,txtPreMeetngPlace"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtbidcat"  display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="form-horizontal col-sm-12">
+                                                <h:outputLabel id="lblbidSectype" class="control-label col-sm-4" value="Bid Security Type:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="txtbidSectype"  value="#{bidAmendmentContoller.prmsBidAmend.bidSecurityType}" requiredMessage="Value is required"
+                                                                     style="width: 100%" required="true" disabled="#{workFlow.readonly}" >
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItem itemLabel="Cash" itemValue="Cash" />
+                                                        <f:selectItem itemLabel="CPO" itemValue="CPO" />
+                                                        <f:selectItem itemLabel="Bank Grant" itemValue="Bank Grant" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtbidSectype" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblbidSecPrice" class="control-label col-sm-4" value="Bid Security Amount:"/>
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtbidSecPrice" readonly="#{workFlow.readonly}" class="form-control" value="#{bidAmendmentContoller.prmsBidAmend.bidSecurityPrice}" required="true" requiredMessage="Value is required" 
+                                                                 />
+                                                    <p:message for="txtbidSecPrice"  display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="form-horizontal col-sm-12">
+                                                <h:outputLabel id="lblCurrenys" class="control-label col-sm-4" value="Currency:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="drdCurrenys" converter="entConverter" value="#{bidAmendmentContoller.prmsBidAmend.currencyId}" disabled="#{workFlow.readonly}" style="width: 100%" required="true" requiredMessage="Value is required" >
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItems value="#{bidAmendmentContoller.fmsLuCurrencyList}" var="currency" itemLabel="#{currency}"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="drdCurrenys" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblbiddocumentpr" class="control-label col-sm-4" value="Bid Document Fee:"/>
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtbiddocument" disabled="#{bidAmendmentContoller.documentFee}" required="true"
+                                                                 requiredMessage="Value is required"
+                                                                 value="#{bidAmendmentContoller.prmsBidAmend.bidDocPrice}" readonly="#{workFlow.readonly}"
+                                                                 />
+                                                    <p:message for="txtbiddocument" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="form-horizontal col-sm-12">
+                                                <h:outputLabel id="lblCurrency" class="control-label col-sm-4" value="Currency:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="drdCurrency" disabled="#{bidAmendmentContoller.currencyfrDocument}#{workFlow.readonly}" value="#{bidAmendmentContoller.prmsBidAmend.currencyId}" 
+                                                                     style="width: 100%" required="true" converter="entConverter" requiredMessage="Value is required" >
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItems value="#{bidAmendmentContoller.fmsLuCurrencyList}" var="currency" itemLabel="#{currency}"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="drdCurrency" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel class="control-label col-sm-4" id="lblbidCriteria" value="Bid Criteria:"/>
+                                                <div class="col-sm-8">
+                                                    <p:panel  id="bidCriteria" 
+                                                              style="border-color: #163758;background-color: white;overflow: auto;border-style: outset;height: 100px" >
+                                                        <p:selectManyCheckbox required="true" id="txtbidCriteria" requiredMessage="Value is required" value="#{bidAmendmentContoller.selectedBidCriteria}"  
+                                                                              style="overflow: auto" layout="grid" columns="1" disabled="#{workFlow.readonly}">
+
+                                                            <f:selectItems value="#{bidAmendmentContoller.bidCriteriaLst}" var="bidCriteria" itemLabel="#{bidCriteria.criteria}" itemValue="#{bidCriteria}"
+                                                                           >
+                                                            </f:selectItems>
+                                                        </p:selectManyCheckbox>
+
+                                                    </p:panel>
+                                                    <p:message for="txtbidCriteria" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblBidDocumentAttachment" class="control-label col-sm-4" value="Bid Document Attachment:"/>
+                                                <div class="col-sm-8">
+
+                                                    <p:growl id="messages" showDetail="true" severity="information,fatal"/> 
+                                                    <p:fileUpload mode="advanced" fileUploadListener="#{bidAmendmentContoller.uploadListener1}" 
+                                                                  value="#{bidAmendmentContoller.prmsLuDmArchive}"   disabled="#{workFlow.readonly}"                                           
+                                                                  multiple="true"  sizeLimit="1000000"  auto="true" immediate="true"
+                                                                  invalidFileMessage="This type of file is not valid"
+                                                                  invalidSizeMessage="The size is not Allowed"
+                                                                  allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|png|mkv|JPG)$/" />
+                                                    <p:dataTable id="fileUp" var="file" value="#{bidAmendmentContoller.prmsLuDmArchiveDataModel}"  rowKey="#{file.id}"
+                                                                 selection="#{bidAmendmentContoller.prmsLuDmArchiveSelection}" selectionMode="Single"
+                                                                 paginator="true" paginatorPosition="bottom">
+
+                                                        <p:ajax event="rowSelect" listener="#{bidAmendmentContoller.rowSelectFile}"/>
+                                                        <f:facet name="header">
+                                                            <p:outputLabel value="File From Database"/>
+                                                        </f:facet>
+                                                        <p:column headerText="File Name">
+                                                            <h:outputText value="#{file.fileName}"/>
+                                                        </p:column>
+                                                        <p:column headerText="Download">
+                                                            <p:commandButton process="@this,fileUp" update="fileUp" ajax="false"                                                
+                                                                             icon="ui-icon-arrowthickstop-1-s" immediate="true">
+                                                                <p:fileDownload value="#{bidAmendmentContoller.fileDownload}" />
+                                                            </p:commandButton>
+                                                        </p:column>
+
+                                                        <!--                                                        <p:column headerText="Delete">
+                                                                                                                    <p:commandButton  icon="ui-icon-trash"/>
+                                                                                                                </p:column>-->
+
+
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.amendment}" id="regDatePnl">
+                                            <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <h:outputLabel id="lblbidregDate" class="control-label col-sm-4" value="Bid Reg Date:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtbidregDate" disabled="#{workFlow.readonly}" required="true" placeholder="MM/dd/yyyy" mindate="today"
+                                                                    maxdate="today" readonlyInput="true" value="#{bidAmendmentContoller.prmsBidAmend.bidRegDate}" requiredMessage="Value is required" >
+                                                            <p:ajax event="dateSelect" update="preBidMeetingDate,txtbidopening,issuedate,txtProcessedDate,txtSiteVistDte" />
+
+                                                        </p:calendar>
+                                                        <p:message for="txtbidregDate" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.clarification}" id="clarificationRegDatePnl">
+                                            <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <h:outputLabel id="lblCalarificationDate" class="control-label col-sm-4"  value="Clarification Date:*"/>
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="dteCalarificationDate" disabled="#{workFlow.readonly}" required="true" placeholder="MM/dd/yyyy" mindate="today"
+                                                                    maxdate="today" readonlyInput="true" value="#{bidAmendmentContoller.prmsBidAmend.clarificationDate}"  requiredMessage="Value is required">
+                                                            <p:ajax event="dateSelect" update="preBidMeetingDate,txtbidopening,issuedate,txtSiteVistDte" />
+
+                                                        </p:calendar>
+                                                        <p:message for="dteCalarificationDate" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblopentime" class="control-label col-sm-4" value="Bid Opening Date:"/>
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="txtbidopening" disabled="#{workFlow.readonly}" required="true" requiredMessage="Value is required" readonlyInput="true" placeholder="MM/dd/yyyy HH:mm" mindate="#{bidAmendmentContoller.registrationDate()}"
+                                                                value="#{bidAmendmentContoller.prmsBidAmend.bidOpenDateTime}" pattern="MM/dd/yyyy HH:mm" >
+                                                        <p:ajax event="dateSelect" update="txtbidclosingDates" />
+                                                    </p:calendar>
+                                                    <p:message for="txtbidopening" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lbldate" class="control-label col-sm-4" value="Bid Closing Date:"/>
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="txtbidclosingDates" readonlyInput="true" value="#{bidAmendmentContoller.prmsBidAmend.bidCloseDateTime}" disabled="#{workFlow.readonly}"
+                                                                mindate="#{bidAmendmentContoller.bidOpeningDate()}" required="true" requiredMessage="Value is required" pattern="MM/dd/yyyy HH:mm" placeholder="MM/dd/yyyy HH:mm" />
+                                                    <p:message for="txtbidclosingDates" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblminuteno" class="control-label col-sm-4" value="Minute Number:"/>
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="txtminuteno" value="#{bidAmendmentContoller.prmsBidAmend.minuteNo}" pattern="HH:mm" timeOnly="true" 
+                                                                required="true" requiredMessage="Value is required" placeholder="HH:mm" readonlyInput="true" disabled="#{bidAmendmentContoller.minuteNo}"
+                                                                />
+                                                    <p:message for="txtminuteno" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblissuedate" class="control-label col-sm-4" value="Bid Float Date:"/>
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="issuedate" placeholder="MM/dd/yyyy" readonlyInput="true" value="#{bidAmendmentContoller.prmsBidAmend.issueDate}" 
+                                                                mindate="#{bidAmendmentContoller.registrationDate()}" required="true" requiredMessage="Value is required" disabled="#{workFlow.readonly}" />
+                                                    <p:message for="issuedate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblprebidMeeting" class="control-label col-sm-4"  value="Pre Bid Meeting date:"/>
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="preBidMeetingDate" readonlyInput="true" required="true" requiredMessage="Value is required" placeholder="MM/dd/yyyy HH:mm" 
+                                                                mindate="#{bidAmendmentContoller.registrationDate()}" disabled="#{bidAmendmentContoller.prebidMeeting}" 
+                                                                value="#{bidAmendmentContoller.prmsBidAmend.preBidMtngOpDatTime}" pattern="MM/dd/yyyy HH:mm" />
+                                                    <p:message for="preBidMeetingDate" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel class="control-label col-sm-4" id="lblPreMeetngPlace" value="Pre Bid Meeting Place:"/>
+                                                <div class="col-sm-8">
+                                                    <p:inputText  id="txtPreMeetngPlace" value="#{bidAmendmentContoller.prmsBidAmend.prebidMetingplace}" disabled="#{bidAmendmentContoller.preMeetingPlace}">
+                                                    </p:inputText>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel id="lblSiteVistDte" class="control-label col-sm-4"  value="Site Visit Date:"/>
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="txtSiteVistDte" placeholder="MM/dd/yyyy" readonlyInput="true" mindate="#{bidAmendmentContoller.registrationDate()}"
+                                                                value="#{bidAmendmentContoller.prmsBidAmend.siteVisitDate}" pattern="MM/dd/yyyy " disabled="#{bidAmendmentContoller.siteVisite}" />
+                                                    <p:message for="txtSiteVistDte" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel class="control-label col-sm-4" id="lblBidValidty" value="Bid Validity:"/>
+                                                <div class="col-sm-8">
+                                                    <p:inputText  id="txtBidValidty" value="#{bidAmendmentContoller.prmsBidAmend.bidValidity}" readonly="#{workFlow.readonly}" class="form-control" 
+                                                                  required="true" requiredMessage="Value is required">
+                                                    </p:inputText>
+                                                    <p:message for="txtBidValidty" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel class="control-label col-sm-4" id="lblPostQualification" value="Post Qualification:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu  id="drdPostQualification" disabled="#{workFlow.readonly}" value="#{bidAmendmentContoller.prmsBidAmend.postQualification}" style="width: 100%" >
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItem itemLabel="Applicable" itemValue="Applicable" />
+                                                        <f:selectItem itemLabel="Not Applicable" itemValue="Not Applicable" />
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel class="control-label col-sm-4" id="lblAmendmentReason" value="Project Id:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu  id="drdProjectId" value="#{bidAmendmentContoller.prmsBidAmend.projectId}" disabled="#{workFlow.readonly}"
+                                                                      style="width: 100%" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItems value="#{bidAmendmentContoller.projectIds}" var="project" 
+                                                                       itemLabel="#{project.projectId}" itemValue="#{project}"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel class="control-label col-sm-4" id="lblAwardType" value="Award Type:"/>
+
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="txtAwardType" value="#{bidAmendmentContoller.prmsBidAmend.awardType}" disabled="#{workFlow.readonly}"
+                                                                     required="true" style="width: 100%" valueChangeListener="#{bidAmendmentContoller.changeLot}" requiredMessage="Value is required">
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItem itemLabel="Lot base" itemValue="Lot Base" />
+                                                        <f:selectItem itemLabel="Item base" itemValue="Item Base" />
+                                                        <p:ajax event="change" update="txtLotName" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtAwardType" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.amendment}" id="AmendReasonPnl">
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" id="lblProjectId" value="Amendment Reason:"/>
+
+                                                    <div class="col-sm-8">
+
+                                                        <p:inputTextarea  id="txtAmendmentReason" readonly="#{workFlow.readonly}" value="#{bidAmendmentContoller.prmsBidAmend.amnedmentReason}" class="form-control" />
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.clarification}" id="ClarifcationeasonPnl">
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" id="lblClarificationReason" value="Clarification Reason:"/>
+
+                                                    <div class="col-sm-8">
+
+                                                        <p:inputTextarea  id="txtClarificationReason" readonly="#{workFlow.readonly}" value="#{bidAmendmentContoller.prmsBidAmend.clarificationReason}" class="form-control" />
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <h:outputLabel class="control-label col-sm-4" id="lblRemark" value="Description:"/>
+
+                                                <div class="col-sm-8">
+                                                    <p:inputTextarea id="txtRemark" readonly="#{workFlow.readonly}" value="#{bidController.eepBidReg.desription}" class="form-control" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Bid Amendment Registration Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="bidRegDetailPanel">
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="MainPnlFrPrAndPlan">
+                                        <div class="panel-body col-sm-12">   
+                                            <div class="col-sm-6">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <h:outputLabel id="lblSourceOfInitiation" value="Source Of Intitiation:" class="control-label col-sm-4"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneRadio id="rdbSourceOfInitiation" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.sourceOfInitation}"
+                                                                              valueChangeListener="#{bidController.changeReqType}" required="true" requiredMessage="value is required" >
+
+                                                                <f:selectItem itemLabel="From PR" itemValue="Request from Pr"/>
+                                                                <f:selectItem itemLabel="From Plan" itemValue="Request from Plan"/>
+                                                                <f:selectItem itemLabel="From Project" itemValue="Request from Project"/>
+
+                                                            </p:selectOneRadio>
+                                                            <p:message for="rdbSourceOfInitiation" display="icon" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="prnnoPanel"  rendered="#{bidAmendmentContoller.prFrItem}" >
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="prno" value="PR No:" for="prApprovedList" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="prApprovedList" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.prId.prNumber}"
+                                                                             valueChangeListener="#{bidAmendmentContoller.valueChange}" >
+
+                                                                </p:inputText>
+                                                                <p:message for="prApprovedList" display="icon" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblItemName" value="Item Name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtItemName" readonly="true" required="true" requiredMessage="Value is required" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.itemRegId.matName}"
+                                                                             class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblUnitMeasure" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtUnitMeasure" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.itemRegId.unitMeasure1}"
+                                                                             readonly="true" class="form-control"/>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="ItemFrmprojectPlnPnl"  rendered="#{bidAmendmentContoller.itemFromProjectPln}" >
+
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblItemNameFrmProjectPln" value="Item Name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtItemNameFrmProjectPln" readonly="true" required="true" requiredMessage="Value is required" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.itemRegId.matName}"
+                                                                             class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblUnitMeasureFrmProjectPln" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtUnitMeasureFrmProjectPln" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.itemRegId.unitMeasure1}"
+                                                                             readonly="true" class="form-control"/>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="ServiceFrmPrPnl"  rendered="#{bidAmendmentContoller.serviceFrmPr}" >
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblServicePrNoFrm" value="PR No:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdServicePrNoFrm" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.prId.prNumber}"
+                                                                             />
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblServiceNameFrmPr" value="Service name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdServiceNameFrmPr" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.serviceName}"
+                                                                             />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblServiceTypeFrmPr" value="Service Type:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtServiceTypeFrmpr" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.serviceType}"
+                                                                             readonly="true" class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblUnitMeasurefrWork" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtUnitMeasurefrWrks" style="width: 100%"  value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.unitMeasures}"
+                                                                             readonly="true" class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </h:panelGroup>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="ServiceFrmProjectPlnPnl"  rendered="#{bidAmendmentContoller.serviceFrmProjectPln}" >
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblServiceNameFrmProjectPln" value="Service name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdServiceNameFrmProjectPln" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.serviceName}"
+                                                                             />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblServiceTypeFrmProjectPlan" value="Service Type:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtServiceTypeFrmProjectPlan" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.serviceType}"
+                                                                             readonly="true" class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblUnitMeasureServfrmProjectPlan" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtUnitMeasureServfrmProjectPlan" style="width: 100%"  value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.unitMeasures}"
+                                                                             readonly="true" class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel class="control-label col-sm-4" id="lblServiceQuantityFrmProjectPln" value="Quantity:"/>
+
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtServiceQuantityFrmProjectPln" value="#{bidAmendmentContoller.prmsBidDetailAmend.quantity}"
+                                                                             class="form-control" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="workpnl"  rendered="#{bidAmendmentContoller.workName}" >
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblPrNoFrmWork" value="PR No:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdPrNoFrmWork" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.prId.prNumber}"
+                                                                             >
+
+                                                                </p:inputText>
+                                                                <p:message for="drdPrNoFrmWork" display="icon" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblWorkName" value="Work Name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtWorkName" readonly="true" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.workName}"
+                                                                             class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblUnitMeasurefrWrks" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtUnitMeasrefrWork" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.unitMeasures}"
+                                                                             readonly="true" class="form-control"/>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="workFrmProjectPlnPnl"  rendered="#{bidAmendmentContoller.workFrmProjectPln}" >
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblWorkNamefrmProjectPln" value="Work Name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtWorkNamefrmProjectPln" readonly="true" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.workName}"
+                                                                             class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblUnitMeasreWorkFrmProjectPln" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtUnitMeasreWorkFrmProjectPln" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.unitMeasures}"
+                                                                             readonly="true" class="form-control"/>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="planNoPanel" rendered="#{bidAmendmentContoller.planNoFrItem}" >
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblPlanNo" value="Plan No:" for="txtPlanNo"  class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtPlanNo" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.planId.planNo}"
+                                                                             />
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblItemCodeFrmPlan" value="Item Name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdItemCodeFrmPlan" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.itemRegId.matName}"
+                                                                             />
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblUnitMeasureFrmPlan" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtUnitMeasureFrmPlan" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.itemRegId.unitMeasure1}"
+                                                                             readonly="true" class="form-control"/>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </h:panelGroup>
+
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="servicePanelFrmPlanNo" rendered="#{bidAmendmentContoller.servicefrmPlan}" >
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblServiceFrmPlNo" value="Plan No:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdServiceFrmPlNo" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.planId.planNo}"
+                                                                             />
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblServiceNameFrmPlNo" value="Service Name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdServiceNameFrmPlNo" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.serviceName}"
+                                                                             />
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblServiceType" value="Service Type:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtServiceType" readonly="true" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.serviceType}"
+
+                                                                             class="form-control"/>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblSericeUnitMeasureFrmPlan" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtSericeUnitMeasureFrmPlan" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.unitMeasures}"
+                                                                             readonly="true" class="form-control"/>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel class="control-label col-sm-4" for="txtServiceQuantity" id="lblServiceQuantity" value="Quantity:"/>
+
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtServiceQuantity"  value="#{bidAmendmentContoller.prmsBidDetailAmend.quantity}"
+                                                                             class="form-control"  />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="WorkPanelFrmPlanNo" rendered="#{bidAmendmentContoller.workFrmPlan}" >
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblWorkFrmPlNo" value="Plan No:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdWorkFrmPlNo" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.planId.planNo}"
+                                                                             />
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblWorkNameFrmPlNo" value="Work Name:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="drdWorkNameFrmPlNo" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.workName}"
+                                                                             />
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblWorkUnitMeasureFrmPlan" value="Unit Measure:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtWorkUnitMeasureFrmPlan" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.serviceId.unitMeasures}"
+                                                                             readonly="true" class="form-control"/>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </h:panelGroup>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <h:outputLabel class="control-label col-sm-4" for="txtQuantity" id="lblQuantity" value="Quantity:"/>
+
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtQuantity" value="#{bidAmendmentContoller.prmsBidDetailAmend.quantity}" class="form-control"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="sourceOfFinacepnl">
+                                                    <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel id="lblSourceOfFinance" value="Source Of Finance:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneRadio id="rdbSourceOfFinance" style="width: 100%" value="#{bidAmendmentContoller.prmsBidDetailAmend.sourceOfFinance}"
+                                                                                  required="true" requiredMessage="Value is required"
+                                                                                  valueChangeListener="#{bidAmendmentContoller.changeSourceOfFinType}">
+                                                                    <f:selectItem itemLabel="Governoment" itemValue="Governoment" itemDisabled="#{bidAmendmentContoller.governoment}"/>
+                                                                    <f:selectItem itemLabel="Financer" itemValue="Financer" itemDisabled="#{bidAmendmentContoller.sourceOfFinan}"/>
+                                                                    <p:ajax event="valueChange" update="manifrmBidUi:serviceTabelPane,sourceOfFinacepnl"/>
+                                                                </p:selectOneRadio>
+                                                                <p:message for="rdbSourceOfFinance" display="icon" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.loanAndCredit}" id="loanNadCreditPnl">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel class="control-label col-sm-4" for="txtLoan" id="lblLoan" value="Loan No:"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtLoan" value="#{bidAmendmentContoller.prmsBidDetailAmend.loanNo}" class="form-control"  />
+                                                                    <p:message for="txtLoan" display="icon" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel class="control-label col-sm-4" for="txtpart" id="lblpartNos" value="Credit No:*"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtpart" value="#{bidAmendmentContoller.prmsBidDetailAmend.creditNo}" class="form-control" required="true" requiredMessage="Value is required"/>
+                                                                    <p:message for="txtpart" display="icon" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </h:panelGroup>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-lg-4"></div>
+                                                        <div class="col-sm-8">
+                                                            <p:commandButton action="#{bidAmendmentContoller.addTable()}" icon="ui-icon-add" validateClient="true" class="btn btn-primary col-lg-4 " 
+                                                                             process="@this,MainPnlFrPrAndPlan,amnedDtlTbl" update="MainPnlFrPrAndPlan,amnedDtlTbl" disabled="#{workFlow.readonly}"
+                                                                             value="Add" />   
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <h:outputLabel class="control-label col-sm-4" id="lblLotName" value="Lot Name:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtLotName" disabled="#{bidAmendmentContoller.lotBase}" 
+                                                                         value="#{bidAmendmentContoller.prmsBidDetailAmend.lotName}" class="form-control" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="fermselctionMethdPnl" >
+                                                    <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <h:outputLabel class="control-label col-sm-4" for="txtlevaluationtype" id="lblevaluationtype" value="Ferm Selection Method:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtlevaluationtype"   style="width: 100%"
+                                                                                 value="#{bidAmendmentContoller.prmsBidDetailAmend.fermSeltionMethd}" required="true" requiredMessage="Value is required"
+                                                                                 valueChangeListener="#{bidAmendmentContoller.changePercent}">
+                                                                    <f:selectItem itemLabel="--- Select One ---" />
+                                                                    <f:selectItem itemLabel="Compliance" itemValue="compliance" />
+                                                                    <f:selectItem itemLabel="Merit" itemValue="merit" />
+                                                                    <p:ajax event="change" update="fermselctionMethdPnl,bidRegTblPanel,serviceTabelPane,workTablePanel" process="@this"/>
+                                                                </p:selectOneMenu>  <p:message for="txtlevaluationtype" display="icon" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <h:panelGroup style="border: 0px; background-color: transparent" id="compliencePnl" rendered="#{bidAmendmentContoller.merit}">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel class="control-label col-sm-4" id="lbltxtFinancial" value="Financial %:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtFinancial" 
+                                                                                 value="#{bidAmendmentContoller.prmsBidDetailAmend.financial}" class="form-control" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel class="control-label col-sm-4" id="lblTechical" value="Technical %:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtTechical"  
+                                                                                 value="#{bidAmendmentContoller.prmsBidDetailAmend.technical}" class="form-control" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel class="control-label col-sm-4" id="lblPassLimit" value="Pass Limit:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtPassLimit" 
+                                                                                 value="#{bidAmendmentContoller.prmsBidDetailAmend.passlimit}" class="form-control" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+<!--                                                    <h:panelGroup style="border: 0px; background-color: transparent" id="resultPnl" rendered="#{bidAmendmentContoller.compliance}">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblResult" value="Result:" class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneRadio id="rdbResult" style="width: 100%" value="{bidAmendmentContoller.prmsBidDetailAmend.result}"
+
+                                                                                      valueChangeListener="{bidController.changeSourceOfFinType}">
+                                                                        <f:selectItem itemLabel="Pass" itemValue="Pass"/>
+                                                                        <f:selectItem itemLabel="Fail" itemValue="Fail" />
+                                                                        <p:ajax event="valueChange" update="MainPnlFrPrAndPlan"/>
+                                                                    </p:selectOneRadio>
+                                                                    <p:message for="rdbResult" display="icon" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>-->
+                                                </h:panelGroup>
+
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                                <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.serviceTable}" id="serviceTabelPane">
+                                    <p:dataTable  id="ServiceTable" paginator="true" paginatorPosition="bottom"  rows="10" value="#{bidAmendmentContoller.bidDetailAmendMdl}"
+                                                  rowIndexVar="num"   var="amendTable" 
+                                                  lazy="true"  scrollHeight="true">
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="PR No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.prId}"  />   
+                                        </p:column>
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Plan No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.planId}"  />   
+                                        </p:column>
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Source Of Intitation"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.sourceOfInitation}"  />   
+                                        </p:column>
+
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Service Type"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.serviceId.serviceType}"/> 
+                                        </p:column> 
+
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel id="lblService" value="Service Name"/>
+                                            </f:facet>
+                                            <h:outputText id="txtService" value="#{amendTable.serviceId.serviceName}"/> 
+                                        </p:column> 
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Unit Measure"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.serviceId.unitMeasures}"/> 
+                                        </p:column>
+                                        <p:column id="column4"  >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Quantity"/>
+                                            </f:facet>
+                                            <h:outputText  value="#{amendTable.quantity}" /> 
+                                        </p:column>
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Source Of Finance"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.sourceOfFinance}" /> 
+                                        </p:column>
+                                        <p:column  rendered="#{bidAmendmentContoller.loanAndCredit}">                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Loan No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.loanNo}" /> 
+                                        </p:column> 
+                                        <p:column rendered="#{bidAmendmentContoller.loanAndCredit}">                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Credit No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.creditNo}" /> 
+                                        </p:column> 
+                                        <p:column id="column8"  >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Ferm Selection Method"/>
+                                            </f:facet>
+                                            <h:outputText id="txtevaltype" value="#{amendTable.fermSeltionMethd}" /> 
+                                        </p:column>
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Financial"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.financial}" /> 
+                                        </p:column>
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Technical"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.technical}" /> 
+                                        </p:column>
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Pass Limit"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.passlimit}" /> 
+
+                                        </p:column>
+
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Lot Name"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.lotName}" /> 
+                                        </p:column>
+                                        <p:column  headerText="Option" >                                                                                                 
+                                            <p:commandLink value="Edit" action="#{bidAmendmentContoller.edit()}" disabled="#{workFlow.readonly}"
+                                                           process="@this" update="ServiceTable,:manifrmBidUi:MainPnlFrPrAndPlan" >
+                                            </p:commandLink>
+                                        </p:column>
+
+                                    </p:dataTable>
+                                </h:panelGroup>
+                                <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.workTable}" id="workTablePanel">
+                                    <p:dataTable  id="workTable" paginator="true" paginatorPosition="bottom"  rows="10" value="#{bidAmendmentContoller.bidDetailAmendMdl}"
+                                                  rowIndexVar="num"   var="amendTable" 
+                                                  lazy="true"  scrollHeight="true">
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="PR No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.prId}"  />   
+                                        </p:column>
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Plan No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.planId}"  />   
+                                        </p:column>
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Source Of Intitation"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.sourceOfInitation}"  />   
+                                        </p:column>
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Work No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.serviceId.workNo}"/> 
+                                        </p:column> 
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Work Name"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.serviceId.workName}"/> 
+                                        </p:column>
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Unit Measure"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.serviceId.unitMeasures}"/> 
+                                        </p:column>
+                                        <p:column id="column4"  >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Quantity"/>
+                                            </f:facet>
+                                            <h:outputText  value="#{amendTable.quantity}" /> 
+                                        </p:column>
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Source Of Finance"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.sourceOfFinance}" /> 
+                                        </p:column>
+                                        <p:column  rendered="#{bidAmendmentContoller.loanAndCredit}">                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Loan No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.loanNo}" /> 
+                                        </p:column> 
+                                        <p:column rendered="#{bidAmendmentContoller.loanAndCredit}">                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Credit No"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.creditNo}" /> 
+                                        </p:column> 
+                                        <p:column id="column8"  >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Ferm Selection Method"/>
+                                            </f:facet>
+                                            <h:outputText id="txtevaltype" value="#{amendTable.fermSeltionMethd}" /> 
+                                        </p:column>
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Financial"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.financial}" /> 
+                                        </p:column>
+                                        <p:column>                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Technical"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.technical}" /> 
+                                        </p:column>
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel  value="Pass Limit"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.passlimit}" /> 
+
+                                        </p:column>
+
+                                        <p:column >                                                                                                 
+                                            <f:facet name="header">
+                                                <h:outputLabel value="Lot Name"/>
+                                            </f:facet>
+                                            <h:outputText value="#{amendTable.lotName}" /> 
+                                        </p:column>
+                                        <p:column  headerText="Option" >                                                                                                 
+                                            <p:commandLink value="Edit" action="#{bidAmendmentContoller.edit()}" disabled="#{workFlow.readonly}"
+                                                           process="@this" update="workTable,:manifrmBidUi:MainPnlFrPrAndPlan" >
+                                            </p:commandLink>
+                                        </p:column>
+                                    </p:dataTable>
+                                </h:panelGroup>
+                                <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{bidAmendmentContoller.itemTable}" id="bidRegTblPanel">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable  id="amnedDtlTbl" paginator="true" paginatorPosition="bottom"  rows="10" value="#{bidAmendmentContoller.bidDetailAmendMdl}"
+                                                              rowIndexVar="num"   var="amendTable" 
+                                                              lazy="true"  scrollHeight="true">
+                                                    <p:column id="columnNo"  >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel id="outQuotCode" value="No"/>
+                                                        </f:facet>
+                                                        <h:outputText id="txtQuotCode" value="#{num+1}"/> 
+                                                    </p:column> 
+                                                    <p:column>                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="PR No"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{amendTable.prId}"  />   
+                                                    </p:column>
+                                                    <p:column>                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Plan No"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{amendTable.planId}"  />   
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Source Of Intitation"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{amendTable.sourceOfInitation}"  />   
+                                                    </p:column>
+
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel id="lblItemServiceName" value="Item Name"/>
+                                                        </f:facet>
+                                                        <h:outputText id="txtitemserviceNames" value="#{amendTable.itemRegId.matName}" /> 
+                                                    </p:column>
+
+                                                    <p:column  >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel id="lblunitmeasure" value="Unit Measure"/>
+                                                        </f:facet>
+                                                        <h:outputText id="txtunitmeasure" value="#{amendTable.itemRegId.unitMeasure1}"/> 
+                                                    </p:column> 
+                                                    <p:column id="column4"  >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel value="Quantity"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{amendTable.quantity}" /> 
+                                                    </p:column>
+                                                    <p:column>                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel value="Source Of Finance"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{amendTable.sourceOfFinance}" /> 
+                                                    </p:column>
+                                                    <p:column rendered="#{bidAmendmentContoller.loanAndCredit}">                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel id="lblLoanNo" value="Loan No"/>
+                                                        </f:facet>
+                                                        <h:outputText id="txtLoanNo" value="#{amendTable.loanNo}" /> 
+                                                    </p:column> 
+                                                    <p:column rendered="#{bidAmendmentContoller.loanAndCredit}">                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel id="lblpart" value="Credit No"/>
+                                                        </f:facet>
+                                                        <h:outputText id="txtpartno" value="#{amendTable.creditNo}" /> 
+                                                    </p:column> 
+                                                    <p:column id="column8"  >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Ferm Selection Method"/>
+                                                        </f:facet>
+                                                        <h:outputText id="txtevaltype" value="#{amendTable.fermSeltionMethd}" /> 
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel value="Financial"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{amendTable.financial}" /> 
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel value="Technical"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{amendTable.technical}" /> 
+                                                    </p:column>
+                                                    <p:column>                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Pass Limit"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{amendTable.passlimit}" /> 
+                                                    </p:column>
+                                                    <!--                                                    <p:column >                                                                                                 
+                                                                                                            <f:facet name="header">
+                                                                                                                <h:outputLabel  value="Result"/>
+                                                                                                            </f:facet>
+                                                                                                            <h:outputText value="{amendTable.result}" /> 
+                                                                                                        </p:column>-->
+
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel value="Lot Name"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{amendTable.lotName}" /> 
+                                                    </p:column>
+                                                    <p:column id="column12" headerText="Option" >                                                                                                 
+                                                        <p:commandLink value="Edit" action="#{bidAmendmentContoller.edit()}" disabled="#{workFlow.readonly}"
+                                                                       process="@this" update="amnedDtlTbl,:manifrmBidUi:MainPnlFrPrAndPlan" >
+                                                        </p:commandLink>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="PreparedPnl">
+                                    <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class=" col-sm-6">
+                                                <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel  for="txtProcessedBy" class="control-label col-sm-4" value="Processed By:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText  id="txtProcessedBy" readonly="true" value="#{bidAmendmentContoller.userName}" title="descripition"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <h:outputLabel  class="control-label col-sm-4" value="Decision:" rendered="#{bidAmendmentContoller.isDecision}"/> 
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="drddecision" rendered="#{bidAmendmentContoller.isDecision}" value="#{bidAmendmentContoller.wfPrmsProcessed.decision}" 
+                                                                             required="true"    requiredMessage="Select Decision" style="width: 100%" valueChangeListener="#{bidAmendmentContoller.handleselectOptions}">                                                                                        
+                                                                <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                <f:selectItem itemLabel="Approve" itemValue="Approved"/>
+                                                                <f:selectItem itemLabel="Reject" itemValue="Rejected"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="drddecision" display="icon"/>                                                                                    
+                                                        </div>  
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class=" col-sm-6">
+                                                <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel class="control-label col-sm-4"
+                                                                       value="Processed Date:" />
+                                                        <div class="col-sm-8">
+                                                            <p:calendar id="txtProcessedDate" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" mindate="today" maxdate="today" disabled="#{workFlow.readonly}" readonlyInput="true" 
+                                                                        required="true" requiredMessage="Value is required:"  value="#{bidAmendmentContoller.wfPrmsProcessed.processedOn}" title="date">
+
+                                                            </p:calendar>
+                                                            <p:message for="txtProcessedDate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel  for="txtComment" class="control-label col-sm-4"
+                                                                        value="Comment Given:" rendered="#{bidAmendmentContoller.isCommentGiven}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputTextarea id="txtComment" class="form-control"  value="#{bidAmendmentContoller.wfPrmsProcessed.commentGiven}" 
+                                                                             title="Remark"  required="false"  requiredMessage="Value is required" rendered="#{bidAmendmentContoller.isCommentGiven}"
+                                                                             validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+
+                                    <div class="panel-body col-sm-12"> 
+                                        <div class="col-sm-6">
+
+
+
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton icon="ui-icon-new" validateClient="true" 
+                                                                         class="btn btn-primary col-lg-4" 
+                                                                         action="#{bidAmendmentContoller.save_BidAmendment()}"
+                                                                         process="@this,bidPanelInfo,bidRegTblPanel,bidCriteria,PreparedPnl"
+                                                                         update="bidRegTblPanel,bidPanelInfo,bidCriteria,amnedDtlTbl,PreparedPnl"
+                                                                         value="#{bidAmendmentContoller.saveorUpdateBundle}"/> 
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

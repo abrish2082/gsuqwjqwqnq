@@ -1,0 +1,429 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">    
+
+        <li><a href="needRequest.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>HR Need Request</span></a></li>
+        <li><a href="annualRecruitmentAndPromotion.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Annual Recruitment And Promotion</span></a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right"> 
+                    <h:panelGroup id="pnlWfIcon"  rendered="#{demandAndSupplyAnalysisController.pnlrWfIcon}"> 
+                        <p:outputLabel id="lblNotWF" value="" class="fa fa-fw fa-gear" style="color: #245269" title="WorkFlow"/>
+                    </h:panelGroup>
+
+                    <p:overlayPanel widgetVar="lblNotWF" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotWF"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="box-body">
+                            <div class="col-md-12">                                       
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblHistory" value="#{demandAndSupplyAnalysisController.workflowList}"
+                                                     var="WF" class="dataTable" rowKey="#{WF.workflowId}" widgetVar="tblHistory"
+                                                     rowIndexVar="num" editable="true">      
+                                            <p:column headerText="No." style="width:40px">
+                                                <h:outputText value="#{num + 1}"/>
+                                            </p:column>                                                                
+                                            <p:column headerText="Processed By">
+                                                <h:outputText value="#{WF.processedBy}"/>
+                                            </p:column>
+                                            <p:column headerText="Processed On">
+                                                <h:outputText value="#{WF.processedOn}"/>
+                                            </p:column>
+                                            <p:column headerText="Comment Given">
+                                                <h:outputText value="#{WF.commentGiven}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>        
+                        </div>
+
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <p:outputLabel id="lblNotf" value="#{demandAndSupplyAnalysisController.requestNotificationCounter} " class="fa fa-bell" style="color: red" /> 
+
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotf"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="box-body">
+                            <div class="col-md-12">                                       
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblNeedRequestDetail1" value="#{demandAndSupplyAnalysisController.recruitmentDataModel}"
+                                                     var="needReq" class="dataTable" selectionMode="single" rowKey="#{needReq.id}" widgetVar="tblNeedRequestDetail1"
+                                                     rowIndexVar="num" editable="true" rows="6" paginator="true" paginatorPosition="bottom">    
+                                            <p:ajax event="rowSelect" process="@this,tblNeedRequestDetail1" listener="#{demandAndSupplyAnalysisController.selecthrHrpRecruitmentRequestId}"
+                                                    update=":frmNeedRequest:tblNeedRequestDetail,:frmSample:tblHistory,:frmNeedRequest:txtYear,:frmSample" />     
+                                            <p:column headerText="No." style="width:40px">
+                                                <h:outputText value="#{num + 1}"/>
+                                            </p:column>
+                                            <p:column headerText="Department">
+                                                <h:outputText value="#{needReq.deptId.depName}"/>
+                                            </p:column> 
+                                            <p:column headerText="BedgetYear">
+                                                <h:outputText value="#{needReq.planningYear}"/>
+                                            </p:column> 
+                                            <p:column headerText="Request date">
+                                                <h:outputText value="#{needReq.requestDate}"/>
+                                            </p:column> 
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>        
+                        </div>
+
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="demandAndSupplyAnalysis.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a  href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+
+        </h:form>
+
+        <h:form id="frmNeedRequest"> 
+            <p:growl id="growl"  autoUpdate="true" severity="information,fatal" showDetail="true" /> 
+
+            <h:panelGroup id="pnlMainpage" rendered="#{demandAndSupplyAnalysisController.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Demand and Supply Analysis</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="searchpnl" class="col-sm-12">                                                    
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                        <div class="form-group form-horizontal">                                                                
+                                                            <h:outputLabel for="txtYear" value="Year:" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtYear" value="#{demandAndSupplyAnalysisController.hrHrpRecruitments.planningYear}"
+                                                                                 filterMatchMode="contains" filter="true" 
+                                                                                 valueChangeListener="#{demandAndSupplyAnalysisController.yearVlc}"
+                                                                                 style="width:100%">
+                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                    <f:selectItems value="#{demandAndSupplyAnalysisController.budgetYears}" var="yearlist" itemValue="#{yearlist}" itemLabel="#{yearlist}"  />
+                                                                    <p:ajax event="change" process="@this " update="tblNeedRequestDetail,:frmSample "/>
+                                                                </p:selectOneMenu>
+                                                                <p:message for="txtYear" display="icon"/>
+                                                            </div>
+                                                        </div>                                                                                         
+                                                    </div> 
+                                                </div>
+                                                <div class="col-md-6"> 
+                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                        <div class="form-group form-horizontal"> 
+                                                            <h:outputLabel for="txtDirectorate" class="control-label col-sm-4" value="Directorate:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtDirectorate" value="#{demandAndSupplyAnalysisController.hrDepartments.depId}"
+                                                                                 style="width:100%" valueChangeListener="#{demandAndSupplyAnalysisController.DepartmentVLC}" >
+                                                                    <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                    <f:selectItems value="#{demandAndSupplyAnalysisController.deptlist}" var="dept" itemValue="#{dept.depId}" itemLabel="#{dept.depName}"/>
+                                                                    <p:ajax event="change" process="@this " update="tblNeedRequestDetail,:frmSample"/>
+                                                                </p:selectOneMenu>
+                                                                <p:message for="txtDirectorate" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl3" class="col-sm-12" rendered="#{demandAndSupplyAnalysisController.filldToModify}">                                                    
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">                                                                
+                                                            <h:outputLabel for="txtHowtobefilled" value="How to be filled:" class="control-label col-sm-4"/>
+                                                            <div class="col-md-8">
+                                                                <p:selectOneMenu id="txtHowtobefilled" value="#{demandAndSupplyAnalysisController.hrHrpRecruitmentRequest.howToBeFilled}" 
+                                                                                 style="width:100%" > 
+                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>   
+                                                                    <f:selectItem itemLabel="Internal Recruitment" itemValue="Internal Recruitment"/>
+                                                                    <f:selectItem itemLabel="External Recruitment" itemValue="External Recruitment"/>
+                                                                    <p:ajax event="change" process="@this"/>
+                                                                </p:selectOneMenu>
+                                                                <p:message for="txtHowtobefilled" display="icon"/>
+                                                            </div>
+                                                        </div>                                                                                         
+                                                    </div> 
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtRemark" class="control-label col-md-4" value="Remark:"/> 
+                                                            <div class="col-md-8">
+                                                                <p:inputTextarea id="txtRemark" value="#{demandAndSupplyAnalysisController.hrHrpRecruitmentRequest.remark}" class="form-control"
+                                                                                 rows="1" cols="4" autoResize="false" title="Remark"/>
+                                                                <p:message for="txtRemark" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal"> 
+                                                            <h:outputLabel for="txtAnalysedBY" class="control-label col-sm-4" value="Analysed BY:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtAnalysedBY" value="#{demandAndSupplyAnalysisController.fullName}"
+                                                                             title="txtAnalysedBY" required="true" readonly="true"/>
+                                                                <p:message for="txtAnalysedBY" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>   
+                                                    <h:panelGroup id="pnlmodify" rendered="#{demandAndSupplyAnalysisController.btnmodify}">
+                                                        <div class="col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-4">                                                              
+                                                            </div>                                                                    
+                                                            <div class="col-sm-3">
+                                                                <p:commandButton id="btnAdd" value="#{demandAndSupplyAnalysisController.modifybtn}" class="btn  btn-block btn-primary col-sm-4 "
+
+                                                                                 action="#{demandAndSupplyAnalysisController.addRequest}"  
+                                                                                 process="@this,pnl3" 
+                                                                                 update="@this,pnl3,tblNeedRequestDetail,"/>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">                                                                
+                                                            <h:outputLabel for="txtWhentobefilled" value="When to be filled:" class="control-label col-sm-4"/>
+                                                            <div class="col-md-8">
+                                                                <p:selectOneMenu id="txtWhentobefilled" value="#{demandAndSupplyAnalysisController.hrHrpRecruitmentRequest.months}"
+                                                                                 style="width:100%" > 
+                                                                    <f:selectItems value="#{demandAndSupplyAnalysisController.months}"/>                                                                       
+                                                                    <p:ajax event="change" process="@this"/>
+                                                                </p:selectOneMenu>
+                                                                <p:message for="txtWhentobefilled" display="icon"/>
+                                                            </div>
+                                                        </div>                                                                                         
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtPosition" class="control-label col-sm-4" value="No. of Position:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtPosition" value="#{demandAndSupplyAnalysisController.hrHrpRecruitmentRequest.numberRequestedPosition}" 
+                                                                             title="No. of Position" class="form-control" />
+                                                                <p:message for="txtPosition" display="icon"/>
+                                                            </div>                                                               
+                                                        </div>                                                                                          
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel for="txtanalysedon" class="control-label col-sm-4" value="analysed on:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtanalysedon" value="#{demandAndSupplyAnalysisController.hrHrpRecruitmentRequest.analysedOn}"
+                                                                             onclick="displayCalendar('frmNeedRequest:txtanalysedon', 'frmNeedRequest:txtanalysedon');"
+                                                                             title="prepared on" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                <p:message for="txtanalysedon" display="icon"/>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <center>
+
+                                                            </center>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                            </h:panelGroup>
+                                            <h:panelGroup id="pnlNeedReq" class="col-sm-12"> 
+                                                <div class="form-group">
+                                                    <div class="col-md-12">                                                                      
+                                                        <div class="form-group form-horizontal"> 
+                                                            <p:dataTable id="tblNeedRequestDetail" value="#{demandAndSupplyAnalysisController.recruitmentRequestDataModel}"
+                                                                         var="needReq" class="dataTable" selectionMode="single" rowKey="#{needReq.id}" widgetVar="tblNeedRequestDetail"
+                                                                         rowIndexVar="num" editable="true" rows="10" paginator="true" paginatorPosition="bottom">    
+                                                                <p:ajax event="rowSelect" process="@this,tblNeedRequestDetail" listener="#{demandAndSupplyAnalysisController.selecthrHrpRecruitmentRequest}"
+                                                                        update=":frmNeedRequest ,:frmSample:tblHistory" />     
+                                                                <p:column headerText="No." style="width:40px">
+                                                                    <h:outputText value="#{num + 1}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Department">
+                                                                    <h:outputText value="#{needReq.recruitmentId.deptId.depName}"/>
+                                                                </p:column> 
+
+                                                                <p:column headerText="Job Title">
+                                                                    <h:outputText value="#{needReq.jobId.jobTitle}"/>
+                                                                </p:column> 
+                                                                <p:column headerText="Job Grade">
+                                                                    <h:outputText value="#{needReq.jobId.jobGradeId.gradeId.grade}"/>
+                                                                </p:column> 
+                                                                <p:column headerText="Reason for Request">
+                                                                    <h:outputText value="#{needReq.vacancySource}"/>
+                                                                </p:column>
+                                                                <p:column headerText="How to be filled">
+                                                                    <h:outputText value="#{needReq.howToBeFilled}"/>
+                                                                </p:column>
+                                                                <p:column headerText="No. of position">
+                                                                    <h:outputText value="#{needReq.numberRequestedPosition}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Months">
+                                                                    <h:outputText value="#{needReq.months}"/>
+                                                                </p:column> 
+                                                                <p:column headerText="Analysed On">
+                                                                    <h:outputText value="#{needReq.analysedOn}"/>
+                                                                </p:column> 
+                                                            </p:dataTable>
+                                                        </div>
+                                                    </div>
+                                                </div>  
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlJobQual" class="col-sm-12"> 
+                                                <div class="form-group">
+                                                    <div class="col-md-12">                                                                      
+                                                        <div class="form-group form-horizontal"> 
+                                                            <p:dataTable id="tblJobInfo" value="#{demandAndSupplyAnalysisController.jobEducQualificationsDataModel}"
+                                                                         var="jobQual" class="dataTable" rowKey="#{jobQual.id}" widgetVar="tblJobInfo"
+                                                                         rowIndexVar="num">      
+                                                                <p:column headerText="No." style="width:40px">
+                                                                    <h:outputText value="#{num + 1}"/>
+                                                                </p:column>                                                                
+                                                                <p:column headerText="Education Level">
+                                                                    <h:outputText value="#{jobQual.educLevelId.educLevel}"/>
+                                                                </p:column> 
+                                                                <p:column headerText="Qualification">
+                                                                    <h:outputText value="#{jobQual.educQualId.educType}"/>
+                                                                </p:column> 
+                                                                <p:column headerText="Minimum Experience">
+                                                                    <h:outputText value="#{jobQual.minExperiance}"/>
+                                                                </p:column>                       
+                                                            </p:dataTable>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal"> 
+                                                                <div class="col-sm-8">
+
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                            </h:panelGroup>
+
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlwf" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="txtxreqdate" class="control-label col-sm-4" value="Prepared On: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtxreqdate" value="#{demandAndSupplyAnalysisController.hrHrpRecruitments.requestDate}"
+                                                                                     onclick="displayCalendar('frmNeedRequest:txtxreqdate', 'frmNeedRequest:txtxreqdate');"
+                                                                                     title="prepared on" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                        <p:message for="txtxreqdate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtPreparedBY" class="control-label col-sm-4"  value="Prepared By:"/>
+
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtPreparedBY" value="#{demandAndSupplyAnalysisController.fullName}"
+                                                                                     title="txtPreparedBY" readonly="true" />
+                                                                        <p:message for="txtPreparedBY" display="icon"/>
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="SomeComment" class="control-label col-sm-4"  value="Comment Given:"/>
+
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="SomeComment" value="#{demandAndSupplyAnalysisController.wfHrProcessed.commentGiven}"
+                                                                                         title="SomeComment"  class="form-control"/>
+                                                                        <p:message for="SomeComment" display="icon"/>
+                                                                    </div>
+
+
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+
+                                        </section>
+                                    </section>
+
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4">                                                              
+                                                    </div>                                                                    
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnSave" value="#{demandAndSupplyAnalysisController.saveorUpdateBundle}" 
+                                                                         action="#{demandAndSupplyAnalysisController.saveDemandAndSupplyAnalaysis}"
+                                                                         process="@this,tblNeedRequestDetail,:frmNeedRequest:pnlwf"  class="btn  btn-block btn-primary col-lg-4"
+                                                                         update=":frmNeedRequest"/>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnNew" value="Reset" class="btn  btn-block btn-primary col-lg-4"
+                                                                         action="#{demandAndSupplyAnalysisController.clearPage}"
+                                                                         process="@this,:frmNeedRequest:pnlNeedReq"  
+                                                                         update=":frmNeedRequest"/> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>   
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">  
+        <li><a href="documentRequest.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Document request</span></a></li> 
+        <li><a href="documentApprove.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Document Approve</span></a></li> 
+    </ui:define>
+
+    <ui:define name="contents">
+
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlWfIcon"  rendered="#{documentProvidignServiceControllers.pnlrWfIcon}"> 
+                        <p:outputLabel id="lblNotwf" value="" class="fa fa-fw fa-gear" style="color: #245269" />
+                    </h:panelGroup>
+                    <p:overlayPanel widgetVar="lblNotwf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotwf"
+                                    class="col-md-4" style="height: 300px; width: 450px">
+                        <div class="box-body">
+                            <div class="col-md-12">                                       
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblHistory" value="#{documentProvidignServiceControllers.workFlowDataModel}"
+                                                     var="WF" class="dataTable" rowKey="#{WF.id}" widgetVar="tblNeedRequestDetail"
+                                                     rowIndexVar="num" editable="true">      
+                                            <p:column headerText="No." style="width:40px">
+                                                <h:outputText value="#{num + 1}"/>
+                                            </p:column>                                                                
+                                            <p:column headerText="Processed By">
+                                                <h:outputText value="#{WF.processedBy}"/>
+                                            </p:column>
+                                            <p:column headerText="Processed On">
+                                                <h:outputText value="#{WF.processedOn}"/>
+                                            </p:column>
+                                            <p:column headerText="Comment Given">
+                                                <h:outputText value="#{WF.commentGiven}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>        
+                        </div>
+
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <p:outputLabel id="lblNotf" value="#{documentProvidignServiceControllers.requestNotificationCounter1} " class="fa fa-bell" style="color: red" />
+
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotf"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="box-body">
+                            <div class="col-md-12">                                       
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblDocList" value="#{documentProvidignServiceControllers.requesstlist}" rowsPerPageTemplate="10,20,30"
+                                                     var="req" selectionMode="single" rowIndexVar="num" rows="10" 
+                                                     selection="#{documentProvidignServiceControllers.hrDocumentRequests}" rowKey="#{req.id}" class="dataTable" >
+                                            <p:ajax event="rowSelect" process="@this,tblDocList" listener="#{documentProvidignServiceControllers.DocumentRequest_processMyEvent}" 
+                                                    update=":frmDocumentGenerate:pnlSearch,:frmSample"/>
+                                            <p:column headerText="No.">
+                                                <h:outputText value="#{num + 1}"/>
+                                            </p:column>
+                                            <p:column headerText=" Employee Name" filterMatchMode="contains" filterBy="#{req.requesterId.firstName}"  >
+                                                <h:outputText value="#{req.requesterId.firstName} #{req.requesterId.middleName} #{req.requesterId.lastName}"/>
+                                            </p:column> 
+                                            <p:column headerText=" Employee ID" filterMatchMode="contains" filterBy="#{req.requesterId.empId}">
+                                                <h:outputText value="#{req.requesterId.empId}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="RequestDate"/>
+                                                </f:facet>
+                                                <h:outputText value="#{req.requestDate}"/>
+                                            </p:column> 
+                                            <p:column headerText="Document Type" >
+                                                <h:outputText value="#{req.documentType.documentType}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>        
+                        </div>
+
+                    </p:overlayPanel>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <a href="../../hrms/documentProvidingService/generateDocument.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmDocumentGenerate"> 
+            <p:growl id="growl"  autoUpdate="true" severity="information,fatal" showDetail="true" /> 
+            <h:panelGroup id="pnlSearch" style="border: 0px; background-color: transparent" rendered="#{documentProvidignServiceControllers.chooseMainPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search ...</h3>
+                            </div>
+                            <div class="box-body">
+
+                                <section class="panel panel-info">
+                                    <section class="panel-body">
+                                        <div class="box-body">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-horizontal col-sm-6">  
+                                                        <h:panelGroup id="pnlSearchEvaLevel">
+                                                            <div class="form-horizontal col-sm-12 form-group required ">
+                                                                <h:outputLabel class="control-label col-sm-4" value="Filter Criteria "/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                                     valueChangeListener="#{documentProvidignServiceControllers.filiterByStatus_Vcl}">
+                                                                        <f:selectItems value="#{documentProvidignServiceControllers.filterByStatus2}"/>   
+                                                                        <p:ajax event="change" process="@this" update=":frmDocumentGenerate:tblDocList,pnlSearch"/>
+                                                                    </p:selectOneMenu> 
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </div>
+                                                    <div  class="form-horizontal col-sm-6">
+                                                        <div class="col-md-4"></div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <h:panelGroup id="pnl3" class="col-sm-12" rendered="#{documentProvidignServiceControllers.pnldocgenerate}">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+
+
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal ">
+                                                                <h:outputLabel for="searchAutocomplete1" value="Employee Name:" class="control-label col-sm-4"/>  
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="searchAutocomplete1"  value="#{documentProvidignServiceControllers.requester.firstName}"
+                                                                                 title="requester" required="true" readonly="true"/>
+                                                                    <p:message for="searchAutocomplete1" display="icon"/>
+                                                                </div> 
+                                                            </div>                                                                                
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtDepartment"  class="control-label col-sm-4" value="Department:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtDepartment" title="Department" value="#{documentProvidignServiceControllers.hrDepartments.depName}" 
+                                                                                 readonly="true"/>
+                                                                    <p:message for="txtDepartment" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtPosition"  class="control-label col-sm-4" value="Job Title:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtPosition" value="#{documentProvidignServiceControllers.hrJobTypes.jobTitle}"  
+                                                                                 title="Job Position" readonly="true"/>
+                                                                    <p:message for="txtPosition" display="icon"/>
+                                                                </div>                                                               
+                                                            </div>                                                                                          
+                                                        </div> 
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtGender"  class="control-label col-sm-4" value="Gender:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtGender" title="gender" value="#{documentProvidignServiceControllers.requester.sex}" 
+                                                                                 readonly="true"/>
+                                                                    <p:message for="txtGender" display="icon"/>
+                                                                </div>                                                               
+                                                            </div>                                                                                          
+                                                        </div>
+
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtServiceYear" class="control-label col-sm-4" value="Service Year:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtServiceYear"  readonly="true" value="#{documentProvidignServiceControllers.experience}" />
+
+                                                                </div>                                                              
+                                                            </div>                                                                                          
+                                                        </div> 
+
+                                                    </div>
+                                                    <div class="col-md-6">
+
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtDocType" class="control-label col-sm-4" value="Document Type :"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtDocType"  readonly="true" value="#{documentProvidignServiceControllers.hrDocumentRequests.documentType.documentType}" />
+
+                                                                </div>                                                              
+                                                            </div>                                                                                          
+                                                        </div> 
+                                                        <div class="col-md-12 textBoxMargin6px form-group required ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtstatus" class="control-label col-sm-4" value="Action "/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="txtstatus" required="true" style="width:100%" requiredMessage="Please select your Program Sponor."
+                                                                                     value="#{documentProvidignServiceControllers.selectedValue}">        
+                                                                        <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                        <f:selectItem itemLabel="Generated" itemValue="-3"/>
+                                                                        <f:selectItem itemLabel="Approved" itemValue="3"/>
+                                                                        <p:ajax process="@this" event="change"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message for="txtstatus" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl1a" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtxreqdate" class="control-label col-sm-4" value="Prepared On: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtxreqdate" value="#{documentProvidignServiceControllers.wfHrProcessed.processedOn}"
+                                                                                             onclick="displayCalendar('frmDocumentGenerate:txtxreqdate', 'frmDocumentGenerate:txtxreqdate');"
+                                                                                             title="prepared on" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                                <p:message for="txtxreqdate" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>  
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtReqestedBY" class="control-label col-sm-4"  value="Processed By:"/>
+
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtReqestedBY" value="#{documentProvidignServiceControllers.fullName}"
+                                                                                             title="txtReqestedBY" readonly="true" />
+                                                                                <p:message for="txtReqestedBY" display="icon"/>
+                                                                            </div>
+
+
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="SomeComment" class="control-label col-sm-4"  value="Comment Given:"/>
+
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="SomeComment" value="#{documentProvidignServiceControllers.wfHrProcessed.commentGiven}"
+                                                                                                 title="SomeComment"  class="form-control"/>
+                                                                                <p:message for="SomeComment" display="icon"/>
+                                                                            </div>
+
+
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </h:panelGroup>
+                                                    <h:panelGroup id="pnlmodify" >
+                                                        <div class="col-md-12">
+                                                            <div class="col-md-6">
+                                                                <div class="col-sm-12 textBoxMargin6px">
+                                                                    <div class="col-sm-4">                                                              
+                                                                    </div>                                                                    
+                                                                    <div class="col-sm-3">
+                                                                        <p:commandButton id="btnmodify" value="save" class="btn  btn-block btn-primary col-sm-4 "
+                                                                                         action="#{documentProvidignServiceControllers.saveGenerateDocument}"  
+                                                                                         process="@this,pnl3" 
+                                                                                         update="pnlSearch,tblDocList"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+
+
+                                        </h:panelGroup>
+
+                                        <div class="box-body">
+                                            <div class="col-md-12">                                       
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <p:dataTable id="tblDocList" value="#{documentProvidignServiceControllers.requestsListDataModel}" rowsPerPageTemplate="10,20,30"
+                                                                     var="req" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                                     selection="#{documentProvidignServiceControllers.hrDocumentRequests}" rowKey="#{req.id}" class="dataTable" >
+                                                            <p:ajax event="rowSelect" process="@this,tblDocList" listener="#{documentProvidignServiceControllers.DocumentRequest_processMyEvent}" 
+                                                                    update=":frmDocumentGenerate:pnlSearch,:frmSample"/>
+                                                            <p:column headerText="No.">
+                                                                <h:outputText value="#{num + 1}"/>
+                                                            </p:column>
+                                                            <p:column headerText=" Employee Name" filterMatchMode="contains" filterBy="#{req.requesterId.firstName}"  >
+                                                                <h:outputText value="#{req.requesterId.firstName} #{req.requesterId.middleName} #{req.requesterId.lastName}"/>
+                                                            </p:column> 
+                                                            <p:column headerText=" Employee ID" filterMatchMode="contains" filterBy="#{req.requesterId.empId}">
+                                                                <h:outputText value="#{req.requesterId.empId}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="RequestDate"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{req.requestDate}"/>
+                                                            </p:column> 
+                                                            <p:column headerText="Document Type" >
+                                                                <h:outputText value="#{req.documentType.documentType}"/>
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </div>
+                                                </div>
+                                            </div>        
+                                        </div>
+                                    </section>
+                                </section>
+                                <div class="form-group" >
+                                    <div class="col-sm-12">
+                                        <div class="col-md-6"> 
+                                            <div class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <div class="form-group form-horizontal">
+                                                        <h:outputLabel for="" class="control-label col-sm-4" value=""/> 
+                                                        <div class="col-sm-5">
+
+                                                            <p:commandButton id="btngenerate" class="btn  btn-block btn-primary col-sm-2 " 
+                                                                             value="#{documentProvidignServiceControllers.experienceorConformationBundle}"
+                                                                             action="#{documentProvidignServiceControllers.generate}"
+                                                                             process="@this"                                            
+                                                                             update=":frmDocumentGenerate"/>
+
+                                                        </div>
+                                                        <div class="col-sm-3"></div>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>   
+
+
+            <h:panelGroup id="pnlexp" style="border: 0px; background-color: transparent" rendered="#{documentProvidignServiceControllers.generateexp}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Employee Experience</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl7" class="col-sm-12">
+                                                <div class="form-group" >
+                                                    <div class="col-sm-12">
+
+                                                        <iframe src="http://172.21.35.201:8080/jasperserver/flow.html?_flowId=searchFlow"  width="100%" height="800"></iframe>
+
+
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section> 
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+            </h:panelGroup> 
+
+            <h:panelGroup id="pnlconf" style="border: 0px; background-color: transparent" rendered="#{documentProvidignServiceControllers.generateEpmConf}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Employment Confirmation</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

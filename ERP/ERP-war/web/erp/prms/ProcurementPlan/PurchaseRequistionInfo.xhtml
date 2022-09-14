@@ -1,0 +1,896 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li>
+            <a href="ServiceAndWorkRegistration.xhtml"><i class="fa fa-circle-o"></i>Service And Work Registration</a>
+        </li>
+        <li> <a href="MarketAssessment.xhtml"><i class="fa  fa-circle-o"></i>Market Assessment</a></li>
+        <li>
+            <a href="ProcurementAnnualPlan.xhtml"><i class="fa  fa-circle-o"></i>Annual Procurement Plan</a>
+        </li>
+        <li>
+            <a href="ProjectProcurementPlan.xhtml"><i class="fa  fa-circle-o"></i>Project Procurement Plan</a>
+        </li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmprBtnSearch"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlGoBackSearchButton" rendered="#{purchaseReqController.renderPnlToSearchPage}">
+                        <p:commandButton id="searchButton" icon="ui-icon-search" style="background-color: white;border-color: white" 
+                                         action="#{purchaseReqController.goBackSearchButtonAction()}"
+                                         title="Back to Search"
+                                         process="@this" update=":frmprUI,:frmMainUI,:frmprBtnSearch" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pGAddNew" rendered="#{purchaseReqController.isRendercreate}">
+                        <p:commandButton  id="btnNewAndSearch" action="#{purchaseReqController.createNewPr()}" icon="#{purchaseReqController.icone}" 
+                                          style="background-color: white;border-color: white"  
+                                          process="@this"  update="@this, :frmMainUI, :frmprUI, :frmprBtnSearch"
+                                          title="#{purchaseReqController.createOrSearchBundle}" rendered="#{purchaseReqController.isRendercreate}"/>
+
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PGNotification" rendered="#{purchaseReqController.renderDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{purchaseReqController.requestNotificationCounter}" 
+                                       style="color: red;background-color: white; border-color: white"/>
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 200px">
+                            <p:outputLabel id="lblReqNotf" value="Purchase Requests"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{purchaseReqController.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="purchaseReqlst"
+                                               value="#{purchaseReqController.prmsPurchaseRequestLst}"
+                                               itemValue="#{purchaseReqlst}" itemLabel="#{purchaseReqlst.prNumber}"/>               
+                                <p:ajax event="valueChange" update=":frmprUI, :frmMainUI, :frmprBtnSearch,:frmprUI:prDetail" />                            
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress"
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 200px" >
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{purchaseReqController.wfPrmsProcessedDModel}"
+                                                             var="currentRow" selectionMode="single" rowIndexVar="num" rows="3" paginator="true"
+                                                             rowKey="#{currentRow.processedId}" paginatorPosition="bottom">
+
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{currentRow.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{currentRow.processedOn}" >
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputText>
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="PurchaseRequistionInfo.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{purchaseReqController.renderPnlManPage}">
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchmarket"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12 "> 
+                                                    <h:outputLabel class="control-label col-sm-4" value="Searching By:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchBy" style="width: 100%" value="#{purchaseReqController.eepPurchaseRequest.columnName}"
+                                                                         valueChangeListener="#{purchaseReqController.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{purchaseReqController.purchaseReqSearchParameterLst}"
+                                                                           var="paramLists" itemLabel="#{paramLists}"/>
+                                                            <p:ajax event="change" process="@this" update="lblMarketAssmntNo,marketAssmntNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12 "> 
+                                                    <h:outputLabel id="lblMarketAssmntNo" class="control-label col-sm-4" value="Search By #{purchaseReqController.eepPurchaseRequest.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="marketAssmntNo" class="form-control" value="#{purchaseReqController.eepPurchaseRequest.columnValue}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group"> 
+                                                <h:outputLabel class="control-label col-sm-2" />
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnFind" icon="ui-icon-search" action="#{purchaseReqController.searchPurchaseRequisitionInfo()}"
+                                                                     process="@this,frmSearchmarket" update=":frmMainUI:frmPrSearch"
+                                                                     value="Find" class="btn btn-primary col-lg-4"/>            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmPrSearch">   
+                                    <p:growl id="growl" showDetail="true" severity="information,fatal,error" autoUpdate="true" />
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblmrktNo"  var="purchaseReq" rows="5" rowKey="#{purchaseReq.id}" 
+                                                                 value="#{purchaseReqController.purchaseRequestMdl}" rowIndexVar="num" 
+                                                                 selection="#{purchaseReqController.prmsPurchaseRequestSelect}" selectionMode="single" 
+                                                                 paginator="true" paginatorPosition="bottom" 
+                                                                 rowsPerPageTemplate="5,10,15" 
+                                                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                                                        <p:ajax event="rowSelect" listener="#{purchaseReqController.rowSelect}" 
+                                                                update=":frmprUI, :frmMainUI, :frmprBtnSearch,:frmprUI:prDetail"  process="@this"/>   
+                                                        <p:column headerText="NO" sortBy="#{num+1}">
+                                                            #{num+1}
+                                                        </p:column>
+                                                        <p:column sortBy="#{purchaseReq.prNumber}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Purchase Req. No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{purchaseReq.prNumber}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{purchaseReq.requistor}" filterBy="#{purchaseReq.requistor}" >
+                                                            <f:facet name="header">
+                                                                <p:outputLabel value="Requestor"/>
+                                                            </f:facet>
+                                                            <p:outputLabel value="#{purchaseReq.requistor}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{purchaseReq.reqstrDepId.depName}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Work Unit Name" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{purchaseReq.reqstrDepId.depName}"/>
+                                                        </p:column>
+                                                        <p:column headerText="Registration Date" sortBy="#{purchaseReq.prDate}">
+                                                            <h:outputText value="#{purchaseReq.prDate}" >
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                    </p:dataTable>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmprUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="actionPlnpanel" rendered="#{purchaseReqController.renderPnlCreatePr}"  >
+                <p:growl id="growl" showDetail="true" severity="information,fatal" autoUpdate="true" />
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Purchase Requisition</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" > 
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="purchasereqInf"  >
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="col-sm-6" >
+                                                <div class="form-horizontal col-sm-12">
+                                                    <h:outputLabel class="control-label col-sm-4" value="Requestor:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneRadio id="txtRequstors" style="width: 100%"  required="true" value="#{purchaseReqController.requistorType}"  
+                                                                          valueChangeListener="#{purchaseReqController.changePrRqType}" disabled="#{purchaseReqController.disableRequisitor}">
+                                                            <f:selectItem itemLabel="Work Unit" itemValue="department" />
+                                                            <f:selectItem itemLabel="Store" itemValue="sr" />
+                                                            <p:ajax process="@this" update=":frmprUI" event="change" />
+                                                        </p:selectOneRadio>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6" >
+                                                <div class="form-horizontal col-sm-12">
+                                                    <h:outputLabel id="lblStatus" class="control-label col-sm-4"  value="Status:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtStatus" class="form-control" readonly="#{workFlow.readonly}" 
+                                                                     value="#{purchaseReqController.eepPurchaseRequest.status}" 
+                                                                     converterMessage="Please Use Only Long Numbers"/>
+                                                        <p:message display="icon" for="txtStatus" />
+                                                    </div>
+                                                </div>
+                                            </div>  
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-6" >
+                                                <div class="form-horizontal col-sm-12">
+                                                    <h:outputLabel id="lblReqId" class="control-label col-sm-4"  value="Purchase Req. No:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtReqId" readonly="true" value="#{purchaseReqController.generatePrNo()}"/>
+                                                        <p:message for="txtReqId" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6" >
+                                                <div class="form-horizontal col-sm-12 textBoxMargin6px">
+                                                    <p:outputLabel id="lbldateReg"  class="control-label col-sm-4" value="Registration Date:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtdateReg" required="true" mindate="today" maxdate="today" readonlyInput="true" 
+                                                                    value="#{purchaseReqController.eepPurchaseRequest.prDate}" placeholder="dd/mm/yyyy" disabled="#{workFlow.readonly}"
+                                                                    pattern="dd/MM/yyyy" requiredMessage="Registration Date Value is Required" readonly="#{workFlow.readonly}">
+                                                            <p:ajax event="dateSelect" />
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </p:calendar>
+                                                        <p:message display="icon" for="txtdateReg" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="textBoxMargin6px">
+                                            <h:panelGroup rendered="#{purchaseReqController.renderMarketTable}">
+                                                <p:dialog id="dlg" header="Department List" widgetVar="dlg" height="300" width="500" showEffect="explode">
+                                                    <h:panelGrid columns="3">
+                                                        <p:tree value="#{purchaseReqController.root}" var="nodes" style="border: transparent; width: 100%"
+                                                                selectionMode="single" selection="#{purchaseReqController.selectedNode}" >
+                                                            <p:ajax event="select" listener="#{purchaseReqController.onNodeSelect}" process="@this" 
+                                                                    update=":frmprUI:txtwork,:frmprUI:txtBudgetCodeServ,:frmprUI:txtBudgetCodeWork"/>
+                                                            <p:treeNode>
+                                                                <h:outputText value="#{nodes}"/>
+                                                            </p:treeNode>
+                                                        </p:tree>
+                                                    </h:panelGrid>
+                                                </p:dialog>
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="col-sm-6" >
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblRequstor" class="control-label col-sm-4"  value="Work Unit:"/>
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtwork" value="#{purchaseReqController.hrDepartments.depName}" onmousedown="return false;" placeholder="Use Only From + Button"
+                                                                             required="true" requiredMessage="Please Select the Work unit" title="Please click on + to select Department">
+                                                                    <p:ajax event="change" update=":frmprUI:txtBudgetCodeServ,:frmprUI:txtBudgetCodeWork" process="@this"/>
+                                                                </p:inputText>
+                                                                <p:message for="txtwork" display="icon"/>
+                                                            </div>
+
+                                                            <div class="col-sm-2">
+                                                                <p:commandButton id="btnTree" onclick="PF('dlg').show();"  partialSubmit="true" style="background: transparent;" 
+                                                                                 title="Choose Department" value="+" disabled="#{workFlow.readonly}"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup id="srNo" rendered="#{purchaseReqController.renderStoreTbale}">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="col-sm-6" >
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel  id="lblSrNo" class="control-label col-sm-4"  value="Store Requisition No:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtSrNo"  required="true" style="width: 100%"  disabled="#{workFlow.readonly}"
+                                                                                 value="#{purchaseReqController.mmsStorereq.srNo}" requiredMessage="Please Select SR No is Required"
+                                                                                 valueChangeListener="#{purchaseReqController.valueChange}" converter="entConverter">
+                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                    <f:selectItems value="#{purchaseReqController.srListsFromDetail}"
+                                                                                   var="srNoLists" itemLabel="#{srNoLists}" itemValue="#{srNoLists}"/>
+                                                                    <p:ajax event="change" update="frmprUI:prDetailTbl,tblActionpurchasePlan,txtDepStore" process="@this,prDetailTbl,tblActionpurchasePlan" />
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon" for="txtSrNo" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblDepStore" value="Work Unit:" class="col-sm-4" style="text-align: right"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtDepStore" value="#{purchaseReqController.mmsStorereq.deptId}" 
+                                                                             readonly="true"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="col-sm-6" >
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel id="lblfileUplodWork"  class="control-label col-sm-4" value="Attachment:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:fileUpload  id="fileUpload" cancelLabel="#{contenu.annuler}"
+                                                                           fileUploadListener="#{purchaseReqController.handleFileUpload}"
+                                                                           value="#{purchaseReqController.prmsLuDmArchive.documentId}" 
+                                                                           allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                           invalidFileMessage="This type of file is not valid" dragDropSupport="false"
+                                                                           invalidSizeMessage="File Size is Exceeded" fileLimit="1" fileLimitMessage="You can't Upload more than one"
+                                                                           multiple="false" mode="advanced" sizeLimit="10000000" auto="true" >
+                                                            </p:fileUpload>
+                                                            <p:dataTable id="dtFileAttach" var="fileVar" paginatorPosition="bottom" paginator="true"  rowKey="#{fileVar.documentId}" rowIndexVar="file"
+                                                                         value="#{purchaseReqController.prmsLuDmArchivesDModel}" selection="#{purchaseReqController.prmsLuDmArchiveSelection}" selectionMode="single">
+                                                                <p:ajax event="rowSelect" listener="#{purchaseReqController.rowSelectFile}"  update="dtFileAttach" process="@this"/>
+                                                                <f:facet name="header">
+                                                                    <p:outputLabel value="Uploaded File From Database"/>
+                                                                </f:facet>
+                                                                <p:column headerText="File Name">
+                                                                    <p:outputLabel value="#{fileVar.fileName}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Download">
+                                                                    <h:panelGroup id="PGFile">
+                                                                        <p:commandButton id="cmdDown" icon="ui-icon-arrowthickstop-1-s" title="Download"
+                                                                                         ajax="false" update="dtFileAttach" process="@this,dtFileAttach" immediate="true">
+                                                                            <p:fileDownload id="filesDown" value="#{purchaseReqController.content}"/>
+                                                                        </p:commandButton>
+                                                                    </h:panelGroup>
+                                                                </p:column>
+                                                            </p:dataTable>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                    <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{purchaseReqController.renderMarketTable}" id="prtypes"  >
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <div class="col-sm-6" >
+                                                <div class="form-horizontal col-sm-12">
+                                                    <p:outputLabel class="control-label col-sm-4" value="Purchase Type:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneRadio id="txtprtype" style="width: 100%"  required="true" requiredMessage="Please check Purchase Type" 
+                                                                          value="#{purchaseReqController.purchaseType}" disabled="#{purchaseReqController.disableRequisitor}"
+                                                                          valueChangeListener="#{purchaseReqController.changeItemService}">
+                                                            <f:selectItem itemLabel="Service" itemValue="service" />
+                                                            <f:selectItem itemLabel="Work" itemValue="work" />
+                                                            <p:ajax  event="valueChange" process="@this" update=":frmprUI,txtBudgetCodeServ,txtBudgetCodeWork" />
+                                                        </p:selectOneRadio>
+                                                        <p:message for="txtprtype" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Purchase Requisition Detail</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row"> 
+                                    <div class="col-sm-12" > 
+                                        <div class="panel-body">
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  id="prDetail"  >
+                                                <div class="form-horizontal col-sm-12"> 
+
+                                                    <h:panelGroup style="border: 0px; background-color: transparent" id="servicePanel" rendered="#{purchaseReqController.service}"  >
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblBudgetCodeServ" value="Budget Code:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu  id="txtBudgetCodeServ" style="width: 100%" converter="entConverter"
+                                                                                          value="#{purchaseReqController.fmsOperatingBudgetDetail}" required="true" requiredMessage="Please Select Service Budget Code"
+                                                                                          valueChangeListener="#{purchaseReqController.getServiceInfoByGL}" disabled="#{workFlow.readonly}">
+                                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                            <f:selectItems  value="#{purchaseReqController.budgetCodeLists}"
+                                                                                            var="buCode" itemLabel="#{buCode.generalLedger.generalLedgerCode}" itemValue="#{buCode}"/>
+                                                                            <p:ajax event="change" update="txtBudgetAmountServ,txtserv,txtServtype,txtUnitMeasuere2,txtEstimated2" process="@this,"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="txtBudgetCodeServ" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel class="col-sm-4" style="text-align: right" value="Service Name:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtserv" value="#{purchaseReqController.prmsPurchaseReqService.serviceId.serviceName}"
+                                                                                     readonly="true"/>
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblBudgetAmountServ" class="control-label col-sm-4" value="Budget Amount:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtBudgetAmountServ" readonly="true"
+                                                                                     value="#{purchaseReqController.fmsOperatingBudgetDetail.approvedAmount}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblServType" value="Service Type:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtServtype" readonly="true"
+                                                                                     value="#{purchaseReqController.prmsPurchaseReqService.serviceType}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblEstimated2" class="control-label col-sm-4" value="Estimated Price:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtEstimated2" readonly="true"
+                                                                                     value="#{purchaseReqController.prmsPurchaseReqService.unitPrice}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblUnitMeasure2" class="control-label col-sm-4" value="Unit Of Measure:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtUnitMeasuere2" readonly="true"
+                                                                                     value="#{purchaseReqController.prmsPurchaseReqService.unitMeasure}" >
+                                                                        </p:inputText>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="col-sm-6" >
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <h:outputLabel id="lblQuantity2" class="control-label col-sm-4" value="Quantity:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtQuantity2" class="form-control" readonly="#{workFlow.readonly}"
+                                                                                     required="true" requiredMessage="Value for Quantity is Required"
+                                                                                     value="#{purchaseReqController.prmsPurchaseReqService.reqQuantity}"
+                                                                                     converterMessage="Please Enter Only Digits" autocomplete="off"/>
+                                                                        <p:message for="txtQuantity2" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblBriefDesc"  class="col-sm-4" style="text-align: right" value="Brief Description:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtBriefDesc" class="form-control"  placeholder="Give Brief Description for Service here !! "  autoResize="false"
+                                                                                         value="#{purchaseReqController.prmsPurchaseReqService.briefDescription}"
+                                                                                         readonly="#{workFlow.readonly}"/>
+                                                                    </div>
+                                                                </div>                                                           
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <div class="col-sm-6">
+                                                                        <p:commandButton id="btnAdd2" value="#{purchaseReqController.addOrModifyBundle}" class=" btn btn-primary col-sm-4 pull-right"
+                                                                                         process="@this,servicePanel" update="servicePanel,servicePanelTbl,servicetable"
+                                                                                         action="#{purchaseReqController.addServOrWorkToPRDetailTable()}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </h:panelGroup>
+                                                    <h:panelGroup style="border: 0px; background-color: transparent" id="PGWorkRegistration" rendered="#{purchaseReqController.workRadio}">
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12 ">
+                                                                    <p:outputLabel id="lblBudgetCodeWork" class="control-label col-sm-4" value="Budget Code:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu id="txtBudgetCodeWork" style="width: 100%" converter="entConverter" required="true" requiredMessage="Please Select Work Budget Code"
+                                                                                         value="#{purchaseReqController.fmsOperatingBudgetDetail}" disabled="#{workFlow.readonly}"
+                                                                                         valueChangeListener="#{purchaseReqController.getWorkInfoByGL}">
+                                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                            <f:selectItems value="#{purchaseReqController.budgetCodeListsWhenWork}" 
+                                                                                           var="working" itemLabel="#{working.generalLedger.generalLedgerCode}" itemValue="#{working}"/>
+                                                                            <p:ajax event="change" update="txtWorkNa,txtBudgetAmountWork,txtUnitMeasuereWork,txtEstimatedWork" process="@this,"/>
+
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="txtBudgetCodeWork" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblWorkNa" class="col-sm-4" style="text-align: right" value="Work Name:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtWorkNa" readonly="true" 
+                                                                                     value="#{purchaseReqController.prmsPurchaseReqService.serviceId.workName}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblBudgetAmountWork" class="control-label col-sm-4" value="Budget Amount:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtBudgetAmountWork" readonly="true" 
+                                                                                     value="#{purchaseReqController.fmsOperatingBudgetDetail.approvedAmount}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <h:outputLabel id="lblUnitMeasureWork" class="control-label col-sm-4" value="Unit Of Measure:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtUnitMeasuereWork" readonly="true"
+                                                                                     value="#{purchaseReqController.prmsPurchaseReqService.serviceId.unitMeasures}">
+                                                                        </p:inputText>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class=" col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblQuantityWork" class="control-label col-sm-4" value="Quantity:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtQuantityWork" class="form-control" readonly="#{workFlow.readonly}"
+                                                                                     value="#{purchaseReqController.prmsPurchaseReqService.reqQuantity}"
+                                                                                     validator="#{validatorManagedBean.Number}" autocomplete="off"
+                                                                                     converterMessage="Please Enter Only Numbers" 
+                                                                                     required="true" requiredMessage="Value for Quantity is Required"/>
+                                                                        <p:message for="txtQuantityWork" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class=" col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblEstimatedWork" class="col-sm-4" style="text-align: right" value="Estimated Price:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtEstimatedWork" readonly="true"
+                                                                                     value="#{purchaseReqController.prmsPurchaseReqService.unitPrice}"/>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <p:outputLabel id="lblBriefDescWork" class="control-label col-sm-4" value="Brief Description:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtBriefDescWork" class="form-control" placeholder="Give Brief Description for Work here !!"  scrollHeight="10" autoResize="false" 
+                                                                                         value="#{purchaseReqController.prmsPurchaseReqService.briefDescription}" readonly="#{workFlow.readonly}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-6">
+                                                                <div class="form-horizontal col-sm-12">
+                                                                    <div class="col-sm-6">
+                                                                        <p:commandButton id="btnAddwork" class="btn btn-primary col-sm-4 pull-right"
+                                                                                         value="#{purchaseReqController.addOrModifyBundle}" update="PGWorkRegistration,PGwork,dtWork" process="@this,PGWorkRegistration"
+                                                                                         action="#{purchaseReqController.addServOrWorkToPRDetailTable()}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup style="border: 0px; background-color: transparent" id="servicePanelTbl" 
+                                                          rendered="#{purchaseReqController.service}" >
+                                                <p:dataTable id="servicetable" paginator="true" paginatorPosition="bottom"  rows="5"
+                                                             rowIndexVar="num" value="#{purchaseReqController.purchaseReqServiceMdl}" 
+                                                             var="serviceTbl" style="margin-bottom: 20px" selectionMode="single"
+                                                             selection="#{purchaseReqController.prmsPurchaseReqServiceSelection}" rowKey="#{serviceTbl.budgetCode.OBDetailId}" >
+                                                    <p:ajax event="rowSelect"  update=":frmprUI:servicePanel" process="@this,"
+                                                            listener="#{purchaseReqController.serviceRowSelected}" />
+                                                    <p:column headerText="S.No">   
+                                                        #{num+1}
+                                                    </p:column>
+                                                    <p:column headerText="Budget Code">
+                                                        <h:outputText value="#{serviceTbl.budgetCode.generalLedger.generalLedgerCode}"/>
+                                                    </p:column>
+                                                    <p:column headerText="Budget Amount">
+                                                        <h:outputText value="#{serviceTbl.budgetCode.approvedAmount}"/>
+                                                    </p:column>
+                                                    <p:column>                                                                                                                                                        
+                                                        <f:facet name="header">
+                                                            <h:outputLabel value="Service Name"/>
+                                                        </f:facet>
+                                                        <h:outputLabel value="#{serviceTbl.serviceId.serviceName}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Brief Description">
+                                                        <p:outputLabel value="#{serviceTbl.briefDescription}"/>
+                                                    </p:column>
+                                                    <p:column>    
+                                                        <f:facet name="header" >
+                                                            <h:outputLabel value="Unit Of Measure" />
+                                                        </f:facet>
+                                                        <h:outputLabel value="#{serviceTbl.unitMeasure}"/>
+                                                    </p:column>
+                                                    <p:column  headerText="Estimated UnitPrice" >                                                                                                                                                        
+                                                        <p:cellEditor>
+                                                            <f:facet name="output">
+                                                                <h:outputText value="#{serviceTbl.unitPrice}" />
+                                                            </f:facet>
+                                                            <f:facet name="input">
+                                                                <p:inputText id="unitPrice" value="#{serviceTbl.unitPrice}" style="width:100%"/>
+                                                            </f:facet>
+                                                        </p:cellEditor>  
+                                                    </p:column>
+                                                    <p:column headerText="Quantity" >                                                                                                                                                        
+                                                        <p:cellEditor>
+                                                            <f:facet name="output">
+                                                                <h:outputText value="#{serviceTbl.reqQuantity}" />
+                                                            </f:facet>
+                                                            <f:facet name="input">
+                                                                <p:inputText id="quantity" value="#{serviceTbl.reqQuantity}" style="width:100%"/>
+                                                            </f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+
+                                                </p:dataTable>
+                                                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" style="position: top;">
+                                                    <p:commandButton id="btnYes" value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                    <p:commandButton id="btnNo" value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                </p:confirmDialog>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup id="PGwork" style="background-color: transparent;border: 0px" rendered="#{purchaseReqController.workRadio}">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-12">
+                                                            <p:dataTable id="dtWork" paginator="true" paginatorPosition="bottom"  rowIndexVar="counter" rows="5"
+                                                                         var="workTable" selection="#{purchaseReqController.prmsPurchaseReqServiceSelection}" selectionMode="single"
+                                                                         value="#{purchaseReqController.purchaseReqServiceMdl}" rowKey="#{workTable.budgetCode.OBDetailId}">
+                                                                <p:ajax event="rowSelect" listener="#{purchaseReqController.serviceRowSelected}"
+                                                                        update=":frmprUI:PGWorkRegistration" process="@this"/>
+                                                                <p:column headerText="S.No">
+                                                                    #{counter+1}
+                                                                </p:column>
+                                                                <p:column headerText="Budget Code">
+                                                                    <h:outputText value="#{workTable.budgetCode.generalLedger.generalLedgerCode}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Budget Amount">
+                                                                    <h:outputText value="#{workTable.budgetCode.approvedAmount}"/>
+                                                                </p:column>
+                                                                <p:column >
+                                                                    <f:facet name="header">
+                                                                        <p:outputLabel value="Work Name"/>
+                                                                    </f:facet>
+                                                                    <p:outputLabel value="#{workTable.serviceId.workName}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Brief Description">
+                                                                    <p:outputLabel value="#{workTable.briefDescription}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Unit Measure">
+                                                                    <f:facet name="header">
+                                                                        <p:outputLabel value="Unit Mesasures"/>
+                                                                    </f:facet>
+                                                                    <p:outputLabel value="#{workTable.unitMeasure}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <p:outputLabel value="Estimated UnitPrice"/>
+                                                                    </f:facet>
+                                                                    <p:outputLabel value="#{workTable.unitPrice}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Quantity">
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{workTable.reqQuantity}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText id="quantity" value="#{workTable.reqQuantity}" style="width:100%"/></f:facet>
+                                                                    </p:cellEditor>
+                                                                </p:column>
+
+                                                            </p:dataTable>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <!--</h:panelGroup>-->
+                                            <p:spacer />
+                                            <p:spacer/>
+                                            <p:spacer/>
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  id="prDetailTbl" rendered="#{purchaseReqController.renderStoreTbale}" >
+                                                <div class="form-horizontal col-sm-12">
+                                                    <div class="form-group">                                        
+                                                        <div class="col-sm-12">
+                                                            <p:dataTable id="tblActionpurchasePlan"  paginator="true" paginatorPosition="bottom"  rows="5"
+                                                                         rowIndexVar="rowIndex" value="#{purchaseReqController.eepPurchaseReqDetMdl}"  var="purchaseSrTbl" rowKey="#{purchaseSrTbl.stDetailId.storeReqId}" 
+                                                                         scrollHeight="true" selectionMode="single" selection="#{purchaseReqController.purchaseRequestDetSelection}">
+                                                                <p:ajax event="rowSelect" listener="#{purchaseReqController.storeDetailPopUp}" update="tblActionpurchasePlan,:frmprUI:srNo" process="@this,"/>
+                                                                <p:column headerText="S.No">
+                                                                    #{rowIndex+1}
+                                                                </p:column>
+                                                                <p:column rendered="#{purchaseReqController.renderStoreTbale}">  
+                                                                    <f:facet name="header">
+                                                                        <h:outputLabel value="Store Req No." />
+                                                                    </f:facet>
+                                                                    <p:outputLabel value="#{purchaseSrTbl.stDetailId}" />
+                                                                </p:column> 
+                                                                <p:column rendered="#{purchaseReqController.renderStoreTbale}">  
+                                                                    <f:facet name="header">
+                                                                        <h:outputLabel value="Item Name" />
+                                                                    </f:facet>
+                                                                    <p:outputLabel value="#{purchaseSrTbl.materialCodeId.matName}" />
+                                                                </p:column> 
+
+                                                                <p:column rendered="#{purchaseReqController.renderStoreTbale}"  >  
+                                                                    <f:facet name="header">
+                                                                        <h:outputLabel value="Item Code" />
+                                                                    </f:facet>
+                                                                    <p:outputLabel value="#{purchaseSrTbl.materialCodeId}" />
+                                                                </p:column> 
+                                                                <p:column >
+                                                                    <f:facet name="header">
+                                                                        <p:outputLabel value="Budget Code"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{purchaseSrTbl.materialCodeId.generalLedgerId}"/>
+                                                                </p:column>
+                                                                <p:column   rendered="#{purchaseReqController.renderStoreTbale}">   
+                                                                    <f:facet name="header">
+                                                                        <h:outputLabel value="Unit Of Measure" />
+                                                                    </f:facet>
+                                                                    <p:outputLabel value="#{purchaseSrTbl.materialCodeId.unitOfMeasure}"/>
+                                                                </p:column> 
+                                                                <p:column  headerText="Quantity" >                                                                                                                                                        
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{purchaseSrTbl.reqQuantity}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText id="quantity" value="#{purchaseSrTbl.reqQuantity}" /></f:facet>
+                                                                    </p:cellEditor>  
+                                                                </p:column> 
+                                                                <p:column  headerText="Estimated UnitPrice" >                                                                                                                                                        
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{purchaseSrTbl.unitPrice}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText id="unitPrice" value="#{purchaseSrTbl.unitPrice}" /></f:facet>
+                                                                    </p:cellEditor>  
+                                                                </p:column>
+
+
+
+                                                            </p:dataTable>
+                                                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" style="position: top;">
+                                                                <p:commandButton id="btnYes2" value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                                <p:commandButton id="btnNo2" value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                            </p:confirmDialog>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <h:panelGroup id="PGPreapared">
+
+
+                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                <div class="col-sm-6">
+                                    <div class=" form-horizontal col-sm-12">
+                                        <p:outputLabel   class=" col-sm-4" style="text-align: right" id="lblPrepatedy1" value="Processed By:"/>
+                                        <div class="col-sm-8">
+                                            <p:inputText  id="txtprey1" value="#{purchaseReqController.userName}" readonly="true" title="processer"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class=" form-horizontal col-sm-12 ">
+                                        <p:outputLabel  id="lblApproved" value="Processed Date:"  class="control-label col-sm-4" />
+                                        <div class="col-sm-8">
+                                            <p:calendar id="calprocessed" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" autocomplete="off" value="#{purchaseReqController.wfPrmsProcessed.processedOn}" 
+                                                        required="true" requiredMessage="Please Enter a Processed Date" mindate="today" maxdate="today">
+                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                            </p:calendar>
+                                            <p:message for="calprocessed" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <div class="col-sm-6" >
+                                    <div class="form-horizontal col-sm-12">
+                                        <p:outputLabel for="txtDecision" id="lblDecision" value="Decision:"  class="control-label col-sm-4" rendered="#{purchaseReqController.renderDecision}"/>
+                                        <div class="col-sm-8">
+                                            <p:selectOneMenu id="txtDecision" value="#{purchaseReqController.wfPrmsProcessed.decision}" style="width: 100%"
+                                                             valueChangeListener="#{purchaseReqController.handleselectOptions}"
+                                                             rendered="#{purchaseReqController.renderDecision}" required="true">
+                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                <f:selectItem itemLabel="Approve" itemValue="Approved"/>
+                                                <f:selectItem itemLabel="Reject" itemValue="Rejected"/>
+                                            </p:selectOneMenu>
+                                            <p:message for="txtDecision" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-horizontal col-sm-12">
+                                        <h:outputLabel id="lblRemark" class="control-label col-sm-4"  value="Comment Given:" rendered="#{purchaseReqController.renderDecision}"/>
+                                        <div class="col-sm-8">
+                                            <p:inputTextarea id="txtRemark" class="form-control" value="#{purchaseReqController.wfPrmsProcessed.commentGiven}" rendered="#{purchaseReqController.renderDecision}"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </h:panelGroup>
+                        <div class="form-group col-sm-12 textBoxMargin6px">
+                            <div class="col-sm-6" >
+                                <div class="form-horizontal col-sm-12">
+                                    <div class="col-lg-4" />
+                                    <div class="col-sm-8">
+                                        <p:commandButton id="btnSave" action="#{purchaseReqController.savePurchaseRequisitionInfo()}"
+                                                         process="@this,purchasereqInf,prDetailTbl,PGPreapared,prtypes,servicePanelTbl,PGwork" 
+                                                         update="actionPlnpanel,purchasereqInf,prDetailTbl,PGPreapared,prtypes,:frmprBtnSearch,servicePanelTbl,PGwork"
+                                                         class="btn btn-primary col-lg-4"
+                                                         value="#{purchaseReqController.saveorUpdateBundle}"/>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>     
+    </ui:define>
+</ui:composition>

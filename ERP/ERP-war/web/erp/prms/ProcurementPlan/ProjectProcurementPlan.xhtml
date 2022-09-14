@@ -1,0 +1,1085 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="ServiceAndWorkRegistration.xhtml"><i class="fa fa-circle-o text"></i> <span> Service And Work Registration</span></a></li>
+        <li><a href="MarketAssessment.xhtml"><i class="fa fa-circle-o text"></i> <span> Market Assessment</span></a></li>
+        <li><a href="ProcurementAnnualPlan.xhtml"><i class="fa fa-circle-o text"></i> <span> Annual Procurement Plan</span></a></li>
+        <li> <a href="PurchaseRequistionInfo.xhtml"><i class="fa fa-circle-o text"></i> <span> Purchase Request</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmProjectPlanTbr"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlGoBackSearchButton" rendered="#{projectPlanController.renderPnlToSearchPage}">
+                        <p:commandButton id="searchButton" icon="ui-icon-search" style="background-color: white;border-color: white" 
+                                         action="#{projectPlanController.goBackSearchButtonAction()}"
+                                         title="Back to Search"
+                                         process="@this" update=":frmMain,:frmMainUI,:frmProjectPlanTbr" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PgCreate" rendered="#{projectPlanController.isRenderCreate}">
+                        <p:commandButton  action="#{projectPlanController.createProjectPlan()}" icon="${projectPlanController.icone}"  
+                                          rendered="#{projectPlanController.isRenderCreate}"
+                                          process="@this" update="@this,:frmProjectPlanTbr,:frmMainUI,:frmMain" 
+                                          title="#{projectPlanController.createOrSearchBundle}" style="background-color: white;border-color: white" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PGNotification" rendered="#{projectPlanController.renderDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{projectPlanController.projectPlanLis1.size()}" 
+                                       style="color: red;background-color: white; border-color: white"/>
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 200px">
+                            <p:outputLabel id="lblReqNotf" value="Procurement Project Plan"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains" converterMessage="entConverter"                                            
+                                                converter="entConverter"  valueChangeListener="#{projectPlanController.RequestListChange}">
+                                <f:selectItems id="selectOneMenuAppListkl" var="purchaseReqlst" 
+                                               value="#{projectPlanController.projectPlanLis1}"
+                                               itemValue="#{purchaseReqlst}" itemLabel="#{purchaseReqlst.projectPlanNo}"/> 
+                                <p:ajax event="valueChange"  update="@this,:frmProjectPlanTbr,:frmMainUI,:frmMain" process="@this," />               
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 200px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{projectPlanController.wfPrmsProcessedDModel}"
+                                                             var="currentRow" selectionMode="single" rowIndexVar="num" rows="5" paginator="true" rowKey="#{currentRow.processedId}" 
+                                                             paginatorPosition="bottom">
+                                                    <p:column headerText="S.No">
+                                                        <h:outputText value="#{num+1}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{currentRow.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{currentRow.processedOn}">
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputText>
+                                                    </p:column>
+                                                    <p:column headerText="Decision">
+                                                        <h:outputText value="#{currentRow.decision}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../prms/ProcurementPlan/ProjectProcurementPlan.xhtml"><i class="fa fa-fw fa-refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{projectPlanController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchProjectPlan"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="col-sm-6" >
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="Searching By:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{projectPlanController.prmsProjectPlan.columnName}"
+                                                                         valueChangeListener="#{projectPlanController.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{projectPlanController.projectSearchParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblCriteriaNo,txtCriteriaNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblCriteriaNo" class="control-label col-sm-4" value="Search By #{projectPlanController.prmsProjectPlan.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCriteriaNo" value="#{projectPlanController.prmsProjectPlan.columnValue}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group"> 
+
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnFind" icon="ui-icon-search" action="#{projectPlanController.search_ProjectPlan()}"
+                                                                         process="@this,frmSearchProjectPlan" update=":frmMainUI:frmProject"
+                                                                         value="Find" class="btn btn-primary col-lg-4"/>            
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmProject">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblBidCriteria"  var="projectPlan" rows="10" rowKey="#{projectPlan.id}"
+                                                                 value="#{projectPlanController.prmsProjectPlanMdel}" class="dataTable" rowIndexVar="num"
+                                                                 selection="#{projectPlanController.prmsProjectPlanSelect}" selectionMode="single"
+                                                                 paginator="true" paginatorPosition="bottom" 
+                                                                 rowsPerPageTemplate="5,10,15" 
+                                                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                                                        <p:ajax event="rowSelect" listener="#{projectPlanController.rowSelect}" 
+                                                                update=":frmMain, :frmMainUI, :frmProjectPlanTbr," />   
+                                                        <p:column headerText="No">
+                                                            #{num+1}
+                                                        </p:column>
+                                                        <p:column sortBy="#{projectPlan.projectPlanNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Project Plan No:" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{projectPlan.projectPlanNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Project Name" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{projectPlan.projectName}" />
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Market Approach" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{projectPlan.marketApproach}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{projectPlan.dateRigistered}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Date Registered" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{projectPlan.dateRigistered}">
+                                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Prepared By" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{projectPlanController.logerName}"/>
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmMain">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainPanel" rendered="#{projectPlanController.renderPnlCreateParty}">
+                <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h1 class="box-title"> <font style="font-style: normal;font-weight: bolder" />Project Procurement Plan</h1>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" >
+                                <div class="form-group col-sm-12 required">
+                                    <div class=" col-sm-6 ">
+                                        <h:panelGroup style="border: 0px; background-color: transparent" id="mainpnl">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel class="control-label col-sm-12" value="Purchase Type:" />
+                                                <div class="col-sm-12">
+                                                    <p:selectOneRadio  style="width: 100%"  required="true" requiredMessage="Please Select Purchase Type" value="#{projectPlanController.purchaseType}"
+                                                                       valueChangeListener="#{projectPlanController.changePrRqType}"  id="txtPrTypes" disabled="#{projectPlanController.disablePurchaseTypeSelection}">
+                                                        <f:selectItem itemLabel="Goods" itemValue="good" />
+                                                        <f:selectItem itemLabel="Service" itemValue="Service" />
+                                                        <f:selectItem itemLabel="Work" itemValue="Work" />
+                                                        <p:ajax  event="change" process="@this" update="frmMain"/>
+                                                    </p:selectOneRadio>
+                                                    <p:message for="txtPrTypes" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <h:panelGroup style="border: 0px; background-color: transparent" id="serviceTypepnl" rendered="#{projectPlanController.serviceName}">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+
+                                                    <p:outputLabel class=" control-label col-sm-12" value="Service Type:" id="lblServiceType"/>
+                                                    <div class="col-sm-12">
+                                                        <p:selectOneRadio style="width: 100%" value="#{projectPlanController.prmsProjectPlan.serviceType}" required="true" requiredMessage="Please Enter Service Type:" rendered="#{projectPlanController.serviceName}"
+                                                                          disabled="#{workFlow.readonly}" valueChangeListener="#{projectPlanController.changeServiceType}"  id="drdServiceType" >
+                                                            <f:selectItem itemLabel="Consultancy" itemValue="Consultancy" />
+                                                            <f:selectItem itemLabel="Non Consultancy" itemValue="Non Consultancy" />
+                                                            <p:ajax  event="change"  update="frmMain" />
+                                                        </p:selectOneRadio>
+                                                        <p:message for="drdServiceType" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <p:outputLabel id="lblProjectPlan" class="col-sm-12" value="Project Plan No:"/>
+                                            <div class="col-sm-12">
+                                                <p:inputText id="txtProjectPlan" readonly="true" value="#{projectPlanController.generateProjectplanNo()}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <p:outputLabel id="lbllotno" class=" control-label col-sm-12" value="Project Name:"/>
+                                            <div class="col-sm-12">
+                                                <p:selectOneMenu id="projectName" required="true" value="#{projectPlanController.pmsCreateProject}" style="width: 100%" 
+                                                                 disabled="#{workFlow.readonly}" converter="entConverter" requiredMessage="Please Select Project Name">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItems value="#{projectPlanController.getProjectIds()}" var="Project" 
+                                                                   itemLabel="#{Project.projectName}" />
+                                                </p:selectOneMenu>
+                                                <p:message for="projectName" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <p:outputLabel id="lblBillOfQntty"  class=" control-label col-sm-12" value="Full Description Of the Procurement:"/>  
+                                            <div class="col-sm-12">
+                                                <p:inputText required="true" class="form-control" disabled="#{workFlow.readonly}" value="#{projectPlanController.prmsProjectPlan.fullProcurementDescription}" 
+                                                             requiredMessage="Please Enter full Description of the Procurement"  id="txtbiilofqntty" />
+                                                <p:message for="txtbiilofqntty" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <p:outputLabel id="estimatedAmount"  class="control-label col-sm-12"  value="Market Approach:"/>
+                                            <div class="col-sm-12">
+                                                <p:inputText required="true" class="form-control" disabled="#{workFlow.readonly}"  value="#{projectPlanController.prmsProjectPlan.marketApproach}" id="txtestimatedAmount" 
+                                                             requiredMessage="Please Enter Market Approach" />
+                                                <p:message for="txtestimatedAmount" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <p:outputLabel id="lblprepostqlftion" class="control-label col-sm-12"  value="Pre/Qualification:"/> 
+                                            <div class="col-sm-12">
+                                                <p:inputText required="true" class="form-control" disabled="#{workFlow.readonly}" value="#{projectPlanController.prmsProjectPlan.preQualification}" id="txtprepostQualifcation" 
+                                                             requiredMessage="Please Enter Pre/Qualification" />
+                                                <p:message for="txtprepostQualifcation" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <p:outputLabel id="lblbankreceiver" class="control-label col-sm-12" value="Procurement Process:"/> 
+                                            <div class="col-sm-12">
+                                                <p:inputText required="true" class="form-control" value="#{projectPlanController.prmsProjectPlan.procurementProcess}" id="txtbankReceiver" 
+                                                             disabled="#{workFlow.readonly}" requiredMessage="Please Enter Procurement Process" />
+                                                <p:message for="txtbankReceiver" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                            <p:outputLabel id="tblProcurementMethod" class="control-label col-sm-12"  value="Source Of Finance:"/>
+                                            <div class="col-sm-6">
+                                                <p:selectOneMenu id="procumentmetheds" required="true" disabled="#{workFlow.readonly}" 
+                                                                 value="#{projectPlanController.prmsProjectPlan.sourceOfFinance}" style="width: 100%"
+                                                                 requiredMessage="Please Select Source Of Finance">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Donate" itemValue="Donate"/>
+                                                    <f:selectItem itemLabel="Loan" itemValue="Loan"/>
+                                                    <f:selectItem itemLabel="Internal Reveune" itemValue="Internal Reveune"/>
+
+                                                </p:selectOneMenu>
+                                                <p:message for="procumentmetheds" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <p:outputLabel id="lblsubmissiontoBank" class=" col-sm-12"  value="Loan:"/>
+                                            <div class="col-sm-6">
+                                                <p:inputText value="#{projectPlanController.prmsProjectPlan.loan}" id="txtsubmissiontoBank" 
+                                                             class="form-control" disabled="#{workFlow.readonly}"/>
+                                                <p:message for="txtsubmissiontoBank" display="icon" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <p:outputLabel id="lblCreditStartingDate" class="col-sm-12" value="Credit:"/>
+                                            <div class="col-sm-6">
+                                                <p:inputText value="#{projectPlanController.prmsProjectPlan.credit}" id="dtCreditStartingDate" 
+                                                             class="form-control" disabled="#{workFlow.readonly}"/>
+                                                <p:message for="dtCreditStartingDate" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <p:outputLabel id="lblEstimatedAmountStartDate" class="col-sm-12" value="Estimated Amount (US$):"/>  
+                                            <div class="col-sm-6">
+                                                <p:inputText class="form-control" disabled="#{workFlow.readonly}" value="#{projectPlanController.prmsProjectPlan.estimatedAmount}" id="dtEstimatedAmountStartDate" 
+                                                             />
+
+                                            </div>
+                                        </div>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.purchaseTypCommon}"  id="purchaseTypePreQualification">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblPqInvitation"  class="control-label col-sm-12" value="Prepare Pre-Qualification Documents Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Prepare Pre-Qualification Documents Starting Date" mindate="today" value="#{projectPlanController.prmsProjectPlan.prepareDocumntStrtDate}" id="txtPqInvitation" 
+                                                                disabled="#{workFlow.readonly}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="txtpqSubmission"/>
+                                                    </p:calendar>
+                                                    <p:message for="txtPqInvitation" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblpqSubmission" class="control-label col-sm-12" value="Prepare Pre-Qualification Documents Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Prepare Pre-Qualification Documents Ending Date" value="#{projectPlanController.prmsProjectPlan.prepareDocumntEndingDate}" id="txtpqSubmission" 
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate1()}"  placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="txtpqSubmission" display="icon" />
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.consultancy}"  id="consultancyPanel">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblPrepareTermOfReference" class="control-label col-sm-12" value="Prepare Term Of Reference Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" mindate="today" value="#{projectPlanController.prmsProjectPlan.termOfRefStrtDt}" id="dtePrepareTermOfReference"  placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dtePrepareTermOfReferenceEndingDate" />
+                                                    </p:calendar>
+                                                    <p:message for="dtePrepareTermOfReference" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblPrepareTermOfReferenceEndingDate" class="control-label col-sm-12"
+                                                               value="Prepare Term Of Reference Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" value="#{projectPlanController.prmsProjectPlan.termOfRefEndDt}" id="dtePrepareTermOfReferenceEndingDate" 
+                                                                mindate="#{projectPlanController.getminDate16()}"  placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dtePrepareTermOfReferenceEndingDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.purchaseTypCommon}"  id="purchasetpeCommon">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblevaluationRpr"  class=" control-label col-sm-12"
+                                                               value="Advertise Specific Procurement Notice and Sales Pre-qualification Document Starting Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Advertise Specific Procurement Notice and Sales Pre-qualification Document Starting Date" mindate="today" value="#{projectPlanController.prmsProjectPlan.advrtiseSpcificNticeStrtDt}" id="txtevaluationRpr"
+                                                                disabled="#{workFlow.readonly}"  placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" update="txtevaluationRprs" process="@this"/>
+                                                    </p:calendar>
+
+                                                    <p:message for="txtevaluationRpr" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblevaluationRprs"  class="control-label col-sm-12"
+                                                               value="Advertise Specific Procurement Notice and Sales Pre-qualification Document Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Advertise Specific Procurement Notice and Sales Pre-qualification Document Ending Date" value="#{projectPlanController.prmsProjectPlan.advrtiseSpcificNticeEndDt}" id="txtevaluationRprs" 
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate2()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="txtevaluationRprs" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.consultancy}"  id="consultancyPnel">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblAdvertiseExpressionStartDate" class="control-label col-sm-12"
+                                                               value="Advertise Expression Of Interest-Floating Period Starting Date:" /> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Advertise Expression Of Interest-Floating Period Starting Date" value="#{projectPlanController.prmsProjectPlan.advrExpInterFloatStrtDt}" 
+                                                                id="dteAdvertiseExpressionStartDate" mindate="today" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteAdvertiseExpressionEndingDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteAdvertiseExpressionStartDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblAdvertiseExpressionEndingDate" class="control-label col-sm-12" 
+                                                               value="Advertise Expression Of Interest-Floating Period Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Advertise Expression Of Interest-Floating Period Ending Date" value="#{projectPlanController.prmsProjectPlan.advrExpInterFloatEndDt}" 
+                                                                id="dteAdvertiseExpressionEndingDate" 
+                                                                mindate="#{projectPlanController.getminDate17()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteAdvertiseExpressionEndingDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblEvaluationAndShortLstStartDate" class="control-label col-sm-12"
+                                                               value="Evaluation Of Expression Of Interest and Short Listing Consultant Starting Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Evaluation Of Expression Of Interest and Short Listing Consultant Starting Date" value="#{projectPlanController.prmsProjectPlan.evExpIntShortLisStrtDt}" 
+                                                                id="dteEvaluationAndShortLstStartDate" mindate="today" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteEvaluationAndShortLstEndingDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteEvaluationAndShortLstStartDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblEvaluationAndShortLstEndingDate" class="control-label col-sm-12"
+                                                               value="Evaluation Of Expression Of Interest and Short Listing Consultant Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Evaluation Of Expression Of Interest and Short Listing Consultant Ending Date" value="#{projectPlanController.prmsProjectPlan.evExpIntShortLisEndDt}" 
+                                                                id="dteEvaluationAndShortLstEndingDate" 
+                                                                mindate="#{projectPlanController.getminDate18()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteEvaluationAndShortLstEndingDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionShrtLstStartDate" class="control-label col-sm-12"
+                                                               value="Submission Of Short Listing Report For Recommendation Starting Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Submission Of Short Listing Report For Recommendation Starting Date" value="#{projectPlanController.prmsProjectPlan.subShrtRepRecStrtDt}" 
+                                                                id="dteSubmissionShrtLstStartDate" mindate="today"  placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteSubmissionShrtLstEndDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteSubmissionShrtLstStartDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionShrtLstEndDate" class="control-label col-sm-12"
+                                                               value="Submission Of Short Listing Report For Recommendation Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Submission Of Short Listing Report For Recommendation Ending Date" value="#{projectPlanController.prmsProjectPlan.subShrtRepRecEndDt}" 
+                                                                id="dteSubmissionShrtLstEndDate" 
+                                                                mindate="#{projectPlanController.getminDate19()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteSubmissionShrtLstEndDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.purchaseTypCommon}"  id="forAllPurchaseTyExpConst">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblrqEvlObjections" class="control-label col-sm-12"
+                                                               value="Opening Of Pre-qualification Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="rqEvlObjection" mindate="today" required="true" requiredMessage="Please Enter Opening Of Pre-qualification Starting Date" disabled="#{workFlow.readonly}"  
+                                                                value="#{projectPlanController.prmsProjectPlan.openPreQulifictionStrtDat}" style="width: 100%" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" >
+                                                        <p:ajax event="dateSelect" process="@this" update="rqEvlObjections"/>
+                                                    </p:calendar>
+                                                    <p:message for="rqEvlObjection" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblrqEvlObjectionss" class="control-label col-sm-12"
+                                                               value="Opening Of Pre-qualification Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar  id="rqEvlObjections" value="#{projectPlanController.prmsProjectPlan.openPreQulifictionEndDat}" style="width: 100%" 
+                                                                 required="true" requiredMessage="Please Enter Opening Of Pre-qualification Ending Date" disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate3()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+
+                                                    </p:calendar>
+                                                    <p:message for="rqEvlObjections" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblPreQualificationPropEvalReprtStartDte" class="control-label col-sm-12"
+                                                               value="Pre-qualification Proposal Evaluation Report Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dtPreQualificationPropEvalReprtStartDte" mindate="today" required="true" requiredMessage="Please Enter Pre-qualification Proposal Evaluation Report Starting Date" disabled="#{workFlow.readonly}" value="#{projectPlanController.prmsProjectPlan.preQlfPrplEvlRprtStrtDt}" style="width: 100%" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dtPreQualificationPropEvalReprtEndDte"/>
+                                                    </p:calendar>
+                                                    <p:message for="dtPreQualificationPropEvalReprtStartDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblPreQualificationPropEvalReprtEndDte" class="control-label col-sm-12"
+                                                               value="Pre-qualification Proposal Evaluation Report Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dtPreQualificationPropEvalReprtEndDte" required="true" requiredMessage="Please Enter Pre-qualification Proposal Evaluation Report Ending Date"  value="#{projectPlanController.prmsProjectPlan.preQlfPrplEvlRprtEndDt}" style="width: 100%" 
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate4()}"
+                                                                placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+
+                                                    </p:calendar>
+                                                    <p:message for="dtPreQualificationPropEvalReprtEndDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionPreQualEvalReprtStrDte" class="control-label col-sm-12"
+                                                               value="Submission Of Pre-qualification Evaluation Report For Recommendation Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dtSubmissionPreQualEvalReprtStrDte" required="true" requiredMessage="Please Enter Submission Of Pre-qualification Evaluation Report For Recommendation Starting Date" value="#{projectPlanController.prmsProjectPlan.submisionEvalRecommStrtDte}" 
+                                                                disabled="#{workFlow.readonly}" style="width: 100%" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" mindate="today">
+                                                        <p:ajax event="dateSelect" process="@this" update="dtSubmissionPreQualEvalReprtEndDte"/>
+                                                    </p:calendar>
+                                                    <p:message for="dtSubmissionPreQualEvalReprtStrDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionPreQualEvalReprtEndDte" class="control-label col-sm-12" 
+                                                               value="Submission Of Pre-qualification Evaluation Report For Recommendation Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dtSubmissionPreQualEvalReprtEndDte" required="true" requiredMessage="Please Enter Submission Of Pre-qualification Evaluation Report For Recommendation Ending Date" value="#{projectPlanController.prmsProjectPlan.submisionEvalRecommEndDte}" style="width: 100%" 
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate5()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                    </p:calendar>
+                                                    <p:message for="dtSubmissionPreQualEvalReprtEndDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.workName}"  id="workPanel">
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblConstructionPeriodstrtingDte"
+                                                               class="control-label col-sm-12" value="Construction Period Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar mindate="today"  id="dteConstructionPeriodstrtingDte" required="true" requiredMessage="Please Enter Construction Period Starting Date" value="#{projectPlanController.prmsProjectPlan.consttrprdsrtdt}" style="width: 100%" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteConstructionPeriodEndinggDte"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteConstructionPeriodstrtingDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblConstructionPeriodEndinggDte" class="control-label col-sm-12" value="Construction Period Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar   id="dteConstructionPeriodEndinggDte" required="true" requiredMessage="Please Enter Construction Period Ending Date" value="#{projectPlanController.prmsProjectPlan.constprdendtdt}" style="width: 100%" 
+                                                                  mindate="#{projectPlanController.getminDate28()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                    </p:calendar>
+                                                    <p:message for="dteConstructionPeriodEndinggDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.consultancy}"  id="consultancyPnl">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionShrtLstApprvlMgtStartDate" class="control-label col-sm-12"
+                                                               value="Submission Of Short Listing Report Approval Mgmt Start Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Submission Of Short Listing Report Approval Mgmt Start Date" mindate="today" value="#{projectPlanController.prmsProjectPlan.subShrtRepAppMgtStrtDt}" 
+                                                                disabled="#{workFlow.readonly}"   id="dteSubmissionShrtLstApprvlMgtStartDate" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteSubmissionShrtLstApprvlMgtEndDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteSubmissionShrtLstApprvlMgtStartDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionShrtLstApprvlMgtEndDate" class="control-label col-sm-12"
+                                                               value="Submission Of Short Listing Report Approval Mgmt Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Submission Of Short Listing Report Approval Mgmt Ending Date" value="#{projectPlanController.prmsProjectPlan.subShrtRepAppMgtEndDt}" 
+                                                                id="dteSubmissionShrtLstApprvlMgtEndDate" disabled="#{workFlow.readonly}" 
+                                                                mindate="#{projectPlanController.getminDate20()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteSubmissionShrtLstApprvlMgtEndDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblIssueRequestStartDate" class="control-label col-sm-12"
+                                                               value="Issue Request For Propoasl-RFP Floating Period Starting Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Issue Request For Propoasl-RFP Floating Period Starting Date" mindate="today" value="#{projectPlanController.prmsProjectPlan.issueRqtRfpFltPrdStrtDt}" 
+                                                                disabled="#{workFlow.readonly}" id="dteIssueRequestStartDate" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteIssueRequestEndDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteIssueRequestStartDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblIssueRequestEndDate" class="control-label col-sm-12"
+                                                               value="Issue Request For Propoasl-RFP Floating Period Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Issue Request For Propoasl-RFP Floating Period Ending Date" value="#{projectPlanController.prmsProjectPlan.issueRqtRfpFltPrdEndDt}" 
+                                                                id="dteIssueRequestEndDate"  disabled="#{workFlow.readonly}" 
+                                                                mindate="#{projectPlanController.getminDate21()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteIssueRequestEndDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblOpenTechncalPrpsalStartDate" class="control-label col-sm-12"
+                                                               value="Opening Of Technical Proposals Starting Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Opening Of Technical Proposals Starting Date" value="#{projectPlanController.prmsProjectPlan.openTechPropStrtDt}" disabled="#{workFlow.readonly}" id="dteOpenTechncalPrpsalStartDate" mindate="today" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" >
+                                                        <p:ajax event="dateSelect" process="@this" update="dteOpenTechncalPrpsalEndingDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteOpenTechncalPrpsalStartDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblOpenTechncalPrpsalEndingDate" class="control-label col-sm-12"
+                                                               value="Opening Of Technical Proposals Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Opening Of Technical Proposals Ending Date" value="#{projectPlanController.prmsProjectPlan.openTechPropEndDt}" 
+                                                                id="dteOpenTechncalPrpsalEndingDate" disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate22()}"  placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteOpenTechncalPrpsalEndingDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblEvaluationOftechnclStarDate" class="control-label col-sm-12"
+                                                               value="Evaluation Of Technical Starting Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Evaluation Of Technical Starting Date" mindate="today" value="#{projectPlanController.prmsProjectPlan.evalTechStrtDt}" id="dteEvaluationOftechnclStarDate" disabled="#{workFlow.readonly}"  placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteEvaluationOftechnclEndDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteEvaluationOftechnclStarDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblEvaluationOftechnclEndDate" class="control-label col-sm-12"
+                                                               value="Evaluation Of Technical Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Evaluation Of Technical Ending Date" value="#{projectPlanController.prmsProjectPlan.evalTechEndDt}"  id="dteEvaluationOftechnclEndDate" disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate23()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteEvaluationOftechnclEndDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalRprtFrPurchseComteStrtDte" class="control-label col-sm-12"
+                                                               value="Submission of Technical Report for Purchase Committe Starting Date:" />
+                                                <div class="col-sm-6">
+                                                    <p:calendar mindate="today" required="true" requiredMessage="Please Enter Submission of Technical Report for Purchase Committe Starting Date" value="#{projectPlanController.prmsProjectPlan.sbmtTchnclRepComiteStrt}" disabled="#{workFlow.readonly}" id="dteSubmissionTechnicalRprtFrPurchseComteStrtDte" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteSubmissionTechnicalRprtFrPurchseComteEndingDte"/>
+                                                    </p:calendar> 
+                                                    <p:message for="dteSubmissionTechnicalRprtFrPurchseComteStrtDte" display="icon" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalRprtFrPurchseComteEndingDte" class="control-label col-sm-12"
+                                                               value="Submission of Technical for Purchase Committe Ending Date:" />
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Submission of Technical for Purchase Committe Ending Date" value="#{projectPlanController.prmsProjectPlan.sbmtTchnclRepComiteEnd}" id="dteSubmissionTechnicalRprtFrPurchseComteEndingDte" disabled="#{workFlow.readonly}" 
+                                                                mindate="#{projectPlanController.getminDate24()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteSubmissionTechnicalRprtFrPurchseComteEndingDte" display="icon" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalRprtMgmtStrtDte" class="control-label col-sm-12"
+                                                               value="Submission of Technical Report for Mgmt Starting Date:"/>  
+                                                <div class="col-sm-6">
+                                                    <p:calendar mindate="today" required="true" requiredMessage="Please Enter Submission of Technical Report for Mgmt Starting Date" value="#{projectPlanController.prmsProjectPlan.sbmtTchncMgmtStrtDt}" 
+                                                                id="dteSubmissionTechnicalRprtMgmtStrtDte" class="form-control" disabled="#{workFlow.readonly}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteSubmissionTechnicalRprtMgmtEndingDte"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteSubmissionTechnicalRprtMgmtStrtDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalRprtMgmtEndingDte" class="control-label col-sm-12"
+                                                               value="Submission of Technical Report for Mgmt Ending Date:"/>  
+                                                <div class="col-sm-6">
+                                                    <p:calendar  required="true" requiredMessage="Please Enter Submission of Technical Report for Mgmt Ending Date" value="#{projectPlanController.prmsProjectPlan.sbmtTchncMgmtEndDt}" 
+                                                                 id="dteSubmissionTechnicalRprtMgmtEndingDte" disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate25()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteSubmissionTechnicalRprtMgmtEndingDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalRprtFBrdStrtDt" class="control-label col-sm-12"
+                                                               value="Submission of Technical Report for Board Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar mindate="today" required="true" requiredMessage="Please Enter Submission of Technical Report for Board Starting Date" value="#{projectPlanController.prmsProjectPlan.sbmtTchncBoardStrtDt}" disabled="#{workFlow.readonly}" id="dtSubmissionTechnicalRprtFBrdStrtDt" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dtSubmissionTechnicalRprtFBrdEndingDt"/>
+                                                    </p:calendar>
+                                                    <p:message for="dtSubmissionTechnicalRprtFBrdStrtDt" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalRprtFBrdEndingDt" class="control-label col-sm-12"
+                                                               value="Submission of Technical Report for Board Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Submission of Technical Report for Board Ending Date" value="#{projectPlanController.prmsProjectPlan.sbmtTchncBoardEndDt}" id="dtSubmissionTechnicalRprtFBrdEndingDt" disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate26()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dtSubmissionTechnicalRprtFBrdEndingDt" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblContractExAndCopmStrt" class="control-label col-sm-12"
+                                                               value="Contract Execution and Completion Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Contract Execution and Completion Starting Date" value="#{projectPlanController.prmsProjectPlan.contExecCompStrtDt}" disabled="#{workFlow.readonly}" id="dtContractExAndCopmStrt" mindate="today" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"> 
+                                                        <p:ajax event="dateSelect" process="@this" update="dtContractExAndCopmEndDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dtContractExAndCopmStrt" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblContractExAndCopmEndDate"  class="control-label col-sm-12" value="Contract Execution and Completion Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" requiredMessage="Please Enter Contract Execution and Completion Ending Date"  value="#{projectPlanController.prmsProjectPlan.contExecCompEndDt}" id="dtContractExAndCopmEndDate"  disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate27()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dtContractExAndCopmEndDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.purchaseTypCommon}"  id="forAllPurchaseTyExpConstu">
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lbloObjection"  class="control-label col-sm-12"
+                                                               value="Submission and Approval of Pre-qualification Evaluation Report Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="txtnoObjection" mindate="today" required="true" value="#{projectPlanController.prmsProjectPlan.submApprlEvalRprtStrtDt}" style="width: 100%" 
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Submission and Approval Starting Date for Pre-qualification Evaluation Report" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dtSubmissionAndApprovalPreQulfEvalReport"/>
+                                                    </p:calendar>
+                                                    <p:message for="txtnoObjection" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionAndApprovalPreQulfEvalReport" class="control-label col-sm-12"
+                                                               value="Submission and Approval of Pre-qualification Evaluation Report Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dtSubmissionAndApprovalPreQulfEvalReport" required="true" value="#{projectPlanController.prmsProjectPlan.submApprvlEvalRprtEndDt}" style="width: 100%" 
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate6()}" requiredMessage="Please Enter Ending Date for Submission and Approval of Pre-qualification Evaluation Report" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+
+                                                    </p:calendar>
+                                                    <p:message for="dtSubmissionAndApprovalPreQulfEvalReport" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="tblPrepareBiddingDocumentStartDate" class="control-label col-sm-12"
+                                                               value="Prepare Bidding Documents Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" mindate="today" id="dtPrepareBiddingDocumentStartDate" value="#{projectPlanController.prmsProjectPlan.prepareDocumntStrtDate}" style="width: 100%"
+                                                                disabled="#{workFlow.readonly}"  requiredMessage="Please Enter Starting Date for Bidding Documents " placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dtPrepareBiddingDocumentEndingDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dtPrepareBiddingDocumentStartDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblPrepareBiddingDocumentEndingDate" class="control-label col-sm-12"
+                                                               value="Prepare Bidding Documents Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dtPrepareBiddingDocumentEndingDate" required="true" value="#{projectPlanController.prmsProjectPlan.prepareDocumntEndingDate}" 
+                                                                style="width: 100%" requiredMessage="Please Enter ending date for preparing Bid Document" disabled="#{workFlow.readonly}" 
+                                                                mindate="#{projectPlanController.getminDate1()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                    </p:calendar>
+                                                    <p:message for="dtPrepareBiddingDocumentEndingDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblbidInvitationaDte"  class="control-label col-sm-12"
+                                                               value="Invitation Of the ShortListed and Provide Bid Document to The Bidders Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="bidInvitationaDte" required="true" mindate="today" value="#{projectPlanController.prmsProjectPlan.invtionShrtLstBiderStrtDt}" style="width: 100%" 
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Bidders Starting date" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteInvitationShortListedProvdBdDocumntStrtDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="bidInvitationaDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblInvitationShortListedProvdBdDocumntStrtDate"  class="control-label col-sm-12"
+                                                               value="Invitation Of the ShortListed and Provide Bid Document to The Bidders Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dteInvitationShortListedProvdBdDocumntStrtDate" required="true" value="#{projectPlanController.prmsProjectPlan.invtionShrtLstBiderEndDt}" style="width: 100%"
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Bidders Ending Date" mindate="#{projectPlanController.getminDate7()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+
+                                                    </p:calendar>
+                                                    <p:message for="dteInvitationShortListedProvdBdDocumntStrtDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblBidOpeningDate" class="control-label col-sm-12"
+                                                               value="Bid Opening Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dteBidOpeningDate" mindate="today" required="true" value="#{projectPlanController.prmsProjectPlan.bidOpeningDate}" style="width: 100%"
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Bid Opening Date" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteBidClosingDate"/>
+                                                    </p:calendar>  
+                                                    <p:message for="dteBidOpeningDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblBidClosingDate" class="control-label col-sm-12"
+                                                               value="Bid Closing Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dteBidClosingDate"  value="#{projectPlanController.prmsProjectPlan.bidClosingDate}" required="true" style="width: 100%" 
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Bid Closing Date" mindate="#{projectPlanController.getminDate8()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                    </p:calendar>  
+                                                    <p:message for="dteBidClosingDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblEvaluationOfTechnicalAndFinancialStrtDte"  class="control-label col-sm-12"
+                                                               value="Evaluation Of Technical and Financial Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar mindate="today" id="dteEvaluationOfTechnicalAndFinancialStrtDte" required="true" value="#{projectPlanController.prmsProjectPlan.evltTchniclFinanStrtDte}" style="width: 100%" 
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Date for Evaluation Of Technical and Financial Starting" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteEvaluationOfTechnicalAndFinancialEndingDte"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteEvaluationOfTechnicalAndFinancialStrtDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblEvaluationOfTechnicalAndFinancialEndingDte"  class="control-label col-sm-12"
+                                                               value="Evaluation Of Technical and Financial Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="dteEvaluationOfTechnicalAndFinancialEndingDte" required="true" value="#{projectPlanController.prmsProjectPlan.evltTchniclFinanEndDte}" style="width: 100%"
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter ending date for Evaluation Of Technical and Financial" mindate="#{projectPlanController.getminDate9()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                    </p:calendar>
+                                                    <p:message for="dteEvaluationOfTechnicalAndFinancialEndingDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalFinancialRprtFrPurchseComteStrtDte" class="control-label col-sm-12"
+                                                               value="Submission of Technical and Financial Report for Purchase Committe Starting Date:" />
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" mindate="today" value="#{projectPlanController.prmsProjectPlan.sbmtTchnclFinanComiteStrt}" id="dteSubmissionTechnicalFinancialRprtFrPurchseComteStrtDte" 
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Starting Date for Submission of Technical and Financial Report for Purchase Committe" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteSubmissionTechnicalFinancialRprtFrPurchseComteEndingDte"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteSubmissionTechnicalFinancialRprtFrPurchseComteStrtDte" display="icon" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalFinancialRprtFrPurchseComteEndingDte" class="control-label col-sm-12"
+                                                               value="Submission of Technical and Financial Report for Purchase Committe Ending Date:" />
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" value="#{projectPlanController.prmsProjectPlan.sbmtTchnclFinanComiteEnd}" id="dteSubmissionTechnicalFinancialRprtFrPurchseComteEndingDte" 
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate10()}" requiredMessage="Please Enter Ending Date for Submission of Technical and Financial Report for Purchase Committe" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteSubmissionTechnicalFinancialRprtFrPurchseComteEndingDte" display="icon" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalFinancialRprtMgmtStrtDte" class="control-label col-sm-12"
+                                                               value="Submission of Technical and Financial Report for Mgmt Starting Date:"/>  
+                                                <div class="col-sm-6">
+                                                    <p:calendar  required="true" mindate="today" value="#{projectPlanController.prmsProjectPlan.sbmtTchnclFinanMgmtStrtDt}" id="dteSubmissionTechnicalFinancialRprtMgmtStrtDte"
+                                                                 disabled="#{workFlow.readonly}" requiredMessage="Please Enter Starting Date for Submission of Technical and Financial Report" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteSubmissionTechnicalFinancialRprtMgmtEndingDte"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteSubmissionTechnicalFinancialRprtMgmtStrtDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalFinancialRprtMgmtEndingDte" class="control-label col-sm-12"
+                                                               value="Submission of Technical and Financial Report for Mgmt Ending Date:"/>  
+                                                <div class="col-sm-6">
+                                                    <p:calendar  required="true" value="#{projectPlanController.prmsProjectPlan.sbmtTchnclFinanMgmtEndDte}" id="dteSubmissionTechnicalFinancialRprtMgmtEndingDte" 
+                                                                 disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate11()}" requiredMessage="Please Enter Ending date for Submission of Technical and Financial Report for Mgmt" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteSubmissionTechnicalFinancialRprtMgmtEndingDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalFinacialRprtFBrdStrtDt" class="control-label col-sm-12"
+                                                               value="Submission of Technical and Financial Report for Board Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" mindate="today" value="#{projectPlanController.prmsProjectPlan.sbmtTchnclFinanBrordStrtD}" id="dtSubmissionTechnicalFinacialRprtFBrdStrtDt"
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Starting Date for Submission of Technical and Financial Report for Board" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dtSubmissionTechnicalFinacialRprtFBrdEndingDt"/>
+                                                    </p:calendar> 
+                                                    <p:message for="dtSubmissionTechnicalFinacialRprtFBrdStrtDt" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblSubmissionTechnicalFinacialRprtFBrdEndingDt" class="control-label col-sm-12"
+                                                               value="Submission of Technical and Financial Report for Board Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" value="#{projectPlanController.prmsProjectPlan.sbmtTchnclFinanBrordEndDt}" id="dtSubmissionTechnicalFinacialRprtFBrdEndingDt" 
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate12()}" requiredMessage="Please Enter Ending Date for Submission of Technical and Financial Report for Board" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dtSubmissionTechnicalFinacialRprtFBrdEndingDt" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblNotificationAwardStrtDte"  class="control-label col-sm-12"
+                                                               value="Notification of Award Starting Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" mindate="today" value="#{projectPlanController.prmsProjectPlan.notificationAwardStrtDate}" id="dteNotificationAwardStrtDte"
+                                                                requiredMessage="Please Enter Starting Date for Notification of Award" disabled="#{workFlow.readonly}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteNotificationAwardEndingDte"/>
+                                                    </p:calendar> 
+                                                    <p:message for="dteNotificationAwardStrtDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblNotificationAwardEndingDte"  class="control-label col-sm-12"
+                                                               value="Notification of Award Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" value="#{projectPlanController.prmsProjectPlan.notificationAwardEndDate}" id="dteNotificationAwardEndingDte" 
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate13()}" requiredMessage="Please Enter Ending Date for Notification of Award " placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteNotificationAwardEndingDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblContractDcumntPreprtionSigningStrtDt"  class="control-label col-sm-12"
+                                                               value="Contract Document Preparation and Contract Signing Starting Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" mindate="today" value="#{projectPlanController.prmsProjectPlan.contrctDocmntPrprtioStrtDt}" id="dteContractDcumntPreprtionSigningStrtDt"
+                                                                disabled="#{workFlow.readonly}" requiredMessage="Please Enter Starting Date for Contract Document Preparation and Contract Signing" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteContractDcumntPreprtionSigningEndingDt"/>
+                                                    </p:calendar>
+
+                                                    <p:message for="dteContractDcumntPreprtionSigningStrtDt" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblContractDcumntPreprtionSigningEndingDt"  class="control-label col-sm-12"
+                                                               value="Contract Document Preparation and Contract Signing Ending Date:"/> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar required="true" value="#{projectPlanController.prmsProjectPlan.contrctDocmntPrprtionEndDt}" id="dteContractDcumntPreprtionSigningEndingDt" 
+                                                                requiredMessage="Please Enter Signing Ending Date for  Contract Document Preparation and Contract"
+                                                                disabled="#{workFlow.readonly}" mindate="#{projectPlanController.getminDate14()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"/>
+                                                    <p:message for="dteContractDcumntPreprtionSigningEndingDt" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.nonConsultancy}"  id="nonConsultancyPanel">
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblServicePeriodstrtingDte"  rendered="#{projectPlanController.nonConsultancy}"
+                                                               class="control-label col-sm-12" value="Service Period Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar mindate="today"  id="dteServicePeriodstrtingDte" required="true" requiredMessage="Please Enter Service Period Starting Date" value="#{projectPlanController.prmsProjectPlan.servicePeriodStrtDt}" style="width: 100%" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteServicePeriodEndingDte"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteServicePeriodstrtingDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblServicePeriodEndingDte"
+                                                               class="control-label col-sm-12" value="Service Period Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar   id="dteServicePeriodEndingDte" required="true" requiredMessage="Please Enter Service Period Ending Date" value="#{projectPlanController.prmsProjectPlan.servicePeriodEndDt}" style="width: 100%" 
+                                                                  mindate="#{projectPlanController.getminDate15()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+
+                                                    </p:calendar>
+                                                    <p:message for="dteServicePeriodEndingDte" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{projectPlanController.goodsName}"  id="goodsPanel">
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblOpeningLc"
+                                                               class="control-label col-sm-12" value="Opening Of Lc:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar  mindate="today" id="dteOpeningLc" required="true" requiredMessage="Please Enter Opening Of Lc" value="#{projectPlanController.prmsProjectPlan.servicePeriodStrtDt}" style="width: 100%" 
+                                                                 disabled="#{workFlow.readonly}"  placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                    </p:calendar>
+                                                    <p:message for="dteOpeningLc" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblDeliverGood"
+                                                               class="control-label col-sm-12" value="Deliver Of Goods Starting Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar  mindate="today" id="dteDeliverGood" required="true"  disabled="#{workFlow.readonly}" value="#{projectPlanController.prmsProjectPlan.servicePeriodStrtDt}" style="width: 100%" requiredMessage="Please Enter Starting Date to Deliver Of Goods " placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                        <p:ajax event="dateSelect" process="@this" update="dteDeliverOfGoodsEndDate"/>
+                                                    </p:calendar>
+                                                    <p:message for="dteDeliverGood" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblDeliverOfGoodsEndDate"
+                                                               class="control-label col-sm-12" value="Deliver Of Goods Ending Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar   id="dteDeliverOfGoodsEndDate" required="true" value="#{projectPlanController.prmsProjectPlan.servicePeriodEndDt}" style="width: 100%" 
+                                                                  disabled="#{workFlow.readonly}" requiredMessage="Please Enter Ending Date for Deliver Of Goods" mindate="#{projectPlanController.getminDate15()}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                    </p:calendar>
+                                                    <p:message for="dteDeliverOfGoodsEndDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{projectPlanController.purchaseTypCommon}"  id="purchasety">
+                                            <div class="form-group col-sm-12  textBoxMargin6px required">
+                                                <p:outputLabel id="lblContractTerminationStartingdte"
+                                                               class="control-label col-sm-12" value="Contract Termination Date:"/>
+                                                <div class="col-sm-6">
+                                                    <p:calendar mindate="today" id="dteContractTerminationStartingdte" required="true" value="#{projectPlanController.prmsProjectPlan.contractTerminationStrtDt}" style="width: 100%" 
+                                                                disabled="#{workFlow.readonly}"  requiredMessage="Please Enter Date to Termination Contract" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy">
+                                                    </p:calendar>
+                                                    <p:message for="dteContractTerminationStartingdte" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                                <section class="panel panel-info">
+                                    <section class="panel-body">  
+                                        <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-md-12">                      
+                                                    <div class="box-body"> 
+                                                        <div class="col-md-6">
+                                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                                <div class="form-group required form-horizontal">
+                                                                    <h:outputLabel  class="control-label col-sm-4" value="Decision:" rendered="#{purchasePlanController.renderDecision}"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu id="drddecision" value="#{projectPlanController.wfPrmsProcessed.decision}" required="true" requiredMessage="Please Select Decision" style="width: 100%" valueChangeListener="#{projectPlanController.handleDecision}" rendered="#{purchasePlanController.renderDecision}">
+                                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                            <f:selectItem itemLabel="Approved" itemValue="Approve"/>
+                                                                            <f:selectItem itemLabel="Rejected" itemValue="Reject"/>                                                                                       
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="drddecision" display="icon"/>
+                                                                    </div>  
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px required">
+                                                                <div class="form-group form-horizontal form-group">
+
+                                                                    <p:outputLabel  for="txtComment" class="control-label col-sm-4" rendered="#{purchasePlanController.renderDecision}" value="Comment Given:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtComment" class="form-control"  value="#{projectPlanController.wfPrmsProcessed.commentGiven}" 
+                                                                                         title="Remark"  rendered="#{purchasePlanController.renderDecision}"
+                                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group">
+                                                                    <p:outputLabel id="lblProcessor" class="control-label col-sm-4" value="Processed By:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText  id="txtProcessedBy" readonly="true" value="#{projectPlanController.userName}" title="Processed By"
+                                                                                      required="true" requiredMessage="Processed By Value is Required"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal required">
+                                                                    <p:outputLabel id="lblApproved" value="Processed Date:"  class="control-label col-sm-4" />
+                                                                    <div class="col-sm-8">
+                                                                        <p:calendar id="calProcessed" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" autocomplete="off" 
+                                                                                    mindate="today" maxdate="today" value="#{projectPlanController.wfPrmsProcessed.processedOn}"
+                                                                                    required="true" requiredMessage="Please Enter Processed Date">
+                                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                        </p:calendar>
+                                                                        <p:message for="calProcessed" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <div class="col-sm-12" > 
+                                    <div class="col-sm-6 ">
+                                        <div class="form-group col-sm-12 textBoxMargin6px required"> 
+                                            <div class="col-sm-12" >
+                                                <p:commandButton id="btnSave" icon="ui-icon-new" validateClient="true" process="frmMain" update="frmMain,:frmProjectPlanTbr"
+                                                                 class="btn btn-primary col-lg-3 pull-right" action="#{projectPlanController.save_ProjectPlan()}"
+                                                                 value="#{projectPlanController.saveorUpdateBundle}"/> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

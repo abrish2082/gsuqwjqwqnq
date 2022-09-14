@@ -1,0 +1,586 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="TrainingPrograms.xhtml"><i class="fa fa-circle-o "></i> <span>Inland &amp; Foreign Training</span></a></li>
+    </ui:define>
+
+
+    <ui:define name="contents">
+        <a href=""></a>
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton validateClient="true" action="#{inlandAnfForeignTrainingControllers.InlandForeignTriainingInfo()}"
+                                     icon="#{inlandAnfForeignTrainingControllers.icone}" style="background-color: white; border-color: white"
+                                     title="#{inlandAnfForeignTrainingControllers.createOrSearchBundle}" 
+                                     process="@this" update="@this,:frmInlandAndForiegnTraining" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <a href="../../hrms/training/EducationPrograms.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmInlandAndForiegnTraining"> 
+            <p:growl id="growl"  autoUpdate="true" severity="information,fatal" showDetail="true" /> 
+            <h:panelGroup id="pnlSearch" style="border: 0px; background-color: transparent" rendered="#{inlandAnfForeignTrainingControllers.chooseMainPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchEvaLevel">
+                                                <div class="form-horizontal col-sm-12 form-group required ">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-6">
+                                                            <p:selectOneMenu id="somFiliterByStatus" value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.location}" style="width:100%"
+                                                                             valueChangeListener="#{inlandAnfForeignTrainingControllers.filiterINladnAndForeignEduByLocation_Vcl}" >
+                                                                <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                <f:selectItem itemLabel=" Inland Education Programs " itemValue="1"/>
+                                                                <f:selectItem itemLabel="Foreign Education Programs" itemValue="2"/>    
+                                                                <p:ajax event="change" process="@this" update=":frmInlandAndForiegnTraining:tblTrainingList"/>
+                                                            </p:selectOneMenu> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblTrainingList"  rowsPerPageTemplate="10,20,30" value="#{inlandAnfForeignTrainingControllers.inlandForeignEduDataModel}"
+                                                         var="var" selectionMode="single"  selection="#{inlandAnfForeignTrainingControllers.hrTdIfEduc}" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom" rowKey="#{var.id}"
+                                                         class="dataTable" >
+                                                <p:ajax event="rowSelect" process="@this,tblTrainingList" listener="#{inlandAnfForeignTrainingControllers.InlandAndForeignEdu_processMyEvent}"
+                                                        update=":frmInlandAndForiegnTraining,:frmSample"/>
+                                                <p:column headerText="No.">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText=" Country"  filterMatchMode="contains" filterBy="#{var.countryId.addressName}"  >
+                                                    <h:outputText value="#{var.countryId.addressName}"/>
+                                                </p:column> 
+                                                <p:column headerText=" Education Qualification" >
+                                                    <h:outputText value="#{var.educQualId.educType}"/>
+                                                </p:column>
+                                                <p:column headerText=" Education level"  filterMatchMode="contains" filterBy="#{var.educLevelId.educLevel}">
+                                                    <h:outputText value="#{var.educLevelId.educLevel}" />
+                                                </p:column>
+
+                                                <p:column filterMatchMode="contains" filterBy="#{var.institution}">
+                                                    <f:facet name="header" >
+                                                        <h:outputText value="Institution" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{var.institution}"/>
+                                                </p:column> 
+                                                <p:column headerText="Start Date" >
+                                                    <h:outputText value="#{var.programStartDate}"/>
+                                                </p:column>
+                                                <p:column headerText="End Date" >
+                                                    <h:outputText value="#{var.programEndDate}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+            <h:panelGroup id="pnlMainpage" style="border: 0px; background-color: transparent" rendered="#{inlandAnfForeignTrainingControllers.chooseCreatePage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Inland &amp; Foreign Education programs followup page</h3>
+                            </div>
+                            <div class="box-body ">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl4" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required ">
+                                                                            <h:outputLabel for="txtLocation" class="control-label col-sm-4" value="Location "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneRadio id="txtLocation" class="col-sm-8" required="true" requiredMessage="select Program location"
+                                                                                                  value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.location}" >
+                                                                                    <f:selectItem itemLabel="Local" itemValue="1" />
+                                                                                    <f:selectItem itemLabel="Abroad" itemValue="2" />                                                        
+                                                                                </p:selectOneRadio>
+                                                                                <p:message for="txtLocation" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtCountry" class="control-label col-sm-4" value="Country :"/>
+                                                                            <div class="col-sm-8">
+                                                                                <div class="col-sm-11 form-group form-horizontal">
+                                                                                    <p:inputText id="txtCountry" value="#{inlandAnfForeignTrainingControllers.hrAddresses.addressName}"/>
+                                                                                </div>
+                                                                                <div class="col-sm-1 " >
+                                                                                    <p:commandButton id="btnAddress" onclick="PF('dlgAddress').show();" partialSubmit="true" style="background: transparent" value="+" /> 
+                                                                                </div>
+                                                                                <p:message for="txtCountry" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <p:dialog id="dlgAddress" header="Address" widgetVar="dlgAddress" height="300" width="500"  showEffect="explode">
+                                                                        <h:panelGrid columns="3" >
+                                                                            <p:tree id="addressTree" value="#{inlandAnfForeignTrainingControllers.root}" var="node" dynamic="true" 
+                                                                                    selectionMode="single" animate="true" selection="#{inlandAnfForeignTrainingControllers.selectedNode}"  
+                                                                                    style="width: 100%; height: 100%; overflow: auto; display: block; border: transparent; border-style: inset" class="col-lg-12">
+                                                                                <p:treeNode id="treeNode" expandedIcon="ui-icon ui-icon-folder-open" 
+                                                                                            collapsedIcon="ui-icon ui-icon-folder-collapsed">
+                                                                                    <h:outputText value="#{node}" id="nodetxt"/>                                                                
+                                                                                </p:treeNode>
+                                                                                <p:ajax event="select" listener="#{inlandAnfForeignTrainingControllers.onNodeSelect}" process="@this,:frmInlandAndForiegnTraining:txtCountry" 
+                                                                                        update=":frmInlandAndForiegnTraining:txtCountry" />
+                                                                            </p:tree>                                   
+                                                                        </h:panelGrid>
+                                                                    </p:dialog>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required ">
+                                                                            <h:outputLabel for="txtEducationId"  class="control-label col-sm-4" value="Education Level "/>
+                                                                            <div class="col-sm-8 ">
+                                                                                <p:selectOneMenu id="txtEducationId" required="true" style="width:100%"   requiredMessage="Please select Education Level"
+                                                                                                 value="#{inlandAnfForeignTrainingControllers.hrLuEducLevels.id}">        
+                                                                                    <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                                    <f:selectItems  value="#{inlandAnfForeignTrainingControllers.eduLevelList}" var="Edulist" itemLabel="#{Edulist.educLevel}" itemValue="#{Edulist.id}"/>
+
+                                                                                    <p:ajax process="@this" event="change"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="txtEducationId" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEduQualification" class="control-label col-sm-4" value="Educatin Qualification "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="txtEduQualification" required="true" style="width:100%"   requiredMessage="Please select Educatin Qualification."
+                                                                                                 value="#{inlandAnfForeignTrainingControllers.hrLuEducTypes.id}">        
+                                                                                    <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                                    <f:selectItems  value="#{inlandAnfForeignTrainingControllers.eduTypeelList}" var="EduTypelist" itemLabel="#{EduTypelist.educType}" itemValue="#{EduTypelist.id}"/>
+                                                                                    <p:ajax process="@this" event="change"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="txtEduQualification" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSponsor" class="control-label col-sm-4" value="Program Sponor "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="txtSponsor" required="true" style="width:100%" requiredMessage="Please select your Program Sponor."
+                                                                                                 value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.programSponsor}">        
+                                                                                    <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                                    <f:selectItem itemLabel="Embasy" itemValue="1"/>
+                                                                                    <f:selectItem itemLabel="EEP" itemValue="2"/>
+                                                                                    <f:selectItem itemLabel="Other" itemValue="3"/>
+                                                                                    <p:ajax process="@this" event="change"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="txtSponsor" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtInstitution" class="control-label col-sm-4" value="Insttution:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtInstitution" value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.institution}"  />  
+                                                                                <p:message for="txtInstitution" display="icon"/>
+                                                                            </div>                                                             
+                                                                        </div>                                                                                          
+                                                                    </div> 
+
+
+                                                                </div>
+
+                                                                <div class="col-md-6">
+
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtStartDate" class="control-label col-sm-4" value="Start Date "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtStartDate" value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.programStartDate}"
+                                                                                             onclick="displayCalendar('frmInlandAndForiegnTraining:txtStartDate', 'frmInlandAndForiegnTraining:txtStartDate');"
+                                                                                             title="start date" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                                <p:message for="txtStartDate" display="icon"/>
+
+                                                                            </div>                                                              
+                                                                        </div>                                                                                          
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEndDate" class="control-label col-sm-4" value="End Date "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEndDate" value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.programEndDate}"
+                                                                                             onclick="displayCalendar('frmInlandAndForiegnTraining:txtEndDate', 'frmInlandAndForiegnTraining:txtEndDate');"
+                                                                                             title="start date" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                                <p:message for="txtEndDate" display="icon"/>
+
+                                                                            </div>                                                              
+                                                                        </div>                                                                                          
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtStartTime" class="control-label col-sm-4" value="Program start Time "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtStartTime" value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.programStartTime}"
+                                                                                             onclick="displayCalendar('frmInlandAndForiegnTraining:txtStartTime', 'frmInlandAndForiegnTraining:txtStartTime');"
+                                                                                             title="start date" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                                <p:message for="txtStartTime" display="icon"/>
+
+                                                                            </div>
+
+
+                                                                        </div>                                                                                          
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtLetterDate" class="control-label col-sm-4" value="Letter Date "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtLetterDate" value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.letterDate}"
+                                                                                             onclick="displayCalendar('frmInlandAndForiegnTraining:txtLetterDate', 'frmInlandAndForiegnTraining:txtLetterDate');"
+                                                                                             title="start date" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                                <p:message for="txtLetterDate" display="icon"/>
+
+                                                                            </div>                                                              
+                                                                        </div>                                                                                          
+                                                                    </div> 
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtRefrenceNo" class="control-label col-sm-4" value="Letter Refrence No "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtRefrenceNo"  value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.letterReferenceNo}"  validator="#{validatorManagedBean.Number}" validatorMessage="Input number value"/>
+
+                                                                            </div>                                                              
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="txtRemark"  value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.remark}" class="form-control"  />
+                                                                            </div>                                                              
+                                                                        </div>                                                                                          
+                                                                    </div> 
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section>
+
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+
+
+
+                                                    <h:panelGroup id="pnl5" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="selectedEmp" value="Employee Name " class="control-label col-sm-4"/>  
+                                                                            <div class="col-sm-8">
+                                                                                <p:autoComplete id="selectedEmp" style="width:100%" placeholder="Search by Name"
+                                                                                                required="true" requiredMessage="Search Selected Staff"
+                                                                                                value="#{inlandAnfForeignTrainingControllers.hrEmployees.firstName}"
+                                                                                                completeMethod="#{inlandAnfForeignTrainingControllers.SearchByStafName}"
+                                                                                                var="selectedEmpList"
+                                                                                                itemValue="#{selectedEmpList.firstName}" itemLabel="#{selectedEmpList}" forceSelection="true" 
+                                                                                                size="20" emptyMessage="no data">  
+                                                                                    <f:facet name="itemtip" >
+                                                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">
+                                                                                            <h:outputText value="Id : " />
+                                                                                            <h:outputText value="#{selectedEmpList.empId}" /> 
+                                                                                            <h:outputText value="first Name " />
+                                                                                            <h:outputText value="#{selectedEmpList.firstName}" />
+                                                                                            <h:outputText value="middle Name: " />
+                                                                                            <h:outputText value="#{selectedEmpList.middleName}" />
+
+                                                                                            <h:outputText value="Last Name: " />
+                                                                                            <h:outputText value="#{selectedEmpList.lastName}" />
+                                                                                        </h:panelGrid>
+                                                                                    </f:facet>
+                                                                                    <p:ajax event="itemSelect" listener="#{inlandAnfForeignTrainingControllers.getByEduName}" process="@this"  
+                                                                                            update="txtDepartment,txtPosition,txtGender , serarchByEmp"/>     
+                                                                                </p:autoComplete> 
+
+                                                                                <p:message for="selectedEmp" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                                                                          
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtGender"  class="control-label col-sm-4" value="Gender:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtGender" title="gender" value="#{inlandAnfForeignTrainingControllers.hrEmployees.sex}" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtGender" display="icon"/>
+                                                                            </div>                                                               
+                                                                        </div>                                                                                          
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtTotalResult" class="control-label col-sm-4" value="Total result "/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id ="txtTotalResult"  value="#{inlandAnfForeignTrainingControllers.hrTdIfEducSelectedStaffs.totalResult}"  
+                                                                                             required="true" requiredMessage="Add Total Result" style="width:100%"  class="form-control" > </p:inputText>
+                                                                                <p:message for="txtTotalResult" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    <div class="col-sm-12 textBoxMargin6px">
+                                                                        <div class="col-sm-4"></div>
+                                                                        <div class="col-sm-3">
+                                                                            <p:commandButton id="btnadd" class="btn  btn-block btn-primary col-sm-2 " 
+                                                                                             value="#{inlandAnfForeignTrainingControllers.addorUpdate}"
+                                                                                             action="#{inlandAnfForeignTrainingControllers.addstud()}"
+                                                                                             process="@this,pnl5" update="@this,pnl5,tblIFTProgDetails,serarchByEmp"                                            
+                                                                                             />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtDepartment"  class="control-label col-sm-4" value="Department:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtDepartment" title="Department" value="#{inlandAnfForeignTrainingControllers.hrDepartments.depName}" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtDepartment" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPosition"  class="control-label col-sm-4" value="Job Title:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPosition" value="#{inlandAnfForeignTrainingControllers.hrJobTypes.jobTitle}"  
+                                                                                             title="Job Position" required="true" readonly="true"/>
+                                                                                <p:message for="txtPosition" display="icon"/>
+                                                                            </div>                                                               
+                                                                        </div>                                                                                          
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtstatus" class="control-label col-sm-4" value="Current Status"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="txtstatus" required="true" style="width:100%" requiredMessage="Please select your Program Sponor."
+                                                                                                 value="#{inlandAnfForeignTrainingControllers.hrTdIfEducSelectedStaffs.status}">        
+                                                                                    <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                                    <f:selectItem itemLabel="Attending" itemValue="1"/>
+                                                                                    <f:selectItem itemLabel="Completed" itemValue="2"/>
+                                                                                    <f:selectItem itemLabel="Quitted" itemValue="3"/>
+                                                                                    <p:ajax process="@this" event="change"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="txtstatus" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section>
+
+
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl6" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12">
+
+                                                                <div class="form-group">
+                                                                    <p:dataTable id="tblIFTProgDetails" value="#{inlandAnfForeignTrainingControllers.eduSelectedStafftDataModel}" rowsPerPageTemplate="10,20,30"
+                                                                                 var="Staffs"  rowIndexVar="num"  rows="10" paginator="true" paginatorPosition="bottom" rowKey="#{Staffs.id}"
+                                                                                 class="dataTable" >
+                                                                        <p:ajax event="rowSelect" process="@this,tblIFTProgDetails" 
+                                                                                update=""/>
+
+                                                                        <p:column headerText="No.">
+                                                                            #{num+1}
+                                                                        </p:column>
+                                                                        <p:column headerText=" Staff Name"  >
+                                                                            <h:outputText value="#{Staffs.empId.firstName} #{Staffs.empId.middleName}"/>
+                                                                        </p:column> 
+                                                                        <p:column headerText=" Staff Id" >
+                                                                            <h:outputText value="#{Staffs.empId.empId}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Total Result"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{Staffs.totalResult}"/>
+                                                                        </p:column> 
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Option"/>
+                                                                            </f:facet>
+                                                                            <p:commandLink value="edit" action="#{inlandAnfForeignTrainingControllers.EditEduStaffdata}" process="@this,tblIFTProgDetails" 
+                                                                                           update=":frmInlandAndForiegnTraining:pnl5,tblIFTProgDetails"/>
+                                                                        </p:column> 
+
+                                                                    </p:dataTable>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12 textBoxMargin6px">
+                                                                <h:panelGroup id="serarchByEmp"  class="col-sm-12 textBoxMargin6px" >
+                                                                    <p:dataTable id="tblTrainingListByEmpId"  rowsPerPageTemplate="10,20,30" value="#{inlandAnfForeignTrainingControllers.empEducList}" 
+                                                                                 var="var"   rowIndexVar="num" rows="5" paginator="true" paginatorPosition="bottom" rowKey="#{var.id}"
+                                                                                 class="dataTable" >
+
+                                                                        <p:column headerText="No.">
+                                                                            <h:outputText value="#{num + 1}"/>
+                                                                        </p:column>
+                                                                        <p:column headerText=" Location"  >
+                                                                            <h:outputText value="#{var.countryId.addressName}"/>
+                                                                        </p:column> 
+                                                                        <p:column headerText=" Course" >
+                                                                            <h:outputText value="#{var.educQualId.educType}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Institution"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{var.institution}"/>
+                                                                        </p:column> 
+                                                                        <p:column headerText="Start Date" >
+                                                                            <h:outputText value="#{var.programStartDate}"/>
+                                                                        </p:column>
+                                                                        <p:column headerText="End Date" >
+                                                                            <h:outputText value="#{var.programEndDate}"/>
+                                                                        </p:column>
+                                                                    </p:dataTable>
+                                                                </h:panelGroup>
+                                                            </div>
+                                                        </div>
+
+                                                        <h:panelGroup id="pnl7" class="form-group col-sm-12">
+
+                                                            <div class="panel-body col-sm-12">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-md-6"> 
+
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtPreparedBy"  class="control-label col-sm-4" value="Prepared By:"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtPreparedBy" value="#{inlandAnfForeignTrainingControllers.fullName}" readonly="true" />  
+                                                                                    <p:message for="txtPreparedBy" display="icon"/>
+                                                                                </div>                                                               
+                                                                            </div>                                                                                          
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtPreparedOn" class="control-label col-sm-4" value="Prepared On "/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtPreparedOn" value="#{inlandAnfForeignTrainingControllers.hrTdIfEduc.preparedOn}"
+                                                                                                 onclick="displayCalendar('frmInlandAndForiegnTraining:txtPreparedOn', 'frmInlandAndForiegnTraining:txtPreparedOn');"
+                                                                                                 title="prepared on" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                                    <p:message for="txtPreparedOn" display="icon"/>
+                                                                                </div>                                                             
+                                                                            </div>                                                                                          
+                                                                        </div> 
+
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+
+                                                        </h:panelGroup>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section>
+                                            <h:panelGroup id="pnlbtnSave" class="form-group col-sm-12">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-sm-12 form-horizontal textBoxMargin6px">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-sm-2 " 
+                                                                                     value="#{inlandAnfForeignTrainingControllers.saveOrUpdate}" action="#{inlandAnfForeignTrainingControllers.saveInlandForeignEducation}"                                                                                                                            
+                                                                                     process="@this,pnl4,pnl6,pnl7" update=":frmInlandAndForiegnTraining"/>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div></div>
+                                            </h:panelGroup>
+
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

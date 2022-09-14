@@ -1,0 +1,243 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="displineOffenseType.xhtml"><i class="fa fa-circle-o "></i> <span>Offense Registration </span></a></li>
+        <li><a href="penalityForOffenseType.xhtml"><i class="fa fa-circle-o "></i><span> Penalty for Offense  </span></a></li>  
+        <li> <a href="disciplineRequest.xhtml"><i class="fa fa-circle-o "></i> <span> Discipline Request</span> </a> </li>
+        <li><a href="disciplineApprove.xhtml"><i class="fa fa-circle-o "></i> <span>Discipline Approve </span> </a> </li>  
+        <li><a href="adjudicateDisciplineAppeal.xhtml"><i class="fa fa-circle-o "></i> <span>Adjudicate Discipline Appeal</span> </a> </li> 
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar  style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" action="#{penalitysRegControllers.createNewAdditionalAmount()}" 
+                                     icon="#{penalitysRegControllers.icone}" validateClient="true" style="background-color: white; border-color: white" 
+                                     process="@this" update="@this,:frmPenality,:frmSample"
+                                     title="#{penalitysRegControllers.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{penalitysRegControllers.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{penalitysRegControllers.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmPenality,:frmSample" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <a href="penalitys.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-body ">
+                        <h:form id="frmPenality">
+                            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>  
+                            <h:panelGroup id="pnlPenalityDataTable"  rendered="#{penalitysRegControllers.renderPnlManPage}">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Search...<small></small></h3>   
+                                </div>
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <div class="col-md-12">                                        
+                                                <div class="col-sm-12">
+                                                    <div class="col-sm-6"> 
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">                                                
+                                                                <p:outputLabel  value="Search By: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdpenalty" value="#{penalitysRegControllers.columnNameResolver.col_Name_FromTable}"  
+                                                                                     valueChangeListener="#{penalitysRegControllers.valueChangeListnerPenality}" 
+                                                                                     style="width:100%" required="true" requiredMessage="Select penality name" >
+                                                                        <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                        <f:selectItems value="#{penalitysRegControllers.columnNameResolverList}" var="penalty"
+                                                                                       itemLabel="#{penalty.parsed_Col_Name}" itemValue="#{penalty.col_Name_FromTable}" /> 
+                                                                        <p:ajax event="change" process="@this" update="drdpenalty,lbpenalty,autoPenalty"/>
+                                                                    </p:selectOneMenu> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lbpenalty" class="control-label col-sm-4" value="#{penalitysRegControllers.columnNameResolver.parsed_Col_Name}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:autoComplete id="autoPenalty"  style="width: 100%;" value="#{penalitysRegControllers.disciplinePenaltyTypes.columnValue}"
+                                                                                    completeMethod="#{penalitysRegControllers.searchByPenaltyName}" var="penaltyNameList" converter="entConverter"
+                                                                                    itemValue="#{penaltyNameList}" itemLabel="#{penaltyNameList.penaltyCode}" 
+                                                                                    forceSelection="true" size="20" emptyMessage="no data" scrollHeight="500">  
+                                                                        <p:ajax event="itemSelect" listener="#{penalitysRegControllers.getByPenaltyName}" 
+                                                                                process="@this" update="dtExp,:frmSample"/>
+                                                                    </p:autoComplete>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">                                       
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <br></br>
+                                                    <div class="box box-primary ">
+                                                        <p:dataTable  id="dtExp" value="#{penalitysRegControllers.allPenalityList}" var="penality"  selectionMode="single" 
+                                                                      rows="10" rowsPerPageTemplate="5,10,15" paginator="true" paginatorPosition="bottom"
+                                                                      selection="#{penalitysRegControllers.disciplinePenaltyTypes}" rowIndexVar="num" rowKey="#{penality.id}">
+                                                            <p:ajax event="rowSelect" listener="#{penalitysRegControllers.populate}"  update=":frmPenality,:frmSample" />
+                                                            <f:facet name="header">
+                                                                <p:outputLabel value="" style=" font-size: 16px;"/>
+                                                            </f:facet>
+                                                            <p:column headerText="No." width="50">
+                                                                <h:outputText value="#{num+1}"/>
+                                                            </p:column>
+                                                            <p:column headerText="Penalty Code">
+                                                                <h:outputText value="#{penality.penaltyCode}" />
+                                                            </p:column>
+                                                            <p:column headerText="Penalty Name">
+                                                                <h:outputText value="#{penality.penaltyName}" />
+                                                            </p:column>
+                                                            <p:column headerText="Classification">
+                                                                <h:outputText value="#{penality.penaltyClassification}" />
+                                                            </p:column>
+                                                            <p:column headerText="Action Taker">
+                                                                <h:outputText value="#{penality.actionTaker}" />
+                                                            </p:column>
+                                                            <p:column headerText="Description">
+                                                                <h:outputText value="#{penality.description}" />
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                            <h:panelGroup id="panelPenality"   rendered="#{penalitysRegControllers.renderPnlCreateAdditional}">
+                                <div class="box-header">
+                                    <h3 class="box-title">Penalty Registration </h3>  
+                                </div>
+                                <section class="panel panel-info"  >
+                                    <section class="panel-body" > 
+                                        <div class="row">
+                                            <div class="col-md-12">                      
+                                                <div class="box-body"> 
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <p:outputLabel  value="Penalty Code: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtPenalityCode" value="#{penalitysRegControllers.disciplinePenaltyTypes.penaltyCode}" 
+                                                                                 required="true" validator="#{validatorManagedBean.Codes}" />
+                                                                    <p:message for="txtPenalityCode" display="icon"/>    
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <p:outputLabel   value="Penalty Name: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txPenalityName" value="#{penalitysRegControllers.disciplinePenaltyTypes.penaltyName}"  validator="#{validatorManagedBean.FullName}"
+                                                                                 required="true"  />
+                                                                    <p:message for="txPenalityName" display="icon"/>                                            
+                                                                </div>  
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal form-group required">
+                                                                        <p:outputLabel  value="Classification:" class="control-label col-sm-4"/>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText id="txtPhaseOutTime" value="#{penalitysRegControllers.disciplinePenaltyTypes.penaltyClassification}"
+                                                                                         required="true" validator="#{validatorManagedBean.Text}"/>
+                                                                            <p:message for="txtPhaseOutTime" display="icon"/>                                                    
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal form-group required">
+                                                                <p:outputLabel   value="ActionTaker: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="slctActionTaker" value="#{penalitysRegControllers.disciplinePenaltyTypes.actionTaker}" required="true" style="width: 100%">
+                                                                        <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                        <f:selectItem itemLabel="Immidiate Boss" itemValue="Immidiate Boss"/>
+                                                                        <f:selectItem itemLabel="Top Managment" itemValue="Top Managment"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message for="slctActionTaker" display="icon"/>                                        
+                                                                </div>
+                                                            </div>    
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  for="txtRemark" class="control-label col-sm-4" value="Description:"/>
+                                                                <div class="col-sm-8 textBoxMargin6px">
+                                                                    <h:inputTextarea id="txtRemark"  class="form-control col-md-12" value="#{penalitysRegControllers.disciplinePenaltyTypes.description}" 
+                                                                                     validator="#{validatorManagedBean.Remark}" />
+                                                                    <p:message for="txtRemark" display="icon"/> 
+                                                                </div>  
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </section>
+                                </section>
+                            </h:panelGroup>
+                            <h:panelGroup id="pnlSaveEmp"  rendered="#{penalitysRegControllers.renderPnlCreateAdditional}" >
+                                <div class="panel-body col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <div class="col-sm-4"></div>                                           
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnSavea" value="#{penalitysRegControllers.saveOrUpdateButton}" 
+                                                                     action="#{penalitysRegControllers.savePenalty}"
+                                                                     class="btn  btn-block btn-primary col-lg-4"
+                                                                     process="@this,:frmPenality:panelPenality" update="@this,:frmPenality,:frmSample"/>
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnReset" value="Reset" 
+                                                                     action="#{penalitysRegControllers.clearPenalty}"
+                                                                     class="btn  btn-block btn-primary col-lg-4" 
+                                                                     process="@this" update=":frmPenality"  /> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </h:form>
+                    </div>                   
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

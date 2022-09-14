@@ -1,0 +1,372 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="attendance.xhtml"><i class="fa fa-fw"></i> <span> Attendance </span></a></li>
+        <li><a href="attendanceApprove.xhtml"><i class="fa fa-fw"></i> <span>Attendance Approve </span></a></li>
+        <li><a href="attendanceReport.xhtml"><i class="fa fa-fw"></i> <span>Absent Employee View </span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:outputLabel id="lblNotf" class="fa fa-bell" value="#{attendanceController.requestNotificationCounter}" style="color: red" />
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotf"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="form-group">
+                            <p:dataTable id="tblnotification" value="#{attendanceController.hrList}"
+                                         var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                         selection="#{attendanceController.selectedattendance}" rowKey="#{res.id}" class="dataTable">
+                                <p:ajax event="rowSelect" process="@this" listener="#{attendanceController.attendanceapproveDisplayChanged}" 
+                                        update=":frmRequest,:frmSample"/>
+                                <p:column headerText="No.">
+                                    <h:outputText value="#{num + 1}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Year"/>
+                                    </f:facet>
+                                    <h:outputText value="#{res.year}"/>
+                                </p:column>
+                                <p:column headerText="Month" filterMatchMode="startsWith" filterBy="#{res.month}">
+                                    <h:outputText  value="#{res.month}" />
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                    </span>
+                    <p:commandLink id="cmlView" class="fa fa-gear" onclick="PF('dlgWorkflow').show();"/>
+                    <span class="ui-separator">
+                    </span>
+                    <p:commandButton id="btnNew" validateClient="true" action="#{attendanceController.createNewAdditionalAmount()}" 
+                                     icon="#{attendanceController.icone}" style="background-color: white" 
+                                     process="@this" update=":frmRequest,:frmSample"
+                                     title="#{attendanceController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                    </span>
+                    <a href="attendanceApprove.xhtml"><i class="fa fa-fw fa-refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <p:commandButton id="btnTrash" type="button" style="background-color: white"  title="Delete" icon="ui-icon-trash"/>
+                    <p:commandButton id="btnPrint" type="button" style="background-color: white"  title="Print" icon="ui-icon-print"/>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmRequest"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup id="pnlSearch" rendered="#{attendanceController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search <small> Attendance Approve ...</small></h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group">
+                                            <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                            <div class="col-sm-3">
+                                                <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                 valueChangeListener="#{attendanceController.filiterByStatus_VclAttendance}">
+
+                                                    <f:selectItems value="#{attendanceController.filterByStatus}"/>   
+                                                    <p:ajax event="change" process="@this" update="tblResultList"/>
+                                                </p:selectOneMenu> 
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblResultList" value="#{attendanceController.hrAttendancesDataModel}"
+                                                         var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                         selection="#{attendanceController.selectedattendance}" rowKey="#{res.id}" class="dataTable">
+                                                <p:ajax event="rowSelect" process="@this" listener="#{attendanceController.attendanceapproveDisplayChanged}" 
+                                                        update=":frmRequest,:frmSample"/>
+                                                <p:column headerText="No.">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Year"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.year}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Month"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.month}"/>
+                                                </p:column> 
+
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+            <h:panelGroup id="pnlMainpage" rendered="#{attendanceController.renderPnlCreateAdditional}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Attendance Approve</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="box-body">
+                                                        <div class="box-body">
+                                                            <div class="box-body">
+                                                                <div class="box-body">
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel value="Year:" class="col-md-4 control-label" />
+                                                                                <div class="col-sm-8 textBoxMargin6px">
+                                                                                    <p:inputText id="calabsentdate" value="#{attendanceController.hrAttendances.year}" readonly="true"/>
+                                                                                </div>                                                                                                                              
+                                                                            </div>                                                                                          
+                                                                        </div>
+                                                                        <div class="col-md-12">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel value="Month:" class="col-md-4 control-label" />
+                                                                                <div class="col-md-8 textBoxMargin6px">
+                                                                                    <p:inputText id="ratevalu"  value="#{attendanceController.hrAttendances.month}" readonly="true"  >
+                                                                                    </p:inputText>
+                                                                                </div>                                                                                                                               
+                                                                            </div>                                                                                          
+                                                                        </div>
+                                                                        <div class="col-md-12">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel value="Reported Date:" class="col-md-4 control-label" />
+                                                                                <div class="col-md-8 textBoxMargin6px">
+                                                                                    <p:inputText id="reporteddatee" value="#{attendanceController.hrAttendances.reportedDate}" readonly="true"   >
+                                                                                    </p:inputText> 
+                                                                                </div>                                                                                                                               
+                                                                            </div>                                                                                          
+                                                                        </div>
+                                                                        <div class="col-md-12">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel value="Prepared On:" class="col-md-4 control-label" />
+                                                                                <div class="col-md-8 textBoxMargin6px">
+                                                                                    <p:inputText id="preparedon" value="#{attendanceController.hrAttendances.preparedOn}" readonly="true"   >
+                                                                                    </p:inputText> 
+                                                                                </div>                                                                                                                               
+                                                                            </div>                                                                                          
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <p:dataTable id="tblAbsent"   value="#{attendanceController.hrAttendanceDetailsDatamodel}"
+                                                                                 var="emp" rowIndexVar="num"  class="dataTable"  
+                                                                                 rows="10" paginator="true" paginatorPosition="bottom">                    
+                                                                        <p:column headerText="No">
+                                                                            <h:outputText value="#{num + 1}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Emp Name"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{emp.empId.firstName} #{emp.empId.middleName}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="EMP ID"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{emp.empId.empId}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Department"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{emp.empId.deptId.depName}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Date OF Absence"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{emp.dateOfAbsence}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Number OF Absent Day"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{emp.noOfDaysAbsent}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Late Minute"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{emp.lateMinute}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Reason"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{emp.reasonForAbsence}"/>
+                                                                        </p:column>
+                                                                    </p:dataTable>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl3" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-group required  form-horizontal">
+                                                                    <h:outputLabel for="drddecision" class="control-label col-sm-4" value="Decision:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:selectOneMenu id="drddecision" value="#{attendanceController.hrAttendances.status}" 
+                                                                                         requiredMessage="Select Decision" required="true" style="width: 100%"  >
+                                                                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                                                                            <f:selectItem itemLabel="Approve" itemValue="1"/>
+                                                                            <f:selectItem itemLabel="Reject" itemValue="2" />
+                                                                        </p:selectOneMenu>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-group required  form-horizontal">
+                                                                    <h:outputLabel for="calApprovedDate" value="Process Date:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calApprovedDate" value="#{attendanceController.hrAttendances.approvededDate}"
+                                                                                     converter="dateConverter" validator="#{validatorManagedBean.Date}"
+                                                                                     onclick="displayCalendar('frmRequest:calApprovedDate', 'frmRequest:calApprovedDate');"
+                                                                                     required="true" requiredMessage="Enter process date" title="process Date"/>
+                                                                        <p:message for="calApprovedDate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>  
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtRemark" value="#{attendanceController.hrAttendances.remark}"
+                                                                                         rows="1" cols="3" autoResize="false" title="Remark" class="form-control"/>
+                                                                        <p:message for="txtRemark" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group">
+                                                                    <p:outputLabel  for="txtprey1" class="control-label col-sm-4"
+                                                                                    id="lblPrepatedy1" value="Processed By:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText  id="txtprey1"   
+                                                                                      value="logedin user"  
+                                                                                      title="descripition"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">  
+                                            <h:panelGroup id="pnlworkflow1" class="col-sm-12">
+                                                <p:dialog id="dlgWorkflow" header="Workflow" widgetVar="dlgWorkflow" height="500"
+                                                          width="1200" modal="true" resizable="false" showEffect="explode">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="box-body ">
+                                                                <h:form class="form-horizontal" id="frmWorkflow" style="margin-top: 20px;">
+                                                                    <section class="panel panel-info" id="pnl22">
+                                                                        <section class="panel-body">                                       
+                                                                            <div class="col-md-12" >                                       
+                                                                                <div class="col-sm-12">
+                                                                                    <p:dataTable id="tblWorkflow" value="#{attendanceController.workFlowDataModel}" 
+                                                                                                 var="currentRow"  rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                                                 rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                                                        <p:column headerText="Processed By">
+                                                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                                                        </p:column>
+                                                                                        <p:column >
+                                                                                            <f:facet name="header">
+                                                                                                <h:outputText value="Decision"/>
+                                                                                            </f:facet>
+                                                                                            <h:outputText value="#{currentRow.action}"/> 
+                                                                                        </p:column>
+                                                                                        <p:column >
+                                                                                            <f:facet name="header">
+                                                                                                <h:outputText value="Comment Given"/>
+                                                                                            </f:facet>
+                                                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                                                        </p:column>
+                                                                                        <p:column >
+                                                                                            <f:facet name="header">
+                                                                                                <h:outputText value="Processed Date"/>
+                                                                                            </f:facet>
+                                                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                                                        </p:column> 
+                                                                                    </p:dataTable>
+                                                                                </div> 
+                                                                            </div>  
+                                                                        </section>
+                                                                    </section>
+                                                                </h:form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </p:dialog>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <h:panelGroup id="pnl4" class="col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="#{attendanceController.saveOrUpdateButton}" 
+                                                                             action="#{attendanceController.saveAttendaceApprove()}" title="Approve"
+                                                                             process="@this,pnl3" class="btn  btn-block btn-primary col-lg-4"                                       
+                                                                             update=":frmRequest,:frmSample"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

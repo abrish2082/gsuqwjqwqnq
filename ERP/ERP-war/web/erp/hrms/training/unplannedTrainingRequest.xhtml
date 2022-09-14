@@ -1,0 +1,590 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li> <a  href="unplannedTrainingApproval.xhtml"> <i class="fa fa-circle-o"></i>Unplanned Training Approval</a></li>  
+        <li> <a  href="trainingHistory.xhtml"> <i class="fa fa-circle-o"></i>Employee Training History</a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmTop"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" action="#{unplannedTrainingController.createNewInfo()}" validateClient="true"
+                                     icon="#{unplannedTrainingController.icone}" style="background-color: white; border-color: white" 
+                                     process="@this" update="@this,:frmUnplannedTrainingRequest,:frmTop" 
+                                     title="#{unplannedTrainingController.createOrSearchBundle}"  />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{unplannedTrainingController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{unplannedTrainingController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmUnplannedTrainingRequest,:frmTop" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup> 
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-gear" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWorkflow" value="#{unplannedTrainingController.hrWorkFlowDataModel}"
+                                                                 var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                 rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Decision"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.changedStstus}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Comment Given"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Processed Date"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                        </p:column> 
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../hrms/training/unplannedTrainingRequest.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>  
+        <h:form id="frmUnplannedTrainingRequest"> 
+            <p:growl id="growl2" showDetail="true" autoUpdate="true" severity="information,fatal"/>    
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlFindAll" rendered="#{unplannedTrainingController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-body ">
+                                <div class="box-header with-border">                                
+                                    <h3 class="box-title">Search...  <small></small></h3>   
+                                </div>
+                                <div class="box-body ">
+                                    <div class="box-body ">  
+                                        <div class="box-body">  
+                                            <div class="col-md-12" >                                        
+                                                <div class="col-sm-12">
+                                                    <div class="col-sm-6" >                                           
+                                                        <div class="form-horizontal col-md-12">
+                                                            <div class="form-group form-group required">
+                                                                <h:outputLabel class="control-label col-sm-4" value="Filter Criteria:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                                     valueChangeListener="#{unplannedTrainingController.valueChangeListnerTrainingRequest}">
+                                                                        <f:selectItems value="#{unplannedTrainingController.filterByStatusForRequest}"/>   
+                                                                        <p:ajax event="change" process="@this" update="@this,tblRequest"/>
+                                                                    </p:selectOneMenu> 
+                                                                </div>   
+                                                            </div>
+                                                        </div> 
+                                                    </div>
+                                                </div>   
+                                            </div>
+                                        </div> 
+                                    </div>
+                                    <div class="col-md-12" >                                        
+                                        <div class="col-sm-12">
+                                            <div class="box box-primary ">
+                                                <p:dataTable id="tblRequest" value="#{unplannedTrainingController.unplannedReqDataModel}"
+                                                             var="unplannedVar" selectionMode="single" rowIndexVar="num" rows="10"  
+                                                             rowsPerPageTemplate="5,10,15" paginatorPosition="bottom" paginator="true" class="dataTable"
+                                                             selection="#{unplannedTrainingController.hrTdUnplanTrainingRequest}" rowKey="#{unplannedVar.id}">
+                                                    <p:ajax event="rowSelect" listener="#{unplannedTrainingController.populate}" 
+                                                            process="@this" update="@this,:frmUnplannedTrainingRequest,:frmTop"/>
+                                                    <f:facet name="header">
+                                                        <p:outputLabel value="" style=" font-size: 16px;"/>
+                                                    </f:facet>
+                                                    <p:column headerText="No." width="50">
+                                                        <h:outputText value="#{num + 1}"/>
+                                                    </p:column>
+                                                    <p:column headerText="Department" filterMatchMode="startsWith" filterBy="#{unplannedVar.departmentId.depName}">
+                                                        <h:outputText value="#{unplannedVar.departmentId.depName }"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Budget Year" filterMatchMode="startsWith" filterBy="#{unplannedVar.budgetYear}">
+                                                        <h:outputText value="#{unplannedVar.budgetYear}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Training Course"  filterMatchMode="startsWith" filterBy="#{unplannedVar.trainingId.courseName}">                
+                                                        <h:outputText value="#{unplannedVar.trainingId.courseName}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div> 
+                                    </div>   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </h:panelGroup>
+            <h:panelGroup id="pnlRequestAll" rendered="#{unplannedTrainingController.renderPnlCreateGatePass}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-body ">
+                                <h4 class="box-title">
+                                    <h4 class="box-title" style="margin-left: 15px;">Unplanned Training Request </h4>
+                                </h4>
+                                <section class="panel panel-info">
+                                    <section class="panel-body">  
+                                        <h:panelGroup id="pnlMaster" class="col-sm-12">
+                                            <div class="row">
+                                                <div class="col-md-12">                      
+                                                    <div class="box-body"> 
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="drdDepartment" class="control-label col-sm-4" title="Department" value="Department: "/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">                                                       
+                                                                        <p:selectOneMenu id="drdDepartment" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.departmentId}" style="width:100%"
+                                                                                         valueChangeListener="#{unplannedTrainingController.departmentValuechange}" converter="entConverter" 
+                                                                                         filter="true" filterMatchMode="startsWith"  required="true" requiredMessage="Please select department.">
+                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                            <f:selectItems value="#{unplannedTrainingController.allDepartmentsList}" 
+                                                                                           var="catagory" itemValue="#{catagory}" itemLabel="#{catagory.depName}"/> 
+                                                                            <p:ajax event="change" process="@this,drdDepartment" update="drdDepartment"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="drdDepartment" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="budgetYear" class="control-label col-sm-4" title="Budget Year" value="Budget Year: "/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">                                                       
+                                                                        <p:selectOneMenu id="budgetYear" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.budgetYear}"
+                                                                                         filter="true" filterMatchMode="startsWith"  style="width:100%"
+                                                                                         required="true" requiredMessage="Please select Budget Year.">
+                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                            <f:selectItems value="#{unplannedTrainingController.budgetYears}" />
+                                                                            <p:ajax event="change" process="@this" update="budgetYear"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="budgetYear" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="drdTrainingCatagory" class="control-label col-sm-4" title="Training Catagory" value="Training Catagory: "/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">                                                       
+                                                                        <p:selectOneMenu id="drdTrainingCatagory" value="#{unplannedTrainingController.hrLuTrainingCategory.id}"
+                                                                                         valueChangeListener="#{unplannedTrainingController.trainingCatagoryVCL}"
+                                                                                         style="width:100%" converter="entConverter" required="true" requiredMessage="Please select Training Catagory.">
+                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                            <f:selectItems value="#{unplannedTrainingController.trainingCatagoryList}" 
+                                                                                           var="catagory" itemValue="#{catagory.id}" itemLabel="#{catagory.categoryName}"/> 
+                                                                            <p:ajax event="change" process="@this,drdTrainingCatagory" update="drdTrainingCatagory,drdTrainingCourse"/>
+                                                                        </p:selectOneMenu> 
+                                                                        <p:message for="drdTrainingCatagory" display="icon"/>
+                                                                    </div>     
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="drdTrainingCourse" class="control-label col-sm-4" title="Training Course" value="Training Course: "/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">                                                       
+                                                                        <p:selectOneMenu id="drdTrainingCourse" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.trainingId}" 
+                                                                                         valueChangeListener="#{unplannedTrainingController.trainingCourseVCL}" 
+                                                                                         style="width:100%" converter="entConverter" 
+                                                                                         filter="true" filterMatchMode="startsWith"  required="true" requiredMessage="Please select Training Course." >
+                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                            <f:selectItems value="#{unplannedTrainingController.trainningCourseList}" var="evaCriteria" 
+                                                                                           itemValue="#{evaCriteria}" itemLabel="#{evaCriteria.courseName}"/> 
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="drdTrainingCourse" display="icon"/>
+                                                                    </div>     
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtNoOfparticipants" class="col-md-4 control-label" title="No of Participants" value="No of Participants: " />
+                                                                    <div class="col-md-8 textBoxMargin6px"> 
+                                                                        <p:inputText id="txtNoOfparticipants" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.noOfParticipant}"
+                                                                                     validator="#{validatorManagedBean.Number}" converterMessage="Please enter numbers only."
+                                                                                     class="form-control" required="true" requiredMessage="Please enter no of participants" />
+                                                                        <p:message for="txtNoOfparticipants" display="icon"/>  
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtlocationType" class="col-md-4 control-label" title="Location" value="Location: " />
+                                                                    <div class="col-sm-8 textBoxMargin6px"> 
+                                                                        <p:selectOneRadio id="txtlocationType" class="col-sm-8" required="true"
+                                                                                          value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.locationType}" >
+                                                                            <f:selectItem itemLabel="Local" itemValue="1" />
+                                                                            <f:selectItem itemLabel="Abroad" itemValue="2" />                                                        
+                                                                        </p:selectOneRadio>
+                                                                        <p:message for="txtlocationType" display="icon"/>  
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="drdInstitution" class="control-label col-sm-4" title="Institution" value="Institution: "/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">                                                       
+                                                                        <p:selectOneMenu id="drdInstitution" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.institutionId}" 
+                                                                                         valueChangeListener="#{unplannedTrainingController.institutionVCL}" 
+                                                                                         style="width:100%" converter="entConverter" required="true" requiredMessage="Please select institution."
+                                                                                         effect="fade"  filter="true" filterMatchMode="startsWith" >
+                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                            <f:selectItems value="#{unplannedTrainingController.institutionList}" var="evaCriteria" 
+                                                                                           itemValue="#{evaCriteria}" itemLabel="#{evaCriteria.institutionName}"/> 
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="drdInstitution" display="icon"/>  
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-sm-6">  
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtStartdate" class="col-md-4 control-label" title="Start Date" value="Start Date: " />
+                                                                    <div class="col-sm-8 textBoxMargin6px"> 
+                                                                        <p:inputText id="txtStartdate" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.startDate}"
+                                                                                     validator="#{validatorManagedBean.Date}" 
+                                                                                     onclick="displayCalendar('frmUnplannedTrainingRequest:txtStartdate', 'frmUnplannedTrainingRequest:txtStartdate');"
+                                                                                     title="Start Date" class="form-control"/>
+                                                                        <p:message for="txtStartdate" display="icon"/> 
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtEnddate" class="col-md-4 control-label" title="End Date" value="End Date: " />
+                                                                    <div class="col-sm-8 textBoxMargin6px"> 
+                                                                        <p:inputText id="txtEnddate" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.endDate}"
+                                                                                     validator="#{validatorManagedBean.Date}" 
+                                                                                     onclick="displayCalendar('frmUnplannedTrainingRequest:txtEnddate', 'frmUnplannedTrainingRequest:txtEnddate');"
+                                                                                     title="End Date" class="form-control"/>
+                                                                        <p:message for="txtEnddate" display="icon"/> 
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtVenue" class="col-md-4 control-label" title="Venue" value="Venue: " />
+                                                                    <div class="col-sm-8 textBoxMargin6px"> 
+                                                                        <p:inputText id="txtVenue" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.venue}"
+                                                                                     validator="#{validatorManagedBean.Text}" 
+                                                                                     class="form-control" required="true" requiredMessage="Please enter Venue."/>
+                                                                        <p:message for="txtVenue" display="icon"/> 
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtPerson" class="col-md-4 control-label" value="Cost/Person: " />
+                                                                    <div class="col-sm-8 textBoxMargin6px"> 
+                                                                        <p:inputText id="txtPerson" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.costPerPerson}"
+                                                                                     validator="#{validatorManagedBean.Number}" converterMessage="Please enter numbers only." 
+                                                                                     class="form-control" required="true" requiredMessage="Please enter cost/person"/>
+                                                                        <p:message for="txtPerson" display="icon"/> 
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtSponseredBy" class="col-md-4 control-label" title="Sponsered By" value="Sponsered By: " />
+                                                                    <div class="col-sm-8 textBoxMargin6px"> 
+                                                                        <p:inputText id="txtSponseredBy" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.sponsoredBy}"
+                                                                                     validator="#{validatorManagedBean.Text}" 
+                                                                                     class="form-control" required="true" requiredMessage="Please enter sponsered by."/>
+                                                                        <p:message for="txtSponseredBy" display="icon"/> 
+                                                                    </div> 
+                                                                </div>
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel class="control-label col-sm-4" title="Remark" value="Remark:"/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                                        <h:inputTextarea id="txtRemark"  class="form-control col-md-12" value="#{unplannedTrainingController.hrTdUnplanTrainingRequest.remark}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>     
+                                                        </div>                                                                  
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <h3 class="box-title">
+                                    <h4 class="box-title" style="margin-left: 15px;">Unplanned Training Participants </h4>
+                                </h3> 
+                                <section class="panel panel-info">
+                                    <section class="panel-body">  
+                                        <h:panelGroup id="pnlDetail" class="col-sm-12" style="border: 0px; background-color: transparent" rendered="#{unplannedTrainingController.renderPnlCreateGatePass}">
+                                            <div class="row">
+                                                <div class="col-md-12">                      
+                                                    <div class="box-body"> 
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="drdSearchBy" class="control-label col-sm-4" value="Search By:" title="Filter Criteria"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneRadio id="drdSearchBy" value="#{unplannedTrainingController.selected}"
+                                                                                          valueChangeListener="#{unplannedTrainingController.searchCriteria}" 
+                                                                                          class="col-sm-10" >
+                                                                            <f:selectItem itemLabel="Employee Id" itemValue="Employee ID"/>
+                                                                            <f:selectItem itemLabel="Employee Name" itemValue="Employee Name"/>
+                                                                            <p:ajax event="change" process="@this" update="@this,txtParticipantId,txtParticipantName"/>
+                                                                        </p:selectOneRadio>
+                                                                    </div>
+                                                                </div>                                               
+                                                            </div>
+
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtParticipantId" class="control-label col-sm-4" title="Participant Id" value="Participant Id " />  
+                                                                    <div class="col-md-8 textBoxMargin6px"> 
+                                                                        <p:autoComplete id="txtParticipantId"  style="width: 100%" value="#{unplannedTrainingController.hrEmployees.empId}"
+                                                                                        completeMethod="#{unplannedTrainingController.searchEmployeeById}" var="sucList" 
+                                                                                        title="Participant Name" required="true" requiredMessage="Please search by emp id." placeholder="Search by emp id"
+                                                                                        itemValue="#{sucList.empId}" itemLabel="#{sucList}" forceSelection="true" size="20" emptyMessage="no data"
+                                                                                        disabled="#{unplannedTrainingController.disableEmpID}">  
+                                                                            <p:column headerText="Employee Id">
+                                                                                <h:outputText value="#{sucList.empId}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Employee Name">
+                                                                                <h:outputText value="#{sucList.firstName} #{sucList.middleName} #{sucList.lastName}"/>
+                                                                            </p:column>
+                                                                            <p:ajax event="itemSelect"
+                                                                                    listener="#{unplannedTrainingController.getById}" 
+                                                                                    process="@this" update="@this,txtParticipantName,txtSex,txtJobPosition" />  
+                                                                        </p:autoComplete> 
+                                                                        <p:message for="txtParticipantId" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtParticipantName" class="control-label col-sm-4" title="Participant Name" value="Participant Name: " />  
+                                                                    <div class="col-md-8 textBoxMargin6px"> 
+                                                                        <p:autoComplete id="txtParticipantName"  style="width: 100%" value="#{unplannedTrainingController.hrEmployees}"
+                                                                                        completeMethod="#{unplannedTrainingController.searchEmployeeByName}" var="sucList"  converter="entConverter"
+                                                                                        title="Participant Name" required="true" requiredMessage="Please search by name." placeholder="Search by Name"
+                                                                                        itemValue="#{sucList}" itemLabel="#{sucList.firstName}" forceSelection="true" size="20" emptyMessage="no data"
+                                                                                        disabled="#{unplannedTrainingController.disableEmpName}">  
+                                                                            <p:column headerText="Employee Name">
+                                                                                <h:outputText value="#{sucList.firstName} #{sucList.middleName} #{sucList.lastName}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Employee Id">
+                                                                                <h:outputText value="#{sucList.empId}"/>
+                                                                            </p:column>
+                                                                            <p:ajax event="itemSelect"
+                                                                                    listener="#{unplannedTrainingController.getByFirstName}" 
+                                                                                    process="@this" update="@this,txtParticipantId,txtSex,txtJobPosition" />  
+                                                                        </p:autoComplete> 
+                                                                        <p:message for="txtParticipantName" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel   for="txtSex" class="control-label col-sm-4" title="Sex" value="Sex:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtSex" value="#{unplannedTrainingController.hrEmployees.sex}" readonly="true"/>
+                                                                        <p:message for="txtSex" display="icon"/>
+                                                                    </div>
+                                                                </div>    
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel  for="txtJobPosition" class="control-label col-sm-4" title="Job Position" value="Job Position:" />
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtJobPosition" value="#{unplannedTrainingController.hrJobTypes.jobTitle}" readonly="true"/>
+                                                                        <p:message for="txtJobPosition" display="icon"/>
+                                                                    </div>    
+                                                                </div> 
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel  for="txtReson" class="control-label col-sm-4" title="Reson" value="Reason:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtReson" value="#{unplannedTrainingController.hrTdUnplanTraParticipant.reason}"/>
+                                                                        <p:message for="txtReson" display="icon"/>
+                                                                    </div>    
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4"></div>                                           
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnAdd" class="btn  btn-block btn-primary"                                             
+                                                                             action="#{unplannedTrainingController.addToDataTable()}" 
+                                                                             value="#{unplannedTrainingController.addorUpdate}"
+                                                                             process="pnlMaster,pnlDetail"
+                                                                             update="pnlDetail,tblDetail"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">                      
+                                                    <div class="box-body">    
+                                                        <div class="col-md-12">  
+                                                            <div class="col-md-12" style="margin-top:10px;">
+                                                                <div class="form-group">
+                                                                    <p:dataTable id="tblDetail" value="#{unplannedTrainingController.unplannedParticipantDataModel}" 
+                                                                                 var="planDetails"  rowIndexVar="num" class="dataTable" rows="5" paginator="true" selectionMode="single"
+                                                                                 selection="#{unplannedTrainingController.selectedParticipant}" rowKey="#{planDetails.empId}" paginatorPosition="bottom">
+                                                                        <p:ajax event="rowSelect" listener="#{unplannedTrainingController.editDataTable}"   process="@this,tblDetail"
+                                                                                update="@this,:frmUnplannedTrainingRequest:pnlDetail"/>
+                                                                        <p:column headerText="NO">
+                                                                            #{num+1}
+                                                                        </p:column>
+                                                                        <p:column headerText="Participant Name">
+                                                                            #{planDetails.empId.firstName}
+                                                                        </p:column>
+                                                                        <p:column headerText="Emplopyee Id">
+                                                                            #{planDetails.empId.empId}
+                                                                        </p:column>
+                                                                        <p:column headerText="Department">
+                                                                            #{planDetails.empId.deptId}
+                                                                        </p:column>
+                                                                        <p:column headerText="Sex">
+                                                                            #{planDetails.empId.sex}
+                                                                        </p:column>
+                                                                        <p:column headerText="Job Position">
+                                                                            #{planDetails.empId.jobId.jobTitle}
+                                                                        </p:column>
+                                                                        <p:column headerText="Reason">
+                                                                            #{planDetails.reason}
+                                                                        </p:column>
+                                                                    </p:dataTable>
+                                                                </div>
+                                                            </div>
+                                                        </div>               
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <section class="panel panel-info">
+                                    <section class="panel-body">  
+                                        <h:panelGroup id="pnlworkflow" class="col-sm-12" rendered="#{unplannedTrainingController.renderPnlCreateGatePass}">
+                                            <div class="row">
+                                                <div class="col-md-12">                      
+                                                    <div class="box-body"> 
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel  for="txtComment" class="control-label col-sm-4" value="Comment Given:"/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                                        <h:inputTextarea id="txtComment"  class="form-control col-md-12" value="#{unplannedTrainingController.wfHrProcessed.commentGiven}"
+                                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only" 
+                                                                                         required="true" requiredMessage="Comment is mandatory"
+                                                                                         onchange="this.value = this.value.trim()"/>
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <p:outputLabel  for="txtProccedDate" class="control-label col-sm-4" id="lblApproved" value="Processed Date:" />
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtProccedDate"  readonly="true"  placeholder="dd/mm/yyyy"
+                                                                                     value="#{unplannedTrainingController.processedOn}"  title="Procced Date"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group">
+                                                                    <p:outputLabel  for="txtproccedBy" class="control-label col-sm-4" id="lblPrepatedy1" value="Processed By:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText  id="txtproccedBy" value="#{workFlow.userName}" title="Processed By"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <h:panelGroup id="pnl4" class="col-sm-12">
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4"></div>                                           
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnSave" value="#{unplannedTrainingController.saveorUpdateBundle}" 
+                                                                         action="#{unplannedTrainingController.saveUnplannedTrainingRequest()}"
+                                                                         disabled="#{unplannedTrainingController.disabledCrud}"
+                                                                         class="btn  btn-block btn-primary" 
+                                                                         process="@this,:frmUnplannedTrainingRequest:pnlMaster,:frmUnplannedTrainingRequest:txtProccedDate"                                       
+                                                                         update="@this,:frmUnplannedTrainingRequest"/>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnReset" value="Reset"                                             
+                                                                         action="#{unplannedTrainingController.resetUnplannedTrainingRequest()}"
+                                                                         class="btn  btn-block btn-primary" 
+                                                                         process="@this" update="@this,:frmUnplannedTrainingRequest" /> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>                           
+        </h:form>
+    </ui:define>
+</ui:composition>
+

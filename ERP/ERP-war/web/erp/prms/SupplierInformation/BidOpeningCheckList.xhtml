@@ -1,0 +1,873 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="BidSubmissionForm.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Submission Form</span></a></li> 
+        <li><a href="BidderRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Bidder Registration</span></a></li> 
+        <li><a href="SupplierPerformanceInformation.xhtml"><i class="fa fa-circle-o "></i> <span>Supplier Performance Information</span></a></li>
+        <li><a href="SupplierProfile.xhtml"><i class="fa fa-circle-o "></i> <span>Suppliers Profile</span></a></li>
+        <li><a href="SupplierSpecfication.xhtml"><i class="fa fa-circle-o"></i> <span>Supplier Specification</span></a></li> 
+
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackToSearch" rendered="#{bidOpeningCheckListController.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{bidOpeningCheckListController.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                         process="@this" update="@this,:frmMainUI, :BidSubmissionMain, :frmSample"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew" action="#{bidOpeningCheckListController.createNewParty()}" icon="#{bidOpeningCheckListController.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmMainUI, :BidSubmissionMain, :frmSample"
+                                     title="#{bidOpeningCheckListController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <a href="BidOpeningCheckList.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{bidOpeningCheckListController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchParty"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="form-group">
+                                                <h:outputLabel class="control-label col-sm-2" value="Searching By:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="drdSearchBy" style="width: 100%" value="#{bidOpeningCheckListController.prmsBidOpeningCheckList.columnName}"
+                                                                     valueChangeListener="#{bidOpeningCheckListController.selectedParamChangeEvent}" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{bidOpeningCheckListController.bidOpeningCheckListSearchParameterLst}"
+                                                                       var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                        <p:ajax event="change" process="@this" update="lblColumnName,txtColumnValue"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                            <div class="form-group"> 
+                                                <h:outputLabel id="lblColumnName" class="control-label col-sm-2" value="Search By #{bidOpeningCheckListController.prmsBidOpeningCheckList.columnName}:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtColumnValue" value="#{bidOpeningCheckListController.prmsBidOpeningCheckList.columnValue}"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMarginTop6px"> 
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnFind" action="#{bidOpeningCheckListController.searchBidCheckListByChekListNo()}" icon="ui-icon-search" 
+                                                                     process="frmSearchParty, @this" update=":frmMainUI:frmParty:tblPartyInfo"
+                                                                     value="Find" class="btn btn-primary col-lg-4" />            
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmParty">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblPartyInfo" value="#{bidOpeningCheckListController.prmsBidOpeningCheckListDataModel}" var="CheckListSearchREsult" rows="10" rowIndexVar="no"
+                                                                 selection="#{bidOpeningCheckListController.checkListSelection}"   
+                                                                 rowKey="#{CheckListSearchREsult.bidOpenCheckListId}"  selectionMode="single" 
+                                                                 paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                        <p:ajax event="rowSelect" listener="#{bidOpeningCheckListController.rowSelect}"   update=":BidSubmissionMain,:frmSample,:frmMainUI,:BidSubmissionMain:checkListDetailPanel" />   
+                                                        <p:column headerText="S.No">
+                                                            #{no+1}
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Check List No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{CheckListSearchREsult.bidCheckListNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Registared Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{CheckListSearchREsult.dateRigisted}">
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Prepared By" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{bidOpeningCheckListController.logerName}" />
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                </div>                 
+                                            </div>    
+                                        </div>  
+                                    </div>                           
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="BidSubmissionMain">
+            <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,fatal" />
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{bidOpeningCheckListController.renderPnlCreateServiceRegistration}">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Bid Opening Check List<small></small></h3>                       
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" >  
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="checkListInfoPanel" >
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group textBoxMarginTop6px required"> 
+                                            <h:outputLabel id="lblmarketAssid" class="control-label col-sm-2"   value="Check List No:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText   id="txtmarketAssid"  readonly="true" class="form-control"
+                                                               value="#{bidOpeningCheckListController.generateCheckListNo()}"/>
+
+                                            </div>
+                                            <h:outputLabel id="lblIssuedDate" class="control-label col-sm-2" value="Registered Date:"/>
+                                            <div class="col-sm-3">                                   
+                                                <p:calendar id="txtcalIssuedDate" required="true"  mindate="today"   maxdate="today"   requiredMessage="Registered Date is required"               
+                                                            value="#{bidOpeningCheckListController.prmsBidOpeningCheckList.dateRigisted}"                   
+                                                            pattern="yyyy/MM/dd" tabindex="4">
+                                                </p:calendar>
+                                                <p:message display="icon" for="txtcalIssuedDate" />
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px required"> 
+
+
+
+                                            <h:outputLabel id="lblBidNo"   class="control-label col-sm-2" value="Bid No:"/>
+                                            <div class="col-sm-3"> 
+                                                <p:selectOneMenu id="txtendUser" style="width: 100%"  required="true" requiredMessage="Bid No is required"
+                                                                 value="#{bidOpeningCheckListController.prmsBid}"
+                                                                 valueChangeListener="#{bidOpeningCheckListController.changeEventGetVendorName}"
+                                                                 converter="entConverter">
+                                                    <f:selectItem itemLabel="---Select One---"  itemValue=""/>
+                                                    <f:selectItems value="#{bidOpeningCheckListController.bidList}" var="refNo"/>
+                                                    <p:ajax event="change" process="@this" update="txtcalOpeningdDate,txtcalclosingDate,txtbiddingCompany,txtLotNumber,:BidSubmissionMain,pnlcheckListDetailForLot,txtbiddingCompanyforLot"/>
+
+                                                </p:selectOneMenu>  
+
+                                                <p:message display="icon" for="txtendUser" />
+                                            </div>
+                                            <h:outputLabel id="lblOpeningDate" class="control-label col-sm-2" value="Bid Opening Date:"/>
+                                            <div class="col-sm-3">                                   
+                                                <p:calendar id="txtcalOpeningdDate"                   
+                                                            value="#{bidOpeningCheckListController.prmsBid.bidOpenDateTime}" required="true"
+                                                            requiredMessage="Bid Opening Date"
+                                                            pattern="dd/MM/yyyy" tabindex="4">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:calendar>
+                                                <p:message for="txtcalOpeningdDate" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px required"> 
+                                            <h:outputLabel id="lblclosingDate" class="control-label col-sm-2" value="Bid closing Date:"/>
+                                            <div class="col-sm-3">                                   
+                                                <p:calendar id="txtcalclosingDate"                        
+                                                            value="#{bidOpeningCheckListController.prmsBid.bidCloseDateTime}" required="true" 
+                                                            requiredMessage="Bid closing Date is required"
+                                                            pattern="dd/MM/yyyy" tabindex="4">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                                </p:calendar>
+                                                <p:message for="txtcalclosingDate" display="icon"/>
+                                            </div>
+
+                                            <h:outputLabel id="lblIssueEXPiration" class="control-label col-sm-2" value="Bid Validity Day: "/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtIssueEXPiration" class="form-control" required="true" requiredMessage="Bid Validity Day is required"
+                                                             value="#{bidOpeningCheckListController.prmsBidOpeningCheckList.expirationOfBid}" validator="#{validatorManagedBean.Text}">
+                                                </p:inputText>
+                                                <p:message display="icon" for="txtIssueEXPiration"/>
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Bid check List File:</h3>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="panel-body">
+                                    <p:panelGrid columns="1" style="float: left;"> 
+                                        <p:fileUpload  id="fileUplod" cancelLabel="#{contenu.annuler}"
+                                                       fileUploadListener="#{bidOpeningCheckListController.uploadListener}"
+                                                       value="#{bidOpeningCheckListController.prmsLuDmArchive.documentId}" allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                       invalidFileMessage="This type of file is not valid" invalidSizeMessage="The size is not Allowed"
+                                                       multiple="false" mode="advanced" sizeLimit="52428800" auto="true" process="tblSavedDoc" update="tblSavedDoc"/>
+                                        <p:dataTable id="tblSavedDoc"  var="currentRow" rowIndexVar="current" value="#{bidOpeningCheckListController.prmsLuDmArchivesDModel}"
+                                                     paginator="true" paginatorPosition="bottom" selectionMode="single" rowKey="#{currentRow.documentId}"
+                                                     selection="#{bidOpeningCheckListController.prmsLuDmArchiveSelection}"
+                                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                     rowsPerPageTemplate="5,10,15" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:1100px">
+                                            <p:ajax event="rowSelect" listener="#{bidOpeningCheckListController.onRowSelect}" update="tblSavedDoc" />
+                                            <p:column id="docNames"   style="border: none; font-size: 10px; text-align: left;"> 
+                                                <h:outputText id="txtcoScale" value="#{currentRow.fileName}"/>
+                                            </p:column>
+                                            <p:column  style="border: none; font-size: 10px; text-align: left;">
+                                                <h:panelGrid style="border: none " columns="2"
+                                                             id="pnlGridtblDoccolOptions">
+                                                    <p:commandButton process="@this,tblSavedDoc"  update="tblSavedDoc"                                             
+                                                                     icon="ui-icon-arrowthickstop-1-s"  ajax="false"  >
+                                                        <p:fileDownload value="#{bidOpeningCheckListController.file}" />
+                                                    </p:commandButton>
+                                                    <p:outputPanel id="buttonDetail">
+                                                        <p:commandButton  process="tblSavedDoc" title="#{dmsBundle.delete}" id="docRemove" 
+                                                                          update="tblSavedDoc" immediate="true" ajax="true" 
+                                                                          icon="ui-icon-trash" style="border: none; color: #0B70F9">
+                                                            <p:confirm header="Confirmation" message="Are you sure?"  icon="ui-icon-alert" />
+                                                        </p:commandButton>
+                                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                            <p:commandButton value="Yes" action="#{bidOpeningCheckListController.remove(rowselect)}" immediate="true" process="@this" update="tblSavedDoc" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                        </p:confirmDialog>
+                                                    </p:outputPanel>
+                                                </h:panelGrid>
+                                            </p:column>  
+                                        </p:dataTable>
+                                    </p:panelGrid>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h:panelGroup style="border: 0px; background-color: transparent" id="pnlcheckListDetailList" rendered="#{bidOpeningCheckListController.renderCheckList}" >
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Bid Opening Detail</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <div class="panel-body">
+                                        <h:panelGroup style="border: 0px; background-color: transparent" id="checkListDetailPanel" >
+                                            <div class="form-horizontal col-sm-12">   
+                                                <div class="form-group textBoxMarginTop6px required">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Bidder Name:" />
+                                                    <div class="col-sm-3"> 
+                                                        <p:selectOneMenu id="txtbiddingCompany" style="width: 100%" required="true" 
+                                                                         value="#{bidOpeningCheckListController.prmsSupplyProfile}" 
+                                                                         converter="entConverter" requiredMessage="Bidder Name is required"
+                                                                         valueChangeListener="#{bidOpeningCheckListController.setSelectedBidder}" >    
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{bidOpeningCheckListController.prmsSupplyProfilLst}" /> 
+                                                            <p:ajax event="change" process="@this" update="@this,:BidSubmissionMain:checklistTbl"/>
+                                                        </p:selectOneMenu> 
+                                                        <p:message display="icon" for="txtbiddingCompany" />
+
+                                                    </div>
+                                                    <h:outputLabel class="control-label col-sm-2" value="Outer Envelope of Bid:" />
+                                                    <div class="col-sm-3 required">
+                                                        <p:selectOneMenu id="txtDeliveryType" style="width: 100%" required="true" requiredMessage="Outer Envelope of Bid is required"
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.outerEnvolopeOfBid}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Sealed" itemValue="Sealed" />
+                                                            <f:selectItem itemLabel="Not Sealed" itemValue="Not Sealed" />
+                                                        </p:selectOneMenu>
+                                                        <p:message display="icon" for="txtDeliveryType" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group textBoxMarginTop6px required">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Bid form status:" />
+                                                    <div class="col-sm-3">
+                                                        <p:selectOneMenu id="txtFormStatus" style="width: 100%" required="true" requiredMessage="Bid form status is required"
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.bidFormStatus}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Completed and Signed" itemValue="Completed and Signed" />
+                                                            <f:selectItem itemLabel="Completed and Not Signed" itemValue="Completed and Not Signed" />
+                                                            <f:selectItem itemLabel="Not Completed and Signed" itemValue="Not Completed and Signed" />
+                                                            <f:selectItem itemLabel="Not Completed and Not Signed" itemValue="Not Completed and Not Signed" />
+                                                        </p:selectOneMenu>
+                                                        <p:message display="icon" for="txtFormStatus" />
+                                                    </div>
+                                                    <h:outputLabel class="control-label col-sm-2" value="Document Authority for signing:"/>
+                                                    <div class="col-sm-3">
+                                                        <p:selectOneRadio id="txtdocumentAuthority" class="col-sm-6" requiredMessage="Document Authority for signing is required"
+                                                                          value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.documentAuthorityForSigning }" required="true">
+                                                            <f:selectItem itemLabel="Yes" itemValue="Yes" />
+                                                            <f:selectItem itemLabel="No" itemValue="No" />                                                        
+                                                        </p:selectOneRadio>
+                                                        <p:message for="txtdocumentAuthority" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group textBoxMarginTop6px required">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Describe submission:" />
+                                                    <div class="col-sm-3">
+                                                        <p:selectOneMenu id="txtFormsubmission" style="width: 100%"  required="true" requiredMessage="Describe submission is required"
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.discriptionOfSubmission}"
+
+                                                                         valueChangeListener="#{bidOpeningCheckListController.changediscribesubmission}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Substitution" itemValue="Substitution" />
+                                                            <f:selectItem itemLabel="Withdrawal" itemValue="Withdrawal" />
+                                                            <f:selectItem itemLabel="Modification" itemValue="Modification" />
+                                                            <f:selectItem itemLabel="No chage" itemValue="No chage" />
+                                                            <p:ajax process="@this"  event="change" update=":BidSubmissionMain:checklistTbl,txtComment,txtTotalAmount,txtCurrency1,txtDiscountType,txtCountry,txtBankName,txtBranchName,calProcDate,txtPrecentage,txtCurrencyy"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message display="icon" for="txtFormsubmission" />
+                                                    </div>
+                                                    <h:outputLabel class="control-label col-sm-2" value="Describe alternate bid:"/>
+                                                    <div class="col-sm-3">
+                                                        <p:selectOneRadio id="txtDiscribeAlternetBid" class="col-sm-6" requiredMessage="Describe alternate bid is required"
+                                                                          value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.discriptionOfAlternateBid }" required="true">
+                                                            <f:selectItem itemLabel="Yes" itemValue="Yes" />
+                                                            <f:selectItem itemLabel="No" itemValue="No" />                                                        
+                                                        </p:selectOneRadio>
+                                                        <p:message for="txtDiscribeAlternetBid" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group textBoxMarginTop6px">
+
+                                                    <h:outputLabel class="control-label col-sm-2" value="Additional Comment:"/>
+                                                    <div class="col-sm-3">
+                                                        <p:inputTextarea id="txtComment"  class="form-control"  autoResize="false"
+                                                                         disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.additionalComent}"/>  
+                                                    </div>
+
+                                                    <h:outputLabel class="control-label col-sm-2" value="Name Of Bidder Present:" />
+                                                    <div class="col-sm-3">
+                                                        <p:inputText id="txtPresent"  
+                                                                     value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.nameOfBidderPresent}" validator="#{validatorManagedBean.Text}"/>
+                                                        <p:message display="icon" for="txtPresent" />
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="form-group textBoxMarginTop6px required">
+                                                    <h:outputLabel id="lblTotalAmount" class="control-label col-sm-2" value="Total Bid Price:"/>
+
+                                                    <div class="col-sm-2">  
+                                                        <p:inputText id="txtTotalAmount" class="col-sm-12" required="true"  requiredMessage="Total Bid Price is Required"    disabled="#{bidOpeningCheckListController.renderwithdrawal}"                                                                                                                                                                                                 
+                                                                     value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.totalBidPrice}"/>
+                                                        <p:message display="icon" for="txtTotalAmount"/>
+                                                    </div>
+                                                    <div class="col-sm-1"> 
+                                                        <p:selectOneMenu id="txtCurrency1" style="width: 100%" required="true" converter="entConverter" disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.currencyId}"  >
+                                                            <f:selectItem itemLabel="--- Select One ---"  itemValue=""/>
+                                                            <f:selectItems value="#{bidOpeningCheckListController.currencyList}" var="refNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group textBoxMarginTop6px required">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Discount Type:" />
+
+                                                    <div class="col-sm-2">
+                                                        <p:selectOneMenu id="txtDiscountType" class="col-sm-12"  style="width: 100%" required="true"  disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.discountType}" requiredMessage="Discount Type is required"
+                                                                         valueChangeListener="#{bidOpeningCheckListController.changePurchaseType}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Currency" itemValue="Currency" />
+                                                            <f:selectItem itemLabel="Percentage" itemValue="Percentage" />
+
+                                                            <p:ajax process="@this"  event="change" update="txtCurrency,:BidSubmissionMain:checklistTbl"/>
+                                                        </p:selectOneMenu>
+
+                                                        <p:message display="icon" for="txtDiscountType" />
+                                                    </div>   
+
+                                                    <div class="col-sm-1"> 
+                                                        <p:selectOneMenu id="txtCurrency" style="width: 100%" required="true" converter="entConverter"   disabled="#{bidOpeningCheckListController.renderCurrency}" 
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.discCurrencyId}"  >
+                                                            <f:selectItem itemLabel="--- Select One ---"  itemValue=""/>
+                                                            <f:selectItems value="#{bidOpeningCheckListController.currencyList}" var="refNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+
+                                                    <h:outputLabel id="lblPrecentage" class="control-label col-sm-2" value="Discount Amount: " />
+                                                    <div class="col-sm-3">
+                                                        <p:inputText id="txtPrecentage" class="form-control"  disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+
+                                                                     value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.percent}" /> 
+                                                        <p:message display="icon" for="txtPrecentage"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group textBoxMarginTop6px required">
+                                                    <h:outputLabel id="lblRefNo" class="control-label col-sm-2" value="Amount of bid Security:"/>
+
+                                                    <div class="col-sm-2">
+                                                        <p:inputText id="txtRefNo"  class="col-sm-12" required="true"   disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+                                                                     requiredMessage="Amount of bid Security is required"
+                                                                     value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.bidSecurityAmount}"/>
+                                                        <p:message display="icon" for="txtRefNo" />
+                                                    </div>
+                                                    <div class="col-sm-1"> 
+                                                        <p:selectOneMenu id="txtCurrencyy" style="width: 100%" required="true" converter="entConverter"     disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.bidSecCurrency}"  >
+                                                            <f:selectItem itemLabel="--- Select One ---"  itemValue=""/>
+                                                            <f:selectItems value="#{bidOpeningCheckListController.currencyList}" var="currency" 
+                                                                           itemLabel="#{currency.currency}"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtCurrencyy" display="icon"/>
+                                                    </div>
+
+                                                    <h:outputLabel id="lblProcDate"  class="control-label col-sm-2"  value="Expiration Date Of Bid Security:"/>
+                                                    <div class="col-sm-3">                                   
+                                                        <p:calendar id="calProcDate"   required="true"   mindate="today"     disabled="#{bidOpeningCheckListController.renderwithdrawal}"                    
+                                                                    value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.expirationDatBidsec}"  
+                                                                    requiredMessage="Expiration Date Of Bid Security is required"
+                                                                    pattern="yyyy/MM/dd" tabindex="4">
+                                                            <f:convertDateTime  pattern="yyyy/MM/dd" />
+                                                        </p:calendar>
+                                                        <p:message display="icon" for="calProcDate"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group textBoxMarginTop6px required">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Bank Name:" />
+                                                    <div class="col-sm-3"> 
+                                                        <p:selectOneMenu id="txtBankName"  value="#{bidOpeningCheckListController.hrLuBanks.bankName}" style="width:100%"   disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+                                                                         valueChangeListener="#{bidOpeningCheckListController.BankChanged}" required="true" requiredMessage="Bank Name is required">
+                                                            <f:selectItems value="#{bidOpeningCheckListController.listOfBanks}" />
+                                                            <p:ajax event="change"  onstart="true" update="txtBranchName" process="txtBankName"/> 
+                                                        </p:selectOneMenu>
+                                                        <p:message display="icon" for="txtBankName" />
+                                                    </div>
+                                                    <h:outputLabel id="lblBranchName" class="col-sm-2" style="text-align: right"  value="Branch Name:"/>
+                                                    <div class="col-sm-3">
+                                                        <p:selectOneMenu id="txtBranchName" style="width:100%" value="#{bidOpeningCheckListController.hrLuBankBranches.branchName}"   
+                                                                         disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+                                                                         valueChangeListener="#{bidOpeningCheckListController.BankBranchChanged}" >
+                                                            <f:selectItems value="#{bidOpeningCheckListController.branchByBank}" />                                                           
+                                                        </p:selectOneMenu>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group textBoxMarginTop6px required">
+                                                    <h:outputLabel id="lblCountry" class="control-label col-sm-2" value="Country:"/>
+                                                    <div class="col-sm-3"> 
+                                                        <p:selectOneMenu id="txtCountry" style="width: 100%" required="true" converter="entConverter"    disabled="#{bidOpeningCheckListController.renderwithdrawal}"
+                                                                         value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDt.countryId}" requiredMessage="Country is required" >
+                                                            <f:selectItem itemLabel="--- Select One ---"  itemValue=""/>
+                                                            <f:selectItems value="#{bidOpeningCheckListController.countryList}" var="country"
+                                                                           itemLabel="#{country.country}"/>
+                                                        </p:selectOneMenu> 
+                                                        <p:message display="icon" for="txtCountry" />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group textBoxMarginTop6px"> 
+
+
+                                                    <div class="col-lg-2"></div>
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnAdd" action="#{bidOpeningCheckListController.addBidCheckListDetail()}" icon="ui-icon-add" validateClient="true"
+                                                                         process="@this,:BidSubmissionMain:checklistTbl,:BidSubmissionMain:checkListDetailPanel" update=":BidSubmissionMain:checklistTbl,:BidSubmissionMain:pnlcheckListDetailList,txtbiddingCompanyforLot,pnlcheckListDetailForLot" class="btn btn-primary col-lg-4"
+                                                                         value="#{bidOpeningCheckListController.addOrModifyBundle}" />   
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+
+
+                    <h:panelGroup style="border: 0px; background-color: transparent" id="checklistTbl" >
+                        <div class="form-horizontal col-sm-12">
+                            <div class="form-group">                                        
+                                <div class="col-sm-12">
+                                    <p:dataTable id="submissionDt" value="#{bidOpeningCheckListController.prmsBidOpeningChecklstDtsmodel}" rowIndexVar="rowContact" var="contact"
+                                                 paginator="true" paginatorPosition="bottom" >
+
+                                        <p:column headerText="Bidding Company">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.suppId}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="Bidding" value="#{contact.suppId}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Outer Envelope of Bid">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.outerEnvolopeOfBid}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="Envelope" value="#{contact.outerEnvolopeOfBid}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="bid form status">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.bidFormStatus}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="form" value="#{contact.bidFormStatus}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Document Authority for signing">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.documentAuthorityForSigning}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="Document" value="#{contact.documentAuthorityForSigning}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Describe  submission">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.discriptionOfSubmission}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="submission" value="#{contact.discriptionOfSubmission}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Discribe alternate bid">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.discriptionOfAlternateBid}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="alternate" value="#{contact.discriptionOfAlternateBid}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Additional Comment">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.additionalComent}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="Comment" value="#{contact.additionalComent}"/></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText=" Bidder Present">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.nameOfBidderPresent}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="Present" value="#{contact.nameOfBidderPresent}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column headerText="Country">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.countryId}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="countrycol" value="#{contact.countryId}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Total Bid Price">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.totalBidPrice}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="totalBid" value="#{contact.totalBidPrice}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText=" Discount Amount">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.percent}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="counAmounttt"  value="#{contact.percent}" /></f:facet>
+                                            </p:cellEditor>
+
+                                        </p:column>
+                                        <p:column headerText=" Discount Type">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.discountType}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="discountType"  value="#{contact.discountType}" /></f:facet>
+                                            </p:cellEditor>
+
+                                        </p:column>
+
+                                        <p:column headerText="Discount Currency" id="tbldiscount"  rendered="#{bidOpeningCheckListController.renderCurrencyDIscount}" >
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.discCurrencyId}" id="txtTblDiscount"   /></f:facet>
+                                                <f:facet name="input"><p:inputText id="disCurrency" value="#{contact.discCurrencyId}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Currency">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.currencyId}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="Currencyy" value="#{contact.currencyId}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Bank Name">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.bankId}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="BankName" value="#{contact.bankId}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Branch Name">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.bankBranchId}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="BranchName" value="#{contact.bankBranchId}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Expiration Date Of Bid Security">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.expirationDatBidsec}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="Security" value="#{contact.expirationDatBidsec}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Amount of bid Security">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.bidSecurityAmount}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="bidsec" value="#{contact.bidSecurityAmount}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                        <p:column headerText="Bid Security Currency">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{contact.bidSecCurrency}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="bidsecCurren" value="#{contact.bidSecCurrency}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column> 
+                                            <p:commandLink  value="Edit" action="#{bidOpeningCheckListController.editItemDataTbl()}" 
+                                                            process="@this,submissionDt" update="@this,:BidSubmissionMain:pnlcheckListDetailList"/>
+
+                                        </p:column>
+
+                                    </p:dataTable>
+                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                        <p:commandButton id="btnYes" value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                        <p:commandButton  id="btnNo" value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                    </p:confirmDialog>
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+                <br></br><br></br>
+                <h:panelGroup style="border: 0px; background-color: transparent" id="pnlcheckListDetailForLot" rendered="#{bidOpeningCheckListController.renderBidlot}">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Bid check List for Lot</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <div class="panel-body">
+
+                                        <div class="form-horizontal col-sm-12">   
+                                            <div class="form-group">
+                                                <h:outputLabel class="control-label col-sm-2" value="Bidder Name:*" />
+                                                <div class="col-sm-3"> 
+
+                                                    <p:inputText id="txtbiddingCompanyforLot"  class="col-sm-12" required="true" 
+                                                                 value="#{bidOpeningCheckListController.checkListDetailforlot.supId.vendorName}"/>
+
+                                                </div>
+                                                <h:outputLabel class="control-label col-sm-2" value="Lot No:*" />
+
+                                                <div class="col-sm-3"> 
+                                                    <p:selectOneMenu id="txtLotNumber"  style="width:100%"  converter="entConverter" 
+                                                                     value="#{bidOpeningCheckListController.checkListDetailforlot.bidDitId}" >
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>        
+                                                        <f:selectItems value="#{bidOpeningCheckListController.prmsBidDetailsList}" var="com" itemLabel="#{com.lotName}"  />
+
+                                                    </p:selectOneMenu   >
+                                                    <p:message display="icon" for="txtLotNumber" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+
+                                                <p:outputLabel id="lbllotUnitPrice" class="control-label col-sm-2" value="Unit Price:*" />
+                                                <div class="col-sm-3"> 
+                                                    <p:inputText id="txtlotUnitPrice" value="#{bidOpeningCheckListController.checkListDetailforlot.price}"  />
+
+                                                    <p:message display="icon" for="txtlotUnitPrice" />
+                                                </div>
+
+
+                                                <h:outputLabel class="control-label col-sm-2" value="Currency:" />
+                                                <div class="col-sm-3"> 
+                                                    <p:selectOneMenu id="txtlotCurrency" style="width: 100%" required="true" converter="entConverter" 
+                                                                     value="#{bidOpeningCheckListController.checkListDetailforlot.currencyId}"  >
+                                                        <f:selectItem itemLabel="--- Select One ---"  itemValue=""/>
+                                                        <f:selectItems value="#{bidOpeningCheckListController.currencyList}" var="refNo"/>
+                                                    </p:selectOneMenu> 
+                                                    <p:message display="icon" for="txtlotCurrency" />
+                                                </div>
+
+                                            </div>
+
+
+
+                                            <div class="form-group textBoxMarginTop6px"> 
+
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="Add" action="#{bidOpeningCheckListController.addBidCheckListLotList()}" icon="ui-icon-add" validateClient="true" 
+                                                                     process="@this,:BidSubmissionMain:pnlcheckListDetailForLot" 
+                                                                     update="@this:BidSubmissionMain:pnlcheckListDetailForLot,pnlchecklistLot,:BidSubmissionMain:checklistLot" class="btn btn-primary col-lg-4"
+                                                                     value="#{bidOpeningCheckListController.addOrModifyBundle}" />   
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div></div>
+                        </div></div>
+
+
+                    <h:panelGroup style="border: 0px; background-color: transparent" id="pnlchecklistLot"   >
+                        <div class="form-horizontal col-sm-12">
+                            <div class="form-group">                                        
+                                <div class="col-sm-12">
+                                    <p:dataTable id="checklistLot" value="#{bidOpeningCheckListController.prmsCheckListDetailforlots}" rowIndexVar="rowContact" var="checklot"
+                                                 paginator="true" paginatorPosition="bottom" editable="true">
+                                        <p:ajax event="rowSelect" listener="#{bidOpeningCheckListController.displayBidOpeningDetailLot}" process="@this"  update="@this,:BidSubmissionMain:pnlcheckListDetailForLot" />   
+                                        <p:column headerText="No">
+                                            #{rowContact+1}
+                                        </p:column>
+                                        <p:column headerText="Bidding Company">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{checklot.supId}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="BiddingforLot" value="#{checklot.supId}" /></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column  headerText="Lot No">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{checklot.bidDitId.lotName}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="ltLot" value="#{checklot.bidDitId.lotName}" style="width:100%"/></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column  headerText="Currency">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{checklot.currencyId}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="ltcurrency" value="#{checklot.currencyId}" style="width:100%"/></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+
+                                        <p:column  headerText="Price">
+                                            <p:cellEditor>
+                                                <f:facet name="output"><h:outputText value="#{checklot.price}" /></f:facet>
+                                                <f:facet name="input"><p:inputText id="ltprice" value="#{checklot.price}" style="width:100%"/></f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+
+                                        <p:column headerText="Option"> 
+                                            <p:commandLink action="#{bidOpeningCheckListController.editDataTbl()}" value="Edit" 
+                                                           process="@this,checklistLot" update="@this,:BidSubmissionMain:pnlcheckListDetailForLot"/>
+                                        </p:column>
+                                    </p:dataTable>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </h:panelGroup>
+                </h:panelGroup>
+
+
+                <h:panelGroup style="border: 0px; background-color: transparent" id="pnlforCommittee"  >
+                    <div class="form-horizontal col-sm-12">
+                        <div class="form-group textBoxMarginTop6px required">
+                            <h:outputLabel id="lblOfficial"  class="control-label col-sm-2" value="Responsible Official:"/>
+                            <div class="col-sm-3">
+                                <p:selectOneMenu id="drdCommitte" value="#{bidOpeningCheckListController.hrcommittesEntity}" style="width: 100%" 
+                                                 required="true" requiredMessage="Responsible Official is required" filter="true" filterMatchMode="contains" converter="entConverter"
+
+                                                 valueChangeListener="#{bidOpeningCheckListController.handleSelectCommittee}"  >
+
+                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                    <f:selectItems id="selectOneMenuISivNumber" 
+                                                   value="#{bidOpeningCheckListController.hrCommitteeses}" var="com" itemLabel="#{com.committeeName}"/>
+                                    <p:ajax  event="change" process="@this" update="@this,drdComitteeMembers" />
+
+                                </p:selectOneMenu> 
+                                <p:message for="drdCommitte" display="icon"/>
+                            </div>
+
+
+                            <p:outputLabel id="lbl_ComitteeMembers" class="control-label col-sm-2" value="Committee Members:" />
+                            <div class="col-sm-3">
+
+                                <p:selectManyMenu id="drdComitteeMembers" value="#{bidOpeningCheckListController.selectedMembers}" style="width: 75%"
+                                                  required="true" requiredMessage="Committee members are required" scrollHeight="150"
+                                                  filter="true" filterMatchMode="contains" showCheckbox="true">
+                                    <f:selectItems value="#{bidOpeningCheckListController.committeeMembersList}" var="committee" itemLabel="#{committee.empId.firstName}"   />
+
+                                </p:selectManyMenu>
+
+                                <p:message for="drdComitteeMembers" display="icon"/>
+                            </div> 
+                        </div>
+                        <div class="form-group textBoxMarginTop6px">   
+                            <h:outputLabel id="lblPreparedBy"  class="control-label col-sm-2" value="Prepared By:"/>
+                            <div class="col-sm-3">
+                                <p:inputText id="txtPrepare" class="form-control"  
+
+                                             value="#{bidOpeningCheckListController.workFlow.userName}" disabled="true" />
+
+                            </div>
+                        </div>
+                        <div class="form-group textBoxMarginTop6px "> 
+                            <div class="col-lg-2" />
+                            <div class="col-sm-3">
+
+                                <p:commandButton id="btnSave" value="#{bidOpeningCheckListController.saveorUpdateBundle}" icon="ui-icon-new" validateClient="true" 
+                                                 class="btn btn-primary col-lg-4" 
+                                                 process="@this,:BidSubmissionMain:checkListInfoPanel,pnlforCommittee,:BidSubmissionMain:checklistLot,pnlchecklistLot"  
+                                                 update="@this,checkListInfoPanel,pnlforCommittee,checklistTbl,pnlchecklistLot" 
+                                                 action="#{bidOpeningCheckListController.actionForConfirmationForBidChe()}" > 
+
+
+
+                                </p:commandButton>
+
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </h:panelGroup>
+
+        </h:form>
+    </ui:define>
+</ui:composition>          
+

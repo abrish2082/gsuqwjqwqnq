@@ -1,0 +1,484 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="payLocationPayGroupSetup.xhtml"><i class="fa fa-fw"></i>Pay Location &amp; Pay Group Setup</a></li>
+        <li><a href="payLocationPayGroup.xhtml"><i class="fa fa-fw"></i>Pay Location Pay Group Mapping with Department</a></li>
+        <li><a href="payrollTaxRateRegistration.xhtml"><i class="fa fa-fw"></i> Tax Rate Entry</a></li>
+        <li><a href="pensionRateEntry.xhtml"><i class="fa fa-fw"></i>Pension Rate Entry</a></li>
+        <li><a href="earningDeductionSetupTabTest.xhtml"><i class="fa fa-fw"></i>Earnings/Deductions</a></li>
+        <li><a href="payrollPeriod.xhtml"><i class="fa fa-fw"></i>Payroll Period</a> </li>
+        <li><a href="EmpEarningDeductionTabTest.xhtml"><i class="fa fa-fw"></i>Employees Earning Deduction</a></li>
+        <li><a href="EmpEarningDeductionUsingGroup.xhtml"><i class="fa fa-fw"></i>All Employees Earning Deduction</a></li>        
+        <li><a href="ThirdPartiesInfo.xhtml"><i class="fa fa-fw"></i>Maintain Third party Info</a></li>
+        <li><a href="generateMonthlyPayroll.xhtml"><i class="fa fa-fw"></i>Generate Monthly Payroll</a> </li>      
+        <li><a href="generatePayrollReports.xhtml"><i class="fa fa-fw"></i>Payroll Report</a> </li>
+        <li><a href="backPaymentGroup.xhtml"><i class="fa fa-fw"></i>Create Payroll Group</a></li>
+        <li><a href="backPaymentForGroupOfEmployees.xhtml"><i class="fa fa-fw"></i>Back Payment using Group</a> </li>        
+        <li><a href="leaveAdvancePayment.xhtml"><i class="fa fa-fw"></i>Leave Advance</a> </li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmHeader"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton validateClient="true" action="#{earningDeductionSetupController.btnNewOrSearch()}"
+                                     icon="#{earningDeductionSetupController.icone}" style="background-color: white" 
+                                     process="@this" update="@this,:frmSearch,:frmearnDeduct"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/payroll/earningDeductionSetupTabTest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>  
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{earningDeductionSetupController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">  
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search ...</h3>
+                            </div>
+                            <div class="nav-tabs-custom">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#tabEarnings" data-toggle="tab">Earnings</a></li>
+                                    <li><a href="#tabDeductions" data-toggle="tab">Deduction</a></li>    
+                                </ul>
+                                <div class="tab-content" id="maintab">                                
+                                    <div class="active tab-pane" id="tabEarnings">  
+                                        <p:dataTable id="tblearnDed" value="#{earningDeductionSetupController.listOfEarnings}"
+                                                     var="earningDed"  paginator="true" paginatorPosition="bottom" class="dataTable"
+                                                     rowIndexVar="num" rows="10" selectionMode="single" rowKey="#{earningDed}" 
+                                                     selection="#{earningDeductionSetupController.hrPayrollEarningDeductions}">
+                                            <p:ajax event="rowSelect" process="@this,tblearnDed" listener="#{earningDeductionSetupController.populateEaring}"
+                                                    update="@this,:frmHeader,:frmSearch,:frmearnDeduct"/>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="S.NO" />
+                                                </f:facet>
+                                                <h:outputText value="#{num+1}"/>
+                                            </p:column>  
+                                            <p:column>
+                                                <f:facet name="header"  >
+                                                    <h:outputText value="General Ledger"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.generalLedgerId.accountTitle}"/>
+                                            </p:column >                        
+                                            <p:column filterBy="#{earningDed.itemCode}" filterMatchMode="contains">
+                                                <f:facet name="header"  >
+                                                    <h:outputText value="Item Code"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.itemCode}"/>
+                                            </p:column >
+                                            <p:column filterBy="#{earningDed.description}" filterMatchMode="contains">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Earnings"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.description}"/>
+                                            </p:column>
+                                            <p:column filterBy="#{earningDed.criterias}" filterMatchMode="contains">
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Mapped With"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.criterias}"/>
+                                            </p:column>  
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Taxable"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.taxable}"/>
+                                            </p:column>   
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Forced Deduction"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.forcedDeduction}"/>
+                                            </p:column>  
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Deduction First Made From Sal"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.firstDeductFromSal}"/>
+                                            </p:column>  
+                                            <p:column filterBy="#{earningDed.drcr}" filterMatchMode="contains">
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Debit/Credit"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.drcr}"/>
+                                            </p:column>  
+                                            <p:column filterBy="#{earningDed.sysCs}" filterMatchMode="contains">
+                                                <f:facet name="header" >
+                                                    <h:outputText value="System/Cost Center Level"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.sysCs}"/>
+                                            </p:column>  
+                                        </p:dataTable> 
+                                    </div>
+                                    <!--begining of morgate-->
+                                    <div class="tab-pane" id="tabDeductions">
+                                        <p:dataTable id="tblDeductions" value="#{earningDeductionSetupController.listOfDeductions}"  
+                                                     rowIndexVar="num"  rows="10"  var="earningDed"  paginator="true" 
+                                                     selectionMode="single" rowKey="#{earningDed}" class="dataTable"
+                                                     selection="#{earningDeductionSetupController.hrPayrollEarningDeductions}">
+                                            <p:ajax event="rowSelect" process="@this,tblDeductions" listener="#{earningDeductionSetupController.populateDeduction}"
+                                                    update="@this,:frmHeader,:frmSearch,:frmearnDeduct"/>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="S.NO" />
+                                                </f:facet>
+                                                <h:outputText value="#{num+1}"/>
+                                            </p:column>  
+                                            <p:column >
+                                                <f:facet name="header"  >
+                                                    <h:outputText value="General Ledger"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.generalLedgerId.accountTitle}"/>
+                                            </p:column >   
+                                            <p:column filterBy="#{earningDed.itemCode}" filterMatchMode="contains">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Item Code"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.itemCode}"/>
+                                            </p:column>
+                                            <p:column filterBy="#{earningDed.description}" filterMatchMode="contains">
+                                                <f:facet name="header">
+                                                    <h:outputText value="Deductions"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.description}"/>
+                                            </p:column>
+                                            <p:column  filterBy="#{earningDed.criterias}" filterMatchMode="contains">
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Mapped With"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.criterias}"/>
+                                            </p:column> 
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Taxable"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.taxable}"/>
+                                            </p:column>   
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Forced Deduction"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.forcedDeduction}"/>
+                                            </p:column> 
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Deduction First Made From Sal"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.firstDeductFromSal}"/>
+                                            </p:column>  
+                                            <p:column filterBy="#{earningDed.drcr}" filterMatchMode="contains">
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Debit/Credit"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.drcr}"/>
+                                            </p:column>  
+                                            <p:column filterBy="#{earningDed.sysCs}" filterMatchMode="contains">
+                                                <f:facet name="header" >
+                                                    <h:outputText value="System/Cost Center Level"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.sysCs}"/>
+                                            </p:column>  
+                                        </p:dataTable> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmearnDeduct">
+            <p:growl id="growl" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup id="pnlMainPage" rendered="#{earningDeductionSetupController.newPage}">
+                <div class="row">
+                    <div class="col-md-12"> 
+                        <div class="box box-primary">             
+                            <div class="box-body ">                     
+                                <div class="box-body ">
+                                    <div class="box-header">
+                                        <h4 class="box-title">Earning Deduction Setup</h4>                                       
+                                    </div>
+                                    <section class="panel panel-info">
+                                        <div class="box-header">
+                                            <h1 class="box-title"></h1>                       
+                                        </div>
+                                        <section class="panel-body">
+                                            <div class="form-group" >
+                                                <div class="col-sm-12" >
+                                                    <div class="col-md-6 ">  
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel value="Item Code:"   class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:inputTextarea  requiredMessage="Please Fill the item code!" id="txtItemCode" value="#{earningDeductionSetupController.hrPayrollEarningDeductions.itemCode}"  validator="#{validatorManagedBean.Remark}" required="true"/>
+                                                                    <p:message display="icon" for="txtItemCode"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel value="General Ledger:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectOneMenu id="drGl" required="true" requiredMessage="Please Select One"
+                                                                                     valueChangeListener="#{earningDeductionSetupController.handleValueChangeGeneralLedger}"
+                                                                                     value="#{earningDeductionSetupController.fmsGeneralLedger.generalLedgerId}"  style="width:100%">
+                                                                        <p:ajax listener="#{earningDeductionSetupController.handleChange}" update="txtItemDescription" />
+                                                                        <f:selectItem itemLabel="--Select One--" itemValue="#{null}"/>
+                                                                        <f:selectItems itemLabel="#{gl.accountTitle}" itemValue="#{gl.generalLedgerId}" var="gl"
+                                                                                       value="#{earningDeductionSetupController.listOfGeneralLedger}"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drGl"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel value="Item Code Description:"   class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:inputTextarea  value="#{earningDeductionSetupController.hrPayrollEarningDeductions.description}"
+                                                                                      requiredMessage="Fill the item description!" id="txtItemDescription" required="true"/>
+                                                                    <p:message display="icon" for="txtItemDescription"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel value="Counter JL:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectOneMenu id="drCounterJl" style="width:100%" required="true" requiredMessage="Please Select One"
+                                                                                     valueChangeListener="#{earningDeductionSetupController.handleValueChangeCounterGeneralLedger}"  
+                                                                                     value="#{earningDeductionSetupController.fmsCounterGeneralLedger.generalLedgerId}"  >
+                                                                        <p:ajax listener="#{earningDeductionSetupController.handleChangeCounterJL}" update="txtCounterItemCodeDes" />
+                                                                        <f:selectItem itemLabel="--Select One--" itemValue="#{null}"/>
+                                                                        <f:selectItems itemLabel="#{gl.accountTitle}" itemValue="#{gl.generalLedgerId}" var="gl" 
+                                                                                       value="#{earningDeductionSetupController.listOfGeneralLedger}"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drCounterJl"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel value="Counter Item Code Description:"   class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:inputTextarea  requiredMessage="Fill the conunter item code description!" id="txtCounterItemCodeDes"
+                                                                                      value="#{earningDeductionSetupController.hrPayrollEarningDeductions.counterLedDesc}"  
+                                                                                      required="true"/>
+                                                                    <p:message display="icon" for="txtCounterItemCodeDes"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Type:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectOneMenu id="selecttype" 
+                                                                                     value="#{earningDeductionSetupController.hrPayrollEarningDeductions.type}"
+                                                                                     valueChangeListener="#{earningDeductionSetupController.handleValueChangeOnEdTypes}" 
+                                                                                     style="width:100%"  required="false" label="Type">
+                                                                        <f:selectItem itemLabel="--Select One--" itemValue="#{null}" />
+                                                                        <f:selectItem itemLabel="Earning" itemValue="Earning" />
+                                                                        <f:selectItem itemLabel="Deduction" itemValue="Deduction" /> 
+                                                                        <p:ajax listener="#{earningDeductionSetupController.handleChangeTo}" update="chkDedFMadeFromSal" />
+                                                                        <p:message display="icon" for="selecttype"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>  
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel value="Map Earning Deduction:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectOneMenu  id="selecttype2" label="Type" style="width:100%"
+                                                                                      required="true" requiredMessage="Please Select One"
+                                                                                      value="#{earningDeductionSetupController.hrPayrollEarningDeductions.criterias}" 
+                                                                                      valueChangeListener="#{earningDeductionSetupController.vcl_MapEarningDeduction}">
+                                                                        <f:selectItem itemLabel="--Criterias--" itemValue="#{null}"  /> 
+                                                                        <f:selectItem itemLabel="Other" itemValue="Other"  /> 
+                                                                        <f:selectItem itemLabel="All Employees Earning Deduction" itemValue="All Employees Earning Deduction" /> 
+                                                                        <f:selectItem itemLabel="Gross Salary" itemValue="Gross Salary" />
+                                                                        <f:selectItem itemLabel="Contract Emp Gross Salary" itemValue="Contract Emp Gross Salary" /> 
+                                                                        <f:selectItem itemLabel="Net Pay" itemValue="Net Pay" />
+                                                                        <f:selectItem itemLabel="Tax" itemValue="Tax" />
+                                                                        <f:selectItem itemLabel="Pension Addition" itemValue="Pension Addition" />
+                                                                        <f:selectItem itemLabel="Pension Deduction" itemValue="Pension Deduction" />
+                                                                        <f:selectItem itemLabel="Overtime" itemValue="Overtime" />                                                                    
+                                                                        <f:selectItem itemLabel="A type overtime" itemValue="A type overtime" />
+                                                                        <f:selectItem itemLabel="B type overtime" itemValue="B type overtime" />
+                                                                        <f:selectItem itemLabel="C type overtime" itemValue="C type overtime" />
+                                                                        <f:selectItem itemLabel="D type overtime" itemValue="D type overtime" />
+                                                                        <f:selectItem itemLabel="Total Taxable Earnings" itemValue="Total Taxable Earnings" />
+                                                                        <f:selectItem itemLabel="Total Deduction" itemValue="Total Deduction" />
+                                                                        <f:selectItem itemLabel="Total Earnings" itemValue="Total Earnings" />
+                                                                        <f:selectItem itemLabel="Cost Sharing" itemValue="Cost Sharing" />
+                                                                        <f:selectItem itemLabel="Pay Suppress" itemValue="Pay Suppress" />
+                                                                        <f:selectItem itemLabel="Allowance in JL" itemValue="Allowance in JL" />
+                                                                        <f:selectItem itemLabel="Allowance in JT" itemValue="Allowance in JT" />
+                                                                        <f:selectItem itemLabel="Allowance in Loc" itemValue="Allowance in Loc" />
+                                                                        <f:selectItem itemLabel="Leave Advance" itemValue="Leave Advance" />
+                                                                        <f:selectItem itemLabel="Transport Allowance" itemValue="Transport Allowance" />
+                                                                        <f:selectItem itemLabel="Mobile Phone Allowance" itemValue="Mobile Phone Allowance" />
+                                                                        <f:selectItem itemLabel="Hardship Allowance" itemValue="Hardship Allowance" />
+                                                                        <f:selectItem itemLabel="Managment Allowance" itemValue="Managment Allowance" />
+                                                                        <f:selectItem itemLabel="Hydro Power plant Allowance" itemValue="Hydro Power plant Allowance" />
+                                                                        <f:selectItem itemLabel="Diesel Power Plant Allowance" itemValue="Diesel Power Plant Allowance" />
+                                                                        <f:selectItem itemLabel="Call On Duty Allwance" itemValue="Call On Duty Allwance" />
+                                                                        <f:selectItem itemLabel="House Allowance" itemValue="House Allowance" />
+                                                                        <f:selectItem itemLabel="Night Shift Allowance" itemValue="Night Shift Allowance" />
+                                                                        <f:selectItem itemLabel="Electricity Allowance" itemValue="Electricity Allowance" /> 
+                                                                        <f:selectItem itemLabel="Third Parties" itemValue="Third Parties" />
+                                                                        <f:selectItem itemLabel="Deduction payable for Third Party" itemValue="Deduction payable for Third Party" /> 
+                                                                        <f:selectItem itemLabel="Ded first Made Before Tax" itemValue="Ded first Made Before Tax" /> 
+                                                                        <f:selectItem itemLabel="Percent ded from sal with limit amt" itemValue="Percent ded from sal with limit amt" /> 
+                                                                        <p:ajax  event="change"/> 
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="selecttype2"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel value="Deduction Order:"   class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:inputTextarea requiredMessage="Fill the deduction order!" id="txtDedOrder" 
+                                                                                     value="#{earningDeductionSetupController.hrPayrollEarningDeductions.dedOrder}" 
+                                                                                     validator="#{validatorManagedBean.Remark}" required="true"/>
+                                                                    <p:message display="icon" for="txtDedOrder"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Debic/Credit:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectOneMenu id="dr" value="#{earningDeductionSetupController.hrPayrollEarningDeductions.drcr}" 
+                                                                                     valueChangeListener="#{earningDeductionSetupController.handleValueChangeOnEdTypes}" 
+                                                                                     style="width:100%"  required="false" label="Type"  >
+                                                                        <f:selectItem itemLabel="Debit" itemValue="Debit" />
+                                                                        <f:selectItem itemLabel="Credit" itemValue="Credit" /> 
+                                                                        <p:ajax listener="#{earningDeductionSetupController.handleChangeTo}" update="chkDedFMadeFromSal" />
+                                                                        <p:message display="icon" for="dr"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Counter Debic/Credit:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectOneMenu id="drCounterDr" value="#{earningDeductionSetupController.hrPayrollEarningDeductions.counterDr}"  
+                                                                                     style="width:100%"  required="false" label="Type"  >
+                                                                        <f:selectItem itemLabel="Debit" itemValue="Debit" />
+                                                                        <f:selectItem itemLabel="Credit" itemValue="Credit" />                                                                  
+                                                                        <p:message display="icon" for="drCounterDr"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="System/Cost Center:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectOneMenu id="drSystemCs" value="#{earningDeductionSetupController.hrPayrollEarningDeductions.sysCs}"
+                                                                                     valueChangeListener="#{earningDeductionSetupController.handleValueChangeOnEdTypes}" 
+                                                                                     style="width:100%"  required="false" label="Type">
+                                                                        <f:selectItem itemLabel="System" itemValue="System" />
+                                                                        <f:selectItem itemLabel="Cost Center" itemValue="Cost Center" /> 
+                                                                        <p:message display="icon" for="drSystemCs"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Taxable:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectBooleanCheckbox value="#{earningDeductionSetupController.isTaxable}">
+                                                                    </p:selectBooleanCheckbox>
+                                                                </div>
+                                                            </div> 
+                                                        </div>     
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Forced Deductions:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectBooleanCheckbox value="#{earningDeductionSetupController.isForcedDeduction}">
+                                                                    </p:selectBooleanCheckbox>
+                                                                </div>
+                                                            </div> 
+                                                        </div>  
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Deductions First Made From Salary:"  class="control-label col-sm-6"/>
+                                                                <div class="col-sm-6"> 
+                                                                    <p:selectBooleanCheckbox id="chkDedFMadeFromSal" value="#{earningDeductionSetupController.isDeductionFirstMadeFromSal}"
+                                                                                             disabled="#{earningDeductionSetupController.disableDedFirstfromSal}">
+                                                                    </p:selectBooleanCheckbox>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-6">
+                                                                </div> 
+                                                                <div class="col-sm-4"> 
+                                                                    <p:commandButton  id="btnSave" action="#{earningDeductionSetupController.saveEarningDeductions()}" 
+                                                                                      update="@(form)" process="@(form)"   class="btn  btn-primary col-sm-6"
+                                                                                      value="#{earningDeductionSetupController.saveOrUpdate}"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div>                                                    
+                                                    </div>  
+                                                </div> 
+                                            </div>  
+                                        </section>
+                                    </section>
+                                </div>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

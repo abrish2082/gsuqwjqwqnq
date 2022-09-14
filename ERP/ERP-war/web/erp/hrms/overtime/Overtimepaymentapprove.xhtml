@@ -1,0 +1,442 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="OtRateSetup.xhtml"><i class="fa fa-fw"></i> <span> Overtime Rate</span></a></li>
+        <li><a href="OvertimePaymentRequest.xhtml"><i class="fa fa-fw"></i> <span> Overtime Payment Request</span></a></li>
+        <li><a href="Overtimepaymentapprove.xhtml"><i class="fa fa-fw"></i> <span>Overtime Payment Approve </span></a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:outputLabel id="lblNotf" class="fa fa-bell" value="#{overtimeRequestController.requestNotificationCounter}" style="color: red" />
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotf"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="form-group">
+                            <p:dataTable id="tblResultList" value="#{overtimeRequestController.overtimelist}"
+                                         var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                         selection="#{overtimeRequestController.selectedovertimerequest}" rowKey="#{res.id}" class="dataTable">
+                                <p:ajax event="rowSelect" process="@this" listener="#{overtimeRequestController.OvertimeapproveDisplayChanged}" 
+                                        update=":frmRequest,:frmSample"/>
+                                <p:column headerText="No.">
+                                    <h:outputText value="#{num + 1}"/>
+                                </p:column>
+                                <p:column headerText="Month" filterMatchMode="startsWith" filterBy="#{res.month}">
+                                    <h:outputText  value="#{res.month}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Year"/>
+                                    </f:facet>
+                                    <h:outputText value="#{res.year}"/>
+                                </p:column> 
+
+                            </p:dataTable>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                    </span>
+                    <p:commandLink id="cmlView" class="fa fa-gear" onclick="PF('dlgWorkflow').show();"/>
+                    <span class="ui-separator">
+                    </span>
+                    <p:commandButton id="btnNew" validateClient="true" action="#{overtimeRequestController.createNewAdditionalAmount()}" 
+                                     icon="#{overtimeRequestController.icone}" style="background-color: white" 
+                                     process="@this" update=":frmRequest,:frmSample"
+                                     title="#{overtimeRequestController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                    </span>
+                    <a href="Overtimepaymentapprove.xhtml"><i class="fa fa-fw fa-refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <p:commandButton id="btnTrash" type="button" style="background-color: white"  title="Delete" icon="ui-icon-trash"/>
+                    <p:commandButton id="btnPrint" type="button" style="background-color: white"  title="Print" icon="ui-icon-print"/>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmRequest"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup id="pnlSearch" rendered="#{overtimeRequestController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search <small> Overtime Approve ...</small></h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group">
+                                            <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                            <div class="col-sm-3">
+                                                <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                 valueChangeListener="#{overtimeRequestController.filiterByStatus_VclOvertimePaymentRequest}">
+
+                                                    <f:selectItems value="#{overtimeRequestController.filterByStatus}"/>   
+                                                    <p:ajax event="change" process="@this" update="tblResultList"/>
+                                                </p:selectOneMenu> 
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblResultList" value="#{overtimeRequestController.hrOvertimeRequestsDataModel}"
+                                                         var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                         selection="#{overtimeRequestController.selectedovertimerequest}" rowKey="#{res.id}" class="dataTable">
+                                                <p:ajax event="rowSelect" process="@this" listener="#{overtimeRequestController.OvertimeapproveDisplayChanged}" 
+                                                        update=":frmRequest,:frmSample"/>
+                                                <p:column headerText="No.">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Year"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.year}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Month"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{res.month}"/>
+                                                </p:column> 
+
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup id="pnlMainpage" rendered="#{overtimeRequestController.renderPnlCreateAdditional}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Overtime Payment Approve</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <div class="col-md-12">
+
+                                                <div class="box-body">
+                                                    <div class="box-body">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel value="Year:" class="col-md-4 control-label" />
+                                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                                        <p:inputText id="calabsentdate" value="#{overtimeRequestController.hrOvertimeRequests.year}" readonly="true"/>
+                                                                    </div>                                                                                                                              
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel value="Month:" class="col-md-4 control-label" />
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="ratevalu"  value="#{overtimeRequestController.hrOvertimeRequests.month}" readonly="true"  >
+                                                                        </p:inputText>
+                                                                    </div>                                                                                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel value="Department:" class="col-md-4 control-label" />
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="txtdepName" value="#{overtimeRequestController.hrOvertimeRequests.deptId.depName}" readonly="true"   >
+                                                                        </p:inputText> 
+                                                                    </div>                                                                                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel value="Type Of Work:" class="col-md-4 control-label" />
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputText id="preparedon" value="#{overtimeRequestController.hrOvertimeRequests.typeOfWork}" readonly="true"   >
+                                                                        </p:inputText> 
+                                                                    </div>                                                                                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel value="Overtime Reason" class="col-md-4 control-label" />
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:inputTextarea id="Reasontxt" value="#{overtimeRequestController.hrOvertimeRequests.overtimeReason}" readonly="true"  class="form-control" >
+                                                                        </p:inputTextarea>
+
+                                                                    </div>                                                                                                                               
+                                                                </div>                                                                                          
+                                                            </div>
+
+                                                        </div>
+
+                                                        <p:dataTable id="tblAbsent"   value="#{overtimeRequestController.hrOvertimeRequestDetailsDatamodel}"
+                                                                     var="emp" rowIndexVar="num"  class="dataTable"  
+                                                                     rows="10" paginator="true" paginatorPosition="bottom">                    
+                                                            <p:column headerText="No">
+                                                                <h:outputText value="#{num + 1}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Emp Name"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{emp.empId.firstName} #{emp.empId.middleName}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="EMP ID"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{emp.empId.empId}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Department"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{emp.empId.deptId.depName}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Rate Type"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{emp.otRateId.otTypes}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Working Hour"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{emp.workingHour}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Day"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{emp.day}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="OT Amount"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{emp.otAmount}"/>
+                                                            </p:column>
+                                                            <p:summaryRow listener="#{overtimeRequestController.sumCal(emp.empId.empId)}">
+                                                                <p:column >
+                                                                    <h:outputText value="Total OT Amount:" />
+                                                                </p:column> 
+                                                                <p:column >
+                                                                    <p:outputLabel value="#{overtimeRequestController.total}" />
+                                                                </p:column>
+                                                                <p:column >
+                                                                    <h:outputText value="Total Working Hour In A: #{overtimeRequestController.OTFA}" />
+                                                                </p:column>
+                                                                <p:column >
+                                                                    <h:outputText value="Total Working Hour In B: #{overtimeRequestController.OTFB}" />
+                                                                </p:column>
+                                                                <p:column >
+                                                                    <h:outputText value="Total Working Hour In C: #{overtimeRequestController.OTFC}" />
+                                                                </p:column>
+                                                                <p:column >
+                                                                    <h:outputText value="Total Working Hour In D: #{overtimeRequestController.OTFD}" />
+                                                                </p:column>
+                                                                <p:column >
+                                                                    <h:outputText value="Total Working Hour In (A+B+C+D): #{overtimeRequestController.OTFTotal}" />
+                                                                </p:column>
+                                                            </p:summaryRow>
+                                                            <p:column sortBy="#{emp.empId.empId}" headerText="Show summary">
+                                                            </p:column>
+                                                            <p:columnGroup type="footer">
+                                                                <p:row>
+                                                                    <p:column colspan="2"  footerText="OT Amount A:#{overtimeRequestController.otamountA}" />
+                                                                    <p:column colspan="2"  footerText="OT Amount B:#{overtimeRequestController.otamountB}" />
+                                                                    <p:column colspan="2"  footerText="OT Amount C:#{overtimeRequestController.otamountC}" />
+                                                                    <p:column colspan="2"  footerText="OT Amount D:#{overtimeRequestController.otamountD}" />
+                                                                    <p:column colspan="1" footerText="Over All OT Amount:" />
+                                                                    <p:column footerText="#{overtimeRequestController.overalltotal}" />
+                                                                </p:row>
+                                                            </p:columnGroup>
+                                                        </p:dataTable>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl3" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-group required form-horizontal">
+                                                                    <h:outputLabel for="drddecision" class="control-label col-sm-4" value="Decision:"/>
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:selectOneMenu id="drddecision" value="#{overtimeRequestController.hrOvertimeRequests.status}" 
+                                                                                         requiredMessage="Select Decision" required="true" style="width: 100%"  >
+                                                                            <f:selectItem itemLabel="Select One" itemValue=""/>
+                                                                            <f:selectItem itemLabel="Approve" itemValue="1"/>
+                                                                            <f:selectItem itemLabel="Reject" itemValue="2" />
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="drddecision" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtRemark" value="#{overtimeRequestController.hrOvertimeRequests.remark}"
+                                                                                         rows="1" cols="3" autoResize="false" title="Remark" class="form-control"/>
+                                                                        <p:message for="txtRemark" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-group required form-horizontal">
+                                                                    <h:outputLabel for="calApprovedDate" value="Approved Date:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calApprovedDate" value="#{overtimeRequestController.hrOvertimeRequests.approvedDate}"
+                                                                                     converter="dateConverter" validator="#{validatorManagedBean.Date}"
+                                                                                     onclick="displayCalendar('frmRequest:calApprovedDate', 'frmRequest:calApprovedDate');"
+                                                                                     required="true" requiredMessage="Enter Approved date" title="Approved Date"/>
+                                                                        <p:message for="calApprovedDate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-group required form-horizontal">
+                                                                    <h:outputLabel for="paymentstartdate" value="Payment Start Date:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="paymentstartdate" value="#{overtimeRequestController.hrPayrollMaintainEds.startDate}"
+                                                                                     converter="dateConverter" validator="#{validatorManagedBean.Date}"
+                                                                                     onclick="displayCalendar('frmRequest:paymentstartdate', 'frmRequest:paymentstartdate');"
+                                                                                     required="true" requiredMessage="Enter Payment Start date" title="Payment Start Date"/>
+                                                                        <p:message for="paymentstartdate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-group required form-horizontal">
+                                                                    <h:outputLabel for="paymentenddate" value="Payment End Date:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="paymentenddate" value="#{overtimeRequestController.hrPayrollMaintainEds.endDate}"
+                                                                                     converter="dateConverter" validator="#{validatorManagedBean.Date}"
+                                                                                     onclick="displayCalendar('frmRequest:paymentenddate', 'frmRequest:paymentenddate');"
+                                                                                     required="true" requiredMessage="Enter Payment End Date" title="Payment End Date"/>
+                                                                        <p:message for="paymentenddate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+
+
+
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">  
+                                            <h:panelGroup id="pnlworkflow1" class="col-sm-12">
+                                                <p:dialog id="dlgWorkflow" header="Workflow" widgetVar="dlgWorkflow" height="500"
+                                                          width="1200" modal="true" resizable="false" showEffect="explode">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="box-body ">
+                                                                <h:form class="form-horizontal" id="frmWorkflow" style="margin-top: 20px;">
+                                                                    <section class="panel panel-info" id="pnl22">
+                                                                        <section class="panel-body">                                       
+                                                                            <div class="col-md-12" >                                       
+                                                                                <div class="col-sm-12">
+                                                                                    <p:dataTable id="tblWorkflow" value="#{overtimeRequestController.workFlowDataModel}" 
+                                                                                                 var="currentRow"  rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                                                 rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                                                        <p:column headerText="Processed By">
+                                                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                                                        </p:column>
+                                                                                        <p:column >
+                                                                                            <f:facet name="header">
+                                                                                                <h:outputText value="Decision"/>
+                                                                                            </f:facet>
+                                                                                            <h:outputText value="#{currentRow.action}"/> 
+                                                                                        </p:column>
+                                                                                        <p:column >
+                                                                                            <f:facet name="header">
+                                                                                                <h:outputText value="Comment Given"/>
+                                                                                            </f:facet>
+                                                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                                                        </p:column>
+                                                                                        <p:column >
+                                                                                            <f:facet name="header">
+                                                                                                <h:outputText value="Processed Date"/>
+                                                                                            </f:facet>
+                                                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                                                        </p:column> 
+                                                                                    </p:dataTable>
+                                                                                </div> 
+                                                                            </div>  
+                                                                        </section>
+                                                                    </section>
+                                                                </h:form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </p:dialog>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+
+
+
+                                    <h:panelGroup id="pnl4" class="col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="#{overtimeRequestController.saveOrUpdateButton}" 
+                                                                             action="#{overtimeRequestController.saveOvertimeApprove()}" title="Approve"
+                                                                             process="@this,pnl3" class="btn  btn-block btn-primary col-lg-4"                                       
+                                                                             update=":frmRequest,:frmSample"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

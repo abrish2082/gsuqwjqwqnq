@@ -1,0 +1,310 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="leaveSetting.xhtml"><i class="fa fa-fw"></i> <span>Leave Setting </span></a></li>
+        <li>      <a href="leaveRequest.xhtml"><i class="fa fa-fw"></i>  <span>Leave Request</span></a> </li>
+        <li>    <a href="leaveApproveDep.xhtml"><i class="fa fa-fw"></i>  <span>Leave Approve Dept</span></a> </li>
+        <li>    <a href="leaveApproveHr.xhtml"><i class="fa fa-fw"></i>  <span>Leave Approve HR </span></a></li>
+        <li>   <a href="leaveReturn.xhtml"><i class="fa fa-fw"></i>  <span>Employees On Leave </span></a></li>
+        <li>    <a href="leaveBalance.xhtml"><i class="fa fa-fw"></i> <span>Generate Leave Balance </span></a> </li>
+        <li>    <a href="leaveSchedule.xhtml"><i class="fa fa-fw"></i> <span>Leave Schedule </span></a> </li>
+        <li> <a href="holiday.xhtml"><i class="fa fa-fw"></i>  <span>Manage Holiday  </span>  </a></li>
+
+    </ui:define>
+    <ui:define name="contents">
+
+
+        <h:form id="frmSample"> 
+
+            <p:toolbar  style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandLink id="cmlView" value="Worlflow" onclick="PF('dlgWorkflow').show();"
+                                   title="Click to see workflow"/> 
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <p:commandButton  action="#{leaveTransferController.createNewAdditionalAmount()}" 
+                                      icon="#{leaveTransferController.icone}" validateClient="true"   style="background-color: white" 
+                                      process="@this" update="@this,:frmLeaveTransfer,:frmSample,:frmSearch"
+                                      value="#{leaveTransferController.createOrSearchBundle}" />
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="leaveTransferRequest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+
+            </p:toolbar>
+
+        </h:form>
+        <h:form id="frmSearch">
+            <p:dialog id="dlgWorkflow" header="Workflow" widgetVar="dlgWorkflow" height="400"
+                      width="1200"  resizable="false" >
+                <h:panelGroup id="pnlworkflow1" class="col-sm-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="box-body ">                                     
+                                <div class="col-md-12" >                                       
+                                    <div class="col-sm-12">
+                                        <p:dataTable id="tblWorkflow" value="#{leaveTransferController.workflowDataModel}" 
+                                                     var="currentRow" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                     rowKey="#{currentRow}" paginatorPosition="bottom">
+                                            <p:column headerText="Processed By">
+                                                <h:outputText value="#{currentRow.processedBy}"/> 
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Decision"/>
+                                                </f:facet>
+                                                <h:outputText value="#{currentRow.decision}"/> 
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Comment Given"/>
+                                                </f:facet>
+                                                <h:outputText value="#{currentRow.commentGiven}"/> 
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Processed Date"/>
+                                                </f:facet>
+                                                <h:outputText value="#{currentRow.processedOn}"/> 
+                                            </p:column> 
+                                        </p:dataTable>
+                                    </div> 
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>   
+            </p:dialog>
+
+            <h:panelGroup id="panelMain"   rendered="#{leaveTransferController.renderPnlManPage}">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h1 class="box-title" >Leave Transfer Requests</h1>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchEvaLevel">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{leaveTransferController.filiterByStatus_Vcl}">
+                                                                <f:selectItems value="#{leaveTransferController.filterByStatus}" var="status" itemValue="#{status}" itemLabel="#{status}"/>   
+                                                                <p:ajax event="change" process="@this" update=":frmSearch:tblRequestList"/>
+                                                            </p:selectOneMenu> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblRequestList" value="#{leaveTransferController.leaveRequesterList}"  selectionMode="single"
+                                                         var="leaveTransfer" rows="10" paginator="true" rowKey="#{leaveTransfer}" class="dataTable"
+                                                         selection="#{leaveTransferController.selectedCriteria}"   rowsPerPageTemplate="10,20,30" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" listener="#{leaveTransferController.populateLeaveTransferRequest}" 
+                                                        process="@this" update=":frmSearch,:frmLeaveTransfer,:frmLeaveTransfer:pnlSaveEmp"/>
+                                                <p:column headerText="Requester EmpID">
+                                                    <h:outputText value="#{leaveTransfer.empId.empId}"/>
+                                                </p:column> 
+                                                <p:column headerText="Requester Full Name">
+                                                    <h:outputText value="#{leaveTransfer.empId.firstName} #{leaveTransfer.empId.middleName} #{leaveTransfer.empId.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Department">
+                                                    <h:outputText value="#{leaveTransfer.empId.deptId.depName}"/>
+                                                </p:column> 
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>               
+            </h:panelGroup>
+
+        </h:form>
+
+        <h:form id="frmLeaveTransfer">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>   
+            <h:panelGroup id="pnlLeaveTransfer"   rendered="#{leaveTransferController.renderPnlCreateAdditional}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header">
+                                <h3 class="box-title">Leave Transfer Request </h3>  
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body ">
+                                <div class="box-body ">
+                                    <section class="panel panel-info"  >
+                                        <section class="panel-body" > 
+                                            <div class=" col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <p:outputLabel   value="EmpID (Requester):" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:autoComplete id="requester" placeholder="Search by  RequesterId" style="width: 100%"
+                                                                        emptyMessage="No data"  maxResults="10"
+                                                                        forceSelection="true" value="#{leaveTransferController.employee.empId}"
+                                                                        completeMethod="#{leaveTransferController.searchEmployeeById}" required="true"   requiredMessage="Field cannot be empty."
+                                                                        var="req" itemValue="#{req.empId}" itemLabel="#{req}"  size="15" minQueryLength="1">
+                                                            <p:ajax  event="itemSelect" listener="#{leaveTransferController.handleSelectById}" process="@this" update="@this,pnlLeaveTransfer" />  
+                                                            <p:column headerText="ID"  >
+                                                                <h:outputText value="#{req.empId}" />
+                                                            </p:column>
+                                                            <p:column headerText="First Name" >
+                                                                <h:outputText  value="#{req.firstName}" />
+                                                            </p:column>
+                                                            <p:column  headerText="Middle Name">
+                                                                <h:outputText value="#{req.middleName}" />
+                                                            </p:column>
+                                                            <p:column  headerText="Last Name">
+                                                                <h:outputText value="#{req.lastName}" />
+                                                            </p:column>
+                                                        </p:autoComplete>   
+                                                        <p:message for="requester" display="icon"/>
+                                                    </div>
+                                                </div> 
+                                                <div class="col-sm-6">
+                                                    <p:outputLabel  for="txtRequesterPos" value="Requester Position:" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtRequesterPos" readonly="true" value="#{leaveTransferController.hrJobTypes.jobTitle}" />
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br/><br/>        
+
+                                            <div class="col-sm-12" >
+                                                <div class="col-sm-6" > 
+                                                    <p:outputLabel  for="txtRequesterName" value="Full Name:" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8" >
+                                                        <p:inputText id="txtRequesterName" readonly="true" value="#{leaveTransferController.employee.firstName} #{leaveTransferController.employee.middleName} #{leaveTransferController.employee.lastName}" />
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6" > 
+                                                    <p:outputLabel  for="txtRequesterDept" class="control-label col-sm-4" value="Department:"/>
+                                                    <div class="col-sm-8" >
+                                                        <p:inputText id="txtRequesterDept" readonly="true" value="#{leaveTransferController.department.depName}" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <br/><br/>  
+                                            <div class="col-sm-12" >
+                                                <div class="col-sm-6" >
+                                                    <h:outputLabel for="txtdept"  class="control-label col-sm-4" value="Work unit:"></h:outputLabel>                                            
+                                                    <div class="col-sm-2">
+                                                        <p:dialog id="dig1" header="organ" widgetVar="dlg1" height="300" width="500" showEffect="explode">
+                                                            <h:panelGrid columns="3" >
+                                                                <p:tree value="#{leaveTransferController.root2}" var="nodes" style="border: transparent; width: 100%"
+                                                                        selectionMode="single" selection="#{leaveTransferController.selectedNode}" >
+                                                                    <p:ajax event="select" listener="#{leaveTransferController.deptChanged}" 
+                                                                            process="@this"  update="@this,:frmLeaveTransfer:checkboxDT,:frmLeaveTransfer:txtdept"  />
+                                                                    <p:treeNode>
+                                                                        <h:outputText value="#{nodes}" />
+                                                                    </p:treeNode>
+                                                                </p:tree>
+                                                            </h:panelGrid>
+                                                        </p:dialog> 
+
+                                                    </div>
+                                                    <div class="col-sm-8" >
+                                                        <p:inputText   id="txtdept" value="#{leaveTransferController.department.depName}" required="true" readonly="true" />
+                                                        <p:message for="txtdept" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-2" >
+                                                    <p:commandButton id="btnTree" rendered="#{leaveTransferController.reanderDeptbtn}" onclick="PF('dlg1').show();"  partialSubmit="true" style="background: transparent"   value="+" />
+                                                </div>
+                                            </div>
+                                            <br/><br/>  
+                                            <div class="col-md-12">                                       
+                                                <div class="col-md-12">
+                                                    <div class="form-group">  
+                                                        <p:dataTable id="checkboxDT" var="emp"  value="#{leaveTransferController.dataModelEmployee}"  
+                                                                     rowIndexVar="index"   class="dataTable"    
+                                                                     paginator="true" paginatorPosition="bottom"
+                                                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                     rowsPerPageTemplate="5,10,15"    >
+                                                            <p:column headerText="Emp Id">
+                                                                <p:outputLabel   id="empId"  value="#{emp.empId}" />
+                                                            </p:column>
+                                                            <p:column headerText="Emp Name">
+                                                                <p:outputLabel   id="empName"  value="#{emp.empId.firstName} #{emp.empId.middleName}" />
+                                                            </p:column>
+                                                            <p:column style="width: 300px">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Select employee leave Transfer"/>
+                                                                </f:facet>
+                                                                <p:selectBooleanCheckbox  value="#{emp.status}"
+                                                                                          valueChangeListener="#{leaveTransferController.departmentSelected}">
+                                                                    <p:ajax event="change"/>
+                                                                </p:selectBooleanCheckbox>
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        </section>
+                                    </section>
+                                    <h:panelGroup id="pnlSaveEmp"   >
+                                        <div class="col-sm-6">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <div class="col-sm-4">                                                              
+                                                </div>                                                                    
+                                                <div class="col-sm-4">
+                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" value="#{leaveTransferController.saveOrUpdate}" 
+                                                                     action="#{leaveTransferController.saveLeaveTransferRequest}" 
+                                                                     process="@this,frmLeaveTransfer" update=":frmLeaveTransfer" icon="ui-icon-save"/>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <p:commandButton id="btnNew" value="Reset" class="btn  btn-block btn-primary col-lg-4" action="#{leaveTransferController.clearLeaveTransferRequest()}"                                          
+                                                                     process="@this" update="@this,:frmLeaveTransfer"  /> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                            <div class="box-footer ">                       
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+
+    </ui:define>
+</ui:composition>

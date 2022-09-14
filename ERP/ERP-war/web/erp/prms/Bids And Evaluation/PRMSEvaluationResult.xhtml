@@ -1,0 +1,738 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="BidCriteria.xhtml"><i class="fa fa-circle-o "></i> <span>Bid’s Criteria</span></a></li> 
+        <li><a href="BidRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Bid Registration</span></a></li> 
+        <li><a href="BidRegistrationAmend.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Amendment</span></a></li> 
+        <li><a href="PreminilaryEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Preliminary Evaluation</span></a></li> 
+        <li><a href="TechnicalEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Technical Evaluation</span></a></li> 
+        <li><a href="FinancialEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Financial Evaluation</span></a></li>
+        <li><a href="PostQualification.xhtml"><i class="fa fa-circle-o "></i><span>Bids Post Qualification</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmPreliminaryEvaluat"> 
+            <p:toolbar style="background-color: white;border-color: white ">
+                <f:facet name="right" >
+
+
+                    <h:panelGroup id="pnlBackToSearch" rendered="#{evaluationResultsController.renderpnlToSearchPage}" >
+                        <p:commandButton  id="btnBacktoSarch" action="#{evaluationResultsController.goBackToSearchPageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                          title="Back to Search" process="@this" update=":frmPreliminaryEvaluat,:frmMainUI,:frmFinancialResult"  style="background-color: white; border-color: white;" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+
+                    <p:commandButton action="#{evaluationResultsController.createNewFinancialResult()}" icon="#{evaluationResultsController.icone}"  
+                                     validateClient="true" process="@this" update=":frmPreliminaryEvaluat,:frmMainUI,:frmFinancialResult" 
+                                     style="background-color: white; border-color: white;"
+                                     title="#{evaluationResultsController.createOrSearchBundle}" rendered="#{evaluationResultsController.isCreateButton}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="PGNotification" rendered="#{evaluationResultsController.isDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{evaluationResultsController.requestNotificationCounter}" 
+                                       style="color: red;background-color: white; border-color: white"/>
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Market Assessment"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{evaluationResultsController.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="resultRequest"
+                                               value="#{evaluationResultsController.financialEvalResultList}"
+                                               itemValue="#{resultRequest}" itemLabel="#{resultRequest}"/>               
+                                <p:ajax event="valueChange" update=":frmFinancialResult, :frmMainUI, :frmFinancialResult:financialResultInformation" />                            
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress"
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 200px" >
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWf" value="#{evaluationResultsController.wfPrmsProcessedDModel}" rowIndexVar="num" var="wfVar" 
+                                                             rows="10" paginator="true" paginatorPosition="bottom" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{wfVar.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{wfVar.processedon}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Decision">
+                                                        <h:outputText value="#{wfVar.decision}" /> 
+                                                    </p:column>
+
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/Bids And Evaluation/EvaluationResult.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{evaluationResultsController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <h:form id="frmFinancialResultSrchLbl"> 
+                                <div class="panel-body">
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="col-sm-6" >
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="Searching By:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{evaluationResultsController.prmsFinancialEvalResult.columnName}"
+                                                                     valueChangeListener="#{evaluationResultsController.selectedParamChangeEvent}" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{evaluationResultsController.financialResSearchParameterLst}"
+                                                                       var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                        <p:ajax event="change" process="@this," update="lblFinancialResNo,txtFinancialResNo"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                <h:outputLabel id="lblFinancialResNo" class="control-label col-sm-4" value="Search By #{evaluationResultsController.prmsFinancialEvalResult.columnName}:"/>
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtFinancialResNo" value="#{evaluationResultsController.prmsFinancialEvalResult.columnValue}"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="col-lg-4"></div>
+                                                <div class="col-sm-8">
+                                                    <p:commandButton  icon="ui-icon-search" action="#{evaluationResultsController.search_EvaluationResultAction()}"
+                                                                      process="@this,frmFinancialResultSrchLbl" update=":frmMainUI:frmFinacialSearchTbl" 
+                                                                      class="btn btn-primary"
+                                                                      value="Find" />     
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                    <div class="row"> 
+                        <div class="col-md-12" > 
+                            <h:form id="frmFinacialSearchTbl"> 
+                                <div class="panel-body">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="financialResultTable"   rows="15" value="#{evaluationResultsController.financialEvalResultMdl}"
+                                                             var="financialResultSearch" paginator="true" paginatorPosition="bottom" 
+                                                             class="dataTable" selection="#{evaluationResultsController.financialEvalResultSelect}"
+                                                             selectionMode="single"  rowKey="#{financialResultSearch.id}"
+                                                             editable="true" editMode="row">
+                                                    <p:ajax event="rowSelect" listener="#{evaluationResultsController.rowSelect}" 
+                                                            update=":frmFinancialResult, :frmMainUI, :frmFinancialResult:financialResultInformation"/> 
+                                                    <p:column headerText="No">
+                                                        #{num+1}
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Financial Result No" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{financialResultSearch.financialResultNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Purchase Type:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{financialResultSearch.purchaseType}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+
+        <h:form id="frmFinancialResult">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="financialResultPanel" 
+                          rendered="#{evaluationResultsController.renderPnlCreateParty}" >
+                <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                <div class="box box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"> Evaluation Result</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" > 
+
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="financialResultInformation" >
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="col-sm-6" >
+                                            <h:panelGroup style="border: 0px; background-color: transparent" id="purchaseType">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel class="control-label col-sm-4" value="Evaluation result from:
+                                                                       "/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneRadio style="width: 60%" disabled="#{workFlow.readonly}"  required="true" value="#{evaluationResultsController.prmsFinancialEvalResult.resultFrom}"
+                                                                              valueChangeListener="#{evaluationResultsController.changeEvaluationFrom}" requiredMessage="Value is required"  id="txtResultFrom" >
+                                                                <f:selectItem itemLabel="Proforma" itemValue="performa" />
+                                                                <f:selectItem itemLabel="Bid" itemValue="Bid" />
+                                                                <p:ajax event="change" update="frmFinancialResult"/>
+                                                            </p:selectOneRadio>
+                                                            <p:message display="icon" for="txtResultFrom"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent" 
+                                                          id="financialResultNoPanel">
+                                                <div class="form-horizontal col-sm-12 textBoxMargin6px">
+                                                    <div class="form-group col-sm-12"> 
+                                                        <h:outputLabel class="control-label col-sm-4" id="lblFinancialResult" value="Financial Result No:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtFinancialResult" readonly="true" 
+                                                                         value="#{evaluationResultsController.generateFinancialRsltNo()}"/>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent" 
+                                                          rendered="#{evaluationResultsController.awardType}" id="pnlAwardType">
+                                                <div class="form-horizontal col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-group col-sm-12">
+                                                        <p:outputLabel class="control-label col-sm-4" id="lblAwardType" value="Award Type:"/> 
+
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneRadio required="true" value="#{evaluationResultsController.prmsFinancialEvalResult.awardType}" requiredMessage="Value is required"
+                                                                              valueChangeListener="#{evaluationResultsController.changeAwardType}" disabled="#{workFlow.readonly}" id="rbtAwardType" >
+                                                                <f:selectItem itemLabel="Item Base" itemValue="Item" />
+                                                                <f:selectItem itemLabel="Lot" itemValue="lot" />
+                                                                <p:ajax event="change" update="financialResultInformation,lotPanel"/>
+                                                            </p:selectOneRadio>
+                                                            <p:message display="icon" for="rbtAwardType"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{evaluationResultsController.mainPnlFrItmLot}" id="pnlMainFrItmLotPack">
+                                                <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{evaluationResultsController.itemTable}" id="pnlItem">
+                                                    <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblBidNoItem" class="control-label col-sm-4" value="Bid No:" />
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdBidNoItem" rendered="true" style="width: 100%"  required="true" disabled="#{workFlow.readonly}"
+                                                                                 value="#{evaluationResultsController.prmsFinancialEvalResult.bidId}" requiredMessage="Value is required"
+                                                                                 converter="entConverter" valueChangeListener="#{evaluationResultsController.changeValueItemBase}" >
+
+                                                                    <f:selectItem itemLabel="-----Select One----" />
+                                                                    <f:selectItems  value="#{evaluationResultsController.getBidNoFrItemBased()}"/>
+                                                                    <p:ajax event="change" update="pnlItem,drdItemName,txtPurchaseTypeFrmItem" />
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon" for="drdBidNoItem"/>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblItemName" class="control-label col-sm-4" value="Item Name:" 
+                                                                           rendered="#{evaluationResultsController.renderItembaseItem}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdItemName" disabled="#{workFlow.readonly}" style="width: 100%"  required="true" requiredMessage="Value is required"
+                                                                                 converter="entConverter" rendered="#{evaluationResultsController.renderItembaseItem}"
+                                                                                 valueChangeListener="#{evaluationResultsController.changeValueItemBaseRank}">
+                                                                    <f:selectItem itemLabel="-----Select One----" />
+                                                                    <f:selectItems  value="#{evaluationResultsController.bidDetailLists}" var="itemBase"
+                                                                                    itemLabel="#{itemBase.itemRegId.matName}" itemValue="#{itemBase}"/>
+                                                                    <p:ajax event="change" update="frmFinancialResult" />
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon" for="drdItemName"/>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblserviceName" class="control-label col-sm-4" value="Service Name:" 
+                                                                           rendered="#{evaluationResultsController.renderItembaseService}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdserviceName"  style="width: 100%"  required="true" requiredMessage="Value is required" disabled="#{workFlow.readonly}"
+                                                                                 converter="entConverter"  rendered="#{evaluationResultsController.renderItembaseService}"
+                                                                                 valueChangeListener="#{evaluationResultsController.changeValueItemBaseRank}">
+                                                                    <f:selectItem itemLabel="-----Select One----" />
+                                                                    <f:selectItems  value="#{evaluationResultsController.bidDetailLists}" var="itemService"
+                                                                                    itemLabel="#{itemService.serviceId.serviceName}" itemValue="#{itemService}"/>
+                                                                    <p:ajax event="change" update="financialEvResulttbl" />
+                                                                </p:selectOneMenu>
+
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblworkName" class="control-label col-sm-4" value="Work Name:"
+                                                                           rendered="#{evaluationResultsController.renderItembaseWork}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdworkName"  style="width: 100%"  required="true" disabled="#{workFlow.readonly}" requiredMessage="Value is required"
+                                                                                 converter="entConverter"  rendered="#{evaluationResultsController.renderItembaseWork}"
+                                                                                 valueChangeListener="#{evaluationResultsController.changeValueItemBaseRank}">
+                                                                    <f:selectItem itemLabel="-----Select One----" />
+                                                                    <f:selectItems  value="#{evaluationResultsController.bidDetailLists}" var="itemBaseWork"
+                                                                                    itemLabel="#{itemBaseWork.serviceId.workName}" itemValue="#{itemBaseWork}"/>
+                                                                    <p:ajax event="change" update="financialEvResulttbl" />
+                                                                </p:selectOneMenu>
+
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel  class="control-label col-sm-4" value="Purchase Type:"
+                                                                            />
+                                                            <div class="col-sm-8">
+                                                                <p:inputText readonly="true" id="txtPurchaseTypeFrmItem" value="#{evaluationResultsController.prmsBid.bidCategory}"/>
+                                                            </div>
+
+                                                        </div>
+                                                    </div> 
+                                                </h:panelGroup>
+                                                <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{evaluationResultsController.lotTabel}" id="pnlLot">
+                                                    <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblBidNoLot" class="control-label col-sm-4" value="Bid No:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdBidNoLot" rendered="true" style="width: 100%"  required="true" disabled="#{workFlow.readonly}"
+                                                                                 converter="entConverter" requiredMessage="Value is required" valueChangeListener="#{evaluationResultsController.changeValueFrItmloat}" 
+                                                                                 value="#{evaluationResultsController.prmsFinancialEvalResult.bidId}"  >
+
+                                                                    <f:selectItem itemLabel="-----Select One----" />
+                                                                    <f:selectItems  value="#{evaluationResultsController.getBidNo()}"/>
+                                                                    <p:ajax event="change" update="drdLot,purchaseTypeFrmbid" />
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon" for="drdBidNoLot"/>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblLotNo" class="control-label col-sm-4" value="Lot No:" />
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdLot" rendered="true" style="width: 100%"  required="true" converter="entConverter" requiredMessage="Value is required"
+                                                                                 valueChangeListener="#{evaluationResultsController.changeValueOfLot}" disabled="#{workFlow.readonly}">
+                                                                    <f:selectItem itemLabel="----Select One----" />
+                                                                    <f:selectItems  value="#{evaluationResultsController.bidDetailLists}" var="lot"
+                                                                                    itemLabel="#{lot.lotName}" itemValue="#{lot}"/>
+                                                                    <p:ajax event="change" process="@this,LotResultTbl" update="frmFinancialResult:LotResultTbl,drdLot"/>
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon" for="drdLot"/>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <!--                                                        <div class="form-horizontal col-sm-12">
+                                                                                                                    <p:outputLabel  class="control-label col-sm-4" value="Service Name:" 
+                                                                                                                                    rendered="{evaluationResultsController.renderLotService}"/>
+                                                                                                                    <div class="col-sm-8">
+                                                                                                                        <p:selectOneMenu   style="width: 100%"  required="true" disabled="{workFlow.readonly}"
+                                                                                                                                           converter="entConverter"  rendered="{evaluationResultsController.renderLotService}"
+                                                                                                                                           valueChangeListener="{evaluationResultsController.changeValueItemBaseRank}">
+                                                                                                                           
+                                                                                                                            <f:selectItems  value="{evaluationResultsController.bidDtlInfoForLot}" var="lotService"
+                                                                                                                                            itemLabel="{lotService.serviceId.serviceName}" itemValue="{lotService}"/>
+                                                                                                                            <p:ajax event="change" update="financialEvResulttbl" />
+                                                                                                                        </p:selectOneMenu>
+                                                        
+                                                                                                                    </div>
+                                                        
+                                                                                                                </div>-->
+                                                        <!--                                                        <div class="form-horizontal col-sm-12">
+                                                                                                                    <p:outputLabel  class="control-label col-sm-4" value="Work Name:"
+                                                                                                                                    rendered="{evaluationResultsController.renderLotWork}"/>
+                                                                                                                    <div class="col-sm-8">
+                                                                                                                        <p:selectOneMenu   style="width: 100%"  required="true" disabled="{workFlow.readonly}"
+                                                                                                                                           converter="entConverter" rendered="{evaluationResultsController.renderLotWork}"
+                                                                                                                                           valueChangeListener="{evaluationResultsController.changeValueItemBaseRank}">
+                                                                                                                           
+                                                                                                                            <f:selectItems  value="{evaluationResultsController.bidDtlInfoForLot}" var="lotBaseWork"
+                                                                                                                                            itemLabel="{lotBaseWork.serviceId.workName}" itemValue="{lotBaseWork}"/>
+                                                                                                                            <p:ajax event="change" update="financialEvResulttbl" />
+                                                                                                                        </p:selectOneMenu>
+                                                        
+                                                                                                                    </div>
+                                                        
+                                                                                                                </div>-->
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel  class="control-label col-sm-4" value="Purchase Type:" 
+                                                                            />
+                                                            <div class="col-sm-8">
+                                                                <p:inputText readonly="true" id="purchaseTypeFrmbid" value="#{evaluationResultsController.prmsBid.bidCategory}"/>
+                                                            </div>
+
+                                                        </div>
+                                                    </div> 
+
+                                                </h:panelGroup>
+
+                                            </h:panelGroup>
+
+
+                                            <h:panelGroup style="border: 0px; background-color: transparent" id="proformaNoPanel" rendered="#{evaluationResultsController.proforma}">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel id="lblProforma" class="control-label col-sm-4" value="Proforma:" />
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtProforma" disabled="#{workFlow.readonly}" rendered="true" style="width: 100%"  required="true" value="#{evaluationResultsController.prmsFinancialEvalResult.quotationId}"
+                                                                             converter="entConverter" valueChangeListener="#{evaluationResultsController.valueChangeListItemInProform}" requiredMessage="Value is required"
+                                                                             >
+                                                                <f:selectItem itemLabel="--- Select One ---" />
+                                                                <f:selectItems  value="#{evaluationResultsController.getProformaList()}" var="proforma"
+                                                                                itemLabel="#{proforma.quotationNo}"/>
+                                                                <p:ajax event="change" update="proformaNoPanel,financialEvResulttbl,txtpurchaseType"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message display="icon" for="txtProforma"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel id="lblItemNames" class="control-label col-sm-4" rendered="#{evaluationResultsController.renderItembaseItem}" value="Item Name:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtItemName" disabled="#{workFlow.readonly}" style="width: 100%" rendered="#{evaluationResultsController.renderItembaseItem}"
+                                                                             valueChangeListener="#{evaluationResultsController.valueChangeForSupplier}">
+                                                                <f:selectItem itemLabel="--- Select One ---" />
+                                                                <f:selectItems value="#{evaluationResultsController.mmsItemRegistrationList}" var="itemName" 
+                                                                               itemLabel="#{itemName.matName}" itemValue="#{itemName.materialId}"/>
+                                                                <p:ajax event="change" update="financialEvResulttbl" />
+                                                            </p:selectOneMenu>
+                                                            <p:message display="icon" for="txtItemName"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel id="lblSerName" class="control-label col-sm-4" rendered="#{evaluationResultsController.renderItembaseService}" value="Service Name:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="drdSerName" disabled="#{workFlow.readonly}" style="width: 100%" rendered="#{evaluationResultsController.renderItembaseService}"
+                                                                             valueChangeListener="#{evaluationResultsController.valueChangeForSupplierFrmServ}">
+                                                                <f:selectItem itemLabel="--- Select One ---" />
+                                                                <f:selectItems value="#{evaluationResultsController.prmsServiceAndWorkRegList}" var="service" 
+                                                                               itemLabel="#{service.serviceName}" itemValue="#{service.servAndWorkId}" />
+                                                                <p:ajax event="change" update="financialEvResulttbl" />
+                                                            </p:selectOneMenu>
+                                                            <p:message display="icon" for="drdSerName"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel id="lblworkNames" class="control-label col-sm-4" rendered="#{evaluationResultsController.renderItembaseWork}" value="Work Name:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="drdworkNames" style="width: 100%" disabled="#{workFlow.readonly}" rendered="#{evaluationResultsController.renderItembaseWork}"
+                                                                             valueChangeListener="#{evaluationResultsController.valueChangeForSupplier}">
+                                                                <f:selectItem itemLabel="--- Select One ---" />
+                                                                <f:selectItems value="#{evaluationResultsController.mmsItemRegistrationList}" var="itemName" 
+                                                                               itemLabel="#{itemName.matName}" itemValue="#{itemName.materialId}"/>
+                                                                <p:ajax event="change" update="financialEvResulttbl" />
+                                                            </p:selectOneMenu>
+                                                            <p:message display="icon" for="drdworkNames"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel  class="control-label col-sm-4" value="Purchase Type:"
+                                                                        />
+                                                        <div class="col-sm-8">
+                                                            <p:inputText readonly="true" id="txtpurchaseType" value="#{evaluationResultsController.prmsQuotation.purchaseType}"/>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <p:outputLabel id="lblDateRegist" class="control-label col-sm-4" value="Registration Date:"/>
+
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="txtDateRegist" required="true" requiredMessage="Value is required"
+                                                                placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" readonly="#{workFlow.readonly}" disabled="#{workFlow.readonly}" readonlyInput="true"
+                                                                value="#{evaluationResultsController.prmsFinancialEvalResult.dateReg}" mindate="today" maxdate="today">
+                                                    </p:calendar>
+                                                    <p:message display="icon" for="txtDateRegist"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Evaluation Result detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" > 
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="lotPanel" rendered="#{evaluationResultsController.lotTabel}">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable  id="LotResultTbl" rowIndexVar="current" paginator="true" paginatorPosition="bottom" 
+                                                              rows="10" value="#{evaluationResultsController.prmsFinancialEvlResultyDtlMdl}"
+                                                              var="rankBasedOnLot" 
+                                                              lazy="true"  scrollHeight="true">
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="No" />
+                                                        </f:facet>
+                                                        #{current+1}
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Supplier Name"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{rankBasedOnLot.supplierId}" />   
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Lot No"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{rankBasedOnLot.lotNo}" />   
+                                                    </p:column>
+                                                    <p:column >     
+
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Total Price"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{rankBasedOnLot.totalPrice}" />   
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Financial"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{rankBasedOnLot.financialResult}" />   
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Technical"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{rankBasedOnLot.technicalResult}" />   
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="sum"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{rankBasedOnLot.sum}" />   
+                                                    </p:column>
+                                                    <p:column >                                                                                           
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Rank"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{rankBasedOnLot.resultRank}" />
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{evaluationResultsController.itemTable}" id="financialTblPanel">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+
+                                                <p:dataTable  id="financialEvResulttbl" rowIndexVar="currents" paginator="true" paginatorPosition="bottom" 
+                                                              rows="10" value="#{evaluationResultsController.prmsFinancialEvlResultyDtlMdl}"
+                                                              var="financialEvResult" 
+                                                              lazy="true"  scrollHeight="true">
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="No" />
+                                                        </f:facet>
+                                                        #{currents+1}
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Supplier Name"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{financialEvResult.supplierId}" />   
+                                                    </p:column>
+                                                    <p:column rendered="#{evaluationResultsController.renderItembaseItem}">                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Item Name"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{financialEvResult.itemId.matName}" />   
+                                                    </p:column>
+                                                    <p:column rendered="#{evaluationResultsController.renderItembaseService}">                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Service Name"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{financialEvResult.serviceId.serviceName}" />   
+                                                    </p:column>
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header" rendered="#{evaluationResultsController.renderMerit}">
+                                                            <h:outputLabel  value="Unit Price"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{financialEvResult.unitPrice}"/>   
+                                                    </p:column>
+                                                    <p:column rendered="#{evaluationResultsController.renderMerit}">                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Technical Result"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{financialEvResult.technicalResult}"/>   
+                                                    </p:column>
+                                                    <p:column rendered="#{evaluationResultsController.renderMerit}">                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Financial Result"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{financialEvResult.financialResult}"/>   
+                                                    </p:column>
+                                                    <p:column rendered="#{evaluationResultsController.renderMerit}">                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Total Result"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{financialEvResult.totalPrice}"/>   
+                                                    </p:column>
+
+                                                    <p:column >                                                                                                 
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Rank"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{financialEvResult.resultRank}"/>   
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="evaluationResultWorkFlow">
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class=" col-sm-6">
+                                            <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <p:outputLabel  for="txtProcessedBy" class="control-label col-sm-4"
+                                                                    value="Processed By:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText  id="txtProcessedBy" readonly="true" value="#{workFlow.userName}" title="descripition"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <h:outputLabel  class="control-label col-sm-4" value="Decision:" rendered="#{evaluationResultsController.isDecision}"/> 
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drddecision" value="#{evaluationResultsController.wfPrmsProcessed.decision}" valueChangeListener="#{evaluationResultsController.handleselectOptions}"
+                                                                         required="true"  rendered="#{evaluationResultsController.isDecision}"  requiredMessage="Select Decision" style="width: 100%">                                                                                        
+                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Approved" itemValue="Approved"/>
+                                                            <f:selectItem itemLabel="Rejected" itemValue="Rejected"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="drddecision" display="icon"/>                                                                                    
+                                                    </div>  
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class=" col-sm-6">
+                                            <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <p:outputLabel class="control-label col-sm-4"
+                                                                   value="Processed Date:" />
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtDateProceesed" required="true" requiredMessage="Value is required" mindate="today" maxdate="today" readonlyInput="true"
+                                                                    placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" readonly="#{workFlow.readonly}" disabled="#{workFlow.readonly}"
+                                                                    value="#{evaluationResultsController.wfPrmsProcessed.processedOn}" 
+                                                                    >
+                                                        </p:calendar>
+                                                        <p:message for="txtDateProceesed" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <p:outputLabel  for="txtComment" class="control-label col-sm-4"
+                                                                    value="Comment Given:" rendered="#{evaluationResultsController.isCommentGiven}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputTextarea id="txtComment" rendered="#{evaluationResultsController.isCommentGiven}" class="form-control"  value="#{marketAssessmentController.wfPrmsProcessed.commentGiven}" 
+                                                                         title="Remark"  required="false" requiredMessage="Value is required"
+                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                    <div class="col-sm-6">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="col-lg-4"></div>
+                                            <div class="col-sm-8">
+                                                <p:commandButton process="@this,evaluationResultWorkFlow,financialTblPanel,lotPanel,proformaNoPanel,financialResultInformation"
+                                                                 update="evaluationResultWorkFlow,financialTblPanel,lotPanel,proformaNoPanel,financialResultInformation"
+                                                                 class="btn btn-primary col-lg-4" action="#{evaluationResultsController.save_EvaluationResultAction()}"
+                                                                 value="#{evaluationResultsController.saveorUpdateBundle}"/> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

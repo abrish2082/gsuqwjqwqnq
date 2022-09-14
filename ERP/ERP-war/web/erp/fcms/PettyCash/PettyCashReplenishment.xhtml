@@ -1,0 +1,478 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li><a href="PettyCashEstablishmentCodeReg.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Petty Cash Establishment</a></li> 
+        <li><a href="PettyCashRegister.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Petty Cash Register</a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="backface-visibility: hidden;border-color:transparent;background: #ffffff " >
+                <f:facet name="right">
+                    <h:panelGroup id="pnlGBtnNew" rendered="#{pettyCashReplenishmentmanagedBean.isRenderedBtnNew}">
+                        <p:commandButton id="btnIcone" style="background-color: white; border-color: white" 
+                                         action="#{pettyCashReplenishmentmanagedBean.createNewPCRR()}" 
+                                         icon="ui-icon-plus" validateClient="true" 
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample"
+                                         title="New" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnIcon1" style="background-color: white; border-color: white" 
+                                     action="#{pettyCashReplenishmentmanagedBean.searchPCRR()}" 
+                                     icon="ui-icon-search" validateClient="true" 
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample"
+                                     title="Search" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{pettyCashReplenishmentmanagedBean.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{pettyCashReplenishmentmanagedBean.fmsPCRList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       rendered="#{pettyCashReplenishmentmanagedBean.isRenderedIconNitification}"
+                                       title="Notifications" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Local Per Diem Request List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{pettyCashReplenishmentmanagedBean.onSelectPCRRequest}" scrollHeight="300">
+                                            <f:selectItems  var="faListVar" value="#{pettyCashReplenishmentmanagedBean.fmsPCRList}"
+                                                            itemValue="#{faListVar}" itemLabel="#{faListVar.cashierId.accountCode} -- #{faListVar.cashierId.empCode.firstName} #{faListVar.cashierId.empCode.middleName}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmSample"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlGworkflowIcon" rendered="#{pettyCashReplenishmentmanagedBean.isRenderedIconWorkFlow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{pettyCashReplenishmentmanagedBean.wfFcmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                                                                 resizableColumns="true" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlGIconPrint" rendered="#{pettyCashReplenishmentmanagedBean.isRenderedIconPrint}">
+                        <p:commandButton id="btnPrint1" type="button" style="background-color: white; border-color: white" title="Print" icon="ui-icon-print" action="pnlPrint" >
+                            <p:printer target=":frmRegisterUI:pnlPrint" />
+                        </p:commandButton>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="PettyCashReplenishment.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" 
+                          rendered="#{pettyCashReplenishmentmanagedBean.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Search_Petty_Cash_Replenishment} ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="pnlSearchPCR" rendered="#{pettyCashReplenishmentmanagedBean.isRenderDecision}">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Cashier_Name}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="drdSearchCasherName" value="#{pettyCashReplenishmentmanagedBean.empEnty.firstName}" placeholder="Search by cashier name" class="form-control"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton  class="btn btn-primary" action="#{pettyCashReplenishmentmanagedBean.findPCRForCheckerAndApprover()}"
+                                                                          icon="ui-icon-search" 
+                                                                          process="@this" update="tblPerDiemDetailSearch"
+                                                                          value="Find" />            
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="panel-body">
+                                    <div class="form-horizontal col-sm-12">
+                                        <p:dataTable id="tblPerDiemDetailSearch" value="#{pettyCashReplenishmentmanagedBean.fmsPCRDataModel}" 
+                                                     selection="#{pettyCashReplenishmentmanagedBean.selectPCRRequest}" class="dataTable"
+                                                     selectionMode="single" rowKey="#{pcrVar.id}" var="pcrVar" paginator="true"
+                                                     paginatorPosition="bottom"  rowIndexVar="num" rows="10" rowsPerPageTemplate="5,10,15"
+                                                      resizableColumns="true" >
+                                            <p:ajax event="rowSelect" listener="#{pettyCashReplenishmentmanagedBean.onSelectPCRRow}"
+                                                    process="@this" update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmSample" />
+                                            <p:column headerText="S/N" width="60">
+                                                <h:outputText value="#{num+1}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Cashier_Name}" filterBy="#{pcrVar.cashierId.empCode.firstName}" resizable="true" filterPosition="top" filterMatchMode="contains" sortBy="#{pcrVar.cashierId.empCode.firstName}" width="180">
+                                                <h:outputText value="#{pcrVar.cashierId.empCode.firstName} #{pcrVar.cashierId.empCode.middleName} #{pcrVar.cashierId.empCode.lastName}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Date}" width="100">
+                                                <h:outputText value="#{pcrVar.preparedDate}" ><f:convertDateTime  pattern="yyyy/MM/dd" /></h:outputText>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Amount}" width="150">
+                                                <h:outputText value="#{pcrVar.amount}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Remark}" width="400">
+                                                <h:outputText value="#{pcrVar.preparedRemark}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+        <h:form  id="frmRegisterUI" class="form-horizontal"> 
+            <p:growl id="growl1" sticky="#{pettyCashReplenishmentmanagedBean.isSticky}" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" 
+                          rendered="#{pettyCashReplenishmentmanagedBean.renderPnlCreatePcRepReq}" class="col-sm-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Petty Cash Replenishment </h3>                       
+                            </div> 
+                            <div class="box-body">
+                                <div class="row"> 
+                                    <p:messages id="messages" showDetail="true" autoUpdate="true" closable="true" severity="information"/>
+                                    <div class="textBoxMargin6px col-sm-12"> 
+                                        <div class="col-sm-6">
+                                            <p:outputLabel class="control-label col-sm-4" value="#{FCMS.Cashier_Name}: "/>
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtCashierName2" readonly="true" class="form-control"
+                                                             value="#{pettyCashReplenishmentmanagedBean.fmsCasherAccount.empCode.firstName} #{pettyCashReplenishmentmanagedBean.fmsCasherAccount.empCode.middleName}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="textBoxMargin6px col-sm-12">
+                                        <div class="col-sm-6">
+                                            <p:outputLabel for="txtAccountCode" class="control-label col-sm-4" value="#{FCMS.Account_Code}: " />
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtAccountCode" readonly="true" class="form-control"
+                                                             value="#{pettyCashReplenishmentmanagedBean.fmsCasherAccount.subsidiaryId.subsidiaryCode}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row"> 
+                                        <div class="col-md-12" > 
+                                            <div class="panel-body">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <div class="form-horizontal  col-sm-12">
+                                                        <p:dataTable id="tblpettyCashReplenishment" value="#{pettyCashReplenishmentmanagedBean.pettyCashPaymentDataModel}"
+                                                                     var="pettyCashReplenishmentModel" rowIndexVar="num"  paginator="true" paginatorPosition="bottom"
+                                                                     rows="10">
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="ቀን"/><br/>
+                                                                    <h:outputText value="#{FCMS.Date}"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{pettyCashReplenishmentModel.registrationDate}" ><f:convertDateTime  pattern="yyyy/MM/dd" /></h:outputText>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="የማዘዣ ቁጥር "/><br/>
+                                                                    <h:outputText value="Petty Cash Payment Voucher Number "/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{pettyCashReplenishmentModel.vocherNo}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="ዝርዝር"/><br/>
+                                                                    <h:outputText value="#{FCMS.Purpose}"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{pettyCashReplenishmentModel.purpose}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="ወጪ"/><br/>
+                                                                    <h:outputText value="#{FCMS.Payed_Amount}"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{pettyCashReplenishmentModel.amount}" converter="#{pettyCashReplenishmentmanagedBean.numberConverter}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="ገቢ"/><br/>
+                                                                    <h:outputText value="Reimbursed"/>
+                                                                </f:facet>
+                                                                <h:outputText value="#{pettyCashReplenishmentModel.reAmount}" converter="#{pettyCashReplenishmentmanagedBean.numberConverter}"/>
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="textBoxMargin6px col-sm-12">
+                                            <div class="col-sm-6">
+                                                <p:outputLabel  class="control-label col-sm-4" value="Total Established: " />
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtEstablished" readonly="true" value="#{pettyCashReplenishmentmanagedBean.reimbursedAmountinter}"
+                                                                 converter="#{pettyCashReplenishmentmanagedBean.numberConverter}" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="textBoxMargin6px col-sm-12">
+                                            <div class="col-sm-6">
+                                                <p:outputLabel  class="control-label col-sm-4" value="Total Paid: " />
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtTotalPaid" readonly="true" value="#{pettyCashReplenishmentmanagedBean.totalPaid}" 
+                                                                 converter="#{pettyCashReplenishmentmanagedBean.numberConverter}" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="textBoxMargin6px col-sm-12">
+                                            <div class="col-sm-6">
+                                                <p:outputLabel  class="control-label col-sm-4" value="Cash on Hand: " />
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtonhand" readonly="true" value="#{pettyCashReplenishmentmanagedBean.cashOnHand}"
+                                                                 converter="#{pettyCashReplenishmentmanagedBean.numberConverter}" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="textBoxMargin6px col-sm-12">                           
+                                            <div class="col-sm-6">
+                                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Processed_By}: "/>
+                                                <div class="col-sm-8"> 
+                                                    <p:inputText id="txtPreparedBy" value="#{pettyCashReplenishmentmanagedBean.userName}"
+                                                                 readonly="true" class="form-control"/>
+                                                    <p:message for="txtPreparedBy" display="icon"  class="col-sm-6 control-label"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="textBoxMargin6px col-sm-12">
+                                            <div class="col-sm-6">
+                                                <p:outputLabel  for="txtProcessedOn" class="control-label col-sm-4"
+                                                                id="lblApproved" value="#{FCMS.Processed_Date}:" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtProcessedOn" readonly="true" class="form-control" placeholder="dd/mm/yyyy"
+                                                                 value="#{pettyCashReplenishmentmanagedBean.wfFcmsProcessed.processedOn}"  
+                                                                 title="ProcessedOn"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="textBoxMargin6px col-sm-12">
+                                            <div class="col-sm-6">
+                                                <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Decision}:" rendered="#{pettyCashReplenishmentmanagedBean.isRenderDecision}"/>
+                                                <div class="col-sm-6">
+                                                    <p:selectOneRadio id="rdoDecision" style="width: 100%" rendered="#{pettyCashReplenishmentmanagedBean.isRenderDecision}" 
+                                                                      value="#{pettyCashReplenishmentmanagedBean.selectedDecision}" required="true">
+                                                        <f:selectItem itemLabel="Approve" itemValue="Approved"/>
+                                                        <f:selectItem itemLabel="Reject" itemValue="Rejected"/>
+                                                    </p:selectOneRadio>
+                                                    <p:message for="rdoDecision" display="icon"/>
+                                                </div>    
+                                            </div> 
+                                        </div>
+                                        <div class="textBoxMargin6px col-sm-12">
+                                            <div class="col-sm-6">
+                                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Commentm}:"/>
+                                                <div class="col-sm-8">
+                                                    <p:column headerText="#{FCMS.Comment}">
+                                                        <h:inputTextarea id="txtReparedRemark" value="#{pettyCashReplenishmentmanagedBean.wfFcmsProcessed.commentGiven}"
+                                                                         class="form-control" readonly="#{pettyCashReplenishmentmanagedBean.isDisabledBtnSave}" style="width: 100%" > </h:inputTextarea> 
+                                                    </p:column> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="textBoxMargin6px col-sm-12">
+                                            <div class="col-sm-6">
+                                                <h:outputLabel class="control-label col-sm-4" value=""/>
+                                                <div class="col-sm-3"> 
+                                                    <p:commandButton  id="btnSave" class="btn btn-primary " value="#{pettyCashReplenishmentmanagedBean.saveorUpdateBundle}"
+                                                                      action="#{pettyCashReplenishmentmanagedBean.saveFcmsPCReplanishment()}" disabled="#{pettyCashReplenishmentmanagedBean.isDisabledBtnSave}"
+                                                                      process="@this,frmRegisterUI" update="@this,frmRegisterUI,:frmSample"/>  
+                                                </div>
+                                                <div class="col-sm-3 ">
+                                                    <p:commandButton id="btnPrint" value="Print" class="btn btn-primary " 
+                                                                     rendered="#{fmsFieldAllowanceManagedBean.renderBtnPrint}" >
+                                                        <p:printer target="pnlPrint" />
+                                                    </p:commandButton>                                          
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+            <p:panel id="pnlPrint" class="visible-print" style="border: 0">
+                <div id="wrapper">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-12 text-center">
+                                    <img src="/ERP-war/resources/image/trrtrret.png" alt="EEP logo"/>
+                                    <h3><b> የኢትዮጵያ ኤሌክትሪክ ኃይል</b></h3>
+                                    <h4><b>ETHIOPIAN ELECTRIC  POWER</b> </h4>
+                                    <small><b>Tel:-</b>011-551 32 88&#32;&#32; <b>FAX:-</b>011-551 29 38&#32;&#32; <b>P.O.Box:-</b> 3375</small>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="col-xs-12 text-center">
+                                    <h5><u><b> PETTY CASH REPLENISHMENT </b></u></h5>
+                                </div>
+                            </div>
+                            <div class="col-md-8 ">
+                                <h5><b> Casher Name:</b>&#32;&#32;<u><h:outputText value="#{pettyCashReplenishmentmanagedBean.fmsCasherAccount.empCode.firstName} #{pettyCashReplenishmentmanagedBean.fmsCasherAccount.empCode.middleName}"/></u></h5>
+                                <h5><b>General Ledger:</b>&#32;&#32; <u><h:outputText  value="#{pettyCashReplenishmentmanagedBean.fmsSubsid1aryLedger1.generalLedgerId.generalLedgerCode}"/></u> </h5>
+                                <h5><b>Subsidiary Ledger:</b>&#32;&#32; <u><h:outputText  value="#{pettyCashReplenishmentmanagedBean.fmsSubsid1aryLedger1.subsidiaryCode}" /></u></h5>
+                            </div>
+                        </div>
+                        <p:spacer height="30"/>
+                        <div class="row">
+                            <div class="form-horizontal  col-md-12">
+                                <p:dataTable id="tblpettyCashReplenishment1" var="pettyCashReplenishmentModel"  rowIndexVar="num" 
+                                             value="#{pettyCashReplenishmentmanagedBean.pettyCashPaymentDataModel}">
+                                    <p:column headerText="S/N" width="80">
+                                        <h:outputText value="#{num+1}"/>
+                                    </p:column> 
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="ቀን"/><br/>
+                                            <h:outputText value="Date"/>
+                                        </f:facet>
+                                        <h:outputText value="#{pettyCashReplenishmentModel.registrationDate}"><f:convertDateTime  pattern="yyyy/MM/dd" /></h:outputText>
+                                    </p:column>
+                                    <p:column width="180">
+                                        <f:facet name="header">
+                                            <h:outputText value="የማዘዣ ቁጥር "/><br/>
+                                            <h:outputText value="Petty Cash Payment Voucher Number "/>
+                                        </f:facet>
+                                        <h:outputText value="#{pettyCashReplenishmentModel.vocherNo}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="ዝርዝር"/><br/>
+                                            <h:outputText value="Purpose"/>
+                                        </f:facet>
+                                        <h:outputText value="#{pettyCashReplenishmentModel.purpose}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="ወጪ"/><br/>
+                                            <h:outputText value="Paid Amount"/>
+                                        </f:facet>
+                                        <h:outputText value="#{pettyCashReplenishmentModel.amount}" converter="#{pettyCashReplenishmentmanagedBean.numberConverter}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="ገቢ"/><br/>
+                                            <h:outputText value="Reimbursed"/>
+                                        </f:facet>
+                                        <h:outputText value="#{pettyCashReplenishmentModel.reAmount}" converter="#{pettyCashReplenishmentmanagedBean.numberConverter}"/>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </div>
+                        <p:spacer width="30"/>
+                        <div class="row" style="alignment-adjust: central">
+                            <div class="form-horizontal col-md-12">                            
+                                <p:panelGrid style="margin-top:0px">
+                                    <p:row>
+                                        <p:column  style="font-weight: bold;text-align: right">Total Established</p:column>
+                                        <p:column style="font-weight: bold;text-align: center" width="400">#{pettyCashReplenishmentmanagedBean.reimbursedAmountinter}</p:column>
+
+                                    </p:row>
+                                    <p:row>
+                                        <p:column style="font-weight: bold;text-align: right">Total Paid</p:column>
+                                        <p:column style="font-weight: bold;text-align: center" width="400">#{pettyCashReplenishmentmanagedBean.totalPaid}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column style="font-weight: bold;text-align: right">Amount On Hand</p:column>
+                                        <p:column style="font-weight: bold;text-align: center" width="400">#{pettyCashReplenishmentmanagedBean.cashOnHand}</p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                            </div>                                          
+                        </div> 
+                        <p:spacer width="20" />
+                        <div class="row" >                                                  
+                            <div class="col-md-12 ">
+                                <h5>Requested By:<u><h:outputText  value=" #{pettyCashReplenishmentmanagedBean.fmsCasherAccount.empCode.firstName} #{pettyCashReplenishmentmanagedBean.fmsCasherAccount.empCode.middleName}" /></u> </h5>
+                                <h5>Checked By:<u><h:outputText  value=" _______________________" /></u> </h5>         
+                                <h5>Approved by: <u><h:outputText  value=" _______________________" /></u></h5>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </p:panel>
+        </h:form>  
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,643 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard "></i> <span> Dashboard</span></a></li>
+        <li><a href="BidOpeningCheckList.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Opening CheckList</span></a></li> 
+        <li><a href="BidSubmissionForm.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Submission Form</span></a></li> 
+        <li><a href="BidderRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Bidder Registration</span></a></li> 
+        <li><a href="SupplierPerformanceInformation.xhtml"><i class="fa fa-circle-o "></i> <span>Supplier Performance Information</span></a></li>
+        <li><a href="SupplierProfile.xhtml"><i class="fa fa-circle-o "></i> <span>Suppliers Profile</span></a></li>
+        <li><a href="SupplierSpecfication.xhtml"><i class="fa fa-circle-o"></i> <span>Supplier Specification</span></a></li> 
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color: white">
+                <f:facet name="right">
+
+                    <h:panelGroup id="pngBackToSearch" rendered="#{supplierPerformanceContriller.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{supplierPerformanceContriller.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                         process="@this" update=":BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:frmSample,:frmMainUI"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+
+                    <p:commandButton id="btnNew" action="#{supplierPerformanceContriller.createNewParty()}" icon="#{supplierPerformanceContriller.icone}" validateClient="true" 
+                                     process="@this" update=":BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:frmSample,:frmMainUI" style="background-color: white"
+                                     title="#{supplierPerformanceContriller.createOrSearchBundle}" rendered="#{supplierPerformanceContriller.isRendercreate}" />
+                    <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{supplierPerformanceContriller.requestNotificationCounter}"
+                                   rendered="#{supplierPerformanceContriller.isRenderNotify}" style="color: red;background-color: white;border-color: white "/>
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblReqNotf" value="Supplier Performance for approve List"/>
+                        <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                            valueChangeListener="#{supplierPerformanceContriller.RequestListChange}" converter="entConverter">
+                            <f:selectItems id="selectOneMenuAppList" var="supPerfReqlst"
+                                           value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfos}"
+                                           itemValue="#{supPerfReqlst}" itemLabel="#{supPerfReqlst.supplierPerfoNo}"/>               
+                            <p:ajax event="valueChange" update=":BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:frmSample,:frmMainUI" />  
+                        </p:selectOneListbox>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="#{PRMS.Workflow}"/>
+                        <!--put work flow list here-->
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{supplierPerformanceContriller.wfPrmsProcessedDModel}"
+                                                             var="currentRow" selectionMode="single" rowIndexVar="num"  rows="5" paginator="true"
+                                                             rowKey="#{currentRow.processedId}" paginatorPosition="bottom" >
+                                                    <p:column headerText="#{PRMS.No}" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="#{PRMS.ProcessedBy}">
+                                                        <h:outputText value="#{currentRow.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="#{PRMS.ProcessedDate}">
+                                                        <h:outputText value="#{currentRow.processedOn}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="#{PRMS.Comment}">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/SupplierInformation/SupplierPerformanceInformation.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{supplierPerformanceContriller.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" >
+                                <h:form id="frmSearchParty"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="#{PRMS.searchingby}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.columnName}"
+                                                                         valueChangeListener="#{supplierPerformanceContriller.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{supplierPerformanceContriller.supplierPerfParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblCriteriaNo,txtCriteriaNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblCriteriaNo" class="control-label col-sm-4" value="#{PRMS.SearchBy} #{supplierPerformanceContriller.prmsSupplierPerformanceInfo.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCriteriaNo" value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.columnValue}"/>
+                                                    </div>
+                                                </div>
+                                            <div class="form-group textBoxMarginTop6px"> 
+
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton   id="btnFind" action="#{supplierPerformanceContriller.searchSupProformance}" icon="ui-icon-search" 
+                                                                       process="@this,frmSearchParty" update=":frmMainUI:frmParty" 
+                                                                       value="#{PRMS.Find}" class="btn btn-primary col-lg-4" />            
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmParty">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblPartyInfo" value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfosmodel}" var="SuppSpecficationList" rows="5" rowIndexVar="no"
+                                                                 selection="#{supplierPerformanceContriller.selectSupplierPerforma}"
+                                                                 rowKey="#{SuppSpecficationList.suppInfoId}"  selectionMode="single" 
+                                                                 paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                        <p:ajax event="rowSelect" listener="#{supplierPerformanceContriller.rowSelect}" 
+                                                                update=":BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:frmSample,:frmMainUI" />
+                                                        <p:column headerText="No">
+                                                            #{no+1}
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.PerformanceNo}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{SuppSpecficationList.supplierPerfoNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.ProcessedDate}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{SuppSpecficationList.dateRigistered}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.ProcessedBy}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{SuppSpecficationList.preparedBy}"/>
+                                                        </p:column>
+
+
+                                                    </p:dataTable>
+                                                </div>                 
+                                            </div>    
+                                        </div>  
+                                    </div>                           
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="BidSubmissionMain">
+            <p:growl id="growl1" showDetail="false" autoUpdate="true" severity="information"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{supplierPerformanceContriller.renderPnlCreateParty}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Supplier/Consultant/Contractor Performance Registration </h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup  style="border: 0px; background-color: transparent" id="checkListInfoPanel" >
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group textBoxMargin6px">
+                                            <p:outputLabel  for="CkeckMovementType" class="control-label col-sm-2" value="#{PRMS.Type}"/>
+                                            <div class="col-sm-6">
+                                                <p:selectOneRadio disabled="#{workFlow.readonly}" id="CkeckMovementType" layout="grid" columns="2" value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.selectOpt}" class="col-sm-4"
+                                                                  valueChangeListener="#{supplierPerformanceContriller.changeTransferType}">
+                                                    <f:selectItem itemLabel="Bid" itemValue="1" />
+                                                    <f:selectItem itemLabel="Performa" itemValue="2" />   
+
+                                                    <p:ajax process="CkeckMovementType" update=":BidSubmissionMain:registerUI"  event="valueChange" />  
+                                                </p:selectOneRadio>  
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group textBoxMarginTop6px required">
+                                            <h:outputLabel  id="lblPerformanc" class="control-label col-sm-2"   value=" #{PRMS.PerformanceNo}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtPerformanc" 
+                                                             value="#{supplierPerformanceContriller.generateSpecficationNo()}"  readonly="true"/>
+                                            </div> 
+                                            <h:outputLabel  id="lblDateReggr" class="control-label col-sm-2"  value="#{PRMS.ProcessedDate}"/>
+                                            <div class="col-sm-3">
+                                                <p:calendar id="txtDateReggr"   disabled="#{workFlow.readonly}"
+                                                            value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.dateRigistered}" readonlyInput="true" />
+                                                <p:message display="icon" for="txtDateReggr"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group textBoxMarginTop6px required">
+
+                                            <h:outputLabel id="lblbidNumber" for="txtbidNumber" class="control-label col-sm-2" value="#{PRMS.BidNo}" 
+                                                           rendered="#{supplierPerformanceContriller.renderBid}"/>
+                                            <div class="col-sm-3"> 
+                                                <p:selectOneMenu id="txtbidNumber" style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                 value="#{supplierPerformanceContriller.prmsBid}" converter="entConverter" 
+                                                                  valueChangeListener ="#{supplierPerformanceContriller.getPurchasetype}" 
+                                                                 rendered="#{supplierPerformanceContriller.renderBid}" >
+                                                    <f:selectItems value="#{supplierPerformanceContriller.bidNumberList}"
+                                                                   var="listb" itemLabel="#{listb}" itemValue="#{listb}"/>
+                                                    <p:ajax event="change" update="txtTP,txtContractNo,txtmkt,test,test2,PGClaim,@this" process="@this" />
+                                                </p:selectOneMenu>   
+                                                <p:message for="txtbidNumber" display="icon"/>
+                                            </div>
+                                            <h:outputLabel  id="lblmk" class="control-label col-sm-2"   value="#{PRMS.MarketApproach}" 
+                                                            rendered="#{supplierPerformanceContriller.renderBid}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtmkt" class="form-control" readonly="true"
+                                                             value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.marketApproch}" 
+                                                             rendered="#{supplierPerformanceContriller.renderBid}"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group textBoxMarginTop6px required">
+
+                                            <h:outputLabel  id="lblPoNoo" class="control-label col-sm-2"  value="#{PRMS.PoNo}" rendered="#{supplierPerformanceContriller.renderPo}"/>
+                                            <div class="col-sm-3"> 
+                                                <p:selectOneMenu id="txtpoNo" style="width: 100%" value="#{supplierPerformanceContriller.prmsPurchaseOrder}" 
+                                                                 rendered="#{supplierPerformanceContriller.renderPo}"
+                                                                 valueChangeListener="#{supplierPerformanceContriller.handleSelectPo}" 
+                                                                 converter="entConverter" disabled="#{workFlow.readonly}">
+                                                    <f:selectItem itemLabel="--- Select One ---"/>
+                                                    <f:selectItems value="#{supplierPerformanceContriller.puchaseOderLists}" var="listP" 
+                                                                   itemLabel="#{listP.pacNo}" itemValue="#{listG}"/>
+                                                    <p:ajax event="change" update="txtsupplierProforma"/>
+                                                </p:selectOneMenu>  
+                                                <p:message for="txtpoNo" display="icon"/>
+                                            </div>
+
+
+
+
+                                        </div>
+
+                                        <div class="form-group textBoxMarginTop6px">
+
+                                            <h:outputLabel id="lblSrNo" class="control-label col-sm-2"  value="#{PRMS.PerformanceNo}" 
+                                                           rendered="#{supplierPerformanceContriller.renderPerforma}"/>
+                                            <div class="col-sm-3">
+                                                <p:selectOneMenu id="txtPerfomaNo"   style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                 value="#{supplierPerformanceContriller.prmsQuotation}"  
+                                                                 valueChangeListener="#{supplierPerformanceContriller.getValueofQuotationNo}"
+                                                                 converter="entConverter"
+                                                                 rendered="#{supplierPerformanceContriller.renderPerforma}">
+                                                    <f:selectItems value="#{supplierPerformanceContriller.getQuotationNo()}"/>
+                                                    <p:ajax event="change" update="@this,txtTP2,txtpoNo" process="@this"  />
+
+                                                </p:selectOneMenu>
+
+                                            </div>
+
+
+
+                                            <h:outputLabel  id="lblTP2" class="control-label col-sm-2"   value="#{PRMS.ProcuremntTypeforPerforma}" 
+                                                            rendered="#{supplierPerformanceContriller.renderPerforma}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtTP2" class="form-control" readonly="true"
+                                                             value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.type2}" 
+                                                             rendered="#{supplierPerformanceContriller.renderPerforma}"/>
+
+                                            </div>
+
+
+                                        </div>
+
+
+
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:outputLabel  id="lblContractNo"  class="control-label col-sm-2" value="#{PRMS.ContractNo}" rendered="#{supplierPerformanceContriller.renderContract}"/>
+                                            <div class="col-sm-3"> 
+                                                <p:selectOneMenu id="txtContractNo" style="width: 100%" 
+                                                                 value="#{supplierPerformanceContriller.prmsCotract}" converter="entConverter"  
+                                                                 disabled="#{workFlow.readonly}" rendered="#{supplierPerformanceContriller.renderContract}"
+                                                                 valueChangeListener="#{supplierPerformanceContriller.handleContract}" >
+                                                    <f:selectItem itemLabel="--- Select One ---"/>
+                                                    <f:selectItems value="#{supplierPerformanceContriller.contractList}"  var="contract" 
+                                                                   itemLabel="#{contract.contractNo}" itemValue="#{contract}"/>
+                                                    <p:ajax event="change" update="txtsupplier,txtDateRegg,txtDateRe" process="@this"/>
+                                                </p:selectOneMenu>   
+
+                                            </div>
+                                            <h:outputLabel  id="lblDateRegg" class="control-label col-sm-2"    value="#{PRMS.ContractAmount}" rendered="#{supplierPerformanceContriller.renderContract}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputTextarea id="txtDateRegg" class="form-control"  
+                                                                 value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.contractAmount}" 
+                                                                 readonly="true" rendered="#{supplierPerformanceContriller.renderContract}"
+                                                                 converterMessage="Please Input Number"/> 
+                                            </div>
+
+
+
+
+                                        </div>
+                                        <h:panelGroup id="test">
+                                            <h:panelGroup id="whenInternational" rendered="#{supplierPerformanceContriller.renderForIntnalSupplier}">
+                                                <div class="form-group textBoxMarginTop6px">
+                                                    <h:outputLabel   class="control-label col-sm-2"  value="#{PRMS.LCNo}" 
+                                                                     rendered="#{supplierPerformanceContriller.renderForIntnalSupplier}" />
+                                                    <div class="col-sm-3">
+                                                        <p:selectOneMenu id="lcno1" value="#{supplierPerformanceContriller.prmsLcRigistration}"  style="width: 100%" 
+                                                                         valueChangeListener="#{supplierPerformanceContriller.handleSelectLc}" converter="entConverter"
+                                                                         disabled="#{workFlow.readonly}"
+                                                                         rendered="#{supplierPerformanceContriller.renderForIntnalSupplier}">
+
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems value="#{supplierPerformanceContriller.lcNoList}" var="listL" itemLabel="#{listL.lcNo}"
+                                                                           itemValue="#{listL}" />
+                                                            <p:ajax update="@this" event="change" />
+                                                        </p:selectOneMenu> 
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+
+                                        <div class="form-group textBoxMarginTop6px">
+
+                                            <h:outputLabel id="lblPurchaseType"  class="control-label col-sm-2" value="#{PRMS.Supplier}"/>
+                                            <div class="col-sm-3"> 
+                                                <p:inputText id="txtsupplier"  style="width: 100%" readonly="true" class="form-control" rendered="#{supplierPerformanceContriller.renderBid}"
+                                                             value="#{supplierPerformanceContriller.prmsCotract.suppId.vendorName}"/> 
+                                                <p:inputText id="txtsupplierProforma"  style="width: 100%" readonly="true" class="form-control" rendered="#{supplierPerformanceContriller.renderPerforma}"
+                                                             value="#{supplierPerformanceContriller.prmsPurchaseOrder.suppId.vendorName}"/>
+                                            </div> 
+
+                                            <h:outputLabel  id="lblDateRe"  class="control-label col-sm-2"  value="#{PRMS.ContractEndDate}" rendered="#{supplierPerformanceContriller.renderContract}" />
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtDateRe"  readonly="true" class="form-control" rendered="#{supplierPerformanceContriller.renderContract}"
+                                                             value="#{supplierPerformanceContriller.prmsCotract.contractenddateam}"  />
+                                            </div>
+
+
+
+
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:outputLabel  id="lbllqdtydamage" class="control-label col-sm-2"   value="#{PRMS.LiquidityDamageAmount}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtlqdtydamage" class="form-control" readonly="#{workFlow.readonly}"
+                                                             value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.liquidityDamageAmount}" />
+                                                <p:message display="icon" for="txtdecc"/>  
+                                            </div>
+                                            <h:outputLabel  id="lblTP" class="control-label col-sm-2"   value="#{PRMS.ProcurementType}" 
+                                                            rendered="#{supplierPerformanceContriller.renderBid}" />
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtTP" class="form-control" readonly="true"
+                                                             value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.type}" 
+                                                             rendered="#{supplierPerformanceContriller.renderBid}"/>
+                                                <p:message display="icon" for="txtTP"/>  
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:outputLabel  id="lblDeliveredd0" class="control-label col-sm-2"  value="#{PRMS.UnDeliveredAmountIn} %:"/>
+                                            <div class="col-sm-3"> 
+                                                <p:inputText id="txtDeliveredd0" class="form-control"  readonly="#{workFlow.readonly}"
+                                                             value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.deliveryAmountInpercent}" 
+                                                             validator="#{validatorManagedBean.Percent}"  converterMessage="Please Input Number"/>
+                                                <p:message display="icon" for="txtDeliveredd0"/>   
+                                            </div>
+
+                                            <h:outputLabel  id="lblDeliveredd" class="control-label col-sm-2"  value="#{PRMS.DeliveredAmountIn} %:"/>
+                                            <div class="col-sm-3"> 
+                                                <p:inputText id="txtDeliveredd" class="form-control" readonly="#{workFlow.readonly}"
+                                                             value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.deliveryAmountInpercent}" 
+                                                             validator="#{validatorManagedBean.Percent}"  converterMessage="Please Input Number"/>
+                                                <p:message display="icon" for="txtDeliveredd"/>   
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:panelGroup id="PGClaim">
+                                                <h:outputLabel class="control-label col-sm-2" value="#{PRMS.ClaimNo}"  rendered="#{supplierPerformanceContriller.renderForClaim}"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="dispName" value="#{supplierPerformanceContriller.prmsClaimRecordingForm}"  style="width: 100%" 
+                                                                     valueChangeListener="#{supplierPerformanceContriller.handleSelectClaim}" converter="entConverter"
+                                                                     disabled="#{workFlow.readonly}" rendered="#{supplierPerformanceContriller.renderForClaim}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{supplierPerformanceContriller.claimNoList}" var="listSt2" 
+                                                                       itemLabel="#{listSt2.claimNo}" itemValue="#{listSt2}" />
+                                                        <p:ajax process="@this," update="txtdecc" event="change" />
+                                                    </p:selectOneMenu> 
+                                                </div>
+
+                                                <h:outputLabel  id="lbldescc2" class="control-label col-sm-2"   value="#{PRMS.ClaimDescription}" rendered="#{supplierPerformanceContriller.renderForClaim}"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtdecc" class="form-control" readonly="true"
+                                                                 value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.claimDescription}" rendered="#{supplierPerformanceContriller.renderForClaim}"/>
+                                                    <p:message display="icon" for="txtdecc"/>  
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+
+
+
+                                        <h:panelGroup id="test2">
+                                            <h:panelGroup id="whenInternational2" rendered="#{supplierPerformanceContriller.renderGoods}" >
+                                                <div class="form-group textBoxMarginTop6px">
+
+                                                    <h:outputLabel   class="control-label col-sm-2"   value="#{PRMS.GoodsEntranceNo}" 
+                                                                     rendered="#{supplierPerformanceContriller.renderGoods}" />
+                                                    <div class="col-sm-3">
+                                                        <p:selectOneMenu id="GoodsEntr" value="#{supplierPerformanceContriller.prmsGoodsEntrance}"  style="width: 100%" 
+                                                                         valueChangeListener="#{supplierPerformanceContriller.handleSelectGoods}" converter="entConverter"
+                                                                         rendered="#{supplierPerformanceContriller.renderGoods}" disabled="#{workFlow.readonly}">
+
+                                                            <f:selectItem itemLabel="---select one---" itemValue="" /> 
+                                                            <f:selectItems value="#{supplierPerformanceContriller.goodsNoList}" var="listG" 
+                                                                           itemLabel="#{listG.registrationNo}" itemValue="#{listG}" />
+                                                            <p:ajax update="@this,txtdecge,txtamount" event="change" />
+                                                        </p:selectOneMenu> 
+                                                    </div>
+
+                                                    <h:outputLabel  id="lbldescge" class="control-label col-sm-2"   value="#{PRMS.GoodsDescription}" 
+                                                                    rendered="#{supplierPerformanceContriller.renderGoods}"/>
+                                                    <div class="col-sm-3">
+                                                        <p:inputText id="txtdecge" class="form-control" readonly="true"
+                                                                     value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.geDescription}" 
+                                                                     rendered="#{supplierPerformanceContriller.renderGoods}" />
+                                                        <p:message display="icon" for="txtdecge"/>  
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group textBoxMarginTop6px">
+
+                                                    <h:outputLabel  id="lbldesamt" class="control-label col-sm-2"   value="#{PRMS.GoodsAmount}" 
+                                                                    rendered="#{supplierPerformanceContriller.renderGoods}"/>
+                                                    <div class="col-sm-3">
+                                                        <p:inputText id="txtamount" class="form-control" readonly="true"
+                                                                     value="#{supplierPerformanceContriller.prmsGoodsEntrance.goodsAmount}" 
+                                                                     rendered="#{supplierPerformanceContriller.renderGoods}" />
+                                                        <p:message display="icon" for="txtamount"/>  
+                                                    </div>
+
+                                                </div>
+
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+
+
+                                        <div class="form-group textBoxMarginTop6px">
+
+                                            <h:outputLabel  id="lbltxtDeliveryType" class="control-label col-sm-2"   value="#{PRMS.DeliveryWRTTime}"/>
+                                            <div class="col-sm-3">
+                                                <p:selectOneMenu id="txtDeliveryType" style="width: 100%"  disabled="#{workFlow.readonly}"
+                                                                 value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.deliveryWrtTime}">
+                                                    <f:selectItem itemLabel="--Select One--" itemValue=""/>
+                                                    <f:selectItem itemLabel="On Time" itemValue="veryGood" />
+                                                    <f:selectItem itemLabel="Delayed" itemValue="Good" />
+                                                </p:selectOneMenu>
+                                                <p:message display="icon" for="txtDeliveryType"/>
+                                            </div>
+
+                                            <h:outputLabel  id="lbludb" class="control-label col-sm-2"   value="#{PRMS.UndeliveredBalance}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtUdb" value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.undeliveredBalance}" />
+                                            </div>
+                                        </div> 
+
+                                        <div class="form-group textBoxMarginTop6px">
+                                            <h:outputLabel  id="lbltibNo" class="control-label col-sm-2"   value="#{PRMS.PurchaseItemDescription}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputTextarea id="txtDescribiton"  class="form-control"   readonly="#{workFlow.readonly}" autoResize="false"
+                                                                 value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.purchaseItemDescribiton}"/>
+                                                <p:message display="icon" for="txtDescribiton"/>  
+                                            </div>
+
+
+                                            <h:outputLabel  id="lblProcurment" class="control-label col-sm-2" value="#{PRMS.WRTProcurementDept}"
+                                                            />
+                                            <div class="col-sm-3">
+                                                <p:inputTextarea id="txtProcurment" class="form-control"  validator="#{validatorManagedBean.Remark}" readonly="#{workFlow.readonly}"
+                                                                 value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.wrtProcurmentDept}" autoResize="false"
+                                                                 converterMessage="Please Input Text"/>
+
+                                                <p:message display="icon" for="txtProcurment"/> 
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">   
+                                            <h:outputLabel  id="lblQualityy" class="control-label col-sm-2"  value="#{PRMS.ItemQuality}"/>
+                                            <div class=" col-sm-3">
+                                                <p:inputText id="Qualitymenu" class="form-control" style="width: 100%"  readonly="#{workFlow.readonly}"
+                                                             value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.itemQuality}" 
+                                                             validator="#{validatorManagedBean.Text}"/> 
+                                            </div>
+                                            <h:outputLabel  id="lblwrtcondition"  class="control-label col-sm-2" value="#{PRMS.WRTCondition}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputTextarea id="txtwrtcondition" class="form-control" readonly="#{workFlow.readonly}"  validator="#{validatorManagedBean.Remark}"
+                                                                 value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.remarkWrtCondition}" autoResize="false"
+                                                                 converterMessage="Please Input Text"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMarginTop6px">   
+                                            <h:outputLabel  id="lblcomment" class="control-label col-sm-2" value="#{PRMS.UserDeptComment}"/>
+                                            <div class="col-sm-3">
+                                                <p:inputTextarea id="txtcomment" class="form-control"  validator="#{validatorManagedBean.Remark}" readonly="#{workFlow.readonly}"
+                                                                 value="#{supplierPerformanceContriller.prmsSupplierPerformanceInfo.userDeptComment}" autoResize="false" 
+                                                                 converterMessage="Please Input Text"/>
+                                                <p:message display="icon" for="txtcomment"/> 
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <section class="panel panel-info">
+                        <section class="panel-body">  
+                            <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-md-12">                      
+                                        <div class="box-body"> 
+                                            <div class="col-md-6">
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group">
+                                                        <p:outputLabel  for="txtProcessedBy" class="control-label col-sm-4"
+                                                                        value="#{PRMS.ProcessedBy}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText  id="txtProcessedBy" readonly="true"  class="form-control" value="#{supplierPerformanceContriller.loggerName}" title="descripition"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group textBoxMarginTop6px "> 
+                                                    <div class="col-lg-4" />
+                                                    <div class="col-sm-8">
+
+                                                        <p:commandButton id="btnSave" value="#{supplierPerformanceContriller.saveorUpdateBundle} #{PRMS.save}" icon="ui-icon-new" validateClient="true" 
+                                                                         class="btn btn-primary col-lg-4" 
+                                                                         process="@this,checkListInfoPanel"   
+                                                                         update=" checkListInfoPanel" 
+                                                                         action="#{supplierPerformanceContriller.saveSupplierInfo()}" /> 
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel  class="control-label col-sm-4" value="#{PRMS.Decision} " rendered="#{supplierPerformanceContriller.renderDecision}"/> 
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="drddecision" value="#{supplierPerformanceContriller.wfPrmsProcessed.decision}" 
+                                                                             style="width: 100%" rendered="#{supplierPerformanceContriller.renderDecision}"
+                                                                             valueChangeListener="#{supplierPerformanceContriller.handleselectOptions}">                                                                                        
+                                                                <f:selectItem itemLabel="---Select---" itemValue=""/>
+                                                                <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                                <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                            </p:selectOneMenu>                                                                                
+
+                                                            <p:message for="drddecision" display="icon"/>                                                                                    
+                                                        </div>  
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-6">
+
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal ">
+                                                        <p:outputLabel  for="txtProcessedDate" class="control-label col-sm-4"
+                                                                        value="#{PRMS.ProcessedDate}" />
+                                                        <div class="col-sm-8">
+                                                            <p:calendar id="txtProcessedDate"    placeholder="dd/mm/yyyy"
+                                                                        value="#{supplierPerformanceContriller.wfPrmsProcessed.processedOn}"  
+                                                                        title="date"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group">
+
+                                                        <p:outputLabel  for="txtComment" class="control-label col-sm-4"
+                                                                        value="#{PRMS.Comment}" rendered="#{supplierPerformanceContriller.renderDecision}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputTextarea id="txtComment" class="form-control"  value="#{supplierPerformanceContriller.wfPrmsProcessed.commentGiven}" 
+                                                                             title="Remark" rendered="#{supplierPerformanceContriller.renderDecision}"
+                                                                             validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+
+                        </section>
+                    </section>
+
+
+
+
+
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

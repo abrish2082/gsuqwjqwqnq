@@ -1,0 +1,706 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard "></i> <span> Dashboard</span></a></li>
+        <li><a href="PortEntry.xhtml"><i class="fa fa-circle-o "></i> <span>Port Registration</span></a></li> 
+        <li><a href="serviceProvider.xhtml"><i class="fa fa-circle-o "></i> <span>Service Provider</span></a></li> 
+        <li><a href="ForeignExchange.xhtml"><i class="fa fa-circle-o "></i> <span>Foreign Currency Exchange</span></a></li>
+        <li><a href="InsuranceRegistrationForm.xhtml"><i class="fa fa-circle-o "></i> <span>Insurance Information</span></a></li>
+        <li><a href="LCRegAmendment.xhtml"><i class="fa fa-circle-o "></i> <span>Letter Of Credit Amendment </span></a></li> 
+        <li><a href="BankClearanceRegistration.xhtml"><i class="fa fa-circle-o "></i> <span>Declaration Settlement(Bank Clearance) Registration</span></a></li>      
+
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="LCregistration"> 
+            <p:toolbar style="background-color: white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackToSearch" rendered="#{lCRigistrationController.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{lCRigistrationController.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                         process="@this" update=":frmMainUI, :LCregistration, :frmLCregUI"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PGcreate" rendered="#{lCRigistrationController.isRendercreate}">
+                        <p:commandButton id="lcregMainsearch" action="#{lCRigistrationController.createNewLCReg()}" icon="#{lCRigistrationController.icone}"  validateClient="true" 
+                                         process="@this" update="@this,:frmMainUI, :LCregistration, :frmLCregUI"
+                                         title="#{lCRigistrationController.createOrSearchBundle}"  rendered="#{lCRigistrationController.isRendercreate}"
+                                         style="background-color: white;border-color: white"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PGNotify" rendered="#{lCRigistrationController.isRenderNotify}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{lCRigistrationController.requestNotificationCounter}"
+                                       style="color: red;background-color: white;border-color: white "/>
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 200px">
+                            <p:outputLabel id="lblReqNotf" value="LC for approve List"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{lCRigistrationController.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="LCReqlst"
+                                               value="#{lCRigistrationController.prmsLcRigistrations}"
+                                               itemValue="#{LCReqlst}" itemLabel="#{LCReqlst.lcNo}"/>               
+                                <p:ajax event="valueChange" update=":frmLCregUI, :frmMainUI, :LCregistration"  />  
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{lCRigistrationController.wfPrmsProcessedDModel}"
+                                                             var="currentRow" selectionMode="single" rowIndexVar="num"  rows="5" paginator="true"
+                                                             rowKey="#{currentRow.processedId}" paginatorPosition="bottom" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{currentRow.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{currentRow.processedOn}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+
+                    <a href="../../prms/TransitManagement/LCInformation.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+
+
+
+                </f:facet>
+
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{lCRigistrationController.renderPnlManPage}">
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="lcregsearchTbl"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                             <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="Searching By:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{lCRigistrationController.prmsLcRigistration.columnName}"
+                                                                         valueChangeListener="#{lCRigistrationController.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{lCRigistrationController.lcRegSearchParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblCriteriaNo,txtCriteriaNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblCriteriaNo" class="control-label col-sm-4" value="Search By #{lCRigistrationController.prmsLcRigistration.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCriteriaNo" value="#{lCRigistrationController.prmsLcRigistration.columnValue}"/>
+                                                    </div>
+                                                </div>
+                                            <div class="form-group"> 
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-4">
+                                                    <p:commandButton  icon="ui-icon-search" action="#{lCRigistrationController.searchByLCInfoNo()}"
+                                                                      process="@this" update=":frmMainUI:frmLcregisMasterTbl"
+                                                                      value="Find" class="btn btn-primary col-lg-3"/>              
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmLcregisMasterTbl">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable  rows="10"  id="LCRegistrationTbl" value="#{lCRigistrationController.prmsLcRigistrationModel}"
+                                                                  var="lcMstrInfoTbl" paginator="true" paginatorPosition="bottom" rowIndexVar="count"
+                                                                  selection="#{lCRigistrationController.selectPrmsLcRigistration}"
+                                                                  selectionMode="single"  rowKey="#{lcMstrInfoTbl.lcId}" 
+                                                                  rowsPerPageTemplate="5,10,15" 
+                                                                  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                                                        <p:ajax event="rowSelect"  listener="#{lCRigistrationController.rowSelect}"
+                                                                update=":LCregistration,:frmMainUI,:frmLCregUI" process="@this" />   
+                                                        <p:column headerText="S.No">
+                                                            #{count+1}
+                                                        </p:column>
+                                                        <p:column filterBy="#{lcMstrInfoTbl.lcNo}" sortBy="#{lcMstrInfoTbl.lcNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="LC No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{lcMstrInfoTbl.lcNo}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{lcMstrInfoTbl.rigistrationDate}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Application Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{lcMstrInfoTbl.rigistrationDate}">
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                        <p:column sortBy="#{lcMstrInfoTbl.rigistrationDate}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Application Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{lcMstrInfoTbl.rigistrationDate}">
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                        <p:column filterBy="#{lcMstrInfoTbl.lcType}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="LC Type" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{lcMstrInfoTbl.lcType}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Permit No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{lcMstrInfoTbl.foreignId.feNumber}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{lcMstrInfoTbl.contractId.contractNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Contract No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{lcMstrInfoTbl.contractId.contractNo}" />
+                                                        </p:column>
+
+
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+
+        <h:form id="frmLCregUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="LCregUIpanel" rendered="#{lCRigistrationController.renderPnlCreateParty}"  >
+                <p:growl id="growl" showDetail="true"  severity="information,fatal" autoUpdate="true" />
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Letter of Credit Information</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="col-sm-6">
+
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="LcregGenPanel" >
+                                        <div class="form-horizontal col-sm-12">  
+                                            <div class="form-horizontal col-sm-12"> 
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblLCreqNO" class="control-label col-sm-4" value="LC No:"/>
+                                                    <div class="col-sm-8">  
+                                                        <p:inputText id="txtLCreqNO" readonly="true" 
+                                                                     value="#{lCRigistrationController.generateLCRegNo()}"/>
+                                                    </div> 
+                                                </div>
+                                            </div> 
+                                        </div>
+                                    </h:panelGroup>
+
+
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="LcreqPanel1" >
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lbllcOpeningDate"  class="control-label col-sm-4" value="LC Opening Date:"/>
+                                                    <div class="col-sm-8">                                   
+                                                        <p:calendar id="openingdate" disabled="#{workFlow.readonly}" value="#{lCRigistrationController.prmsLcRigistration.lcOpeningDate}"
+                                                                    pattern="dd/MM/yyyy"  placeholder="dd/mm/yyyy" mindate="today"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblRegDatee" class="control-label col-sm-4" value="Last Shipment Date:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="PQdateReg" disabled="#{workFlow.readonly}" value="#{lCRigistrationController.prmsLcRigistration.shipmentDate}" 
+                                                                    pattern="dd/MM/yyyy"  placeholder="dd/mm/yyyy" valueChangeListener="#{lCRigistrationController.calcLcExpireDate}" maxdate="today">
+                                                            <f:convertDateTime  pattern="dd/MM/yyyy"/>
+                                                            <p:ajax event="dateSelect" process="@this,:frmLCregUI:txtNoOfDays,PQdateReg" update="Expiredate" />
+                                                        </p:calendar>
+                                                    </div>
+                                                </div> 
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="NoOfDays" class="control-label col-sm-4" value="Number of Days: "/>
+                                                    <div class="col-sm-8">                                   
+                                                        <p:inputText id="txtNoOfDays" value="#{lCRigistrationController.prmsLcRigistration.numberOfDays}" 
+                                                                     readonly="#{workFlow.readonly}" valueChangeListener="#{lCRigistrationController.calcLcExpireDateByDayNo}"
+                                                                     validator="#{validatorManagedBean.Number}" validatorMessage="Please Enter Number Only">
+                                                            <p:ajax event="keyup" process="@this,:frmLCregUI:txtNoOfDays,PQdateReg" update="Expiredate"/>
+                                                        </p:inputText>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblRegDate" class="control-label col-sm-4" value="LC Expire Date:"/>
+                                                    <div class="col-sm-8">                                   
+                                                        <p:calendar id="Expiredate" value="#{lCRigistrationController.prmsLcRigistration.lcExpireDate}" readonly="true" 
+                                                                    showOn="off"  placeholder="Entering From Keyboard is protected" pattern="dd/MM/yyyy">
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </p:calendar>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px required">
+                                                    <p:outputLabel value="LC Amount:" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-4">
+                                                        <p:inputText id="txtLCAmt" required="true" readonly="#{workFlow.readonly}" value="#{lCRigistrationController.prmsLcRigistration.lcAmount}" 
+                                                                     requiredMessage="Please insert number only for  Lc Amount"/>
+                                                        <p:message display="icon" for="txtLCAmt"/>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <p:selectOneMenu  style="width: 100%" converter="entConverter" disabled="#{workFlow.readonly}"
+                                                                          value="#{lCRigistrationController.fmsLuCurrency}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{lCRigistrationController.currencyLists}" 
+                                                                           var="currency" itemLabel="#{currency.currency}" itemValue="#{currency}" />
+
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px required">
+                                                    <p:outputLabel id="lblDelviveryLCAmnt" class="control-label col-sm-4" value="Delivery term:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtDelviveryLCAmnt" class="form-control" readonly="#{workFlow.readonly}"
+                                                                     value="#{lCRigistrationController.prmsLcRigistration.deliveryTermAfterLcAmount}"
+                                                                     required="true" requiredMessage="Delivery term Value is Required"
+                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Please Enter Numbers Only">
+                                                            <p:ajax event="keyup" listener="#{lCRigistrationController.remainingLcAmount()}" 
+                                                                    process="@this" update="txtRemainLCpaymtAmnt"/>
+                                                        </p:inputText>
+                                                        <p:message for="txtDelviveryLCAmnt" display="icon"/>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px required">
+                                                    <p:outputLabel id="lblLCPayaftrAccp" class="control-label col-sm-4" value="LC Payment after acceptance:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtLCPayaftrAccp" class="form-control" readonly="#{workFlow.readonly}"
+                                                                     value="#{lCRigistrationController.prmsLcRigistration.lcPaymentAfterAcceptance}"
+                                                                     required="true" requiredMessage="Payment after Acceptance Value is Required"
+                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Please Enter Numbers Only" >
+                                                            <p:ajax event="keyup" listener="#{lCRigistrationController.remainingLcAmount()}" 
+                                                                    process="@this" update="txtRemainLCpaymtAmnt"/>
+                                                        </p:inputText>
+                                                        <p:message for="txtLCPayaftrAccp" display="icon"/>
+                                                    </div> 
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblRemainLCpaymtAmnt" class="control-label col-sm-4" value="Remaining LC payment amount :"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtRemainLCpaymtAmnt" readonly="true"
+                                                                     value="#{lCRigistrationController.prmsLcRigistration.remainingLcPaymentAmount}">
+
+                                                        </p:inputText>
+
+                                                    </div> 
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblSourceOfFund" class="control-label col-sm-4" value="Source of Fund:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtSourceOfFund" class="form-control" readonly="#{workFlow.readonly}"
+                                                                     value="#{lCRigistrationController.prmsLcRigistration.sourchOfFund}"/>
+
+                                                    </div> 
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblPartialShip" class="control-label col-sm-4" value="Partial Shipment:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="lblPartialShips"  disabled="#{workFlow.readonly}" style="width: 100%"
+                                                                         value="#{lCRigistrationController.prmsLcRigistration.partialShipment}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Allowed" itemValue="Allowed" />
+                                                            <f:selectItem itemLabel="Not Allowed" itemValue="Not Allowed" />
+                                                        </p:selectOneMenu>
+                                                    </div> 
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px required">
+                                                    <p:outputLabel value="Contract No :" class="control-label col-sm-4" />
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtcontractNc" converter="entConverter" value="#{lCRigistrationController.prmsContract}" style="width: 100%"
+                                                                         valueChangeListener="#{lCRigistrationController.setSelectSuppliers}" disabled="#{workFlow.readonly}" 
+                                                                         required="true" requiredMessage="Please Select Contract No">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{lCRigistrationController.listOfContract}" var="cont" itemLabel="#{cont.contractNo}" itemValue="#{cont}"/>
+                                                            <p:ajax event="change" process="@this" update="txtsuplier" />
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtcontractNc" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px"> 
+                                                    <p:outputLabel value="Bank Name:" id="lblBankName"  class="control-label col-sm-4">
+                                                    </p:outputLabel>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id= "txtBankName" converter="entConverter" style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                         value="#{lCRigistrationController.prmsServiceProvider}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{lCRigistrationController.listOfService}" var="bank" itemLabel="#{bank.name}" itemValue="#{bank}"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblCountry" class="control-label col-sm-4"  value="Country of Origin:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdCountry" style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                         converter="entConverter"
+                                                                         value="#{lCRigistrationController.comLuCountry}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{lCRigistrationController.countryList}" 
+                                                                           var="countries" itemLabel="#{countries}" itemValue="#{countries}"/>
+                                                        </p:selectOneMenu>
+                                                    </div> 
+                                                </div>
+                                            </div> 
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px"></div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px"></div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+
+                                </div>
+                                <div class="col-sm-6">
+
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="LCregMasterPanel2" >
+                                        <div class="form-horizontal col-sm-12">
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblAppDatee" class="control-label col-sm-4" value="Application Date:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:calendar disabled="#{workFlow.readonly}" id="AppDate" value="#{lCRigistrationController.prmsLcRigistration.rigistrationDate}" 
+                                                                    pattern="dd/MM/yyyy"  placeholder="dd/mm/yyyy" mindate="today" maxdate="today"/>
+                                                    </div>
+
+                                                </div> 
+                                            </div>
+
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblLCType" class="control-label col-sm-4" value="LC Type:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="lblLCTypes"  disabled="#{workFlow.readonly}" style="width: 100%"
+                                                                         value="#{lCRigistrationController.prmsLcRigistration.lcType}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Confirmed" itemValue="Confirmed" />
+                                                            <f:selectItem itemLabel="Transferable" itemValue="Transferable" />
+                                                            <f:selectItem itemLabel="Irrevocable" itemValue="Irrevocable" />
+                                                        </p:selectOneMenu>
+
+                                                    </div> 
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblPermitNo" class="control-label col-sm-4" value="Permit No:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtPermitNo"  disabled="#{workFlow.readonly}" style="width: 100%"
+                                                                         value="#{lCRigistrationController.prmsForeignExchange}" converter="entConverter"
+                                                                         valueChangeListener="#{lCRigistrationController.setSelectForiegn}" required="true" requiredMessage="Permit No Value is Required">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{lCRigistrationController.prmsForeignExchangeLsts}" var="foreign" itemLabel="#{foreign.feNumber}" itemValue="#{foreign}" />
+                                                            <p:ajax event="change" process="@this" update="txtPerAmt" />
+
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtPermitNo" display="icon"/>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Permit Amount:"  id="lblPerAmt"  class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtPerAmt" readonly="true"  value="#{lCRigistrationController.prmsForeignExchange.permitAmount}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblportOfLoding" class="control-label col-sm-4" value="Port Of Loading:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtPortNc" converter="entConverter" value="#{lCRigistrationController.portOfLoading}" style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                         valueChangeListener="#{lCRigistrationController.setSelectPortLoad}" >
+                                                            <f:selectItem itemLabel="--- Select One ---" noSelectionOption="true"/>
+                                                            <f:selectItems value="#{lCRigistrationController.listOfPorts}" var="port" itemLabel="#{port.portName}" itemValue="#{port}" />
+                                                        </p:selectOneMenu>
+                                                    </div> 
+                                                </div> 
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblportOfDischarge" class="control-label col-sm-4" value="Port Of Discharge:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtportOfDischarge" converter="entConverter" value="#{lCRigistrationController.portOfDischarge}" style="width: 100%" 
+                                                                         valueChangeListener="#{lCRigistrationController.setSelectPortDisch}" disabled="#{workFlow.readonly}">
+                                                            <f:selectItem itemLabel="--- Select One ---" noSelectionOption="true"/>
+                                                            <f:selectItems value="#{lCRigistrationController.listOfPorts}" var="port" itemLabel="#{port.portName}" itemValue="#{port}" />
+                                                        </p:selectOneMenu>
+
+                                                    </div> 
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblsuplier" class="control-label col-sm-4"  value="Supplier:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtsuplier" readonly="true" value="#{lCRigistrationController.prmsContract.suppId.vendorName}" /> 
+                                                    </div> 
+                                                </div>
+                                            </div> 
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblGoodsDesc" class="control-label col-sm-4" value="Description of Goods:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputTextarea id="txtGoodsDesc" class="form-control" readonly="#{workFlow.readonly}" autoResize="false"
+                                                                         value="#{lCRigistrationController.prmsLcRigistration.descriptionOfGoods}"/> 
+
+                                                    </div> 
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblFileUp" class="control-label col-sm-4"  value="File Upload:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:panelGrid columns="1" style="float: left;"> 
+                                                            <p:fileUpload  id="fileUplod" cancelLabel="#{contenu.annuler}" disabled="#{workFlow.readonly}"
+                                                                           fileUploadListener="#{lCRigistrationController.uploadListener}"
+                                                                           value="#{lCRigistrationController.prmsLuDmArchive.documentId}" allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                           invalidFileMessage="This type of file is not valid" invalidSizeMessage="The size is not Allowed"
+                                                                           multiple="false" mode="advanced" sizeLimit="52428800" auto="true" 
+                                                                           process="@this,tblSavedDoc" update="tblSavedDoc"/>
+                                                            <p:dataTable id="tblSavedDoc"  var="currentRow" value="#{lCRigistrationController.prmsLuDmArchivesDModel}"
+                                                                         paginator="true" paginatorPosition="bottom" selectionMode="single" rowKey="#{currentRow.documentId}"
+                                                                         selection="#{lCRigistrationController.prmsLuDmArchiveSelection}" >
+                                                                <p:ajax event="rowSelect" listener="#{lCRigistrationController.onRowSelect}" process="@this" update="tblSavedDoc" />
+                                                                <f:facet name="header">
+                                                                    <p:outputLabel value="File From DataBase"/>
+                                                                </f:facet>
+                                                                <p:column id="docNames" headerText="File Name"> 
+                                                                    <h:outputText id="txtcoScale" value="#{currentRow.fileName}"/>
+                                                                </p:column>
+                                                                <p:column  headerText="Download">
+                                                                    <h:panelGroup id="pnlGridtblDoccolOptions">
+                                                                        <p:commandButton process="@this,tblSavedDoc"  update="tblSavedDoc"                                             
+                                                                                         icon="ui-icon-arrowthickstop-1-s"  ajax="false"  >
+                                                                            <p:fileDownload value="#{lCRigistrationController.file}" />
+                                                                        </p:commandButton>
+                                                                    </h:panelGroup>
+
+
+                                                                </p:column>  
+                                                            </p:dataTable>
+                                                        </p:panelGrid>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <section class="panel panel-info">
+                        <section class="panel-body">  
+                            <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-md-12">                      
+                                        <div class="box-body"> 
+                                            <div class="col-md-6">
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group">
+                                                        <p:outputLabel class="control-label col-sm-4" value="Processed By:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText  id="txtProcessedBy" readonly="true" value="#{lCRigistrationController.loggerName}" title="descripition"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel  class="control-label col-sm-4" value="Decision:" rendered="#{lCRigistrationController.renderDecision}"/> 
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="drddecision" value="#{lCRigistrationController.wfPrmsProcessed.decision}" 
+                                                                             requiredMessage="Select Decision" required="true" style="width: 100%"
+                                                                             valueChangeListener="#{lCRigistrationController.handleselectOptions}" rendered="#{lCRigistrationController.renderDecision}">                                                                                        
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                                <f:selectItem itemLabel="Reject" itemValue="Reject"/>                                                                                     
+                                                            </p:selectOneMenu>
+                                                            <p:message for="drddecision" display="icon"/>                                                                                    
+                                                        </div>  
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-6">
+
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal required">
+                                                        <p:outputLabel  class="control-label col-sm-4" value="Processed Date:" />
+                                                        <div class="col-sm-8">
+                                                            <p:calendar id="txtProcessedDate" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" 
+                                                                        value="#{lCRigistrationController.wfPrmsProcessed.processedOn}" title="date"
+                                                                        required="true" requiredMessage="Processed Date is Required" maxdate="today" mindate="today">
+                                                            </p:calendar>
+                                                            <p:message display="icon" for="txtProcessedDate"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group">
+
+                                                        <p:outputLabel  class="control-label col-sm-4"  value="Comment Given:" rendered="#{lCRigistrationController.renderDecision}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputTextarea id="txtComment" class="form-control"  value="#{lCRigistrationController.wfPrmsProcessed.commentGiven}" 
+                                                                             title="Remark"  validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only" 
+                                                                             rendered="#{lCRigistrationController.renderDecision}"/>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+
+                            <div class="col-md-12" > 
+                                <div class="col-sm-6">
+                                    <div class="form-group textBoxMargin6px">
+                                        <div class="col-lg-4"></div>
+                                        <div class="col-sm-8">
+                                            <p:commandButton action="#{lCRigistrationController.saveLCInfo()}" id="lcdetailsave" icon="ui-icon-new"  
+                                                             process="@this,:frmLCregUI:LcregGenPanel,:frmLCregUI:LcreqPanel1,:frmLCregUI:LCregMasterPanel2,:frmLCregUI:pnlworkflow" 
+                                                             update=":frmLCregUI:LCregMasterPanel2,:frmLCregUI:LcregGenPanel,:frmLCregUI:LcreqPanel1,:frmLCregUI:pnlworkflow,:LCregistration"   
+                                                             class="btn btn-primary col-lg-4 "
+                                                             value="#{lCRigistrationController.saveorUpdateBundle}"/> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </section> 
+
+                </div> 
+            </h:panelGroup>
+
+        </h:form> 
+    </ui:define>
+</ui:composition>          

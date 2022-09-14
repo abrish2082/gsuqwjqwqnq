@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>   
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmHeader"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                      <h:panelGroup id="pnlPlus"  rendered="#{uniformController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{uniformController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white"  title="New Or Search"
+                                         process="@this" update="@this,:frmUniform,frmHeader" 
+                                         />
+                        <span class="ui-separator">
+
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    
+                    <p:commandButton id="btnNew" validateClient="true" action="#{uniformController.btnNewOrSearch()}"
+                                     icon="#{uniformController.icone}" style="background-color: white;border-color:  white" 
+                                     process="@this" update="@this,:frmUniform"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/uniform/uniform.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>       
+
+        <h:form id="frmUniform"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup id="pnlSearch" rendered="#{uniformController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">  
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-sm-8"> 
+                                            <div class="form-horizontal col-md-12">
+                                                <div class="form-group"> 
+                                                    <h:outputLabel for="srcCriteriaName" value="Job Title:" class="control-label col-sm-2"/> 
+                                                    <div class="col-sm-5">  
+                                                        <p:selectOneMenu id="srcCriteriaName" value="#{uniformController.filtercriteria}"
+                                                                         valueChangeListener="#{uniformController.findByJobId}"
+                                                                         filterMatchMode="startsWith" filter="true" style="width: 100%">
+                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                            <f:selectItems value="#{uniformController.listOfJobTypes}" var="listofJobs" itemValue="#{listofJobs.id}" itemLabel="#{listofJobs.jobTitle}"/>
+                                                            <f:selectItem itemLabel="Load all" itemValue="Load all"/>
+                                                            <p:ajax event="change" process="@this" update=":frmUniform:tblUniform"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>               
+                                <div class="form-group">
+                                    <p:dataTable id="tblUniform" value="#{uniformController.listOfUniform}" 
+                                                 var="uniform" rowIndexVar="num" rowKey="#{uniform.id}" rows="10" 
+                                                 selection="#{uniformController.hrUniform}"
+                                                 selectionMode="single" paginator="true" paginatorPosition="bottom" rowsPerPageTemplate="10,20,30">
+                                        <p:ajax event="rowSelect" process="@this,tblUniform" listener="#{uniformController.uniformVlc}"
+                                                update=":frmUniform,:frmHeader"/>
+                                        <p:column headerText="No." style="width:100px;">
+                                            <h:outputText value="#{num + 1}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Job Title "/>
+                                            </f:facet>
+                                            <h:outputText value="#{uniform.jobId.jobTitle}"/>
+                                        </p:column> 
+                                        <p:column >
+                                            <f:facet name="header">
+                                                <h:outputText value="Sex"/>
+                                            </f:facet>
+                                            <h:outputText value="#{uniform.sex}"/>
+                                        </p:column>
+                                        <p:column >
+                                            <f:facet name="header">
+                                                <h:outputText value="Quantity "/>
+                                            </f:facet>
+                                            <h:outputText value=""/>
+                                        </p:column>
+                                        <p:column >
+                                            <f:facet name="header">
+                                                <h:outputText value="Year "/>
+                                            </f:facet>
+                                            <h:outputText value=""/>
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>                                                        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+            <h:panelGroup id="pnlMainPage" rendered="#{uniformController.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Uniform Benefit</h3>
+                            </div>
+
+                            <div class="box-body ">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <h:panelGroup id="pnl1" class="col-sm-12">
+
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                            <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                                <div class="form-group form-horizontal">       
+                                                                                    <h:outputLabel for="somJob" class="control-label col-sm-4" value="Job Title: "/>
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:selectOneMenu id="somJob" value="#{uniformController.hrJobTypes.id}" style="width:100%"                                                
+                                                                                                         valueChangeListener="#{uniformController.vcl_jobTitle}" converter="entConverter" 
+                                                                                                         required="true"  requiredMessage="Select Job Titel">  
+                                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                            <f:selectItems value="#{uniformController.listOfJobTypes}" var="listofJobs" itemValue="#{listofJobs.id}" itemLabel="#{listofJobs}"/>                                                             
+                                                                                            <p:ajax event="change" process="@this" update=":frmUniform:txtJobGrade"/>
+                                                                                        </p:selectOneMenu>
+                                                                                        <p:message for="somJob" display="icon"/>
+                                                                                    </div>
+                                                                                </div>                                            
+                                                                            </div>
+                                                                        </div> 
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSex" class="control-label col-sm-4" value="Sex: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneRadio id="txtSex" value="#{uniformController.hrUniform.sex}"  class="col-sm-8">
+                                                                                    <f:selectItem itemLabel="Male" itemValue="1"/>
+                                                                                    <f:selectItem itemLabel="Female" itemValue="2"/>
+                                                                                    <p:ajax update="" event="valueChange"/>
+                                                                                </p:selectOneRadio>
+                                                                                <p:message for="txtSex" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                                   
+                                                                </div>
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal ">
+                                                                                <h:outputLabel for="txtJobGrade" value="Job Grade: " class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtJobGrade" value="#{uniformController.hrJobTypes.jobGradeId.gradeId.grade}" 
+                                                                                                 title="Job Grade" readonly="true"/>
+                                                                                    <p:message for="txtJobGrade" display="icon"/>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>    
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </section>
+                                            </h:panelGroup>
+
+
+
+
+
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl2" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6">
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                        <div class="form-group form-horizontal">     
+                                                                            <h:outputLabel for="somCategory" class="control-label col-sm-4" value="Category: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="somCategory" value="#{uniformController.mmsCategory.catId}" style="width:100%"                                                
+                                                                                                 valueChangeListener="#{uniformController.vcl_category}" converter="entConverter" 
+                                                                                                 required="true" requiredMessage="Select Category">  
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{uniformController.listOfCatagories}" var="listOfCat" itemValue="#{listOfCat.catId}" itemLabel="#{listOfCat}"/>                                                             
+                                                                                    <p:ajax event="change" process="@this" update="somSubCategory"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="somCategory" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                        <div class="form-group form-horizontal">       
+                                                                            <h:outputLabel for="somSubCategory" class="control-label col-sm-4" value="Sub Category: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="somSubCategory" value="#{uniformController.mmsSubCat.subCatId}" style="width:100%"                                                
+                                                                                                 valueChangeListener="#{uniformController.vcl_subCategory}" converter="entConverter" 
+                                                                                                 required="true" requiredMessage="Select Sub Category" >  
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{uniformController.listOfSubCatagories}" var="listOfSubCat" itemValue="#{listOfSubCat.subCatId}" itemLabel="#{listOfSubCat.subCatName}"/>                                                             
+                                                                                    <p:ajax event="change" process="@this" update="somUniformItem"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="somSubCategory" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                        <div class="form-group form-horizontal">       
+                                                                            <h:outputLabel for="somUniformItem" class="control-label col-sm-4" value="Uniform Item "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="somUniformItem" value="#{uniformController.mmsItemRegistration.materialId}" style="width:100%"
+                                                                                                 converter="entConverter"  required="true" requiredMessage="Select Uniform Type">  
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{uniformController.listOfUniformItems}" var="listOfUniform" itemValue="#{listOfUniform.materialId}" itemLabel="#{listOfUniform.matName}"/>                                                             
+                                                                                    <p:ajax event="change" />
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="somUniformItem" display="icon"/>
+                                                                            </div>
+                                                                        </div> 
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">       
+                                                                            <h:outputLabel for="txtDescription" class="control-label col-sm-4" value="Description of Item: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="txtDescription"  value="#{uniformController.hrUniformDetails.description}" 
+                                                                                                 validator="#{validatorManagedBean.Text}" class="form-control" title="Description"/>
+                                                                                <p:message for="txtDescription" display="icon"/>
+                                                                            </div>
+                                                                        </div> 
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtQuantity" class="control-label col-sm-4" value="Quantity: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtQuantity" class="form-control" value="#{uniformController.hrUniformDetails.quantity}" 
+                                                                                             title="Uniform Quantity Needed" required="true" requiredMessage="Quantity" />                                                                                    
+                                                                                <p:message for="txtQuantity" display="icon"/>
+                                                                            </div>                                                               
+                                                                        </div>                                                                                          
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px form-group required">
+                                                                        <div class="form-group form-horizontal">                                                                
+                                                                            <h:outputLabel for="somYear" value="Every: " class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="somYear" value="#{uniformController.hrUniformDetails.year}"
+                                                                                                 filterMatchMode="contains" filter="true" required="true" requiredMessage="Select Year" style="width:100%">
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{uniformController.listOfYears}" var="listOfYears" itemValue="#{listOfYears}" itemLabel="#{listOfYears}"  />
+                                                                                    <p:ajax event="change" process="@this " update=""/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="somYear" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                                                                         
+                                                                    </div>
+
+                                                                    <div class="col-sm-12 textBoxMargin6px">
+                                                                        <div class="col-sm-4">                                                              
+                                                                        </div>                                                                    
+                                                                        <div class="col-sm-3">
+                                                                            <center>
+                                                                                <p:commandButton id="btnAdd" value="#{uniformController.addOrUpdate}" class="btn  btn-block btn-primary col-sm-4 "
+                                                                                                 action="#{uniformController.addUniform}"  
+                                                                                                 process="@this,pnl1,pnl2" style="margin-top: 20px"
+                                                                                                 update="pnl2,tblUniformDetail"/>
+                                                                            </center>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-12">                                                                      
+                                                                    <div class="form-group form-horizontal">
+                                                                        <p:dataTable id="tblUniformDetail" value="#{uniformController.uniformDetailsDataModel}" rowsPerPageTemplate="10,20,30"
+                                                                                     var="uniformVar"  rowIndexVar="num"  rows="10" paginator="true" paginatorPosition="bottom" 
+                                                                                     class="dataTable"  rowKey="#{uniformVar.id}">   
+                                                                            <p:ajax event="rowSelect" process="@this,tblUniformDetail" 
+                                                                                    update=":frmUniform"/>
+                                                                            <p:column headerText="Job Title">
+                                                                                <h:outputText value="#{uniformVar.uniformId.jobId.jobTitle}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Sex">
+                                                                                <h:outputText value="#{uniformVar.uniformId.sex}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Uniform Type">
+                                                                                <h:outputText value="#{uniformVar.uniformTypeId.matName}"/>
+                                                                            </p:column> 
+                                                                            <p:column headerText="Quantity">
+                                                                                <h:outputText value="#{uniformVar.quantity}"/>
+                                                                            </p:column> 
+                                                                            <p:column headerText="Year">
+                                                                                <h:outputText value="#{uniformVar.year}"/>
+                                                                            </p:column>
+
+                                                                            <p:column headerText="Option">
+                                                                                <p:commandLink action="#{uniformController.EditUniformdata}" value="Edit" 
+                                                                                               process="@this,tblUniformDetail"
+                                                                                               update=":frmUniform:pnl2,tblUniformDetail "/>
+                                                                            </p:column>   
+                                                                        </p:dataTable>
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+                                                        </div>
+
+                                                    </h:panelGroup>
+                                                </section>                                       
+                                            </section>
+
+                                            <h:panelGroup id="pnlSave">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                     value="#{uniformController.saveOrUpdate}" action="#{uniformController.saveUniform()}"
+                                                                                     process="@this,:frmUniform:pnl1" update=":frmUniform"/>
+                                                                </div>
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"  action="#{uniformController.clear()}"
+                                                                                     process="@this" update=":frmUniform"/> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                            <div class="box-footer ">
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>

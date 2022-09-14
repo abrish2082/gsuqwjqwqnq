@@ -1,0 +1,330 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">        
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="bscResult.xhtml"><i class="fa fa-fw fa-refresh"></i> <span>Refresh Page</span></a></li>
+        <li><a href="bscSession.xhtml"><i class="fa fa-circle-o "></i> <span>BSC Session</span></a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">BSC Result</h3>                                       
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body ">
+                        <div class="box-body ">
+                            <h:form id="frmBscResult"> 
+                                <p:growl id="growl" showDetail="false" autoUpdate="true" severity="information"/> 
+                                <section class="panel panel-info">
+                                    <section class="panel-body">
+                                        <h:panelGroup id="pnl1" class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <div class="col-md-6"> 
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal"> 
+                                                                <h:outputLabel for="somBSCSession" class="control-label col-sm-4" value="Session"/>
+                                                                <div class="col-sm-8">                                                       
+                                                                    <p:selectOneMenu id="somBSCSession" style="width:100%" converter="entConverter" required="true"
+                                                                                     value="#{bscResultController.hrBscSessions.id}" requiredMessage="Select Session List"
+                                                                                     valueChangeListener="#{bscResultController.bscSession_vcl}">
+                                                                        <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                        <f:selectItems value="#{bscResultController.activeSessions}" var="bs"
+                                                                                       itemValue="#{bs.id}" itemLabel="#{bs.bscYear} #{'--'} #{bs.term}"/>
+                                                                        <p:ajax event="change" update="calStartDate,calEndDate"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message for="somBSCSession" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>   
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="calStartDate" class="control-label col-sm-4" value="Start Date"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="calStartDate" value="#{bscResultController.hrBscSessions.startDate}" 
+                                                                                 title="Start Date" readonly="true"/>
+                                                                    <p:message for="calStartDate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>     
+                                                        <br></br>
+                                                        <br></br>   
+                                                        <div class="col-md-12">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="calEndDate" class="control-label col-sm-4" value="End Date"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="calEndDate" value="#{bscResultController.hrBscSessions.endDate}" title="End Date" readonly="true"/>
+                                                                    <p:message for="calEndDate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section> 
+                                </section> 
+                                <section class="panel panel-info">
+                                    <section class="panel-body">
+                                        <h:panelGroup id="pnl2" class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <div class="col-md-6"> 
+                                                        <div class="col-md-12">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="searchEmployee" value="Employee Name" class="control-label col-sm-4"/>  
+                                                                <div class="col-sm-8">
+                                                                    <p:autoComplete id="searchEmployee" style="width:100%" value="#{bscResultController.hrEmployees.firstName}"
+                                                                                    completeMethod="#{bscResultController.SearchByFname}" var="empList" required="true" 
+                                                                                    title="Employee Name" requiredMessage="Search Employee by Name"
+                                                                                    itemValue="#{empList.firstName}" itemLabel="#{empList}" forceSelection="true" size="20" emptyMessage="no data">  
+                                                                        <p:ajax event="itemSelect"  process="@this" 
+                                                                                listener="#{bscResultController.getByFirstName}" 
+                                                                                update="txtEmployeeId,txtJobTitle,txtDepartment,txtSex"/>     
+                                                                    </p:autoComplete> 
+                                                                    <p:message for="searchEmployee" display="icon"/>
+                                                                </div> 
+                                                            </div>                                                                                          
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtEmployeeId" class="control-label col-sm-4" value="Employee Id"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtEmployeeId" value="#{bscResultController.hrEmployees.empId}"
+                                                                                 readonly="true" title="Employee Id" />
+                                                                    <p:message for="txtEmployeeId" display="icon"/>
+                                                                </div>
+                                                            </div>                                               
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtJobTitle" class="control-label col-sm-4" value="Job Title"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtJobTitle" value="#{bscResultController.hrJobTypes.jobTitle}" 
+                                                                                 title="Position" readonly="true"/>
+                                                                    <p:message for="txtJobTitle" display="icon"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal"> 
+                                                                <h:outputLabel for="txtResult" class="control-label col-sm-4" value="Result"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtResult" value="#{bscResultController.hrBscResults.bscResult}"
+                                                                                 title="Result" class="form-control" required="true" requiredMessage="Enter Result"/>
+                                                                    <p:message for="txtResult" display="icon"/>
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtDepartment" class="control-label col-sm-4" value="Department"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtDepartment" value="#{bscResultController.hrDepartments.depName}" 
+                                                                                 title="Department" readonly="true"/>
+                                                                    <p:message for="txtDepartment" display="icon"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtSex" class="control-label col-sm-4" value="Sex"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtSex" value="#{bscResultController.hrEmployees.sex}" 
+                                                                                 title="Gender" readonly="true"/>
+                                                                    <p:message for="txtSex" display="icon"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br> 
+                                                        <div class="col-md-12">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark"/> 
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtRemark" value="#{bscResultController.hrBscResults.remark}" 
+                                                                                     rows="1" cols="3" autoResize="false" title="Remark"
+                                                                                     validator="#{validatorManagedBean.Remark}" class="form-control"/>
+                                                                    <p:message for="txtRemark" display="icon"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                    </div> 
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 ">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <center>
+                                                                <p:commandButton id="btnAdd" value="#{bscResultController.addorUpdate}" 
+                                                                                 action="#{bscResultController.addBSCResult()}" class="btn  btn-block btn-down col-lg-4" 
+                                                                                 process="@this,pnl2" style="margin-top: 20px"
+                                                                                 update="@this,pnl2,tblBscResult"/>
+                                                            </center>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <section class="panel panel-info">
+                                    <section class="panel-body">
+                                        <h:panelGroup id="pnl3" class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <div class="col-md-12">                                                                      
+                                                        <div class="form-group form-horizontal"> 
+                                                            <p:dataTable id="tblBscResult" value="#{bscResultController.bscResultDataModel}" styleClass="dataTable" rowsPerPageTemplate="5,10,15,20"
+                                                                         paginator="true" paginatorPosition="bottom" var="bscResult" rowIndexVar="rowIndex" rows="10">
+                                                                <p:column style="width:100px">
+                                                                    <f:facet name="header">No.</f:facet>
+                                                                    <p:outputLabel value="#{rowIndex+1}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Employee Id">
+                                                                    <h:outputText value="#{bscResult.empId}"/>
+                                                                </p:column>
+                                                                <p:column>
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Employee Name"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{bscResult.empId.firstName} #{bscResult.empId.middleName} #{bscResult.empId.lastName}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Department">
+                                                                    <h:outputText value="#{bscResult.empId.deptId}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Job Position">
+                                                                    <h:outputText value="#{bscResult.empId.jobId.jobTitle}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Sex">
+                                                                    <h:outputText value="#{bscResult.empId.sex}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Result">
+                                                                    <h:outputText value="#{bscResult.bscResult}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Remark">
+                                                                    <h:outputText value="#{bscResult.remark}"/>
+                                                                </p:column>
+                                                                <p:column headerText="Edit">  
+                                                                    <p:commandLink value="Edit" action="#{bscResultController.editDataTable()}"
+                                                                                   process="@this,tblBscResult" update=":frmBscResult:pnl2">
+                                                                    </p:commandLink>
+                                                                </p:column>
+                                                            </p:dataTable>
+                                                        </div>
+                                                    </div>
+                                                </div>  
+                                            </div>
+                                            <br></br>
+                                            <br></br>
+                                            <br></br>
+                                            <br></br>
+                                            <br></br>
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <div class="col-md-6"> 
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtPrepardeby" class="control-label col-sm-4" value="Preparde By"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:autoComplete id="txtPrepardeby" value="#{bscResultController.evalutor.firstName}"
+                                                                                    completeMethod="#{bscResultController.searchEvaluatorName}" 
+                                                                                    var="emp" required="true" requiredMessage="Enter Your Name" style="width:100%" 
+                                                                                    itemValue="#{emp.firstName}" itemLabel="#{emp}" forceSelection="true" size="20" emptyMessage="no data"> 
+                                                                        <f:facet name="itemtip">
+                                                                            <h:panelGrid columns="2" cellpadding=""> 
+                                                                                <h:outputText value="ID:"/>
+                                                                                <h:outputText value="#{emp.empId}"/> 
+                                                                                <h:outputText value="First Name:"/>  
+                                                                                <h:outputText value="#{emp.firstName}"/>                      
+                                                                                <h:outputText value="Middle Name:"/>
+                                                                                <h:outputText value="#{emp.middleName}"/>
+                                                                                <h:outputText value="Last Name:"/>
+                                                                                <h:outputText value="#{emp.lastName}"/>                        
+                                                                            </h:panelGrid>
+                                                                        </f:facet>
+                                                                        <p:ajax event="itemSelect" listener="#{bscResultController.getEvaluatorName}"
+                                                                                process="@this" update="txtPrepardeby"/>     
+                                                                    </p:autoComplete>
+                                                                    <p:message for="txtPrepardeby" display="icon"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="calEvaluatedDate" class="control-label col-sm-4" value="Preparde On"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="calEvaluatedDate" value="#{bscResultController.hrBsc.preparedOn}" converter="dateConverter"                                                                                 
+                                                                                 onclick="displayCalendar('frmBscResult:calEvaluatedDate', 'frmBscResult:calEvaluatedDate');"
+                                                                                 required="true" requiredMessage="Enter Preparde On" class="form-control" title="Preparde On"/>
+                                                                    <p:message for="calEvaluatedDate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>                                                                              
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+
+                                <h:panelGroup id="pnl5">
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4">                                                              
+                                                    </div>                                                                    
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnSave" value="Save" class="btn  btn-block btn-primary col-lg-4" 
+                                                                         action="#{bscResultController.save()}"
+                                                                         process="@this,pnl1,tblBscResult,pnl3"                                       
+                                                                         update=":frmBscResult"/>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                         action="#{bscResultController.clearPage()}"
+                                                                         process="@this" update=":frmBscResult" /> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </h:form>      
+                        </div>   
+                    </div>                   
+                </div>                   
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+

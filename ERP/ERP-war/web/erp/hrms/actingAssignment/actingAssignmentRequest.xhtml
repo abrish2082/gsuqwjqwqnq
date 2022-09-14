@@ -1,0 +1,531 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>  
+        <li><a href="actingAssignmentApprove.xhtml"> <span>Acting Approve</span></a></li> 
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{actingAssignmentRequestController.actingAssignmentInfo()}"
+                                     icon="#{actingAssignmentRequestController.icone}" style="background-color: white; border-color: white" 
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmActingAssignment" 
+                                     title="#{actingAssignmentRequestController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdlWf" class="fa fa-fw fa-wordpress"
+                                       title="Work flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="dlgWorkflow" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdlWf" 
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work flow"/>
+                            <p:dataTable id="tblWorkflow" value="#{actingAssignmentRequestController.workflowDataModel}"
+                                         var="currentRow" selectionMode="single" class="dataTable" rows="10" paginator="true"
+                                         rowKey="#{currentRow}" paginatorPosition="bottom">
+                                <p:column headerText="Processed By">
+                                    <h:outputText value="#{currentRow.processedBy}"/> 
+                                </p:column>
+                                <p:column >
+                                    <f:facet name="header">
+                                        <h:outputText value="Status"/>
+                                    </f:facet>
+                                    <h:outputText value="#{currentRow.changedStstus}"/> 
+                                </p:column>
+                                <p:column >
+                                    <f:facet name="header">
+                                        <h:outputText value="Processed Date"/>
+                                    </f:facet>
+                                    <h:outputText value="#{currentRow.processedOn}" converter="dateConverter"/> 
+                                </p:column>
+                                <p:column >
+                                    <f:facet name="header">
+                                        <h:outputText value="Comment Given"/>
+                                    </f:facet>
+                                    <h:outputText value="#{currentRow.commentGiven}"/> 
+                                </p:column>
+                            </p:dataTable>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/actingAssignment/actingAssignmentRequest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{actingAssignmentRequestController.chooseMainPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" title="Search acting assignment on request">Search <small>Acting Assignment ...</small></h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                    <div class="col-sm-5">
+                                                        <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                         valueChangeListener="#{actingAssignmentRequestController.filiterByStatus_Vcl}">
+                                                            <f:selectItems value="#{actingAssignmentRequestController.statusList}"/>   
+                                                            <p:ajax event="change" process="@this" update=":frmSearch:tblActingList"/>
+                                                        </p:selectOneMenu> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblActingList" value="#{actingAssignmentRequestController.requestsListDataModel}" rowsPerPageTemplate="10,20,30"
+                                                         var="req" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                         selection="#{actingAssignmentRequestController.hrActingAssignment}" rowKey="#{req.id}" class="dataTable">
+                                                <p:ajax event="rowSelect" process="@this,tblActingList" listener="#{actingAssignmentRequestController.populateActingAssignment}" 
+                                                        update=":frmToolBar,:frmSearch,:frmActingAssignment"/>
+                                                <p:column headerText="No." style="width: 60px">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Assigned Employee Name" filterMatchMode="contains" filterBy="#{req.assignedBy.firstName}">
+                                                    <h:outputText value="#{req.assignedBy.firstName} #{req.assignedBy.middleName} #{req.assignedBy.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Assigned Employee ID" filterMatchMode="contains" filterBy="#{req.assignedBy.empId}">
+                                                    <h:outputText value="#{req.assignedBy.empId}"/>
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Request Date"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{req.requestDate}" converter="dateConverter"/>
+                                                </p:column> 
+                                                <p:column headerText="Acting Type" filterMatchMode="contains" filterBy="#{req.actingType}">
+                                                    <h:outputText value="#{req.actingType}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmActingAssignment"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainpage" rendered="#{actingAssignmentRequestController.chooseCreatePage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Acting Assignment Request</h3>
+                            </div>
+                            <div class="box-body ">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl1" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="rdoActingFor" class="control-label col-sm-4" value="Acting Type: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneRadio id="rdoActingFor" value="#{actingAssignmentRequestController.hrActingAssignment.actingType}"
+                                                                                                  valueChangeListener="#{actingAssignmentRequestController.handleEmployee}"
+                                                                                                  required="true" class="col-sm-8" requiredMessage="Select acting type">
+                                                                                    <f:selectItem itemLabel="Employee" itemValue="Employee"/>
+                                                                                    <f:selectItem itemLabel="Position" itemValue="Position"/> 
+                                                                                    <p:ajax process="@this" event="change" update="frmActingAssignment"/>
+                                                                                </p:selectOneRadio>
+                                                                                <p:message for="rdoActingFor" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup id="pnl2" class="col-sm-12" rendered="#{actingAssignmentRequestController.chooseEmployee}">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="searchAutocomplete" value="Employee Name: " class="control-label col-sm-4"/>  
+                                                                            <div class="col-sm-8">
+                                                                                <p:autoComplete id="searchAutocomplete" style="width:100%" placeholder="Enter name to search"
+                                                                                                value="#{actingAssignmentRequestController.hrEmployees.firstName}" scrollHeight="300"
+                                                                                                completeMethod="#{actingAssignmentRequestController.SearchByFname}" 
+                                                                                                var="empName" required="true" requiredMessage="Please enter name to search"
+                                                                                                itemValue="#{empName.firstName}" itemLabel="#{empName}" forceSelection="true" 
+                                                                                                size="20" emptyMessage="no data">  
+                                                                                    <p:column headerText="Full Name">
+                                                                                        <h:outputText  value="#{empName.firstName} #{empName.middleName} #{empName.lastName}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="Employee ID" >
+                                                                                        <h:outputText  value="#{empName.empId}"/>
+                                                                                    </p:column>
+                                                                                    <p:ajax event="itemSelect" process="@this" listener="#{actingAssignmentRequestController.getByEmpName}" 
+                                                                                            update="txtEmpdep,txtSex,txtEmpId,txtJobGrade,txtSalary"/>     
+                                                                                </p:autoComplete> 
+                                                                                <p:message for="searchAutocomplete" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmpdep"  class="control-label col-sm-4" value="Department:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmpdep" title="Department" value="#{actingAssignmentRequestController.hrDepartments.depName}" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtEmpdep" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJobGrade"  class="control-label col-sm-4" value="Job Grade:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJobGrade" value="#{actingAssignmentRequestController.hrLuGrades.grade}" 
+                                                                                             title="Job Grade" required="true" readonly="true"/>
+                                                                                <p:message for="txtJobGrade" display="icon"/>
+                                                                            </div>                                                               
+                                                                        </div>                                                                                          
+                                                                    </div>                                                     
+                                                                </div> 
+
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmpId" class="control-label col-sm-4" value="Employee ID:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmpId" value="#{actingAssignmentRequestController.hrEmployees.empId}" 
+                                                                                             required="true" readonly="true" title="Employee ID">
+                                                                                </p:inputText>
+                                                                                <p:message for="txtEmpId" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSex"  class="control-label col-sm-4" value="Job Title:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSex" value="#{actingAssignmentRequestController.hrJobTypes.jobTitle}"  
+                                                                                             title="Job Position" required="true" readonly="true"/>
+                                                                                <p:message for="txtSex" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>                                                                                                                                          
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">                                                                
+                                                                            <h:outputLabel for="txtSalary"  class="control-label col-sm-4" value="Salary:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSalary" value="#{actingAssignmentRequestController.hrEmployees.basicSalary}"
+                                                                                             title="Employee Salary"  required="true" readonly="true"/>
+                                                                                <p:message for="txtSalary" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>                                                                                                                                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup id="pnl3" class="col-sm-12" rendered="#{actingAssignmentRequestController.choosePosition}">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="srcActingPosition" class="control-label col-sm-4" value="Acting Position: "/>  
+                                                                            <div class="col-sm-8">
+                                                                                <p:autoComplete id="srcActingPosition" style="width:100%" placeholder="Enter job title to serach"
+                                                                                                value="#{actingAssignmentRequestController.hrJobTypes.jobTitle}" scrollHeight="300"
+                                                                                                completeMethod="#{actingAssignmentRequestController.SearchByJobTitel}" 
+                                                                                                var="jobName" required="true" requiredMessage="Enter job title to serach"
+                                                                                                itemValue="#{jobName.jobTitle}" itemLabel="#{jobName}" forceSelection="true" 
+                                                                                                size="20" emptyMessage="no data">  
+                                                                                    <p:ajax event="itemSelect" process="@this" listener="#{actingAssignmentRequestController.getByJobTitel}" 
+                                                                                            update="txtGrade,txtJobCode,txtJobLevel"/>     
+                                                                                </p:autoComplete> 
+                                                                                <p:message for="srcActingPosition" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtGrade" class="control-label col-sm-4" value="Grade:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtGrade" value="#{actingAssignmentRequestController.jobGrades.grade}"
+                                                                                             title="Grade" readonly="true"/>
+                                                                                <p:message for="txtGrade" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJobCode" class="control-label col-sm-4" value="Job Code:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJobCode" value="#{actingAssignmentRequestController.hrJobTypes.jobCode}" 
+                                                                                             title="Job Code" readonly="true"/>
+                                                                                <p:message for="txtJobCode" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                          
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJobLevel" class="control-label col-sm-4" value="Job Level:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJobLevel" value="#{actingAssignmentRequestController.hrLuJobLevels.jobLevel}" 
+                                                                                             title="Job Level" readonly="true"/>
+                                                                                <p:message for="txtJobLevel" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                          
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section> 
+
+                                            <div class="box-header">
+                                                <h1 class="box-title">Candidate for Acting Position</h1>                       
+                                            </div>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl4" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="searchAutocomplete1" value="Employee Name: " class="control-label col-sm-4"/>  
+                                                                            <div class="col-sm-8">
+                                                                                <p:autoComplete id="searchAutocomplete1" style="width:100%" placeholder="Enter acting name to search"
+                                                                                                value="#{actingAssignmentRequestController.delegateEmp.firstName}" scrollHeight="300"
+                                                                                                completeMethod="#{actingAssignmentRequestController.SearchByFnameDelegate}"
+                                                                                                var="delegateList" required="true" requiredMessage="Enter acting name to search"
+                                                                                                itemValue="#{delegateList.firstName}" itemLabel="#{delegateList}" forceSelection="true" 
+                                                                                                size="20" emptyMessage="no data">  
+                                                                                    <p:column headerText="Full Name">
+                                                                                        <h:outputText  value="#{delegateList.firstName} #{delegateList.middleName} #{delegateList.lastName}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="Employee ID" >
+                                                                                        <h:outputText  value="#{delegateList.empId}"/>
+                                                                                    </p:column>
+                                                                                    <p:ajax event="itemSelect" listener="#{actingAssignmentRequestController.getByDelegateName}" process="@this"  
+                                                                                            update="txtDepartment,txtPosition,txtEmployeeId,txtJobGrade1,txtSalary1"/>     
+                                                                                </p:autoComplete> 
+                                                                                <p:message for="searchAutocomplete1" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtDepartment"  class="control-label col-sm-4" value="Department:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtDepartment" title="Department" value="#{actingAssignmentRequestController.departments.depName}" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtDepartment" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJobGrade1"  class="control-label col-sm-4" value="Job Grade:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJobGrade1" value="#{actingAssignmentRequestController.luGrades.grade}" 
+                                                                                             title="Job Grade" required="true" readonly="true"/>
+                                                                                <p:message for="txtJobGrade1" display="icon"/>
+                                                                            </div>                                                               
+                                                                        </div>                                                                                          
+                                                                    </div>                                                     
+                                                                </div>
+
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmployeeId" class="control-label col-sm-4" value="Employee ID:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmployeeId" value="#{actingAssignmentRequestController.delegateEmp.empId}" 
+                                                                                             required="true" readonly="true" title="Employee ID">
+                                                                                </p:inputText>
+                                                                                <p:message for="txtEmployeeId" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPosition"  class="control-label col-sm-4" value="Job Title:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPosition" value="#{actingAssignmentRequestController.jobTypes.jobTitle}"  
+                                                                                             title="Job Position" required="true" readonly="true"/>
+                                                                                <p:message for="txtPosition" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>                                                                                                                                          
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">                                                                
+                                                                            <h:outputLabel for="txtSalary1" class="control-label col-sm-4" value="Salary:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSalary1" value="#{actingAssignmentRequestController.delegateEmp.basicSalary}"
+                                                                                             title="Employee Salary"  required="true" readonly="true"/>
+                                                                                <p:message for="txtSalary1" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>                                                                                                                                                                                    
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl5" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="txtFromDate" class="control-label col-sm-4" value="Start Date: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtFromDate" value="#{actingAssignmentRequestController.hrActingAssignment.startingDate}"
+                                                                                             onclick="displayCalendar('frmActingAssignment:txtFromDate', 'frmActingAssignment:txtFromDate');"
+                                                                                             required="true" title="Date of Delegate" requiredMessage="From date is requered" class="form-control" />
+                                                                                <p:message for="txtFromDate" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group required form-horizontal">
+                                                                            <h:outputLabel for="txtProcessedBy" value="Processed By: " class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtProcessedBy" value="#{workFlow.userName}"
+                                                                                             title="Processed By" readonly="true"/>
+                                                                                <p:message for="txtProcessedBy" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                                                                                       
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtRequestDate" class="control-label col-sm-4" value="Processed Date:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtRequestDate" value="#{actingAssignmentRequestController.wfHrProcessed.processedOn}"
+                                                                                             converter="dateConverter" readonly="true" title="Request Date"/>
+                                                                                <p:message for="txtRequestDate" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                          
+                                                                    </div>                                              
+                                                                </div>
+                                                                <div class="col-md-6 textBoxMargin6px"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required">       
+                                                                            <h:outputLabel for="txtToDate" class="control-label col-sm-4" value="End Date: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtToDate" value="#{actingAssignmentRequestController.hrActingAssignment.endingDate}"
+                                                                                             onclick="displayCalendar('frmActingAssignment:txtToDate', 'frmActingAssignment:txtToDate');"
+                                                                                             required="true" title="To Date" requiredMessage="To date is requered" class="form-control" />
+                                                                                <p:message for="txtToDate" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="txtRemark" value="#{actingAssignmentRequestController.wfHrProcessed.commentGiven}"
+                                                                                                 class="form-control" validator="#{validatorManagedBean.Text}" 
+                                                                                                 rows="1" cols="5" autoResize="false" title="Comment Given"/>
+                                                                                <p:message for="txtRemark" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section>
+                                            <h:panelGroup id="pnl6" class="form-group col-sm-12">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-sm-2 " 
+                                                                                     value="#{actingAssignmentRequestController.saveorUpdateBundle}"
+                                                                                     action="#{actingAssignmentRequestController.saveActingRequest}" disabled="#{actingAssignmentRequestController.disableBtn}"
+                                                                                     process="@this,pnl1,pnl2,pnl3,pnl4,pnl5" update=":frmActingAssignment"/>
+                                                                </div>
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                                     action="#{actingAssignmentRequestController.clearActingRequest()}"
+                                                                                     process="@this" update=":frmActingAssignment"/> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

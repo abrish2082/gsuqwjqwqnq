@@ -1,0 +1,600 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">        
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+            </div>
+        </h:form>     
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li><a href="mmsLostFixedAsset.xhtml"><i class="fa fa-circle-o"></i> <span>Lost Fixed Asset</span></a></li> 
+        <li><a href="stockItemLost.xhtml"><i class="fa fa-circle-o"></i> <span>Lost Stock Item </span></a></li> 
+        <li><a href="FixedAssetTransfer.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Transfer</span></a></li> 
+        <li><a href="FixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Return </span></a></li> 
+        <li><a href="StockDisposal.xhtml"><i class="fa fa-circle-o"></i> <span> Stock Disposal </span></a></li> 
+        <li><a href="FixedAssetItemDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Disposal Collection</span></a></li> 
+        <li><a href="Disposal.xhtml  "><i class="fa fa-circle-o"></i> <span>Fixed Asset Disposal</span></a></li> 
+        <li><a href="StockDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Stock Item Disposal</span></a></li> 
+        <li><a href="InventoryBalanceSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Balance Sheet</span></a></li> 
+        <li><a href="InventoryCountSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Count Sheet</span></a></li> 
+        <li><a href="NeedAssessment.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment</span></a></li> 
+        <li><a href="NeedAssessmentCollected.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment Collected</span></a></li> 
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackSarch" rendered="#{nonFixedAssetReturnController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnBackToSearch" action="#{nonFixedAssetReturnController.goBackToSearchpageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back To Search" />
+
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew" action="#{nonFixedAssetReturnController.createNewNonReturnInfo()}" icon="#{nonFixedAssetReturnController.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"  rendered="#{nonFixedAssetReturnController.isRenderCreate}"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{nonFixedAssetReturnController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{nonFixedAssetReturnController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{nonFixedAssetReturnController.mmsNFAList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Stock Return  List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{nonFixedAssetReturnController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="srListVar" value="#{nonFixedAssetReturnController.mmsNFAList}"
+                                                            itemValue="#{srListVar}"  itemLabel="#{srListVar.nfaNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI,:frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{nonFixedAssetReturnController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>                           
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12  ">
+                                                    <p:dataTable id="tblWf" value="#{nonFixedAssetReturnController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.decision}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../mms/InventoryInformation/NonFixedAssetReturn.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{nonFixedAssetReturnController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Search} ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <h:panelGroup id="searchpnl">
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="txtPartyName" value="#{nonFixedAssetReturnController.columnNameResolver.col_Name_FromTable}"
+                                                                 valueChangeListener="#{nonFixedAssetReturnController.changeEventColumnName}" converter="entConverter"
+                                                                 style="width: 100%">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue=""/>
+                                                    <f:selectItems value="#{nonFixedAssetReturnController.columnNameResolverList}" var="NonFixedFAColName"
+                                                                    itemValue="#{NonFixedFAColName.col_Name_FromTable}"
+                                                                   itemLabel="#{NonFixedFAColName.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this" update="searchpnl"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblColumnName" class="control-label col-sm-2" value=" #{nonFixedAssetReturnController.columnNameResolver.parsed_Col_Name}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtColumnValue" class="form-control" value="#{nonFixedAssetReturnController.nonFxdRetEntity.columnValue}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="findbtn" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSearch" class="btn btn-primary" action="#{nonFixedAssetReturnController.searchReturnInformation2()}" icon="ui-icon-search" 
+                                                                 process="@this,searchpnl" update="searchpnl,:frmMainUI:mainUI"
+                                                                 value="#{MMS.find}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </h:panelGroup>
+                                </h:form>                               
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                       
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" var="DispInfo" rows="5" 
+                                                             style="font-family: Cambria; "  
+                                                             rowIndexVar="num"   
+                                                             selection="#{nonFixedAssetReturnController.hpSelect}"
+                                                             rowKey="#{DispInfo.nfaId}"  selectionMode="single" 
+                                                             value="#{nonFixedAssetReturnController.mmsreturnNFSearchInfoDataModel}"
+                                                             class="dataTable"
+                                                             paginator="true" paginatorPosition="bottom">
+                                                    <p:ajax event="rowSelect" listener="#{nonFixedAssetReturnController.rowSelect}" update=":frmRegisterUI, :frmMainUI, :frmToolbar " />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Stock_Return_No}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.nfaNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Returned_By}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.returnedBy}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Department}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.department}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Returned_Date}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.returnDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Return_Status}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.returnStatus}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>      
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl"  autoUpdate="true" severity="information,fatal" showDetail="true" />  
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{nonFixedAssetReturnController.renderPnlCreateReturn}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Stock_Items_Return}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" >                              
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Stock_Return_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtGatePassNumber" readonly="true"  class="form-control"
+                                                             value="#{nonFixedAssetReturnController.generateReturnNo2()}"/>
+                                            </div>
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Store_Name}:"/>
+                                            <div class="col-sm-4 ">
+                                                <p:selectOneMenu id="stName" value="#{nonFixedAssetReturnController.storeInfoEntity}"  style="width: 100%" 
+                                                                 valueChangeListener="#{nonFixedAssetReturnController.handleSelectStoreName1}" converter="entConverter"
+                                                                 required="true" disabled="#{workFlow.readonly}">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue=""/> 
+                                                    <f:selectItems value="#{nonFixedAssetReturnController.storeInfoLst}" 
+                                                                   var="lstSt" itemLabel="#{storeInfoLst.storeName}" itemValue="#{storeInfoLst}" />
+                                                    <p:ajax update=" :frmRegisterUI:frmMaterialInfo" event="change" process="@this,"/>
+                                                </p:selectOneMenu> 
+                                            </div>
+                                        </div> 
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel id="lblDateAccepted1" class="control-label col-sm-2" value="#{MMS.Received_Date}:"/>
+                                            <div class="col-sm-4">
+
+
+                                                <p:inputText id="calApprovalDate" value="#{nonFixedAssetReturnController.nonFxdRetEntity.return2Date}"
+                                                             placeholder="#{MMS.dd_mm_yyyy}" required="true" requiredMessage="Date is required" class="form-control"
+                                                             onclick="displayCalendar('frmRegisterUI:calApprovalDate', 'frmRegisterUI:calApprovalDate');"  validator="#{validatorManagedBean.Date}" readonly="#{workFlow.readonly}"/>
+                                                <p:message for="calApprovalDate" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Returned_By}:"/>
+                                            <div class="col-sm-4">
+
+                                                <p:autoComplete id="retBy2" emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;" required="true" requiredMessage="Returned By value is Required"
+                                                                value="#{nonFixedAssetReturnController.nonFxdRetEntity.returnedBy}"
+                                                                completeMethod="#{nonFixedAssetReturnController.searchEmployeeInformation}"
+                                                                var="returnerName" itemValue="#{returnerName.firstName}" itemLabel="#{returnerName}"  size="15"> 
+                                                    <p:ajax  event="itemSelect" listener="#{inspectionController.getEmployeeInfo}"
+                                                             process="@this" update="retBy2, tblMaterial" />  
+                                                    <p:column headerText="First Name" >
+                                                        <h:outputText  value="#{returnerName.firstName}" />
+                                                    </p:column>
+                                                    <p:column headerText="Middle Name"  >
+                                                        <h:outputText value="#{returnerName.middleName}" />
+                                                    </p:column>
+                                                    <p:column  headerText="Sex">
+                                                        <h:outputText value="#{returnerName.sex}" />
+                                                    </p:column>
+                                                </p:autoComplete>
+                                                <p:message  for="retBy2" display="icon"/>
+                                            </div>
+
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Account_Code}:"/>
+
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtDebitCode1" value="#{nonFixedAssetReturnController.nonFxdRetEntity.accountCode}" class="form-control"  
+                                                             required="true" requiredMessage="Account Code value is Required" 
+                                                             placeholder="Please Use + Button only" onmousedown="return false;"/>
+                                                <p:message for="txtDebitCode1" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p:commandButton id="btnAddCreditCode" partialSubmit="true" class="btn btn-primary" value="+" onclick="PF('dig1').show();" title="Add Account Code"
+                                                                 />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel for="txtRemark" class="control-label col-sm-2" value="#{MMS.Remark}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtRemark" class="form-control" style="width: 100%;"
+                                                                 value="#{nonFixedAssetReturnController.nonFxdRetEntity.remark}"/>
+
+                                                <p:message for="txtRemark" display="icon" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <p:dialog id="dig1" header="Account Code"  widgetVar="dig1" height="260" width="650" showEffect="explode" resizable="false">
+                                    <h:panelGroup id="pnlCreditcode" class="col-sm-12">
+                                        <div class="col-md-12 textBoxMargin6px ">                                                                
+                                            <div class="form-group form-horizontal required">
+                                                <h:outputLabel  class="control-label col-sm-4" value="System:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="sysSearch" value="#{nonFixedAssetReturnController.fmsLuSystem}"
+                                                                     filterMatchMode="contains" filter="true" converter="entConverter"
+                                                                     valueChangeListener="#{nonFixedAssetReturnController.SystemChange}" required="true"
+                                                                     requiredMessage="Value is required: Select System" style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{nonFixedAssetReturnController.lusystems}" var="sys" itemLabel="#{sys.systemCode}" itemValue="#{sys}" />
+                                                        <p:ajax event="change" process="@this" update="ccSearch,pnljob,glSearch"/>
+                                                    </p:selectOneMenu> 
+                                                    <p:message for="sysSearch" display="icon"/>   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 textBoxMargin6px">                                                                
+                                            <div class="form-group form-horizontal required">
+                                                <h:outputLabel  class="control-label col-sm-4" value="Cost Center:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="ccSearch"  value="#{nonFixedAssetReturnController.costcSysJunction}" style="width: 100%" required="true"
+                                                                     converter="entConverter"  filterMatchMode="contains" filter="true"
+                                                                     valueChangeListener="#{nonFixedAssetReturnController.CostCenterChange}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{nonFixedAssetReturnController.costcenterJunction}" var="costC" itemLabel="#{costC.fmsCostCenter.systemName} " itemValue="#{costC}"/>
+                                                        <p:ajax event="change" process="@this" />
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 textBoxMargin6px">                                                                
+                                            <div class="form-group form-horizontal required">
+                                                <h:outputLabel  class="control-label col-sm-4" value="General Ledger:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="glSearch" value="#{nonFixedAssetReturnController.generalLedger}"
+                                                                     valueChangeListener="#{nonFixedAssetReturnController.getGeneralLedgerChange}"
+                                                                     converter="entConverter"
+                                                                     filterMatchMode="contains" filter="true" style="width: 100%" required="true" 
+                                                                     requiredMessage="Value is required: Select General Ledger"> 
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{nonFixedAssetReturnController.glList}" var="glVarr" itemLabel="#{glVarr.generalLedgerCode}" itemValue="#{glVarr}"/>
+                                                        <p:ajax event="change" process="@this" />
+                                                    </p:selectOneMenu>  
+                                                    <p:message for="glSearch" display="icon"/> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h:panelGroup id="pnljob">
+                                            <h:panelGroup id="pnlJOBNO" rendered="#{nonFixedAssetReturnController.renderJobNo}">
+                                                <div class="col-md-12 textBoxMargin6px">                                                                
+                                                    <div class="form-group form-horizontal">
+
+                                                        <h:outputLabel for="jbSearch" class="control-label col-sm-4" value="Job No:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="jbSearch"  value="#{nonFixedAssetReturnController.fmsSystemJobJunction}" style="width: 100%" 
+                                                                             converter="entConverter"
+                                                                             valueChangeListener="#{nonFixedAssetReturnController.SysJobNoChange}">
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                                <f:selectItems value="#{nonFixedAssetReturnController.sysJobNOList}" var="sysJobVar" itemLabel="#{sysJobVar.jobNo} " itemValue="#{sysJobVar}"/>
+                                                                <p:ajax event="change" process="@this" />
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                        <div class="col-md-12 textBoxMargin6px">                                                                
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel id="buttonaddDtl" class="control-label col-sm-4"/>
+                                                <div class="col-sm-8">
+                                                    <p:commandButton id="btnAddA" class="btn btn-primary" value="Add" validateClient="true" 
+                                                                     process="dig1"  update="dig1,:frmRegisterUI:txtDebitCode1" 
+                                                                     action="#{nonFixedAssetReturnController.addAccountInfoDetail()}"/> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </p:dialog>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Stock_Items_Return_Detail}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmMaterialInfo" >
+                                    <div class="form-horizontal col-sm-12 "> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <p:outputLabel id="AdminSearch"  value="#{MMS.Material_List}:" class="control-label col-sm-2"  /> 
+                                            <div class="col-sm-4 ">
+                                                <p:autoComplete id="searchBystoreName" emptyMessage="no data"  
+                                                                placeholder="Enter Maretial Code" 
+                                                                widgetVar="foo"
+                                                                style="width: 100%;"  title="Mat List"
+                                                                value="#{nonFixedAssetReturnController.itemRegEntity.matCode}"
+                                                                completeMethod="#{nonFixedAssetReturnController.searchMatInformationByPrefix}"
+                                                                required="true" requiredMessage="Material code is required "
+                                                                var="storeInfoEntitys"  itemValue="#{storeInfoEntitys.matCode}" itemLabel="#{storeInfoEntitys}"   size="15"> 
+                                                    <p:column headerText="Material Name"  >
+                                                        <h:outputText value="#{storeInfoEntitys.matName}" />
+                                                    </p:column>
+                                                    <p:column headerText="Material Code:" >
+                                                        <h:outputText  value="#{storeInfoEntitys.matCode}" />
+                                                    </p:column>
+                                                    <p:ajax  event="itemSelect" listener="#{nonFixedAssetReturnController.handleSelectItemNameAuto}" 
+                                                             process="@this" update="txtItemCode,txtunitPrice,txtunitmeasure,txtbinBalance" />                                                    
+                                                </p:autoComplete>     
+                                                <p:message for="searchBystoreName" display="icon"/>
+                                            </div>
+                                            <h:outputLabel value="#{MMS.Item_Name}:" class="control-label col-sm-2" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtItemCode" value="#{nonFixedAssetReturnController.itemRegEntity.matName}"
+                                                             class="form-control"     required="false"  readonly="true"/>
+                                            </div>
+                                        </div>  
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel value="#{MMS.Unit_Price}:" class="control-label col-sm-2"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtunitPrice" value="#{nonFixedAssetReturnController.totalStockValue.weightAvgPric}"
+                                                             class="form-control"   required="false"  readonly="true"/>
+                                            </div>
+                                            <h:outputLabel value="#{MMS.Unit_Measure}:" class="control-label col-sm-2"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtunitmeasure" value="#{nonFixedAssetReturnController.itemRegEntity.unitMeasure1}"
+                                                             class="form-control"    required="false"  readonly="true" />
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl_binBalance" class="control-label col-sm-2" value="#{MMS.Item_Balance}:"/> 
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtbinBalance" class="form-control" readonly="true" value="#{nonFixedAssetReturnController.binCard.currentQuantity}"  />
+                                                <p:message for="txtbinBalance" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <p:outputLabel id="lbl_Quantity"  value="#{MMS.Returned_Quantity}:" class="control-label col-sm-2" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtquantity" value="#{nonFixedAssetReturnController.nonFxdRetDtlEntity.quantity}"
+                                                             class="form-control" required="true" requiredMessage="quantity is Required" 
+                                                             disabled="#{workFlow.readonly}"    validator="#{validatorManagedBean.Number}" converterMessage="Pls Use Only Digit Numbers"/>
+                                                <p:message for="txtquantity" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnAdd" class="btn btn-primary" action="#{nonFixedAssetReturnController.addDetail}" icon="ui-icon-add" validateClient="true" 
+                                                                 process="@this,:frmRegisterUI:frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmMaterialInfo,frmMaterialInfo"
+                                                                 value="#{nonFixedAssetReturnController.addOrModifyBundle}"/>            
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                       
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblMaterial" value="#{nonFixedAssetReturnController.returnNFAddDetailDataModel}" rowIndexVar="rowContact" var="material"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowEdit"  update="" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{rowContact+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.itemId.matCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.itemId.matName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Measure}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.itemId.unitMeasure1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Price}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{material.itemId.mmsBinCard.unitPrice}"/>
+                                                    </p:column>
+                                                    <p:column headerText="#{MMS.Quantity}">
+                                                        <p:cellEditor>
+                                                            <f:facet name="output"><h:outputText value="#{material.quantity}" /></f:facet>
+                                                            <f:facet name="input"><p:inputText id="remark54" value="#{material.quantity}" style="width:100%"/></f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column headerText="#{MMS.Option}">
+                                                        <p:commandLink action="#{nonFixedAssetReturnController.editDataTable}" value="Edit" 
+                                                                       process="@this,:frmRegisterUI:tblMaterial"
+                                                                       update="@this,:frmRegisterUI:frmMaterialInfo"/>
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmApproverInfo">
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+                                            <div class="col-sm-4 ">
+                                                <p:inputText id="txtRecievedBy2" class="form-control" requiredMessage="Name is required"
+                                                             value="#{nonFixedAssetReturnController.userName}"
+                                                             required="true"
+                                                             readonly="true"/>
+                                                <p:message for="txtRecievedBy2" display="icon" />
+                                            </div>
+                                            <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4 ">
+                                                <p:inputText id="txtAcceptedDate" class="form-control" value="#{nonFixedAssetReturnController.workFlow.processedOn}"
+                                                             required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtAcceptedDate', 'frmRegisterUI:txtAcceptedDate');" />                                                                                                                                                    
+                                                <p:message for="txtAcceptedDate" display="icon"/>
+                                            </div> 
+                                        </div>                                                                                       
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="saveButtonNFAR" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSave" class="btn btn-primary" disabled="#//{nonFixedAssetReturnController.disableUpdateBtn}"
+                                                                 action="#{nonFixedAssetReturnController.saveNFAReturn()}" icon="ui-icon-new" validateClient="true"
+                                                                 process="@this,frmRegisterUI:frmGatePassDtlInfo,frmRegisterUI:frmTblMaterialInfo,frmRegisterUI:frmApproverInfo"  
+                                                                 update="frmGatePassDtlInfo,frmTblMaterialInfo,:frmRegisterUI "
+                                                                 value="#{nonFixedAssetReturnController.saveorUpdateBundle}"/> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

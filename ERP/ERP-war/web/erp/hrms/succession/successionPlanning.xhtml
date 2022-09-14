@@ -1,0 +1,591 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li> <a  href="keyManagerialPosition.xhtml"> <i class="fa fa-circle-o"></i>Key Managerial Position</a></li>
+        <li><a href="successor.xhtml"><i class="fa fa-circle-o"></i>Maintain Successor</a></li>
+        <li><a href="maintianCompetency.xhtml"><i class="fa fa-circle-o"></i> <span>Maintain Competency </span></a></li>
+        <li><a href="maintianCompetencyType.xhtml"><i class="fa fa-circle-o"></i> <span>Maintain Competency Type </span></a></li>
+        <li><a href="maintianCompetencySubType.xhtml"><i class="fa fa-circle-o"></i> <span>Maintain Competency SubType </span></a></li>
+        <li><a href="competencyKmpProfile.xhtml"><i class="fa fa-circle-o"></i> <span>Maintain Competency Profile </span></a></li>
+        <li> <a href="successorEvaluation.xhtml"> <i class="fa fa-circle-o"></i>Successor Evaluation</a></li> 
+        <li> <a href="successorEvaluationApprovall.xhtml"> <i class="fa fa-circle-o"></i>Successor Evaluation Approval</a></li>
+        <li><a href="successionPlanningApproval.xhtml"><i class="fa fa-circle-o"></i> <span>Succession Planning Approve</span></a></li> 
+        <li><a href="developmentPlan.xhtml"><i class="fa fa-circle-o"></i> <span>Development plan  </span></a></li>    
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmTop"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnSearch0" validateClient="true" action="#{hrSmSuccessionPlanningCotroller.searchPage()}"
+                                     icon="ui-icon-search" title="Search" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmSuccessionplan,:frmTop"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{hrSmSuccessionPlanningCotroller.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{hrSmSuccessionPlanningCotroller.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmSuccessionplan,:frmTop" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlGNotifica">
+                        <span  class="NotificationText"> #{hrSmSuccessionPlanningCotroller.hrApplyList1.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" title="Notification" />
+                        <p:overlayPanel widgetVar="widNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 500px">
+                            <p:outputLabel id="lblReqNotf" value="Evaluated List"/>
+                            <div class="col-md-12 textBoxMargin6px">  
+                                <div class="form-group">
+                                    <p:dataTable id="tblnotification" value="#{hrSmSuccessionPlanningCotroller.hrApplyList1}"
+                                                 var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                 selection="#{hrSmSuccessionPlanningCotroller.hrSmSuccessorEvaluation}" rowKey="#{res.id}" class="dataTable">
+                                        <p:ajax event="rowSelect" listener="#{hrSmSuccessionPlanningCotroller.requestNotifys}"
+                                                process="@this,tblnotification" update=":frmSuccessionplan,:frmTop"/>
+                                        <p:column headerText="No.">
+                                            <h:outputText value="#{num + 1}"/>
+                                        </p:column>
+                                        <p:column headerText="Employee Name" filterMatchMode="startsWith" filterBy="#{res.empId.firstName}">
+                                            <h:outputText value="#{res.empId.firstName} 
+                                                          #{res.empId.middleName} #{res.empId.lastName}"/>
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Current Position" />
+                                            </f:facet>
+                                            <h:outputText value="#{res.empId.jobId}"/> 
+                                        </p:column>
+                                        <p:column >
+                                            <f:facet name="header">
+                                                <h:outputText value="Proposed Position" />
+                                            </f:facet>
+                                            <h:outputText value="#{res.kmpId.jobId.jobTitle}"/> 
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-gear" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{hrSmSuccessionPlanningCotroller.workflowDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}"/> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.changedStstus}"/> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}"/> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}"/> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../hrms/succession/successionPlanning.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>  
+        <h:form id="frmSuccessionplan"> 
+            <p:growl id="growl2" showDetail="true" autoUpdate="true" severity="information,fatal"/>               
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlSearch" rendered="#{hrSmSuccessionPlanningCotroller.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header with-border">                                
+                                <h2 class="box-title"><h:outputLabel value="#{hrSmSuccessionPlanningCotroller.headerTitle1}"/></h2>
+                            </div>
+                            <div class="box-body ">
+                                <div class="box-body">
+                                    <div class="col-md-12">                                        
+                                        <div class="col-sm-12"> 
+                                            <p:dataTable id="tblKmpList" value="#{hrSmSuccessionPlanningCotroller.hrApplyList1}"
+                                                         var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                         selection="#{hrSmSuccessionPlanningCotroller.hrSmSuccessorEvaluation}" rowKey="#{currentRow.id}" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" listener="#{hrSmSuccessionPlanningCotroller.populate}"
+                                                        process="@this,tblKmpList" update=":frmSuccessionplan,:frmTop"/>
+                                                <p:column headerText="Successor Name" filterMatchMode="contains" filterBy="#{currentRow.empId.firstName}">
+                                                    <h:outputText value="#{currentRow.empId}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Department"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.kmpId.deptId.depName}"/> 
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Current Position" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.empId.jobId}"/> 
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Grade" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.empId.gradeId.description}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Proposed Position"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.kmpId.jobId.jobTitle}"/> 
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div> 
+                                    </div> 
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </h:panelGroup>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlFindAll" rendered="#{hrSmSuccessionPlanningCotroller.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">                                
+                                <h2 class="box-title"><h:outputLabel id="frmsuccosion" value="#{hrSmSuccessionPlanningCotroller.headerTitle}"/></h2>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body ">
+                                    <div class="box-body ">
+                                        <div class="box-body ">                                          
+                                            <div class="col-md-12" >                                        
+                                                <div class="col-sm-12">
+                                                    <div class="col-sm-6" >                                           
+                                                        <div class="form-horizontal col-md-12">
+                                                            <div class="form-group">
+                                                                <h:outputLabel for="drdsJob" class="control-label col-sm-4" value="Filter Criteria:"/>  
+                                                                <div class="col-sm-6">                                                       
+                                                                    <p:selectOneMenu id="drdsJob" style="width:100%"
+                                                                                     valueChangeListener="#{hrSmSuccessionPlanningCotroller.valueChangefiliterByStatus}">
+                                                                        <f:selectItems value="#{hrSmSuccessionPlanningCotroller.populateFilterByStatus}"/>   
+                                                                        <p:ajax event="change" process="@this" update=":frmSuccessionplan:tblKmpList1"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>   
+                                                            </div>
+                                                        </div>                                                
+                                                    </div>
+                                                </div>   
+                                            </div>   
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12" >                                        
+                                        <div class="col-sm-12">
+                                            <p:dataTable id="tblKmpList1" value="#{hrSmSuccessionPlanningCotroller.successionPlaningtList}"
+                                                         var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" rowsPerPageTemplate="5,10,15" paginator="true"
+                                                         selection="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlans}" rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" listener="#{hrSmSuccessionPlanningCotroller.populateapprove}"
+                                                        process="@this" update=":frmSuccessionplan,:frmTop"/>
+                                                <p:column headerText="Successor Name" filterMatchMode="contains" filterBy="#{currentRow.successorEvaluationId.empId.firstName}">
+                                                    <h:outputText value="#{currentRow.successorEvaluationId.empId}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Department"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.successorEvaluationId.kmpId.deptId.depName}"/> 
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Current Position" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.successorEvaluationId.empId.jobId}"/> 
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Grade" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.successorEvaluationId.empId.gradeId.description}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Proposed Position"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.successorEvaluationId.kmpId.jobId.jobTitle}"/> 
+                                                </p:column> 
+                                            </p:dataTable>
+                                        </div> 
+                                    </div>   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </h:panelGroup>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlSucceassorAll" rendered="#{hrSmSuccessionPlanningCotroller.renderPnlCreateGatePass}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary "> 
+                            <!-- /.box-header --> 
+                            <h4 class="box-title" style="margin-left: 5px;">Succession Planning</h4>
+                            <div class="box-body ">
+                                <div class="box-body ">         
+                                    <div class="nav-tabs-custom">
+                                        <div class="tab-content" id="maintab">
+                                            <div class="tab-pane active" id="tabPersonal">
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">  
+                                                        <h:panelGroup id="pnlOne" class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-md-12">                      
+                                                                    <div class="box-body">
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal">
+                                                                                    <h:outputLabel for="txtSucccessors" class="col-md-4 control-label" value="Successor Name:" />
+                                                                                    <div class="col-sm-8"> 
+                                                                                        <p:inputText id="txtSucccessors" value="#{hrSmSuccessionPlanningCotroller.hrEmployees.firstName}" 
+                                                                                                     title="Successor" readonly="true"  />
+                                                                                    </div> 
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal">
+                                                                                    <h:outputLabel for="txtpostion" class="col-md-4 control-label" value="KMP:"/>
+                                                                                    <div class="col-sm-8"> 
+                                                                                        <p:inputText id="txtpostion"  value="#{hrSmSuccessionPlanningCotroller.hrJobTypes.jobTitle}" readonly="true"  />
+                                                                                    </div> 
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal">
+                                                                                    <h:outputLabel for="txtGrade" class="col-md-4 control-label" value="Grade:" />
+                                                                                    <div class="col-sm-8"> 
+                                                                                        <p:inputText id="txtGrade"  value="#{hrSmSuccessionPlanningCotroller.hrLuGrades.grade}" readonly="true"  />
+                                                                                    </div> 
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal">
+                                                                                    <h:outputLabel for="txtDep" class="col-md-4 control-label" value="Department:" />
+                                                                                    <div class="col-sm-8"> 
+                                                                                        <p:inputText id="txtDep" value="#{hrSmSuccessionPlanningCotroller.hrDepartments.depName}" readonly="true"  />
+                                                                                    </div> 
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>       
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">  
+                                                        <h:panelGroup id="pnlTextarea" class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-md-12">                      
+                                                                    <div class="box-body"> 
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group required">
+                                                                                    <h:outputLabel for="txtaStrength" class="col-md-4 control-label" value="Successor Strength: " />
+                                                                                    <div class="col-sm-8"> 
+                                                                                        <p:inputTextarea id="txtaStrength" class="form-control"  value="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlans.successorStrength}" 
+                                                                                                         title="Strength" required="true" requiredMessage="Enter strength" rendered="true"
+                                                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"
+                                                                                                         onchange="this.value = this.value.trim()"/>
+                                                                                        <p:message for="txtaStrength" display="icon"/>
+                                                                                    </div> 
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group required">
+                                                                                    <h:outputLabel value="Development Plan： " class="col-md-4 control-label"/>
+                                                                                    <div class="col-sm-8"> 
+                                                                                        <p:inputTextarea id="txtaDevelop" class="form-control"  value="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlans.developmentPlan}" 
+                                                                                                         title="Development Plan"  required="true"  requiredMessage="Enter Plan" 
+                                                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"
+                                                                                                         onchange="this.value = this.value.trim()"/>
+                                                                                        <p:message for="txtaDevelop" display="icon"/>
+                                                                                    </div> 
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group required">
+                                                                                    <h:outputLabel for="drdReadiness" class="col-md-4 control-label" title="Readiness" value="Readiness Time Frame： "/>
+                                                                                    <div class="col-sm-8">                                                       
+                                                                                        <p:selectOneMenu id="drdReadiness" value="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlans.readinessTimeFrame}" style="width:100%"
+                                                                                                         required="true" requiredMessage="Select One">
+                                                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                            <f:selectItem itemLabel="Ready with 12 Months" itemValue="Ready with 12 Months" />
+                                                                                            <f:selectItem itemLabel="Ready with 30 Months" itemValue="Ready with 30 Months"/>
+                                                                                            <f:selectItem itemLabel="Ready with 60 Months" itemValue="Ready with 60 Months"/>
+                                                                                            <p:ajax event="change" process="@this" update=""/>
+                                                                                        </p:selectOneMenu>
+                                                                                        <p:message for="drdReadiness" display="icon"/>
+                                                                                    </div>     
+                                                                                </div>
+                                                                            </div> 
+                                                                        </div>
+                                                                        <div class="col-sm-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group required">
+                                                                                    <h:outputLabel for="txtaneed" class="col-md-4 control-label" value="Development Needs： " />
+                                                                                    <div class="col-sm-8"> 
+                                                                                        <p:inputTextarea id="txtaneed" class="form-control"  value="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlans.developmentNeed}" 
+                                                                                                         title="Needs" required="true" requiredMessage="Enter Need" rendered="true"
+                                                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"
+                                                                                                         onchange="this.value = this.value.trim()"/>
+                                                                                        <p:message for="txtaneed" display="icon"/>
+                                                                                    </div> 
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group">
+                                                                                    <h:outputLabel for="txtaremark" class="col-md-4 control-label" value="Remark:" />
+                                                                                    <div class="col-sm-8"> 
+                                                                                        <p:inputTextarea id="txtaremark" class="form-control"  value="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlans.remark}" 
+                                                                                                         title="Remark"  required="false"  requiredMessage="Enter Plan" 
+                                                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"
+                                                                                                         onchange="this.value = this.value.trim()"/>
+                                                                                        <p:message for="txtaremark" display="icon"/>
+                                                                                    </div> 
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>                                                                 
+                                                                    </div>       
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">  
+                                                        <h:panelGroup id="pnlTable1" style="border: 0px; background-color: transparent" >
+                                                            <div class="col-md-6">
+                                                                <p:commandButton id="btnPlus" value="+"  onclick="PF('dlg').show();" partialSubmit="true" type="button"
+                                                                                 style="background: transparent;"/>
+                                                                <p:dialog class="col-md-4" id="dlgCourse" header="Training/Course" modal="true" widgetVar="dlg" showEffect="explode" hideEffect="fade" resizable="true" height="300" width="600">
+                                                                    <h:panelGroup id="pnlcourse">
+                                                                        <div class="col-md-12 textBoxMargin6px"></div>
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel  class="control-label col-sm-4" value="Course Catagory:"/>
+                                                                            <div class="col-sm-8">                                                       
+                                                                                <p:selectOneMenu id="drdsomcatagor" value="#{hrSmSuccessionPlanningCotroller.hrLuTrainingCategory.id}" style="width:100%" converter="entConverter"
+                                                                                                 required="true" valueChangeListener="#{hrSmSuccessionPlanningCotroller.courseNameValuechange}" requiredMessage="Selct Coures Catagory">
+                                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{hrSmSuccessionPlanningCotroller.hrLuTrainingCategoryList}" var="catagory" itemValue="#{catagory.id}" itemLabel="#{catagory.categoryName}"/> 
+                                                                                    <p:ajax event="change" process="@this" update="drdTrain"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdsomcatagor" display="icon"/>
+                                                                            </div>   
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px"></div>
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel  class="control-label col-sm-4" value="Training/Course:"/>
+                                                                            <div class="col-sm-8">                                                       
+                                                                                <p:selectOneMenu id="drdTrain" value="#{hrSmSuccessionPlanningCotroller.hrTdCourses.id}" style="width:100%" 
+                                                                                                 required="true" converter="entConverter" requiredMessage="Select Training Courses"
+                                                                                                 valueChangeListener="#{hrSmSuccessionPlanningCotroller.courseValuechange}">
+                                                                                    <f:selectItem itemLabel="--- Select One---" itemValue=""/>
+                                                                                    <f:selectItems value="#{hrSmSuccessionPlanningCotroller.coursetrainningList}" var="trains"  itemValue="#{trains.id}" itemLabel="#{trains.courseName}"/> 
+                                                                                    <p:ajax event="change" process="@this"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="drdTrain" display="icon"/>
+                                                                            </div>    
+                                                                        </div> 
+                                                                        <div class="col-md-12 textBoxMargin6px"></div>
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel  class="control-label col-sm-4" value="Start Time:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtStrdate" value="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlanDetails.startDate}"
+                                                                                             onclick="displayCalendar('frmSuccessionplan:txtStrdate', 'frmSuccessionplan:txtStrdate');" required="true"
+                                                                                             title="Start Date" class="form-control" requiredMessage="Select Time" validator="#{validatorManagedBean.Date}"/>
+                                                                                <p:message for="txtStrdate " display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px"></div>
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel  class="control-label col-sm-4" value="End Time:"/>
+                                                                            <div class="col-sm-8">                                                       
+                                                                                <p:inputText id="txtEnddate" value="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlanDetails.endDate}"
+                                                                                             onclick="displayCalendar('frmSuccessionplan:txtEnddate', 'frmSuccessionplan:txtEnddate');" required="true"
+                                                                                             title="End Date" class="form-control" requiredMessage="Select Time" validator="#{validatorManagedBean.Date}"/>
+                                                                                <p:message for="txtStrdate " display="icon"/>
+                                                                            </div>   
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px"> </div>
+                                                                        <div class="form-group form-horizontal">
+                                                                            <div class="col-md-4"></div>
+                                                                            <div class="col-sm-4">
+                                                                                <p:commandButton id="btnAdd" value="Add" class="btn  btn-block btn-primary col-lg-4"                                              
+                                                                                                 action="#{hrSmSuccessionPlanningCotroller.add()}"       
+                                                                                                 process="@this,pnlcourse" update=":frmSuccessionplan:pnlcourse,tbltime"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </h:panelGroup>
+                                                                </p:dialog> 
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">                      
+                                                                    <div class="box-body">    
+                                                                        <div class="col-md-12">  
+                                                                            <div class="col-md-12" style="margin-top:10px;">
+                                                                                <div class="form-group">
+                                                                                    <p:dataTable id="tbltime" value="#{hrSmSuccessionPlanningCotroller.planDetailDataModel}"
+                                                                                                 var="planDetails"  rowIndexVar="num" class="dataTable" rows="5" paginator="true"
+                                                                                                 paginatorPosition="bottom" selectionMode="single" rowKey="#{planDetails}"
+                                                                                                 selection="#{hrSmSuccessionPlanningCotroller.hrSmSuccessionPlanDetails}">
+                                                                                        <p:ajax event="rowSelect" process="@this" listener="#{hrSmSuccessionPlanningCotroller.selectedSuccession}"
+                                                                                                update=":frmSuccessionplan" />
+                                                                                        <p:column headerText="SNO">
+                                                                                            #{num+1}
+                                                                                        </p:column>
+                                                                                        <p:column headerText="Training/Course Name">
+                                                                                            #{planDetails.trainingId.courseName}
+                                                                                        </p:column>
+                                                                                        <p:column headerText="Start Time">
+                                                                                            #{planDetails.startDate}
+                                                                                        </p:column>
+                                                                                        <p:column headerText="End Time">
+                                                                                            #{planDetails.endDate}
+                                                                                        </p:column>
+                                                                                    </p:dataTable>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>               
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">  
+                                                        <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                                            <div class="row">
+                                                                <div class="col-md-12">                      
+                                                                    <div class="box-body"> 
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group">
+                                                                                    <p:outputLabel  for="txtComment" class="control-label col-sm-4"
+                                                                                                    value="Comment Given:"/>
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:inputTextarea id="txtComment" class="form-control"  value="#{hrSmSuccessionPlanningCotroller.wfHrProcessed.commentGiven}" 
+                                                                                                         title="Remark"  required="false"  requiredMessage="Enter Plan" 
+                                                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"
+                                                                                                         onchange="this.value = this.value.trim()"/>
+                                                                                    </div>  
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group required">
+                                                                                    <p:outputLabel  for="txtApproved" class="control-label col-sm-4"
+                                                                                                    id="lblApproved" value="Processed Date:" />
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:inputText id="txtApproved"  readonly="true"  placeholder="dd/mm/yyyy"
+                                                                                                     value="#{hrSmSuccessionPlanningCotroller.wfHrProcessed.processedOn}"  
+                                                                                                     title="date"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal form-group">
+                                                                                    <p:outputLabel  for="txtprey1" class="control-label col-sm-4"
+                                                                                                    id="lblPrepatedy1" value="Processed By:"/>
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:inputText  id="txtprey1"   
+                                                                                                      value="#{workFlow.userName}"  
+                                                                                                      title="descripition"/>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <h:panelGroup id="pnlSave">
+                                                    <div class="panel-body col-sm-12">
+                                                        <div class="form-group col-sm-12">
+                                                            <div class="col-sm-6">
+                                                                <div class="col-sm-12 form-horizontal">
+                                                                    <div class="col-sm-4">                                                              
+                                                                    </div>                                                                    
+                                                                    <div class="col-sm-3">
+                                                                        <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                         value="#{hrSmSuccessionPlanningCotroller.saveorUpdateBundle}"
+                                                                                         action="#{hrSmSuccessionPlanningCotroller.saveSuccessionPlanning()}"
+                                                                                         process="@this,pnlworkflow,pnlTextarea,pnlOne"                                       
+                                                                                         update="@this,:frmSuccessionplan" disabled= "#{hrSmSuccessionPlanningCotroller.disableBtn}"/>
+                                                                    </div>
+                                                                    <div class="col-sm-3">
+                                                                        <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                                         action="#{hrSmSuccessionPlanningCotroller.resetSuccessionPlaning()}"
+                                                                                         process="@this,pnlTextarea,pnlOne" 
+                                                                                         update=":frmSuccessionplan" /> 
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>                                                      
+                                            </div>  
+                                        </div>
+                                    </div>                           
+                                </div>  
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>                           
+        </h:form>
+    </ui:define>
+</ui:composition>
+

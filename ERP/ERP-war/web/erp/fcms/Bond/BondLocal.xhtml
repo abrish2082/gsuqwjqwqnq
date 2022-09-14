@@ -1,0 +1,414 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li>
+            <a href="BondLibor.xhtml"><i class="fa fa-circle-o"></i>Bond Libor </a>
+        </li>
+        <li>
+            <a href="BondForeign.xhtml"><i class="fa fa-circle-o"></i>Bond Foreign </a>
+        </li>
+        <li>
+            <a href="LocalRepayment.xhtml"><i class="fa fa-circle-o"></i>Bond Local Repayment </a>
+        </li>
+        <li>
+            <a href="BondCoupon.xhtml"><i class="fa fa-circle-o"></i>Bond Coupon </a>
+        </li>
+        <li>
+            <a href="BondCouponSchedule.xhtml"><i class="fa fa-circle-o"></i>Bond Coupon Schedule </a>
+        </li>
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone" action="#{bondLocalController.createNewAdditionalAmount()}" 
+                                     icon="#{bondLocalController.icone}" validateClient="true" style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title ="#{bondLocalController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    <a href="BondLocal.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: white; background-color: transparent" id="mainUI" rendered="#{bondLocalController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Bond_Local_Search}</h3>
+                    </div> 
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel for="searchId" class="control-label col-sm-4" value="#{FCMS.Serial_Number}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:inputText id="searchId"   value="#{bondLocalController.bondLocal.serialNo}"
+                                                         class="form-control"  style="width: 100%" >
+                                                <p:ajax event="select" process="@this" update="@this"/>
+                                            </p:inputText>
+                                            <p:message for="searchId" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel for="searchName" class="control-label col-sm-4" value="#{FCMS.Name}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:autoComplete id="searchName"  emptyMessage="no data found"   style="width: 100%"                                              
+                                                            value="#{bondLocalController.bondLocal.buyerFullName}"
+                                                            completeMethod="#{bondLocalController.searchName}" 
+                                                            var="nameinfo" itemValue="#{nameinfo.buyerFullName}" itemLabel="#{nameinfo}"  >
+                                                <p:ajax  event="itemSelect" listener="#{bondLocalController.getBuyersName}" 
+                                                         process="searchName" update="@this"></p:ajax>  
+                                                <p:column headerText="Buyer's Name"  >
+                                                    <h:outputText value="#{nameinfo.buyerFullName}" />
+                                                </p:column>
+                                                <p:column  headerText="#{FCMS.Serial_Number}">
+                                                    <h:outputText value="#{nameinfo.serialNo}" />
+                                                </p:column>
+                                            </p:autoComplete> 
+                                            <p:message for="searchName" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                        <div class="col-sm-8">
+                                            <p:commandButton id="btnSearch" value="#{FCMS.Find}" class="btn btn-primary" 
+                                                             process="@this" 
+                                                             action="#{bondLocalController.searchBondLocal()}" 
+                                                             update="@this,tblLocInfoDetail"  />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class = "col-md-6">
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel for="txtAmount" class="control-label col-sm-4" value=" #{FCMS.Principal_Amount}: "></h:outputLabel>   
+                                        <div class="col-sm-8">
+                                            <p:inputText id="txtAmount" value="#{bondLocalController.bondLocal.valueBirr}"  
+                                                         converter="#{bondLocalController.numberConverter}" class="form-control"  
+                                                         style="width: 100%" >
+                                                <p:ajax event="select" process="@this" update="@this"/>
+                                            </p:inputText>  
+                                            <p:message for="txtAmount" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <p:panel id="pnldtabel" style="border: white;"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <p:dataTable id="tblLocInfoDetail" 
+                                                         value="#{bondLocalController.bondLocals}"
+                                                         style="font-size: 11px;"  
+                                                         rows="10"             
+                                                         paginator="true" 
+                                                         paginatorPosition="bottom"
+                                                         rowsPerPageTemplate="5,10,15"
+                                                         resizableColumns="true"
+                                                         rowIndexVar="numbers"  
+                                                         var="addInfo"
+                                                         selection="#{bondLocalController.bondLocalselect}"
+                                                         selectionMode="single"
+                                                         rowKey="#{addInfo.serialNo}" 
+                                                         > 
+                                                <p:ajax event="rowSelect" listener="#{bondLocalController.getbond}"
+                                                        update="@(form)" process="@this"/>
+                                                <p:column  style="width:60px">
+                                                    <f:facet name="header"  >
+                                                        <h:outputText value="#{FCMS.No}" />
+                                                    </f:facet>      
+                                                    <h:outputText value="#{numbers+1}"/>          
+                                                </p:column>                                       
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Serial_Number}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.serialNo}" />
+                                                </p:column>  
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Bond_Type}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.bondType}" />
+                                                </p:column> 
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Amount}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.valueBirr}" converter="#{bondLocalController.numberConverter}"/>
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Full_Name}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.buyerFullName}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Bond_Maturity}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.rePaid}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Interest_Margin}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.interestBearing}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Grace_Period}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.gracePeriod}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Issued_Date}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.applicationDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Value_Date}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.registeredDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column>                                             
+                                            </p:dataTable>  
+                                        </div>
+                                    </div>    
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>  
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" 
+                          rendered="#{bondLocalController.renderPnlCreateAdditional}" >
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Bond_Foreign_Registration}</h3>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtbondTypeId" class="control-label col-sm-4" value="#{FCMS.Serial_Number}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:inputText id="txtbondTypeId"   value="#{bondLocalController.bondLocal.serialNo}"
+                                                         class="form-control"  style="width: 100%"
+                                                         title="TypeId" required="true" requiredMessage="The serialNo field is required." />
+                                            <p:message for="txtbondTypeId" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtType"  class="control-label col-sm-4" value="#{FCMS.Bond_Type}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+
+                                            <p:selectOneMenu id="txtType"   style="width: 100%" value="#{bondLocalController.bondLocal.bondType}"
+                                                             converter="entConverter"  required="true" requiredMessage="Bond Type is required, please select one " >
+                                                <f:selectItems  value="#{bondLocalController.bondTypeList}" />
+                                            </p:selectOneMenu>
+                                            <p:message for="txtType" display="icon" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtAmount" class="control-label col-sm-4" value="#{FCMS.Principal_Amount}: "></h:outputLabel>   
+                                        <div class="col-sm-8">
+                                            <p:inputText id="txtAmount" value="#{bondLocalController.bondLocal.valueBirr}"  
+                                                         class="form-control"  style="width: 100%" required="true" requiredMessage="The Amount field is required and it must be number"
+                                                         converterMessage="Amount must be anumber" 
+                                                         validatorMessage="Amount must be anumber" validator="#{validatorManagedBean.Double}"
+                                                         >
+                                                <f:validateDoubleRange/>  
+                                            </p:inputText>
+                                            <p:message display="icon" for="txtAmount"/>           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtgracePeriod" class="control-label col-sm-4" value="#{FCMS.Grace_Period}: "></h:outputLabel>   
+                                        <div class="col-sm-8">
+                                            <p:inputText id="txtgracePeriod" value="#{bondLocalController.bondLocal.gracePeriod}"  
+                                                         class="form-control"  style="width: 100%" required="true" requiredMessage="This field is required and it must be number"
+                                                         converterMessage="Grace Period must be anumber" 
+                                                         validatorMessage="Grace Period must be anumber" validator="#{validatorManagedBean.Number}">
+                                                <f:validateDoubleRange/>     
+                                            </p:inputText>
+                                            <p:message display="icon" for="txtgracePeriod"/>     
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtbuyerFullName" class="control-label col-sm-4" value="Buyer's Full Name : "></h:outputLabel>   
+                                        <div class="col-sm-8">
+                                            <p:inputText id="txtbuyerFullName" value="#{bondLocalController.bondLocal.buyerFullName}"  
+                                                         class="form-control"  style="width: 100%" 
+                                                         title="EmpId" required="true" requiredMessage="This field is required and it must a-zA-Z"
+                                                         converterMessage="Buyer Full Name must be a text" 
+                                                         validatorMessage="Buyer Full Name must be a text" validator="#{validatorManagedBean.FullName}"         
+                                                         > 
+                                                <f:validateRegex pattern="^[a-zA-Z ]+$" />    </p:inputText>
+                                            <p:message  display="icon" for="txtbuyerFullName"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtinterestBearing" class="control-label col-sm-4" value="#{FCMS.Interest_Margin} : "/>
+                                        <div class="col-sm-4">
+                                            <p:inputText id="txtinterestBearing" value="#{bondLocalController.bondLocal.interestBearing}" converter="#{bondLocalController.numberConverter}"
+                                                         required="true" class="form-control" readonly="#{bondLocalController.isCheckedInterestFree}" 
+                                                         requiredMessage="This field is required and it must be a number"
+                                                         converterMessage="Interest Margin must be anumber" 
+                                                         validatorMessage="Interest Margin must be anumber" validator="#{validatorManagedBean.Double}"> 
+                                                <p:ajax process="@this" update="txtinterestBearing" listener="#{bondLocalController.InterestMarigin(event)}" 
+                                                        event="change" />
+                                            </p:inputText>  
+                                            <p:message for="txtinterestBearing" display="icon"/>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <p:selectBooleanCheckbox id="chkIsinterestFree" value="#{bondLocalController.isCheckedInterestFree}" 
+                                                                     valueChangeListener="#{bondLocalController.onCheckInterestFreeEvent}"
+                                                                     >
+                                                <p:ajax event="valueChange" process="@this" update="txtinterestBearing" />
+                                            </p:selectBooleanCheckbox>
+                                            <p:outputLabel for="chkIsinterestFree" value=" #{FCMS.Interest_Free}" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel id="lblBtnSave" class="control-label col-sm-4"/>
+                                        <div class="col-sm-8">
+                                            <p:commandButton id="btnsave" class="btn btn-primary"
+                                                             action="#{bondLocalController.saveBondLocal()}"
+                                                             value="#{bondLocalController.saveUpdate}"
+                                                             process="@this,registerUI"
+                                                             update=":frmRegisterUI"/>
+                                        </div>                                                   
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtMaturity" class="control-label col-sm-4" value="#{FCMS.Bond_Maturity}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:inputText id="txtMaturity"   value="#{bondLocalController.bondLocal.bondMaturity}" 
+                                                         class="form-control"  style="width: 100%" valueChangeListener="#{bondLocalController.changeOnMaturity}"
+                                                         required="true" requiredMessage="This field is required and must be number"
+                                                         converterMessage="Bond Maturity must be anumber" 
+                                                         validatorMessage="Bond Maturity must be anumber" validator="#{validatorManagedBean.Number}">
+                                                <p:ajax event="keyup" update="txtmaturityDate" process="@this" />
+                                            </p:inputText>
+                                            <p:message for="txtMaturity" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtIssuedDate" class="control-label col-sm-4" value="#{FCMS.Issued_Date}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:calendar id="txtIssuedDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                        value="#{bondLocalController.bondLocal.applicationDate}"
+                                                        valueChangeListener="#{bondLocalController.changeOnMaturityDate}"
+                                                        required="true"  requiredMessage="This field is required Date format e.g 20/02/2018"
+                                                        converterMessage="Issued Date must be a Date" >
+                                                <p:ajax event="dateSelect" update="txtmaturityDate" process="@this"/>
+                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                            </p:calendar>
+                                            <p:message for="txtIssuedDate" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtmaturityDate" class="control-label col-sm-4" value="#{FCMS.Bond_Maturity_Date}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:calendar id="txtmaturityDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" showOn="none" autocomplete="off"
+                                                        value="#{bondLocalController.bondLocal.bondMaturityDate}" converterMessage="Value must be a Date"
+                                                        required="true" requiredMessage="This field is required date must look like e.g 20/02/2018">
+                                            </p:calendar>
+                                            <p:message for="txtmaturityDate" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>                   
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtRegisteredDate" class="control-label col-sm-4" value="#{FCMS.Value_Date}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:calendar id="txtRegisteredDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                        value="#{bondLocalController.bondLocal.registeredDate}" converterMessage="Value must be a Date"
+                                                        required="true" requiredMessage="This field is required date must look like e.g 2017/02/18"/>
+                                            <p:message for="txtRegisteredDate" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtRefernceno"  class="control-label col-sm-4" value=" #{FCMS.Document_Reference_Number}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:inputText id="txtRefernceno"  value="#{bondLocalController.bondLocal.documentReferenceNumber}" 
+                                                         required="true" requiredMessage="Document Reference value ie required"
+                                                         converterMessage="Reference Number must be Alpha Numeric Text" 
+                                                         validatorMessage="Reference Number must be Alpha Numeric Text" validator="#{validatorManagedBean.AlphaNumericText}">
+                                            </p:inputText>
+                                            <p:message for="txtRefernceno" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </h:panelGroup>                                          
+        </h:form>
+    </ui:define>
+</ui:composition>

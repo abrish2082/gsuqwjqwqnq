@@ -1,0 +1,576 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li> 
+        <li><a href="transferRequest.xhtml"><span>Transfer Request</span></a></li>
+        <li><a href="transferApprove.xhtml"><span>Transfer Approve</span></a></li> 
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{internalMovementCon.internaMovementInfo()}"
+                                     icon="#{internalMovementCon.icone}" style="background-color: white; border-color: white" 
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmInternalMovement" 
+                                     title="#{internalMovementCon.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/transfer/internalMovement.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{internalMovementCon.chooseMainPage}" style="border: 0px; background-color: transparent">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title" title="Search on internal movement">Search <small>Internal Employment History</small> ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="col-md-12"> 
+                                        <div class="col-md-12">    
+                                            <div class="col-sm-6">                                           
+                                                <div class="form-horizontal col-md-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel for="srcEmployeeId" value="Employee ID:" class="control-label col-sm-4"/>                                                          
+                                                        <div class="col-sm-8">  
+                                                            <p:inputText id="srcEmployeeId" value="#{internalMovementCon.hrEmployees.empId}"
+                                                                         title="Employee Id"  class="form-control"/>                                                                                                                                                
+                                                            <p:message for="srcEmployeeId" display="icon"/>                                                          
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                        </div> 
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="form-horizontal col-md-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel for="txtEmpName" value="Employee Name:" class="control-label col-sm-4"/>                                                          
+                                                        <div class="col-sm-8">  
+                                                            <p:inputText id="txtEmpName" value="#{internalMovementCon.hrEmployees.firstName}"
+                                                                         title="Employee Name" class="form-control"/>                                                                                                        
+                                                            <p:message for="txtEmpName" display="icon"/>                                                          
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="col-sm-6" >
+                                                <div class="col-md-4">                                                    
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnSearch" value="Search" class="btn  btn-block btn-primary col-lg-4" 
+                                                                     action="#{internalMovementCon.searchAllReqeust()}"
+                                                                     process="@this,:frmSearch:srcEmployeeId,:frmSearch:txtEmpName"
+                                                                     update=":frmSearch:tblRequestList" icon="ui-icon-search"/>
+                                                </div>                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>   
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblRequestList" value="#{internalMovementCon.recreateRequestsListDataModel}" 
+                                                         var="rqst" selectionMode="single" rowIndexVar="num" class="dataTable"
+                                                         selection="#{internalMovementCon.hrEmpInternalHistory}" rowKey="#{rqst.id}" 
+                                                         scrollable="true" scrollHeight="400">
+                                                <p:ajax event="rowSelect" process="@this,tblRequestList" listener="#{internalMovementCon.populateInternalMovement}"
+                                                        update=":frmToolBar,:frmSearch,:frmInternalMovement"/>
+                                                <p:column headerText="No." style="width:60px;">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Employee Name"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{rqst.empId.firstName} #{rqst.empId.middleName} #{rqst.empId.lastName}"/>
+                                                </p:column> 
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Employee Id"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{rqst.empId.empId}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Reference Number"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{rqst.referenceNo}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmInternalMovement"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainpage" rendered="#{internalMovementCon.chooseCreatePage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Internal Employment History</h3>
+                            </div>
+                            <div class="box-body ">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl1" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="searchAutocomplete" value="Employee Name: " class="control-label col-sm-4"/>  
+                                                                            <div class="col-sm-8">
+                                                                                <p:autoComplete id="searchAutocomplete" value="#{internalMovementCon.hrEmployees.firstName}" style="width:100%"
+                                                                                                completeMethod="#{internalMovementCon.searchByFname}" placeholder="Enter name to search"
+                                                                                                var="empList" required="true" requiredMessage="Enter name to search" scrollHeight="300"
+                                                                                                itemValue="#{empList.firstName}" itemLabel="#{empList}" forceSelection="true" 
+                                                                                                size="20" emptyMessage="no data">  
+                                                                                    <p:ajax event="itemSelect"  listener="#{internalMovementCon.getByEmpName}" 
+                                                                                            process="@this" update="pnl1"/>     
+                                                                                    <p:column headerText="Full Name">
+                                                                                        <h:outputText  value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="Employee ID">
+                                                                                        <h:outputText  value="#{empList.empId}"/>
+                                                                                    </p:column>
+                                                                                </p:autoComplete> 
+                                                                                <p:message for="searchAutocomplete" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmpdep"  class="control-label col-sm-4" value="Department:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmpdep" title="Department" value="#{internalMovementCon.department.depName}" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtEmpdep" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSalaryStep"  class="control-label col-sm-4" value="Salary Step:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSalaryStep" value="#{internalMovementCon.hrEmployees.salaryStep}"
+                                                                                             title="Salary Step" required="true" readonly="true"/>
+                                                                                <p:message for="txtSalaryStep" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJobGrade1"  class="control-label col-sm-4" value="Job Grade:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJobGrade1" value="#{internalMovementCon.hrLuGrades.grade}" 
+                                                                                             title="Grade" required="true" readonly="true"/>
+                                                                                <p:message for="txtJobGrade1" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmpId" class="control-label col-sm-4" value="Employee ID:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmpId" value="#{internalMovementCon.hrEmployees.empId}" 
+                                                                                             required="true" readonly="true" title="Employee ID">
+                                                                                </p:inputText>
+                                                                                <p:message for="txtEmpId" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJobTitle"  class="control-label col-sm-4" value="Job Title:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJobTitle" value="#{internalMovementCon.hrJobs.jobTitle}"  
+                                                                                             title="Job Position" required="true" readonly="true"/>
+                                                                            </div>                                                               
+                                                                        </div>                                                                                          
+                                                                    </div>  
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">                                                                
+                                                                            <h:outputLabel for="txtsal"  class="control-label col-sm-4" value="Salary:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtsal" value="#{internalMovementCon.hrEmployees.basicSalary}"
+                                                                                             title="Employee Salary"  required="true" readonly="true"/>
+                                                                                <p:message for="txtsal" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtHireDate" class="control-label col-sm-4" value="Hire Date:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtHireDate" value="#{internalMovementCon.hrEmployees.hireDate}" 
+                                                                                             required="true" readonly="true" title="Employee ID">
+                                                                                </p:inputText>
+                                                                                <p:message for="txtHireDate" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section> 
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl2" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-sm-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="txtdept" class="control-label col-sm-4" value="Department: "/>
+                                                                            <div class="col-sm-7">
+                                                                                <p:inputText id="txtdept" value="#{internalMovementCon.hrDepartments.depName}"
+                                                                                             title="Department" required="true" readonly="true"/>
+                                                                                <p:message for="txtdept" display="icon"/>
+                                                                            </div>
+                                                                            <div class="col-sm-1">
+                                                                                <p:commandButton onclick="PF('dlg1').show();" id="btnTree" partialSubmit="true" style="background: transparent;" value="+" type="button"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <p:dialog id="dig1" header="Department List" widgetVar="dlg1" height="300" width="500" showEffect="explode" modal="true">
+                                                                        <h:panelGrid columns="3">
+                                                                            <p:tree value="#{internalMovementCon.root2}" var="nodes" style="border: transparent; width: 100%"
+                                                                                    selectionMode="single" selection="#{internalMovementCon.selectedNode}">
+                                                                                <p:ajax event="select" listener="#{internalMovementCon.onNodeSelect}" process="@this" 
+                                                                                        update=":frmInternalMovement:txtdept,:frmInternalMovement:txtSystem,:frmInternalMovement:txtCostCenter,
+                                                                                        :frmInternalMovement:txtPayLocation,:frmInternalMovement:txtPayGroup,:frmInternalMovement:sonJob"/>
+                                                                                <p:treeNode>
+                                                                                    <h:outputText value="#{nodes}"/>
+                                                                                </p:treeNode>
+                                                                            </p:tree>                                       
+                                                                        </h:panelGrid>
+                                                                    </p:dialog>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSystem" class="control-label col-sm-4" value="System:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSystem" value="#{internalMovementCon.system}" title="System" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtCostCenter" class="control-label col-sm-4" value="Cost Center:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtCostCenter" value="#{internalMovementCon.costCenter}" title="Cost Center"
+                                                                                             readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPayLocation" class="control-label col-sm-4" value="Pay Location:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPayLocation" value="#{internalMovementCon.payLocation}" title="Pay Location"
+                                                                                             readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPayGroup" class="control-label col-sm-4" value="Pay Group:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPayGroup" value="#{internalMovementCon.payGroup}" title="Pay Group"
+                                                                                             readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                </div>          
+                                                                <div class="col-sm-6">                                                         
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="sonJob" class="control-label col-sm-4" value="Job Title: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="sonJob" value="#{internalMovementCon.hrJobTypes.id}" style="width:100%"                                                
+                                                                                                 valueChangeListener="#{internalMovementCon.jobChangedListener}" converter="entConverter" 
+                                                                                                 required="true" requiredMessage="Select Job Title">  
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                    <f:selectItems value="#{internalMovementCon.jobTypes}" var="listofJobs" itemValue="#{listofJobs.id}" itemLabel="#{listofJobs}"/>                                                             
+                                                                                    <p:ajax event="change" process="@this,sonJob" update="txtJobGrade,txtEmpSalaryStep"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="sonJob" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>                                                                                                             
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJobGrade" class="control-label col-sm-4" value="Job Grade:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJobGrade" value="#{internalMovementCon.luGrades.grade}"
+                                                                                             required="true" title="Job Grade" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required"> 
+                                                                            <h:outputLabel for="txtEmpSalaryStep" class="control-label col-sm-4" value="Salary Step: "/>  
+                                                                            <div class="col-sm-8"> 
+                                                                                <p:selectOneMenu id="txtEmpSalaryStep" value="#{internalMovementCon.hrLuSalarySteps.salaryStep}" 
+                                                                                                 valueChangeListener="#{internalMovementCon.salaryScaleChanged}" 
+                                                                                                 required="true" requiredMessage="Select Salary Step" style="width:100%">
+                                                                                    <f:selectItems value="#{internalMovementCon.salarySetps}" var="stepSal" itemValue="#{stepSal.salaryStepId.salaryStep}" 
+                                                                                                   itemLabel="#{stepSal.salaryStepId.salaryStep}"/>
+                                                                                    <p:ajax event="change" process="@this" update="txtSalary"/>
+                                                                                </p:selectOneMenu> 
+                                                                                <p:message for="txtEmpSalaryStep" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>     
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSalary" class="control-label col-sm-4" value="Salary:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSalary" value="#{internalMovementCon.hrSalaryScales.salary}"
+                                                                                             readonly="true" required="true" title="Employee Salary"/>
+                                                                                <p:message for="txtSalary" display="icon"/>
+                                                                            </div>                                                                 
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br/><br/><br/><br/><br/>   
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel class="control-label col-sm-4"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:commandLink id="cmlView" value="[ View Previous Assignment ]" onclick="PF('dlgHistory').show();"
+                                                                                               title="Click to see previous direct assignment"/> 
+                                                                            </div>
+                                                                        </div>
+                                                                        <h:panelGroup id="pnlHistory">
+                                                                            <p:dialog id="dlgHistory" header="Assignment History" widgetVar="dlgHistory" height="500"
+                                                                                      width="1000" modal="true" resizable="false" showEffect="explode">
+                                                                                <div class="panel-body col-sm-12">
+                                                                                    <div class="form-group col-sm-12">
+                                                                                        <div class="form-group form-horizontal">
+                                                                                            <h:outputLabel for="txtHisId" value="Employee ID:" class="control-label col-sm-3"/>
+                                                                                            <div class="col-sm-4">
+                                                                                                <p:inputText id="txtHisId" value="#{internalMovementCon.hrEmp.empId}"
+                                                                                                             title="Employee ID" class="form-control"/>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="form-group col-sm-12">
+                                                                                        <div class="form-group form-horizontal">
+                                                                                            <h:outputLabel for="txtHisName" value="Employee Name:" class="control-label col-sm-3"/>
+                                                                                            <div class="col-sm-4">
+                                                                                                <p:inputText id="txtHisName" value="#{internalMovementCon.hrEmp.firstName}"
+                                                                                                             title="Employee Name" class="form-control"/>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="form-group col-sm-6">
+                                                                                        <div class="form-group form-horizontal">
+                                                                                            <h:outputLabel  class="control-label col-sm-6"/>
+                                                                                            <div class="col-sm-4">
+                                                                                                <p:commandButton id="btnSearch1" value="Search" class="btn  btn-block btn-primary col-lg-2" 
+                                                                                                                 action="#{internalMovementCon.searchAssignmentHis()}" icon="ui-icon-search"
+                                                                                                                 process="@this,txtHisId,txtHisName" update="tblHistory"/>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-md-12">                                       
+                                                                                    <div class="col-md-12">
+                                                                                        <div class="form-group">
+                                                                                            <p:dataTable id="tblHistory" value="#{internalMovementCon.historyDataModel}" 
+                                                                                                         var="his" rowIndexVar="num" class="dataTable" scrollable="true" scrollHeight="300">
+                                                                                                <p:column headerText="No." style="width:30px;">
+                                                                                                    <h:outputText value="#{num + 1}"/>
+                                                                                                </p:column>
+                                                                                                <p:column>
+                                                                                                    <f:facet name="header">
+                                                                                                        <h:outputText value="Full Name"/>
+                                                                                                    </f:facet>
+                                                                                                    <h:outputText value="#{his.empId.firstName} #{his.empId.middleName} #{his.empId.lastName}"/>
+                                                                                                </p:column> 
+                                                                                                <p:column>
+                                                                                                    <f:facet name="header">
+                                                                                                        <h:outputText value="Emp ID"/>
+                                                                                                    </f:facet>
+                                                                                                    <h:outputText value="#{his.empId.empId}"/>
+                                                                                                </p:column>
+                                                                                                <p:column>
+                                                                                                    <f:facet name="header">
+                                                                                                        <h:outputText value="Department"/>
+                                                                                                    </f:facet>
+                                                                                                    <h:outputText value="#{his.oldDepName}"/>
+                                                                                                </p:column>
+                                                                                                <p:column>
+                                                                                                    <f:facet name="header">
+                                                                                                        <h:outputText value="Job Title"/>
+                                                                                                    </f:facet>
+                                                                                                    <h:outputText value="#{his.oldJobName}"/>
+                                                                                                </p:column>
+                                                                                                <p:column>
+                                                                                                    <f:facet name="header">
+                                                                                                        <h:outputText value="Grade"/>
+                                                                                                    </f:facet>
+                                                                                                    <h:outputText value="#{his.oldGrade}"/>
+                                                                                                </p:column>
+                                                                                                <p:column>
+                                                                                                    <f:facet name="header">
+                                                                                                        <h:outputText value="Salary Step"/>
+                                                                                                    </f:facet>
+                                                                                                    <h:outputText value="#{his.oldSalaryStep}"/>
+                                                                                                </p:column>
+                                                                                                <p:column style="width: 60px"> 
+                                                                                                    <f:facet name="header">
+                                                                                                        <h:outputText value="Salary"/>
+                                                                                                    </f:facet>
+                                                                                                    <h:outputText value="#{his.oldSalary}"/>
+                                                                                                </p:column>
+                                                                                                <p:column>
+                                                                                                    <f:facet name="header">
+                                                                                                        <h:outputText value="Process Date"/>
+                                                                                                    </f:facet>
+                                                                                                    <h:outputText value="#{his.processDate}"/>
+                                                                                                </p:column>
+                                                                                            </p:dataTable>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </p:dialog>
+                                                                        </h:panelGroup>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl3" class="col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel  class="control-label col-sm-4" value="Internal Movement Type: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu id="movementType" value="#{internalMovementCon.hrEmpInternalHistory.processType}"
+                                                                                         filterMatchMode="contains" filter="true" style="width:100%"
+                                                                                         required="true" requiredMessage="Select movement type"> 
+                                                                            <f:selectItems value="#{internalMovementCon.internalMovementTypes}"/>                                                                       
+                                                                            <p:ajax event="change" process="@this"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="movementType" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtRemark" value="#{internalMovementCon.hrEmpInternalHistory.remark}"
+                                                                                         rows="1" cols="5" autoResize="false" title="Remark" readonly="false" class="form-control"
+                                                                                         validator="#{validatorManagedBean.Remark}"/>
+                                                                        <p:message for="txtRemark" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtReferenceNo" class="control-label col-sm-4" value="Reference No: "/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtReferenceNo" value="#{internalMovementCon.hrEmpInternalHistory.referenceNo}"
+                                                                                     required="true" title="Reference Number" class="form-control"
+                                                                                     requiredMessage="Reference number is required"/>                                    
+                                                                        <p:message for="txtReferenceNo" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="calMovementDate" class="control-label col-sm-4" value="Effective Date: "/>  
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calMovementDate" value="#{internalMovementCon.hrEmpInternalHistory.processDate}"
+                                                                                     required="true" requiredMessage="Enter effective date." title="Movement Date" class="form-control"
+                                                                                     onclick="displayCalendar('frmInternalMovement:calMovementDate', 'frmInternalMovement:calMovementDate');"/>     
+                                                                        <p:message for="calMovementDate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <h:panelGroup id="pnlSave" class="col-sm-12">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-sm-2" 
+                                                                                     value="#{internalMovementCon.saveorUpdateBundle}" disabled="#{internalMovementCon.dsbButton}"
+                                                                                     action="#{internalMovementCon.saveInternalMovement()}" 
+                                                                                     process="@this,pnlMainpage" update=":frmInternalMovement"/>    
+                                                                </div>
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                                     action="#{internalMovementCon.resetInternalMovement()}" title="Clear"
+                                                                                     process="@this" update=":frmInternalMovement"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+

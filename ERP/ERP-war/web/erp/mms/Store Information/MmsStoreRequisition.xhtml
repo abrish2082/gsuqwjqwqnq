@@ -1,0 +1,800 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+
+        <li><a href="ReceivableItemLocation.xhtml"><i class="fa fa-circle-o"></i> <span>Receivable Item Location </span></a></li>
+        <li><a href="ItemLocationForIssuance.xhtml"><i class="fa fa-circle-o"></i> <span>Issuable Item Location </span></a></li>
+
+        <li><a href="StoreInformation.xhtml"><i class="fa fa-circle-o"></i> <span>Store Information</span></a></li> 
+        <li><a href="ShelfRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Location Management Shelf</span></a></li>
+        <li><a href="ShelfCellInformations.xhtml"><i class="fa fa-circle-o"></i> <span>Location Management Cell</span></a></li>
+        <li><a href="shelfLife.xhtml"><i class="fa fa-circle-o"></i> <span>Shelf Life</span></a></li>
+        <li><a href="DepartmentToStoreMapper.xhtml"><i class="fa fa-circle-o"></i> <span>Department To Store</span></a></li>   
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{storeRequisitionController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch" action="#{storeRequisitionController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>
+
+                    <p:commandButton id="btnNew" action="#{storeRequisitionController.createNewSRInfo()}" icon="#{storeRequisitionController.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{storeRequisitionController.createOrSearchBundle}" />
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+
+                    <h:panelGroup id="pnlGNotifica" rendered="#{storeRequisitionController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{storeRequisitionController.mmsSrList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Store Requisition List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{storeRequisitionController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="srListVar" value="#{storeRequisitionController.mmsSrList}"
+                                                            itemValue="#{srListVar}"  itemLabel="#{srListVar.srNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI, :frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{storeRequisitionController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{storeRequisitionController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.wfDecison}" /> 
+                                                        </p:column>
+
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../mms/Store Information/MmsStoreRequisition.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i> </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{storeRequisitionController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"        
+                                                                    value="#{storeRequisitionController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{storeRequisitionController.columnNameChangeEvent}"> 
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{storeRequisitionController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>                                            
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2"  value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{storeRequisitionController.requisition.columnValue}"/>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnFind" class="btn btn-primary" action="#{storeRequisitionController.searchSRInformation()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass"
+                                                                 value="Find" />            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{storeRequisitionController.mmsSRSearchInfoDataModel}" var="sRInfo" rows="5" selectionMode="single"
+                                                             paginator="true" paginatorPosition="bottom" editable="true" rowIndexVar="num"
+                                                             selection="#{storeRequisitionController.selectedSR}" rowKey="#{sRInfo.storeReqId}">
+
+                                                    <p:ajax event="rowSelect" listener="#{storeRequisitionController.onRowEdit}" process="@this" update=":frmRegisterUI, :frmMainUI, :frmToolbar,:frmRegisterUI:frmApproverInfo" />      
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column filterMatchMode="contains" filterBy="#{sRInfo.srNo}">
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.SR_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sRInfo.srNo}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Request_Store}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{sRInfo.requestStore}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Requested_By}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{sRInfo.requestedBy}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Requisition_Date}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{sRInfo.requestedDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Type}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{sRInfo.assetType}"/>
+                                                    </p:column>
+
+
+                                                </p:dataTable>
+
+                                            </div>                 
+                                        </div>    
+
+                                    </div>  
+
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{storeRequisitionController.renderPnlCreateSR}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"> </h3>
+                        <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Store_Requisition}:"/>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information,fatal" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+
+                                        <div class="form-group textBoxMargin6px required">  
+                                            <h:outputLabel id="lbl_srno" class="control-label col-sm-2" value="#{MMS.SR_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="lbl_srnoSequence"  required="true" requiredMessage="SR No is required"
+                                                             readonly="true"
+                                                             value="#{storeRequisitionController.requisition.srNo}"/> 
+                                                <p:message for="lbl_srnoSequence" display="icon" />
+                                            </div> 
+                                            <!--<div class="col-sm-2">-->
+
+                                            <!--                                                <p:selectBooleanCheckbox id="chkIsToStore" value="{storeRequisitionController.isCheckedToStore}" 
+                                                                                                                     valueChangeListener="{storeRequisitionController.onCheckToStore}"
+                                                                                                                     disabled="{workFlow.readonly}">
+                                                                                                <p:ajax event="valueChange" process="@this" update="pnltostore,btnTree" />
+                                                                                            </p:selectBooleanCheckbox>
+                                                                                            <p:outputLabel for="chkIsToStore" value="To Store" style="color: #0072b1;"/>-->
+                                            <!--</div>-->
+                                            <!--                                            <div class="col-sm-1">
+                                                                                            <p:selectBooleanCheckbox id="chkIsSpecIdent" value="{storeRequisitionController.isCheckedSpecIdentification}" 
+                                                                                                                     valueChangeListener="{storeRequisitionController.onCheckSpecIdentification}"
+                                                                                                                     disabled="{workFlow.readonly}">
+                                                                                                <p:ajax event="valueChange" process="@this" update="pGgrNo" />
+                                                                                            </p:selectBooleanCheckbox>
+                                                                                            <p:outputLabel for="chkIsSpecIdent" value="Spec. Identification" style="color: #0072b1;"/>
+                                                                                        </div>-->
+
+                                            <h:outputLabel id="lbl_txtRequestDate" class="control-label col-sm-2"  value="#{MMS.Requisition_Date}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtRequestDate" class="form-control" value="#{storeRequisitionController.requisition.requestedDate}"  disabled="#{workFlow.readonly}"
+                                                             required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtRequestDate', 'frmRegisterUI:txtRequestDate');" />                                                                                                                                                    
+                                                <p:message for="txtRequestDate" display="icon"/>
+                                            </div> 
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">  
+                                            <h:outputLabel  class="control-label col-sm-2" />  
+                                            <div class="col-sm-4 c">
+                                                <p:selectOneRadio id="rdbtnStoreOrSpec" value="#{storeRequisitionController.isSelectedToStores}" 
+                                                                  valueChangeListener="#{storeRequisitionController.onCheckToStore}" 
+                                                                  disabled="#{workFlow.readonly}">
+                                                    <p:ajax event="valueChange" process="rdbtnStoreOrSpec" update="pnltostore,btnTree,pGgrNo,pnlDep,dlgDpt,frmTblMaterialInfo,frmMaterialInfo" />
+                                                    <f:selectItem itemLabel="Stock" itemValue="store"/>
+                                                    <f:selectItem itemLabel="Specific Identification" itemValue="specific Identification"/>
+                                                </p:selectOneRadio>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px required">   
+                                            <p:outputLabel id="lbl_requestedby"    value="#{MMS.Requested_By}:" class="control-label col-sm-2"  /> 
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="txtrequester" emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;" 
+                                                                disabled="#{workFlow.readonly}"
+                                                                value="#{storeRequisitionController.employeEntity.firstName}"
+                                                                completeMethod="#{storeRequisitionController.searchEmployeeInformation}"
+                                                                required="true" requiredMessage="Clerk name is required "
+                                                                var="empInfoEntitys"  itemValue="#{empInfoEntitys.firstName}" itemLabel="#{empInfoEntitys}"   size="15"> 
+
+                                                    <f:facet name="itemtip" >
+                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">                        
+                                                            <h:outputText  value="#{MMS.First_Name}:" />
+                                                            <h:outputText value="#{empInfoEntitys.firstName}" />
+
+                                                            <h:outputText value="#{MMS.Middle_Name}:" />
+                                                            <h:outputText value="#{empInfoEntitys.middleName}" />
+                                                            <h:outputText value="#{MMS.Employee_Id}:"/>
+                                                            <h:outputText value="#{empInfoEntitys.empId}" />
+                                                        </h:panelGrid>
+                                                    </f:facet>
+                                                    <p:ajax  event="itemSelect" listener="#{storeRequisitionController.getEmployeeInfo}" process="@this" update="txtrequester" />  
+                                                </p:autoComplete>     
+                                                <p:message for="txtrequester" display="icon"/>
+                                            </div>
+
+                                            <h:outputLabel for="jbSearch" class="control-label col-sm-2"  value="#{MMS.Job_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="jbSearch"  value="#{storeRequisitionController.pmsWorkAuthorization}" style="width: 100%" 
+                                                                 converter="entConverter"  disabled="#{workFlow.readonly}" required="true" requiredMessage="Job No is Required"
+                                                                 valueChangeListener="#{storeRequisitionController.handleSelectJOB}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems value="#{storeRequisitionController.pmsJobNos}" var="sysJobVar" itemLabel="#{sysJobVar.jobNo} " itemValue="#{sysJobVar}"/>
+                                                    <p:ajax event="change" process="@this" />
+                                                </p:selectOneMenu>
+                                                <p:message for="jbSearch" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">   
+                                            <h:panelGroup id="pnlDep" >
+                                                <p:outputLabel id="lbl_Department" class="control-label col-sm-2"  value="#{MMS.Department}:" rendered="#{storeRequisitionController.isHideGrNo}" /> 
+                                                <div class="col-sm-3">
+                                                    <p:inputText   id="txtDepartment" class="form-control" required="true" placeholder="Use Only From + Button" onmousedown="return false;" rendered="#{storeRequisitionController.isHideGrNo}" 
+                                                                   readonly="#{workFlow.readonly}"  requiredMessage="Department is required"
+                                                                   value="#{storeRequisitionController.hrDepartmentEntity.depName}"  />
+                                                    <p:message for="txtDepartment" display="icon"/>
+                                                </div>
+                                                <div class="col-sm-1">
+                                                    <p:commandButton  id="btnTree" onclick="PF('dlgDpt').show();" process="@this"  partialSubmit="true" style="background: transparent;" value="+" rendered="#{storeRequisitionController.isHideGrNo}" />
+                                                </div>
+                                                <p:dialog id="dlgDpt" header="Departments" widgetVar="dlgDpt" height="300" width="500" showEffect="explode" rendered="#{storeRequisitionController.isHideGrNo}" >
+                                                    <h:panelGrid columns="3" style="border-color: #ffffff " > 
+                                                        <p:tree id="tree1" value="#{storeRequisitionController.root2}" var="nodes" style="border: transparent; width: 100%"  rendered="#{storeRequisitionController.isHideGrNo}" 
+                                                                selectionMode="single" selection="#{storeRequisitionController.selectedNode}" >
+                                                            <p:ajax event="select" listener="#{storeRequisitionController.onNodeSelect}" process="@this" 
+                                                                    update=":frmRegisterUI:txtDepartment,:frmRegisterUI:selectStoreInfoList,:frmRegisterUI:glSearch,:frmRegisterUI:pGgrNo"/>
+                                                            <p:treeNode>
+                                                                <h:outputText value="#{nodes}" rendered="#{storeRequisitionController.isHideGrNo}" />
+                                                            </p:treeNode>
+                                                        </p:tree>                                       
+                                                    </h:panelGrid>
+                                                </p:dialog>
+                                            </h:panelGroup>
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel for="glSearch" class="control-label col-sm-2"  value="#{MMS.General_Ledger}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="glSearch" value="#{storeRequisitionController.generalLedger}"
+                                                                 valueChangeListener="#{storeRequisitionController.getGeneralLedgerChange}"
+                                                                 converter="entConverter"  disabled="#{workFlow.readonly}"
+                                                                 filterMatchMode="contains" filter="true" style="width: 100%" required="true" 
+                                                                 requiredMessage="Value is required: Select General Ledger"> 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems value="#{storeRequisitionController.glList}" var="glVarr" itemLabel="#{glVarr.generalLedgerCode}" itemValue="#{glVarr}"/>
+                                                    <p:ajax event="change" process="@this" />
+                                                </p:selectOneMenu>  
+                                                <p:message for="glSearch" display="icon"/> 
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <p:outputLabel  id="lbl_requestStore"  class="control-label col-sm-2"  value="#{MMS.Request_Store}:" />
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="selectStoreInfoList" style="width: 100%"  required="true"  requiredMessage="Store Name Is required"
+                                                                   converter="entConverter"   value="#{storeRequisitionController.storeEntity}"  disabled="#{workFlow.readonly}"
+                                                                   valueChangeListener="#{storeRequisitionController.handleSelectStoreName}" filter="true" filterMatchMode="contains"> 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuQualification" 
+                                                                   value="#{storeRequisitionController.storeList}" var="store" itemLabel="#{store.storeName}" itemValue="#{store}"/>
+                                                    <p:ajax update="selectStoreInfoList,frmMaterialInfo,pnltostore"  process=":frmRegisterUI:selectStoreInfoList" event="change" />
+
+                                                </p:selectOneMenu>
+                                                <p:message for="selectStoreInfoList" display="icon"/>  
+
+                                            </div> 
+
+                                        </div>
+                                        <h:panelGroup id="pnltostore" >
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel  id="lbl_toStore"  class="control-label col-sm-2" rendered="#{storeRequisitionController.isCheckedToStore}" value="#{MMS.To_Store}:" />
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu   id="selectToStoreInfoList" style="width: 100%"  required="true"  requiredMessage="Store Name Is required" 
+                                                                       converter="entConverter" value="#{storeRequisitionController.toStoreEntity}" rendered="#{storeRequisitionController.isCheckedToStore}" disabled="#{workFlow.readonly}"
+                                                                       valueChangeListener="#{storeRequisitionController.handleSelectToStoreName}"> 
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems id="selectOneMenuTOStore" 
+                                                                       value="#{storeRequisitionController.toStoreList}" var="store" itemLabel="#{store.storeName}" itemValue="#{store}"/>
+                                                        <p:ajax update="selectStoreInfoList"  process=":frmRegisterUI:selectToStoreInfoList" event="change" />
+
+                                                    </p:selectOneMenu>
+                                                    <p:message for="selectToStoreInfoList" display="icon"/>  
+
+
+
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+
+                                    </div>
+                                </h:panelGroup>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">  </h3>
+                        <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Requisition_Detail}:"/>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+                                <h:panelGroup id="frmMaterialInfo"  >
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:panelGroup id="pGgrNo" >
+                                                <p:outputLabel  id="lblgrn"  class="control-label col-sm-2" value="#{MMS.GR_N}:" rendered="#{storeRequisitionController.isHideGrNo}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu   id="drdGrNoList" style="width: 100%"  required="true"  requiredMessage="GR No Is required"
+                                                                       converter="entConverter"   value="#{storeRequisitionController.mmsGrn}"  disabled="#{workFlow.readonly}"
+                                                                       filter="true" filterMatchMode="contains" rendered="#{storeRequisitionController.isHideGrNo}"
+                                                                       valueChangeListener="#{storeRequisitionController.grnNoChangeEvent}"> 
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{storeRequisitionController.mmsGrnList}" var="grn" itemLabel="#{grn.grnNo}" itemValue="#{grn}"/>
+                                                        <p:ajax update="@this,itemFromGrnDetail"  process="@this,itemFromGrnDetail" event="change" />
+
+                                                    </p:selectOneMenu>
+                                                    <p:message for="drdGrNoList" display="icon"/>  
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px ">
+                                            <p:outputLabel value="#{MMS.Material_List}:" class="control-label col-sm-2"  /> 
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="searchBystoreNames" emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;" rendered="#{storeRequisitionController.isCheckedSpecIdentification}"
+                                                                converter="entConverter"
+                                                                value="#{storeRequisitionController.itemregistrationEntity}"
+                                                                completeMethod="#{storeRequisitionController.searchMatInformationByPrefix}"
+
+                                                                var="storeInfoEntitys"  itemValue="#{storeInfoEntitys}" itemLabel="#{storeInfoEntitys.matCode}"   size="15"> 
+
+                                                    <f:facet name="itemtip" >
+                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">                        
+                                                            <h:outputText value="#{MMS.Item_Name}:" />
+                                                            <h:outputText value="#{storeInfoEntitys.matName}" />
+
+                                                            <h:outputText  value="#{MMS.Item_Code}:"/>
+                                                            <h:outputText value="#{storeInfoEntitys.matCode}" />
+                                                        </h:panelGrid>
+                                                    </f:facet>
+                                                    <p:ajax  event="itemSelect" listener="#{storeRequisitionController.handleSelectItemNameAuto}" process="@this" update="txtItemCode,txtunitPrice,txtunitmeasure,txtbinBalance,plate" />  
+                                                </p:autoComplete>
+                                                <p:autoComplete id="itemFromGrnDetail" emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;" rendered="#{storeRequisitionController.isHideGrNo}" 
+                                                                converter="entConverter"
+                                                                value="#{storeRequisitionController.itemregistrationEntity}"
+                                                                completeMethod="#{storeRequisitionController.getItemInformations1}"
+
+                                                                var="storeInfoEntitys"  itemValue="#{storeInfoEntitys}" itemLabel="#{storeInfoEntitys.matCode}" size="15"> 
+
+                                                    <f:facet name="itemtip" >
+                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">                        
+                                                            <h:outputText value="#{MMS.Item_Name}:" />
+                                                            <h:outputText value="#{storeInfoEntitys.matName}" />
+
+                                                            <h:outputText value="#{MMS.Item_Code}:" />
+                                                            <h:outputText value="#{storeInfoEntitys.matCode}" />
+                                                        </h:panelGrid>
+                                                    </f:facet>
+                                                    <p:ajax  event="itemSelect" listener="#{storeRequisitionController.handleSelectItemNameAuto}" process="@this" update="txtItemCode,txtunitPrice1,txtunitmeasure,txtbinBalance1,plate" />  
+                                                </p:autoComplete> 
+                                                <p:message for="searchBystoreNames" display="icon"/>
+                                                <p:message for="itemFromGrnDetail" display="icon"/>
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px required ">
+                                                <p:outputLabel id="lbl_Quantity" value="#{MMS.Requested_Quantity}:" class="control-label col-sm-2" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtquantity" value="#{storeRequisitionController.requisitionDetail.quantity}"
+                                                                 class="form-control" required="true" requiredMessage="quantity is Required" 
+                                                                 disabled="#{workFlow.readonly}"    validator="#{validatorManagedBean.Number}" converterMessage="Pls Use Only Digit Numbers">
+                                                        <p:ajax event="keyup" listener="#{storeRequisitionController.checkReqGreaterThanStoreQty()}" 
+                                                                process="@this"/>
+                                                    </p:inputText>
+                                                    <p:message for="txtquantity" display="icon"/>
+                                                </div>
+                                            </div>
+
+                                        </div>  
+
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel  value="#{MMS.Unit_Price}:" class="control-label col-sm-2"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtunitPrice" value="#{storeRequisitionController.totalStockValue.weightAvgPric}" rendered="#{storeRequisitionController.isCheckedSpecIdentification}"
+                                                             required="false"  readonly="true"/>
+                                                <p:inputText id="txtunitPrice1" value="#{storeRequisitionController.requisitionDetail.unitPrice}" rendered="#{storeRequisitionController.isHideGrNo}"
+                                                             required="false"  readonly="true"/>
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel value="#{MMS.Item_Name}:" class="control-label col-sm-2" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtItemCode" value="#{storeRequisitionController.itemregistrationEntity.matName}"
+                                                                 required="false"  readonly="true"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel id="lbl_binBalance" class="control-label col-sm-2" value="#{MMS.Item_Balance}:"/> 
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtbinBalance" readonly="true" value="#{storeRequisitionController.binCard.currentQuantity}" 
+                                                               rendered="#{storeRequisitionController.isCheckedSpecIdentification}"/>
+                                                <p:inputText   id="txtbinBalance1"  readonly="true" value="#{storeRequisitionController.mmsGrnDetail.receivedQuantity}"
+                                                               rendered="#{storeRequisitionController.isHideGrNo}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+
+                                            <h:outputLabel  value="#{MMS.Unit_Of_Measure}:" class="control-label col-sm-2"  />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtunitmeasure" value="#{storeRequisitionController.itemregistrationEntity.unitMeasure1}"
+                                                             required="false"  readonly="true" />
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px">
+                                            <p:outputLabel id="lbl_ApprovedQuantity" value="#{MMS.Approved_Quantity}:" class="control-label col-sm-2" rendered="#{storeRequisitionController.renderApprovedQuantity}" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtApprovedquantity" value="#{storeRequisitionController.requisitionDetail.approvedQuantityTemp}" rendered="#{storeRequisitionController.renderApprovedQuantity}"
+                                                             class="form-control" required="true" requiredMessage="Quantity is Required"  
+                                                             validator="#{validatorManagedBean.Number}" converterMessage="Pls Use Only Digit Numbers"/>
+                                                <p:message for="txtApprovedquantity" display="icon"/>
+                                            </div>
+                                            <h:panelGroup id="plate">
+                                                <p:outputLabel id="lbl_PlateNo"  value="#{MMS.Plate_Number}:" class="control-label col-sm-2" rendered="#{storeRequisitionController.renderPlateNo}" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtPlateNo" rendered="#{storeRequisitionController.renderPlateNo}" value="#{storeRequisitionController.requisitionDetail.plateNo}"
+                                                                 class="form-control" required="true" requiredMessage="Plate No is Required" readonly="#{workFlow.readonly}" 
+                                                                 validator="#{validatorManagedBean.AlphaNumericText}" converterMessage="Pls Use Only Digit Numbers"/>
+                                                    <p:message for="txtPlateNo" display="icon"/>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnAdd" class="btn btn-primary" action="#{storeRequisitionController.addRequisitionInfoDetail}" 
+                                                                 icon="ui-icon-add" validateClient="true" 
+                                                                 process="@this,frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmMaterialInfo"
+                                                                 value="#{storeRequisitionController.addorModify}"/>           
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <!--                                <h:panelGroup id="PgGrnDetailInfo">
+                                                                    <div class="form-horizontal col-sm-12">
+                                                                        <div class="form-group textBoxMargin6px">                                        
+                                                                            <div class="col-sm-12">
+                                                                                <p:dataTable id="dtGrnDetail" rendered="{storeRequisitionController.isHideGrNo}" paginator="true" paginatorPosition="bottom"
+                                                                                              var="grndts" widgetVar="grns" rows="5" 
+                                                                                             value="{storeRequisitionController.mmsGrnDetailsDModel}"
+                                                                                             rowIndexVar="count" rowKey="{grndts.grnDetailId}" editable="true" editMode="cell">
+                                                                                    <p:ajax event="cellEdit" />
+                                                                                    <p:column headerText="S.Nos">
+                                                                                        <h:outputText value="{count+1}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="GRN No">
+                                                                                        <h:outputText value="{grndts.grnId.grnNo}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="Material Name">
+                                                                                        <h:outputText value="{grndts.itemId.matName}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="Store Quantity">
+                                                                                        <h:outputText value="{grndts.remainingQuantity}"/>
+                                                                                    </p:column>
+                                                                                    <p:column id="clmReceivedQty" headerText="Requested Quantity">
+                                                                                        <p:cellEditor>
+                                                                                            <f:facet name="output">
+                                                                                                <h:outputText value="{grndts.receivedQuantity}" />
+                                                                                            </f:facet>
+                                                                                            <f:facet name="input">
+                                                                                                <p:inputText value="{grndts.receivedQuantity}">
+                                                                                                    <p:ajax event="keyup" listener="{storeRequisitionController.checkReqGreaterThanStoreQty()}" 
+                                                                                                            process="@this"/>
+                                                                                                </p:inputText>
+                                                                                            </f:facet>
+                                                                                        </p:cellEditor>
+                                                                                    </p:column>
+                                                                                    
+                                                                                </p:dataTable>
+                                                                            </div>
+                                
+                                                                        </div>
+                                                                    </div>
+                                                                </h:panelGroup>-->
+
+                                <h:panelGroup id="frmTblMaterialInfo">
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tbldataModel" var="reqResultDtl" value="#{storeRequisitionController.requisitionDetailsModel}" widgetVar="cellcars"
+                                                             selectionMode="single"  disabledSelection=" #{workFlow.readonly}" rowIndexVar="rowCount" rows="5"
+                                                             selection="#{storeRequisitionController.selectedSRDetail}" rowKey="#{reqResultDtl.itemId}"
+                                                             paginator="true" paginatorPosition="bottom">
+
+                                                    <p:ajax event="rowSelect" listener="#{storeRequisitionController.updateSRDetail}" update=":frmRegisterUI:frmMaterialInfo" />
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="S.No"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{rowCount+1}"/>
+                                                    </p:column>  
+                                                    <p:column headerText="GRN No" rendered="#{storeRequisitionController.isHideGrNo}">
+                                                        <h:outputText value="#{reqResultDtl.grnId.grnNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{reqResultDtl.itemId.matCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{reqResultDtl.itemId.matName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Price}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{reqResultDtl.unitPrice}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Unit_Measure}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{reqResultDtl.itemId.unitMeasure1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Requested_Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{reqResultDtl.quantity}"/>
+                                                    </p:column>
+                                                    <p:column >
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Balance}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{storeRequisitionController.receivedQty}"/>
+                                                    </p:column>
+                                                    <p:column rendered="#{storeRequisitionController.renderApprovedQuantity}">
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Approved_Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{reqResultDtl.approvedQuantity}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+                                <h:panelGroup id="frmApproverInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">  
+
+                                            <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby" 
+                                                               value="#{storeRequisitionController.userName}" readonly="true" 
+                                                               required="true" requiredMessage="prepared is required"/>                                             
+                                            </div>
+
+                                            <h:outputLabel for="txtAcceptedDate" class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtAcceptedDate" class="form-control" value="#{storeRequisitionController.wfMmsProcessed.processedOn}"
+                                                             required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtAcceptedDate', 'frmRegisterUI:txtAcceptedDate');" />                                                                                                                                                    
+                                                <p:message for="txtAcceptedDate" display="icon"/>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">  
+                                            <h:outputLabel id="lbl_prepareRemxasrk1"  class="control-label col-sm-2"  value="#{MMS.Remark}:" rendered="#{storeRequisitionController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtprepttareRemassrk1"  class="form-control" rendered="#{storeRequisitionController.renderDecision}"
+                                                                 value="#{storeRequisitionController.wfMmsProcessed.commentGiven}"
+                                                                 validator="#{validatorManagedBean.Remark}"/>     
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">  
+                                                <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="#{MMS.Decision}:" rendered="#{storeRequisitionController.renderDecision}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{storeRequisitionController.selectedValue}" 
+                                                                     required="true" requiredMessage="Decision is Required"
+                                                                     rendered="#{storeRequisitionController.renderDecision}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                        <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                    </p:selectOneMenu>   
+                                                    <p:message for="drdDecision" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="noremeaa"  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnSave" class="btn btn-primary"  
+                                                                  disabled="#{storeRequisitionController.disableBtnCreate}"
+                                                                  value="#{storeRequisitionController.saveorUpdateBundle}"
+                                                                  action="#{storeRequisitionController.saveStoreRequisiton()}"  
+                                                                  process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmApproverInfo" 
+                                                                  update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmToolbar,:frmRegisterUI:frmApproverInfo" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

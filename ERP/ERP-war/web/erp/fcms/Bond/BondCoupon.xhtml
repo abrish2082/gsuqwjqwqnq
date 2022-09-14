@@ -1,0 +1,560 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">   
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li>
+            <a href="BondLibor.xhtml"><i class="fa fa-circle-o"></i>Bond Libor </a>
+        </li>
+        <li>
+            <a href="BondForeign.xhtml"><i class="fa fa-circle-o"></i>Bond Foreign </a>
+        </li>      
+        <li>
+            <a href="BondLocal.xhtml"><i class="fa fa-circle-o"></i>Bond Local </a>
+        </li>
+        <li>
+            <a href="LocalRepayment.xhtml"><i class="fa fa-circle-o"></i>Bond Local Repayment </a>
+        </li>
+        <li>
+            <a href="BondCouponSchedule.xhtml"><i class="fa fa-circle-o"></i>Bond Coupon Schedule </a>
+        </li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmCreateAdd"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone" action="#{bondCouponController.createAdditional()}" 
+                                     icon="#{bondCouponController.icone}" class="toolBarButton" style="background-color: white; border-color: white"
+                                     process="@this" update="@(form)" title ="#{bondCouponController.createOrSearchBundle}"
+                                     />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    <a href="BondCoupon.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Bond_Coupon_Search}</h3>
+                    </div>
+                    <div class="box-body ">
+                        <div class="box-body ">
+                            <h:form id="frmMainUI">
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{bondCouponController.renderPnlMainPage}">
+                                    <div class="col-md-12" > 
+                                        <h:form id="frmCopSearch"> 
+                                            <p:growl id="growlSrc" showDetail="true" sticky="true" autoUpdate="true" severity="information,fatal"/>
+                                            <!--<section class="panel panel-info"  >
+                                                <section class="panel-body" >-->
+                                            <div class="col-md-12">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <!-- <div class="col-md-12 textBoxMargin6px">
+                                                         <div class="form-group  form-horizontal">
+                                                             <h:outputLabel for="searchbondNo" class="control-label col-sm-4" value="Bond Number"/> 
+                                                             <div class="col-sm-8">
+                                                                 <p:inputText id="searchbondNo"  required="false" value="#//{bondCouponController.bondCoupon.bondNo}"
+                                                                              class="form-control"  style="width: 100%"     >
+                                                                     <p:ajax event="select" process="@this" update="@this"/>
+                                                                 </p:inputText>
+                                                             </div>
+                                                         </div>
+                                                     </div> -->
+                                                    <div class="form-group  textBoxMargin6px">   
+                                                        <h:outputLabel   class="control-label col-sm-2" value="#{FCMS.searching_By}:"/>
+                                                        <div class="col-sm-4">
+                                                            <p:selectOneMenu   id="drdSearchName" style="width: 100%"        
+                                                                               converter="entConverter"  value="#{bondCouponController.columnNameResolver.col_Name_FromTable}"
+                                                                               valueChangeListener="#{bondCouponController.columnNameChangeEvent}"> 
+                                                                <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                                <f:selectItems value="#{bondCouponController.columnNamesList}" 
+                                                                               var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                                <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                            </p:selectOneMenu>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group textBoxMargin6px"> 
+                                                        <h:outputLabel id="lblSearchName" class="control-label col-sm-2" 
+                                                                       value="#{FCMS.searching_By}:"/>
+                                                        <div class="col-sm-4">
+                                                            <p:inputText id="txtSearchName" class="form-control" value="#{bondCouponController.bondCoupon.columnValue}"/>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:commandButton  id="btnSearch" value="#{FCMS.Find}" class="btn btn-primary" 
+                                                                                  process="@this"
+                                                                                  action="#{bondCouponController.searchBondCoupon()}" 
+                                                                                  update="tblCoupon"  />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 " style="padding-top: 20px">
+                                                <p:dataTable id="tblCoupon"
+                                                             value="#{bondCouponController.bondCouponAddDatamodel}"
+                                                             style="font-size: 11px"
+                                                             rows="10"
+                                                             paginator="true"
+                                                             paginatorPosition="bottom"
+                                                             rowsPerPageTemplate="5,10,15"
+                                                             resizableColumns="true"
+                                                             rowIndexVar="numbers"
+                                                             var="addinfo"
+                                                             selectionMode="single"
+                                                             selection="#{bondCouponController.bondCouponselect}"
+                                                             rowKey="#{addinfo.bondNo}"
+                                                             >
+                                                    <p:ajax event="rowSelect" listener="#{bondCouponController.getByBondNo}"
+                                                            update="@(form)" process="@this,">
+                                                    </p:ajax>
+                                                    <p:column style="width: 60px" headerText ="#{FCMS.No}" >
+                                                        <h:outputText value="#{numbers+1}"/>  
+                                                    </p:column>
+                                                    <p:column  headerText ="Bond Number">
+                                                        <h:outputText value="#{addinfo.bondNo}" />
+                                                    </p:column> 
+                                                    <p:column headerText ="#{FCMS.Bond_Issued_Date}">
+                                                        <h:outputText value="#{addinfo.bondIssuedDate}" >
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputText>
+                                                    </p:column> 
+                                                    <p:column headerText ="#{FCMS.Interest_Repayment_StartD_ate}">
+                                                        <h:outputText value="#{addinfo.interestRepaymentStartDate}" >
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputText>
+                                                    </p:column> 
+                                                    <p:column headerText ="Principal Repayment End Date">
+                                                        <h:outputText value="#{addinfo.principalRepaymentEndDate}">
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputText>
+                                                    </p:column> 
+                                                    <p:column headerText ="number of bond">
+                                                        <h:outputText value="#{addinfo.numberOfBond}" />
+                                                    </p:column>  
+                                                    <p:column headerText ="#{FCMS.Total_Bond_Value}">
+                                                        <h:outputText value="#{addinfo.totalBondValue}" />
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </h:form>
+                                    </div>
+                                </h:panelGroup>
+                            </h:form>
+                            <h:form id="frmCOPReg"  > 
+                                <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+                                <h:panelGroup id="pnlReg" style="border: 0px; background-color: transparent"  rendered="#{bondCouponController.renderPnlCreateAdditional}">
+                                    <section class="panel panel-info"  >
+                                        <section class="panel-body" >  
+                                            <h:panelGroup id="pnltransm" class="col-sm-12">
+                                                <h:form id="frmAllCOPReg">
+                                                    <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+                                                    <div class="form-group  col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                            <h:outputLabel for="txtBondNo" class="control-label col-sm-4" value="Bond Number: "></h:outputLabel> 
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtBondNo"   value="#{bondCouponController.bondCoupon.bondNo}"
+                                                                             class="form-control"  style="width: 100%" readonly="true"
+                                                                             />
+                                                                <p:message for="txtBondNo" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                            <h:outputLabel for="txtNumBond" class="control-label col-sm-4" value="#{FCMS.number_of_bond} : "></h:outputLabel> 
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtNumBond"   value="#{bondCouponController.bondCoupon.numberOfBond}" 
+                                                                             class="form-control"  style="width: 100%" readonly="true"
+                                                                             >                                                
+                                                                </p:inputText>
+                                                                <p:message for="txtNumBond" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;">
+                                                            <h:outputLabel for="txtTotlBondValue" class="control-label col-sm-4" value="#{FCMS.Total_Bond_Value} : "></h:outputLabel>   
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtTotlBondValue" value="#{bondCouponController.bondCoupon.totalBondValue}"  
+                                                                             class="form-control"  style="width: 100%" readonly="true" 
+                                                                             >
+                                                                </p:inputText>  
+                                                                <p:message for="txtTotlBondValue" display="icon"/>
+                                                            </div>                                                               
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;">
+                                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Interest_Repayment_StartD_ate}: "></h:outputLabel> 
+                                                            <div class="col-sm-6">
+                                                                <p:calendar id="txtStartDate" pattern="dd/MM/yyyy" placeholder="No Input Needed from keyboard" showOn="off"
+                                                                            value="#{bondCouponController.bondCoupon.interestRepaymentStartDate}"/>
+
+                                                            </div>                                                               
+                                                        </div> 
+                                                    </div>
+                                                    <div class="form-group required  col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;">
+                                                            <h:outputLabel for="txtIssueDate" class="control-label col-sm-4" value="#{FCMS.Bond_Issued_Date}: "/> 
+                                                            <div class="col-sm-6">
+                                                                <p:calendar id="txtIssueDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                                            value="#{bondCouponController.bondCoupon.bondIssuedDate}" required="true" requiredMessage=" Bond Issued Date value is Required"
+                                                                            valueChangeListener="#{bondCouponController.changeIssueDate}"  converterMessage="Vaue must be n Date Format" >
+                                                                    <p:ajax event="dateSelect" update="txtStartDate,txtEndDate" process="@this,"/>
+                                                                </p:calendar>
+                                                                <p:message for="txtIssueDate" display="icon"/>
+                                                            </div>                                                               
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;">
+                                                            <h:outputLabel class="control-label col-sm-4" value="Principal Repayment End Date: "></h:outputLabel> 
+                                                            <div class="col-sm-6">
+                                                                <p:calendar id="txtEndDate" pattern="dd/MM/yyyy" placeholder="No Input Needed from keyboard" showOn="off"
+                                                                            value="#{bondCouponController.bondCoupon.principalRepaymentEndDate}" />
+
+                                                            </div>                                                              
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                            <h:outputLabel for="txtInterest" class="control-label col-sm-4" value="#{FCMS.Interest_Rate}: "></h:outputLabel>   
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtInterest" value="#{bondCouponController.bondCoupon.interestRate}"  
+                                                                             class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}"
+                                                                             required="true" requiredMessage="Interest is required and must be number "
+                                                                             converterMessage="Interest must be anumber" 
+                                                                             >
+                                                                </p:inputText>  
+                                                                <p:message for="txtInterest" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>                                            
+                                                </h:form>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <h:form id="frmSingCOPReg">
+                                        <h:panelGroup id="pnlSingCop" class="col-sm-12">
+                                            <section class="panel panel-info"  >
+                                                <section class="panel-body" >  
+                                                    <p:growl id="growl2" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+
+                                                    <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                            <h:outputLabel for="txtSerial" class="control-label col-sm-4" value="#{FCMS.Serial_Number}: "></h:outputLabel> 
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtSerial" value="#{bondCouponController.singleCoupon.serialNo}"
+                                                                             class="form-control"  style="width: 100%"
+                                                                             title="TypeId" required="true" requiredMessage="Serial Number is required." />
+                                                                <p:message for="txtSerial" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                            <h:outputLabel for="txtBondValue" class="control-label col-sm-4" value="#{FCMS.Bond_Value}: "></h:outputLabel>   
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtBondValue" value="#{bondCouponController.singleCoupon.bondValue}"  
+                                                                             class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}"
+                                                                             required="true" requiredMessage="Bond Value is required and must be number "
+                                                                             converterMessage="Amount must be anumber">
+                                                                </p:inputText>  
+                                                                <p:message for="txtBondValue" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                            <h:outputLabel for="txtGracePeriod" class="control-label col-sm-4" value="#{FCMS.Grace_Period}: "></h:outputLabel>   
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtGracePeriod" value="#{bondCouponController.singleCoupon.gracePeriod}"  
+                                                                             class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Number}"
+                                                                             required="true" requiredMessage="Grace Period is required and must be number "
+                                                                             converterMessage="Amount must be anumber">
+                                                                </p:inputText>  
+                                                                <p:message for="txtGracePeriod" display="icon"/>
+                                                            </div>
+                                                        </div>                                                        
+                                                        <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                            <h:outputLabel for="txtBondMatuy" class="control-label col-sm-4" value="#{FCMS.Bond_Maturity}: "></h:outputLabel>   
+                                                            <div class="col-sm-6">
+                                                                <p:inputText id="txtBondMatuy" value="#{bondCouponController.singleCoupon.bondMaturity}"  
+                                                                             class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Number}"
+                                                                             required="true" requiredMessage="Bond Maturity is required and must be number "
+                                                                             converterMessage="Amount must be anumber" 
+                                                                             validatorMessage="Amount must be anumber">
+                                                                </p:inputText>  
+                                                                <p:message for="txtBondMatuy" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12" style="padding-bottom: 10px;" >
+                                                            <div class="col-sm-2"></div>
+                                                            <div class="col-sm-2">
+                                                                <p:commandButton id="btnAdd" value="#{bondCouponController.forSingleCoAddOrUpdate}"  class="btn btn-primary"
+                                                                                 action="#{bondCouponController.addToSingleCoupon()}"  
+                                                                                 process=":frmCOPReg:frmAllCOPReg:txtBondNo,:frmCOPReg:frmAllCOPReg:txtTotlBondValue,:frmCOPReg:frmAllCOPReg:txtNumBond,frmSingCOPReg"
+                                                                                 update=":frmCOPReg:frmAllCOPReg:txtBondNo,:frmCOPReg:frmAllCOPReg:txtNumBond,:frmCOPReg:frmAllCOPReg:txtTotlBondValue,frmSingCOPReg"/>
+                                                            </div>  
+
+                                                            <div class="col-sm-2">
+                                                                <p:commandButton value="Extend" rendered="#{bondCouponController.extendDisable}" 
+                                                                                 action="#{bondCouponController.extendCouponBond()}" class="btn btn-primary" 
+                                                                                 onclick="PF('confirmExtend').show()"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group required col-sm-12">
+                                                        <div class="col-md-12 " style="padding-top: 20px">
+                                                            <p:dataTable id="obDetTable" var="obd" value="#{bondCouponController.singleCouponAddDatamodel}"  
+                                                                         rows="5" rowIndexVar="num" paginator="true" paginatorPosition="bottom" 
+                                                                         resizableColumns="true" rowKey="#{obd.serialNo}"
+                                                                         selectionMode="single" selection="#{bondCouponController.singleCouponSelect}" >
+                                                                <p:ajax event="rowSelect" process="@this" listener="#{bondCouponController.singlePopulate}" update=":frmCOPReg:frmSingCOPReg" />
+                                                                <p:column headerText="No.">
+                                                                    <h:outputText value="#{num+1}" />
+                                                                </p:column>
+                                                                <p:column headerText="#{FCMS.Serial_Number}">
+                                                                    <h:outputText value="#{obd.serialNo}" />
+                                                                </p:column>
+                                                                <p:column headerText="#{FCMS.Bond_Value}">
+                                                                    <h:outputText value="#{obd.bondValue}" converter="#{numberConverter.numberConverter}"/>
+                                                                </p:column>
+                                                                <p:column headerText="#{FCMS.Grace_Period}">
+                                                                    <h:outputText value="#{obd.gracePeriod}" />
+                                                                </p:column>
+                                                                <p:column headerText="#{FCMS.Bond_Maturity}">
+                                                                    <h:outputText value="#{obd.bondMaturity}" />
+                                                                </p:column>
+                                                            </p:dataTable>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </section>
+                                        </h:panelGroup>
+                                    </h:form>
+                                    <div class="box-body">
+                                        <div class="col-sm-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required col-sm-12">
+                                                    <div class="form-horizontal col-sm-12" style="padding-bottom: 10px;" >
+                                                        <div class="col-sm-4" >                                                              
+                                                        </div> 
+                                                        <div class="col-sm-2">
+                                                            <p:commandButton id="btnsave" class="btn btn-primary"
+                                                                             action="#{bondCouponController.saveBondCoupon()}"
+                                                                             value="#{bondCouponController.saveUpdate}"
+                                                                             process=":frmCOPReg:pnlReg" 
+                                                                             update="@(form)"/>                                                                    
+                                                        </div>   
+                                                        <div class="col-sm-4">                                                              
+                                                        </div> 
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton value="Terminate" rendered="#{bondCouponController.terminateDisable}"
+                                                                             class="btn btn-primary" onclick="PF('confirmTermination').show()"/>
+                                                        </div>
+
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </h:form>  
+                            <h:form id="frmExtendUI">
+                                <div class="col-md-6">
+                                    <p:dialog id="digExtend" 
+                                              header="Coupon Bond Extend" 
+                                              widgetVar="confirmExtend"                                              
+                                              showEffect="bounce"
+                                              position="center" modal="true" width="40%">
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel for="txtBondno"  class="control-label col-sm-4" value="Bond Number: "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtBondno"  value="#{bondCouponController.bondCoupon.bondNo}" 
+                                                                 readonly="true" class="form-control"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel for="txtNewSerialNo"  class="control-label col-sm-4" value="New Serial Number: "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtNewSerialNo"  value="#{bondCouponController.couponExtend.newSerialNo}" 
+                                                                 required="true" requiredMessage="value ie required"/>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group required form-horizontal">
+
+                                                <h:outputLabel for="EndDate1" class="control-label col-sm-4" value="Extended Date:"></h:outputLabel>   
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="EndDate1" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" converterMessage="Value must be in Date Format"
+                                                                value="#{bondCouponController.couponExtend.extendDate}" 
+                                                                required="true" requiredMessage="The  field is required date must look like e.g 2017/02/18"/>
+                                                    <p:message for="EndDate1" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel for="txtExtenBy" class="control-label col-sm-4" value="Extend By"></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtExtenBy"   value="#{bondCouponController.couponExtend.extendBy}"
+                                                                 title="TypeId" required="true" requiredMessage="The Balance field is required."
+                                                                 converter="#{bondCouponController.numberConverter}" 
+                                                                 valueChangeListener="#{bondCouponController.getExtendByCalculation}">
+                                                        <f:ajax event="blur" />
+                                                    </p:inputText>
+                                                    <p:message for="txtExtenBy" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel for="txtPaidInterest" class="control-label col-sm-4" value="Paid Interest"></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtPaidInterest"   value="#{bondCouponController.totalPaidInterest}"
+                                                                 class="form-control"  style="width: 100%" readonly="true"
+                                                                 title="TypeId" required="true" requiredMessage="The Balance field is required."
+                                                                 converter="#{bondCouponController.numberConverter}"/>
+                                                    <p:message for="txtPaidInterest" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel for="txtPaidPrincipal" class="control-label col-sm-4" value="Paid Principal"></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtPaidPrincipal"   value="#{bondCouponController.totalPaidPrincipal}"
+                                                                 class="form-control"  style="width: 100%" readonly="true"
+                                                                 title="TypeId" required="true" requiredMessage="The Balance field is required."
+                                                                 converter="#{bondCouponController.numberConverter}"/>
+                                                    <p:message for="txtPaidPrincipal" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel for="txtRemainPrincipal" class="control-label col-sm-4" value="Remain Principal"></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtRemainPrincipal"   value="#{bondCouponController.totalRemainPrincipal}"
+                                                                 class="form-control"  style="width: 100%" readonly="true"
+                                                                 title="TypeId" required="true" requiredMessage="The Balance field is required."
+                                                                 converter="#{bondCouponController.numberConverter}"/>
+                                                    <p:message for="txtRemainPrincipal" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="col-md-12 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">                                          
+                                                <br></br>
+                                                <div class="col-sm-8" style="left: 150px">
+                                                    <p:commandButton value="Confirm"  class="btn  btn-block btn-primary col-sm-4" 
+                                                                     process="@this,"  style="width: 100px" 
+                                                                     action="#{bondCouponController.confirmExtend()}" 
+                                                                     update="@this,">
+                                                        <p:confirm header="Confirm" message="Extend the Bond?" />
+                                                    </p:commandButton>
+                                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                                    </p:confirmDialog> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p:dialog>   
+                                </div> 
+                            </h:form>
+                            <h:form id="frmTerminationUI">
+                                <div class="col-md-6">
+                                    <p:dialog id="digTerminate" 
+                                              header="Coupon Bond Termination" 
+                                              widgetVar="confirmTermination"                                              
+                                              showEffect="bounce"
+                                              position="center" modal="true" width="40%">
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel for="txtRefernceno"  class="control-label col-sm-4" value="Reference Number: "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtRefernceno"  value="#{bondCouponController.bondCoupon.terminationReferenceNo}" 
+                                                                 required="true" requiredMessage="value ie required"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group required form-horizontal">
+
+                                                <h:outputLabel for="EndDate" class="control-label col-sm-4" value="Termination Date"></h:outputLabel>   
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="EndDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" converterMessage="Value must be in Date Format"
+                                                                value="#{bondCouponController.bondCoupon.terminationDate}" 
+                                                                required="true" requiredMessage="The  field is required date must look like e.g 18/02/2018"/>
+                                                    <p:message for="EndDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel for="txtTotBondValue" class="control-label col-sm-4" value="Total Bond Value"></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtTotBondValue"   value="#{bondCouponController.bondCoupon.totalBondValue}"
+                                                                 class="form-control"  style="width: 100%" readonly="true"
+                                                                 title="TypeId" required="true" requiredMessage="The Balance field is required."
+                                                                 converter="#{bondCouponController.numberConverter}"/>
+                                                    <p:message for="txtTotBondValue" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="col-md-12 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">                                          
+                                                <br></br>
+                                                <div class="col-sm-8" style="left: 150px">
+                                                    <p:commandButton value="Confirm"  class="btn  btn-block btn-primary col-sm-4" 
+                                                                     process="@this,:frmTerminationUI"  style="width: 100px" 
+                                                                     action="#{bondCouponController.terminateCouponBond()}" 
+                                                                     update=":frmTerminationUI" >
+                                                        <p:confirm header="Confirm" message="terminate the bond?" />
+                                                    </p:commandButton>
+                                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                                    </p:confirmDialog> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p:dialog>   
+                                </div> 
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+

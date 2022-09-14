@@ -1,0 +1,753 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+            </div>
+        </h:form>
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li><a href="Insurance.xhtml"><i class="fa fa-circle-o"></i> <span>Insurance Registration</span></a></li> 
+        <li><a href="FixedAssetAttributeReg.xhtml"><i class="fa fa-circle-o"></i> <span>FixedAssetAttributeRegistration</span></a></li> 
+        <li><a href="FixedAssetIFRS.xhtml"><i class="fa fa-circle-o"></i> <span>FixedAssetRegistration</span></a></li> 
+        <li><a href="LeaseRegistration.xhtml"><i class="fa fa-circle-o"></i> <span> Lease Registration </span></a></li>
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id ="pngBackSarch" rendered="#{fixedAssetRegController.renderpnlToSearchpage}">
+                        <p:commandButton id="btnBackToSearch" action="#{fixedAssetRegController.goBackToSearchpageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew"  action="#{fixedAssetRegController.createNewFixedAssetRegInfo()}" icon="#{fixedAssetRegController.icone}"  validateClient="true" 
+                                     style="background-color: white;border-color: white" rendered="#{fixedAssetRegController.isRenderCreate}" 
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{fixedAssetRegController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{fixedAssetRegController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{fixedAssetRegController.mmsFarList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Insurance Item  List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{fixedAssetRegController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems var="srListVar" value="#{fixedAssetRegController.mmsFarList}"
+                                                           itemValue="#{srListVar}"  itemLabel="#{srListVar.farNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI, :frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{fixedAssetRegController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>                       
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{fixedAssetRegController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.decision}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                        <a href="../../mms/FixedAssetsInformation/FixedAssetRegistration.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                        <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"> </i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+         <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{fixedAssetRegController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Search}...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"     
+                                                                   converter="entConverter"  value="#{fixedAssetRegController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{fixedAssetRegController.changeEventColumnName}"> 
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                    <f:selectItems value="#{fixedAssetRegController.columnNameResolverList}" 
+                                                                    itemValue="#{colNameList.col_Name_FromTable}" 
+                                                                   var="colNameList" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2" value="#{fixedAssetRegController.columnNameResolver.parsed_Col_Name}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{fixedAssetRegController.fixedAssetRegEntity.columnValue}"/>
+                                            </div>
+                                        </div>                                 
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="findbtn" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSearch" class="btn btn-primary" action="#{fixedAssetRegController.searchFARInformation1()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass"
+                                                                 value="#{MMS.find}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                       
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" var="FxAssetInfo" rows="5" 
+                                                             style="font-family: Cambria; "  
+                                                             rowIndexVar="num"   
+                                                             selection="#{fixedAssetRegController.hpSelect}"
+                                                             rowKey="#{FxAssetInfo.id}"  selectionMode="single" 
+                                                             value="#{fixedAssetRegController.mmsFixedAssetRegSearchDataModel}"
+                                                             class="dataTable"
+                                                             paginator="true" paginatorPosition="bottom">
+                                                    <p:ajax event="rowSelect" listener="#{fixedAssetRegController.rowSelect}" update=":frmRegisterUI, :frmMainUI,:frmToolbar :frmRegisterUI:frmMaterialInfo" />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.FAR_No}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{FxAssetInfo.farNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Type}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{FxAssetInfo.selectOpt}"/>
+                                                    </p:column> 
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Department}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{FxAssetInfo.department.depName}"/>
+                                                    </p:column>  
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Approved_By}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{FxAssetInfo.approvedBy}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmRegisterUI" >
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" life="3500" autoUpdate="true" />
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{fixedAssetRegController.renderPnlCreateFAR}">
+                <p:dialog id="dlg" header="Departments" widgetVar="dlgDpt" height="400" width="500" showEffect="explode">
+                    <h:panelGrid columns="2" style="border-color: #ffffff ">
+                        <p:tree value="#{fixedAssetRegController.root2}" var="nodes" style="border: transparent; width: 100%"
+                                selectionMode="single" selection="#{fixedAssetRegController.selectedNode}" >
+                            <p:ajax event="select" listener="#{fixedAssetRegController.onNodeSelect}" process="@this" 
+                                    update=":frmRegisterUI:drdDepartments"/> 
+                            <p:treeNode> 
+                                <h:outputText value="#{nodes}" />
+                            </p:treeNode>
+                        </p:tree>                                       
+                    </h:panelGrid>
+                </p:dialog>               
+                <div class="box box-primary ">
+                    <div class="box-header">
+                        <h3 class="box-title">#{MMS.Minor_Asset_Registration}</h3>                   
+                    </div>
+                    <div class="box-body ">
+                        <div class="box-body">
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:panelGroup id="frmGatePassDtlInfo">
+                                        <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                        <div class="form-horizontal  col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.FAR_No}:"/>
+                                                <div class="col-sm-4 ">
+                                                    <p:inputText id="txtFarsNumber"  readonly="true"  
+                                                                 value="#{fixedAssetRegController.generateFARNo()}"/>
+                                                </div>
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.System_Number}:" for="sysBuildingSearch" />
+                                                <div class="col-sm-4 " >
+                                                    <p:selectOneMenu id="sysBuildingSearch" value="#{fixedAssetRegController.luSystemEntity}" filter="true" filterMatchMode="contains" 
+                                                                     style="width: 100%" valueChangeListener="#{fixedAssetRegController.SystemChange}" converter="entConverter" disabled="#{workFlow.readonly}" >
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems value="#{fixedAssetRegController.systemCodelist}" 
+                                                                       var="sysCode" itemValue="#{sysCode}" itemLabel="#{sysCode.systemCode}" />
+                                                        <p:ajax   event="change"  update=""  process="@this" />
+                                                    </p:selectOneMenu>   
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required"> 
+                                                <h:panelGroup id="PGdptSelection">
+                                                    <p:outputLabel  class="control-label col-sm-2" value="#{MMS.Department}:"  /> 
+                                                    <div class="col-sm-3">
+                                                        <p:inputText   id="drdDepartments" class="form-control" required="true" 
+                                                                       requiredMessage="Department is required"   placeholder="Use Only From + Button" onmousedown="return false;"
+                                                                       value="#{fixedAssetRegController.hrDepartmentsEntity.depName}"  />
+                                                        <p:message for="drdDepartments" display="icon"/>
+                                                    </div>
+                                                    <div class="col-sm-1">
+                                                        <p:commandButton  id="btnTree1" onclick="PF('dlgDpt').show();"  partialSubmit="true" title="Choose Department"  
+                                                                          style="background: transparent;" value="+" readonly="#{workFlow.readonly}"/>
+                                                    </div>
+                                                </h:panelGroup>        
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel for="drdDeliveryStatus" class="control-label col-sm-2" value="#{MMS.Delivery_Status}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="drdDeliveryStatus"  
+                                                                 value="#{fixedAssetRegController.fixedAssetRegEntity.deliveryStatus}" />
+                                                    <p:message for="drdDeliveryStatus" display="icon"/>
+                                                </div>  
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">#{MMS.Asset_Detail} </h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row"> 
+                                    <div class="col-md-12" > 
+                                    </div>
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="frmMaterialInfo"  >
+                                        <div class="form-horizontal col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel  for="CheckItemType" class="control-label col-sm-2" value="#{MMS.Item_Type}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneRadio id="CheckItemType"  layout="grid" columns="3" value="#{fixedAssetRegController.checkItemType}" 
+                                                                      class="col-sm-4" valueChangeListener="#{fixedAssetRegController.changeCheckItemType}" rendered="true" requiredMessage="Item Type is required">
+                                                        <f:selectItem itemLabel="#{MMS.Previous}" itemValue="1" />
+                                                        <f:selectItem itemLabel="#{MMS.Used}" itemValue="2" />   
+                                                        <f:selectItem itemLabel="#{MMS.New}" itemValue="3" />
+                                                        <p:ajax process="CheckItemType" update="frmRegisterUI:frmMaterialInfo"  event="change" />  
+                                                    </p:selectOneRadio>                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-horizontal col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.SIV_NO}:"  rendered="#{fixedAssetRegController.renderNew}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdSIV_NO" value="#{fixedAssetRegController.sivs}"  style="width: 100%"  rendered="#{fixedAssetRegController.renderNew}"
+                                                                     valueChangeListener="#{fixedAssetRegController.handleSelectSIVNo11}"  converter="entConverter"
+                                                                     required="true" requiredMessage="Please Select Siv No" disabled="#{workFlow.readonly}" >
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems id="selectOneMenuSivNumber" var="sivNo" itemLabel="#{sivNo.sivNo}" itemValue="#{sivNo}"
+                                                                       value="#{fixedAssetRegController.sivNoLists}"/>
+                                                        <p:ajax update="txtFxSRNo,selectOneListBoxSivMatCodeList,txtItemStatusNew,txtRequester1,txtFixedAssetCode" process="@this" event="valueChange" />
+                                                    </p:selectOneMenu> 
+                                                </div>              
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Item_Code}:"  rendered="#{fixedAssetRegController.renderPrevious}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="txtMaterialcodePrev" style="width: 100%;" 
+                                                                     valueChangeListener="#{fixedAssetRegController.MaterialCodeListprv}" filterMatchMode="contains" 
+                                                                     filter="true"  rendered="#{fixedAssetRegController.renderPrevious}"
+                                                                     required="true" 
+                                                                     value="#{fixedAssetRegController.itemRegistrationEntity.materialId}" >
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems id="selectsivMatListsPrev" value="#{fixedAssetRegController.itemCodeList}" var="ItemCodePrev" itemLabel="#{ItemCodePrev.matCode}"  itemValue="#{ItemCodePrev.materialId}" />                         
+                                                        <p:ajax update="tagPrev,txtSivMatNamePrev,txtSubCategory,txtCategory,txtItemStatusNew" process="@this" event="change" />
+                                                    </p:selectOneMenu>
+                                                </div>                     
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.select}:"  rendered="#{fixedAssetRegController.renderOld}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="searchTagNo" value="#{fixedAssetRegController.fixedAssetRegDtlEntity}"  style="width: 100%"  filter="true" filterMatchMode="contains"
+                                                                     valueChangeListener="#{fixedAssetRegController.handleTagNo}" converter="entConverter"
+                                                                     required="true" requiredMessage="Date is required" rendered="#{fixedAssetRegController.renderOld}" >
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems value="#{fixedAssetRegController.fixedAssetDtlList}" var="listSt" itemLabel="#{listSt.tagNo}" itemValue="#{listSt}" />
+                                                        <p:ajax update="@this,txtFarsNumber,txtMaterialcodeOld,txtSivMatNameOld,txtSubCategory,txtCategory,txtUnitPriceBookValue,frmGatePassDtlInfo, txtItemStatusNew" event="change" process="@this"/>
+                                                    </p:selectOneMenu> 
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Item_Code}:"  rendered="#{fixedAssetRegController.renderNew}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="selectOneListBoxSivMatCodeList"    style="width: 100%;" converter="entConverter"
+                                                                     valueChangeListener="#{fixedAssetRegController.MaterialCodeList}" filterMatchMode="contains"  
+                                                                     value="#{fixedAssetRegController.itemRegistrationEntity.materialId}"
+                                                                     rendered="#{fixedAssetRegController.renderNew}"
+                                                                     filter="true" required="true" requiredMessage="Please Insert Item Code">
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems id="selectsivMatLists" value="#{fixedAssetRegController.itemCodesWhenNewLists}"  var="ItemCodeNew" itemLabel="#{ItemCodeNew.itemId.matCode}" itemValue="#{ItemCodeNew.itemId.materialId}"/>                                                          
+                                                        <p:ajax update="txtSivMatName,txtUnitPrice,txtFixedAssetCode,txtCategory,txtSubCategory,txtRequester,txtWarrantyP,txtItemStatusNew" process="@this" event="change" />
+                                                    </p:selectOneMenu>
+                                                </div>
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Account_Code}:"  rendered="#{fixedAssetRegController.renderNew}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="accCodenw" value="#{fixedAssetRegController.fmsGeneralLedgarEntity.generalLedgerId}"  style="width: 100%" 
+                                                                     valueChangeListener="#{fixedAssetRegController.handleSelectGeneralLedgar}" converter="entConverter" rendered="#{fixedAssetRegController.renderNew}"
+                                                                     filterMatchMode="contains" filter="true" required="true" requiredMessage="Please Input Account Code">
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems value="#{fixedAssetRegController.glCodeList}" var="listStF" itemLabel="#{listStF.generalLedgerCode}" itemValue="#{listStF.generalLedgerId}" />
+                                                        <p:ajax update="@this" event="change" />
+                                                    </p:selectOneMenu> 
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.Tag_No}:" rendered="#{fixedAssetRegController.renderPrevious}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="tagPrev"  readonly="true"  class="form-control" rendered="#{fixedAssetRegController.renderPrevious}"
+                                                                 value="#{fixedAssetRegController.fixedAssetRegDtlEntity.tagNo}"/>
+                                                </div>
+                                                <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Account_Code}:" rendered="#{fixedAssetRegController.renderPrevious}" />
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="accCodePrev" value="#{fixedAssetRegController.fmsGeneralLedgarEntity.generalLedgerId}"  style="width: 100%" 
+                                                                     valueChangeListener="#{fixedAssetRegController.handleSelectGeneralLedgar}" converter="entConverter"
+                                                                     filterMatchMode="contains" filter="true" required="true" requiredMessage="Please Insert Account Code"
+                                                                     rendered="#{fixedAssetRegController.renderPrevious}">
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems value="#{fixedAssetRegController.glCodeList}" var="listStF" itemLabel="#{listStF.generalLedgerCode}" itemValue="#{listStF.generalLedgerId}" />
+                                                        <p:ajax update="@this" event="change" />
+                                                    </p:selectOneMenu> 
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required"> 
+                                                <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Tag_No}:" rendered="#{fixedAssetRegController.renderNew}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtFixedAssetCode"  readonly="true"  rendered="#{fixedAssetRegController.renderNew}"
+                                                                 value="#{fixedAssetRegController.fixedAssetRegDtlEntity.tagNo}"/>
+                                                    <p:message for="txtFixedAssetCode" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  for="txtWarrantyP" class="control-label col-sm-2" value="#{MMS.Service_Life}:" rendered="#{fixedAssetRegController.renderNew}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtWarrantyP"    readonly="true"  rendered="#{fixedAssetRegController.renderNew}"
+                                                                   value="#{fixedAssetRegController.itemRegistrationEntity.serviceYear}"/>
+                                                    <p:message for="txtWarrantyP" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Item_Code}:" rendered="#{fixedAssetRegController.renderOld}" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtMaterialcodeOld" required="true"  requiredMessage="Date is required" class="form-control" readonly="true"
+                                                                   rendered="#{fixedAssetRegController.renderOld}"
+                                                                   value="#{fixedAssetRegController.itemRegistrationEntity.matCode}"/>
+                                                    <p:message for="txtMaterialcodeOld" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Account_Code}:" for="stNameFx" rendered="#{fixedAssetRegController.renderOld}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="stNameFx" value="#{fixedAssetRegController.fmsGeneralLedgarEntity.generalLedgerId}"  style="width: 100%" 
+                                                                     valueChangeListener="#{fixedAssetRegController.handleSelectGeneralLedgarOld}" converter="entConverter"
+                                                                     filterMatchMode="contains" filter="true" required="true" requiredMessage="Account Code is Required"
+                                                                     rendered="#{fixedAssetRegController.renderOld}">
+
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems value="#{fixedAssetRegController.glCodeList}" var="listStF" itemLabel="#{listStF.generalLedgerCode}" itemValue="#{listStF.generalLedgerId}" />
+                                                        <p:ajax update="@this" event="change" />
+                                                    </p:selectOneMenu> 
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Item_Name}:" rendered="#{fixedAssetRegController.renderNew}" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtSivMatName" required="true" requiredMessage="Date is required"  readonly="true" rendered="#{fixedAssetRegController.renderNew}" 
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntity.itemName}"/>
+                                                    <p:message for="txtSivMatName" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  for="txtUnitPrice" class="control-label col-sm-2" value="#{MMS.Unit_Price}:" rendered="#{fixedAssetRegController.renderNew}" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtUnitPrice"   
+                                                                   readonly="true" rendered="#{fixedAssetRegController.renderNew}" 
+                                                                   value="#{fixedAssetRegController.itemRegistrationEntity.mmsBinCard.unitPrice}"/>
+                                                    <p:message for="txtUnitPrice" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Item_Name}:" rendered="#{fixedAssetRegController.renderPrevious}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtSivMatNamePrev" required="true"  requiredMessage="Date is required" class="form-control" readonly="true"
+                                                                   rendered="#{fixedAssetRegController.renderPrevious}"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntity.itemName}"/>
+                                                    <p:message for="txtSivMatNamePrev" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Unit_Price}:" rendered="#{fixedAssetRegController.renderPrevious}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtUnitPriceBookValuePrev"  class="form-control" required="true" 
+                                                                   readonly="false" rendered="#{fixedAssetRegController.renderPrevious}"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntity.unitPrice}"
+                                                                   validator="#{validatorManagedBean.Number}" 
+                                                                   requiredMessage="Please Insert Number"/>
+                                                    <p:message for="txtUnitPriceBookValuePrev" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Item_Name}:" rendered="#{fixedAssetRegController.renderOld}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtSivMatNameOld" required="true" requiredMessage="Date is required" class="form-control" readonly="true"
+                                                                   rendered="#{fixedAssetRegController.renderOld}"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntityOLD.itemName}"/>
+                                                    <p:message for="txtSivMatNameOld" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  for="txtUnitPriceBookValue" class="control-label col-sm-2" value="#{MMS.Unit_Price}:" rendered="#{fixedAssetRegController.renderOld}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtUnitPriceBookValue"  class="form-control" 
+                                                                   readonly="true" rendered="#{fixedAssetRegController.renderOld}"
+                                                                   value="#{fixedAssetRegController.itemRegistrationEntity.unitPrice}"/>
+                                                    <p:message for="txtUnitPriceBookValue" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel  for="txtPreviouscodePrev" class="control-label col-sm-2" value="#{MMS.Previous_Code}" rendered="#{fixedAssetRegController.renderOldPreviw}"
+                                                                />                                             
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtPreviouscodePrev"  class="form-control"  
+                                                                   rendered="#{fixedAssetRegController.renderOldPreviw}"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntity.previousCode}"/>
+                                                    <p:message for="txtPreviouscodePrev" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Category}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtCategory" required="true" requiredMessage="Date is required"  readonly="true"
+
+                                                                   value="#{fixedAssetRegController.itemRegistrationEntity.matCategory}"/>
+                                                    <p:message for="txtCategory" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Sub_Category}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtSubCategory" required="true"  requiredMessage="Date is required"  readonly="true"
+                                                                   value="#{fixedAssetRegController.itemRegistrationEntity.matSubcategory}"/>
+                                                    <p:message for="txtSubCategory" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel   class="control-label col-sm-2" value="#{MMS.SR_No}:" rendered="#{fixedAssetRegController.renderOldPreviw}"/>  
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu   id="txtFxSRNoPrev"  style="width: 100%" converter="entConverter"
+                                                                       valueChangeListener="#{fixedAssetRegController.handleSelectSrNo}" filterMatchMode="contains" 
+                                                                       filter="true"  required="true"  requiredMessage="Date is required" rendered="#{fixedAssetRegController.renderOldPreviw}"
+                                                                       value="#{fixedAssetRegController.storeRequisitionEntity}" >
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue=""/>
+                                                        <f:selectItems value="#{fixedAssetRegController.srNoListsWhenPrve}" 
+                                                                       var="srs" itemLabel="#{srs.srNo}" itemValue="#{srs}"/>
+                                                        <p:ajax update="txtRequester" process="@this" event="change" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtFxSRNoPrev" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  for="txtRequester" class="control-label col-sm-2" value="#{MMS.Requester}:" rendered="#{fixedAssetRegController.renderOldPreviw}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtRequester"  readonly="true"
+                                                                   rendered="#{fixedAssetRegController.renderOldPreviw}"
+                                                                   value="#{fixedAssetRegController.storeRequisitionEntity.requestedBy}"/>
+                                                    <p:message for="txtRequester" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel   class="control-label col-sm-2" value="#{MMS.SR_No}:" rendered="#{fixedAssetRegController.renderNew}"/>                                                
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtFxSRNo"  readonly="true" rendered="#{fixedAssetRegController.renderNew}"
+                                                                   value="#{fixedAssetRegController.sivs.srNo}"/>                                      
+                                                </div>                    
+                                                <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Requester}:" rendered="#{fixedAssetRegController.renderNew}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtRequester1" required="true"  requiredMessage="Requester required"  readonly="true"
+                                                                   rendered="#{fixedAssetRegController.renderNew}"
+                                                                   value="#{fixedAssetRegController.employeEntity.firstName}"/>
+                                                    <p:message for="txtRequester1" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel  for="txtWarrantyPeriodPrev" class="control-label col-sm-2" value="#{MMS.Warranty_Period}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtWarrantyPeriodPrev"  class="form-control" readonly="fasle"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntity.warrantyPeriod}"/>
+                                                    <p:message for="txtWarrantyPeriodPrev" display="icon"/>
+                                                </div>
+                                                <h:outputLabel  for="txtWarrantyOld" class="control-label col-sm-2" value="#{MMS.Warranty}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtWarrantyOld"  class="form-control" validator="#{validatorManagedBean.Text}"
+                                                                   readonly="false"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntity.warranty}"/>
+                                                    <p:message for="txtWarrantyOld" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel  for="txtWarranty" class="control-label col-sm-2" value="#{MMS.Company}:" rendered="#{fixedAssetRegController.renderNew}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtWarranty"  class="form-control" validator="#{validatorManagedBean.Text}"
+                                                                   rendered="#{fixedAssetRegController.renderNew}"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntity.warranty}"/>
+                                                    <p:message for="txtWarranty" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel  for="txtItemStatusNew" class="control-label col-sm-2" value="#{MMS.Item_Status}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtItemStatusNew"   readonly="true"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntity.itemStatus}"/>
+                                                    <p:message for="txtItemStatusNew" display="icon"/>
+                                                </div>
+                                                <h:outputLabel for="txtDescription" class="control-label col-sm-2" value="#{MMS.Description}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputTextarea id="txtDescription" class="form-control" validator="#{validatorManagedBean.Text}" placeholder="Text Only"  
+
+                                                                     value="#{fixedAssetRegController.fixedAssetRegDtlEntity.description}"/>
+                                                </div>  
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel  for="txtCostOld" class="control-label col-sm-2" value="#{MMS.Revaluation_Cost}:" rendered="#{fixedAssetRegController.renderOld}" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtCostOld"  class="form-control"  readonly="false"
+                                                                   rendered="#{fixedAssetRegController.renderOld}"
+                                                                   value="#{fixedAssetRegController.fixedAssetRegDtlEntityOLD.reevaluationCost}"
+
+                                                                   converterMessage="Please Insert Number"/>
+                                                    <p:message for="txtCostOld" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="buttonaddFADtl" class="control-label col-sm-2"/>  
+                                                <div class="col-sm-4">
+                                                    <p:commandButton id="btnAdd" class="btn btn-primary" action="#{fixedAssetRegController.addFixedAsetDetailAll()}" icon="ui-icon-new" validateClient="true" 
+                                                                     process="@this,frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,frmMaterialInfo"
+                                                                     value="#{fixedAssetRegController.addOrModifyBundle}"/>            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                        <h:panelGroup id="frmTblMaterialInfo">
+                            <div class="form-horizontal col-sm-12">
+                                <div class="form-group textBoxMargin6px">                                        
+                                    <div class="col-sm-12">
+                                        <p:dataTable id="tblMaterial1" value="#{fixedAssetRegController.mmsFixedAssetRegDtlDataModel}" rowIndexVar="rowContact" var="material"
+                                                     paginator="true" paginatorPosition="bottom" editable="true" >
+                                            <p:ajax event="rowEdit"  update="" />
+                                            <p:ajax event="rowEditCancel"  update="" />
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{MMS.No}"/>
+                                                </f:facet>
+                                                <h:outputText value="#{rowContact+1}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{MMS.Tag_No}" rendered="#{fixedAssetRegController.renderOld}" />
+                                                    <h:outputText value="Siv_No" rendered="#{fixedAssetRegController.renderNew}" />
+                                                    <h:outputText value="#{MMS.Item_Code}" rendered="#{fixedAssetRegController.renderPrevious}" />
+                                                </f:facet>
+                                                <h:outputText value="#{material.tagNo}" rendered="#{fixedAssetRegController.renderOld}" />
+                                                <h:outputText value="#{material.sivNo}" rendered="#{fixedAssetRegController.renderNew}" />
+                                                <h:outputText value="#{material.itemId.matCode}" rendered="#{fixedAssetRegController.renderPrevious}" />
+                                            </p:column>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="#{MMS.Item_Code}" rendered="#{fixedAssetRegController.renderNew}" />
+                                                    <h:outputText value="Item Code" rendered="#{fixedAssetRegController.renderOld}" />  
+                                                    <h:outputText value="Previous Code:" rendered="#{fixedAssetRegController.renderPrevious}" /> 
+                                                </f:facet>
+                                                <h:outputText value="#{material.itemId.matCode}" rendered="#{fixedAssetRegController.renderNew}" />
+                                                <h:outputText value="#{material.itemId.matCode}" rendered="#{fixedAssetRegController.renderOld}" />
+                                                <h:outputText value="#{material.previousCode}" rendered="#{fixedAssetRegController.renderPrevious}" />
+                                            </p:column>
+                                            <p:column rendered="#{fixedAssetRegController.renderOld}">
+                                                <f:facet name="header">                                 
+                                                    <h:outputText value="Previous Code" rendered="#{fixedAssetRegController.renderOld}" />  
+                                                </f:facet>
+                                                <h:outputText value="#{material.previousCode}" rendered="#{fixedAssetRegController.renderOld}" />  
+                                            </p:column>
+                                            <p:column rendered="#{fixedAssetRegController.renderNew}">
+                                                <f:facet name="header">                                 
+                                                    <h:outputText value="#{MMS.Tag_No}" rendered="#{fixedAssetRegController.renderNew}"/>  
+                                                </f:facet>
+                                                <h:outputText value="#{material.tagNo}" rendered="#{fixedAssetRegController.renderNew}" />  
+                                            </p:column>
+                                            <p:column rendered="#{fixedAssetRegController.renderOld}">
+                                                <f:facet name="header">                                 
+                                                    <h:outputText value="Revaluation Cost" rendered="#{fixedAssetRegController.renderOld}" />  
+                                                </f:facet>
+                                                <h:outputText value="#{material.previousCode}" rendered="#{fixedAssetRegController.renderOld}" />  
+                                            </p:column>
+                                            <p:column headerText="#{MMS.Warranty_Period}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{material.warrantyPeriod}" /></f:facet>
+                                                    <f:facet name="input"><p:inputText id="desk1" value="#{material.warrantyPeriod}" style="width:100%"/></f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                            <p:column headerText="#{MMS.Warranty}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{material.warranty}" /></f:facet>
+                                                    <f:facet name="input"><p:inputText id="desk" value="#{material.warranty}" style="width:100%"/></f:facet>
+                                                </p:cellEditor>
+                                            </p:column>                       
+                                            <p:column headerText="#{MMS.Description}">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText value="#{material.description}" /></f:facet>
+                                                    <f:facet name="input"><p:inputText id="val" value="#{material.description}" style="width:100%"/></f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+
+                                            <p:column headerText="#{MMS.Option}">
+                                                <p:commandLink action="#{fixedAssetRegController.editDataTable}" value="Edit" 
+                                                               process="@this,:frmRegisterUI:tblMaterial1"
+                                                               update="@this,:frmRegisterUI:frmMaterialInfo"/>
+                                            </p:column>   
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Receiver_Information}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmApproverInfo">
+                                    <div class="form-horizontal col-sm-12">                                       
+                                        <div class="form-horizontal col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtApprovedBy" 
+                                                                 value="#{fixedAssetRegController.userName}"
+                                                                 required="true" requiredMessage="Processed by is required" readonly="true"/>
+                                                    <p:message for="txtApprovedBy" display="icon" />
+                                                </div>
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtAcceptedDate" class="form-control" value="#{fixedAssetRegController.workFlow.processedOn}"
+                                                                 required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                                 onclick="displayCalendar('frmRegisterUI:txtAcceptedDate', 'frmRegisterUI:txtAcceptedDate');" />                                                                                                                                                    
+                                                    <p:message for="txtAcceptedDate" display="icon"/>
+                                                </div> 
+                                            </div>
+                                            <h:panelGroup id="padding">
+                                                <div class="form-group textBoxMargin6px"> 
+                                                    <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="Decicsion:" rendered="#{fixedAssetRegController.renderDecision}"/>
+                                                    <div class="col-sm-4">
+                                                        <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{fixedAssetRegController.selectedValue}" rendered="#{fixedAssetRegController.renderDecision}">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                            <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                        </p:selectOneMenu>   
+                                                    </div> 
+                                                    <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="comment:" rendered="#{fixedAssetRegController.renderDecision}"/>
+                                                    <div class="col-sm-4">
+                                                        <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{fixedAssetRegController.workFlow.commentGiven}"  rendered="#{fixedAssetRegController.renderDecision}"/>     
+                                                    </div> 
+                                                </div>
+                                            </h:panelGroup>
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="saveButtonFAR" class="control-label col-sm-2"/>
+                                                <div class="col-sm-4">
+                                                    <p:commandButton id="btnSave" class="btn btn-primary" action="#{fixedAssetRegController.saveFARegistration()}" icon="ui-icon-new" validateClient="true"
+
+                                                                     process="@this,frmRegisterUI:frmGatePassDtlInfo,frmRegisterUI:frmApproverInfo"  
+                                                                     update="frmGatePassDtlInfo,:frmRegisterUI,:frmToolbar"
+                                                                     value="#{fixedAssetRegController.saveorUpdateBundle}"/> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

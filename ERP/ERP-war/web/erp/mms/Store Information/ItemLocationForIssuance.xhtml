@@ -1,0 +1,575 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+
+        <li><a href="ReceivableItemLocation.xhtml"><i class="fa fa-circle-o"></i> <span>Receivable Item Location </span></a></li> 
+        <li><a href="MmsStoreRequisition.xhtml"><i class="fa fa-circle-o"></i> <span>Store Requisition</span></a></li> 
+        <li><a href="StoreInformation.xhtml"><i class="fa fa-circle-o"></i> <span>Store Information</span></a></li> 
+        <li><a href="ShelfRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Location Management Shelf</span></a></li>
+        <li><a href="ShelfCellInformations.xhtml"><i class="fa fa-circle-o"></i> <span>Location Management Cell</span></a></li>
+        <li><a href="shelfLife.xhtml"><i class="fa fa-circle-o"></i> <span>Shelf Life</span></a></li>
+        <li><a href="DepartmentToStoreMapper.xhtml"><i class="fa fa-circle-o"></i> <span>Department To Store</span></a></li>
+
+    </ui:define>
+
+    <ui:define name="contents">   
+
+
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{itemLocationIssuanceController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch" action="#{itemLocationIssuanceController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>                   
+                    <p:commandButton  id="btnNew" action="#{itemLocationIssuanceController.createNewLocationIssuance()}" icon="#{itemLocationIssuanceController.icone}" validateClient="true" 
+                                      style="background-color: white;border-color: white"
+                                      process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                      title="#{itemLocationIssuanceController.createOrSearchBundle}"  />
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/Store Information/ItemLocationForIssuance.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{itemLocationIssuanceController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px required">   
+                                            <h:outputLabel  for="selectStoreInfoList" class="control-label col-sm-2" value="Store Name:"/>
+                                            <div class="col-sm-3">
+                                                <p:selectOneMenu   id="selectStoreInfoList" style="width: 100%"  required="true"  requiredMessage="Store Name Is required"
+                                                                   converter="entConverter"   value="#{itemLocationIssuanceController.storeInfoEntity}"
+                                                                   valueChangeListener="#{itemLocationIssuanceController.handleSelectStoreNameForSearch}" 
+                                                                   > 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuQualification" 
+                                                                   value="#{itemLocationIssuanceController.storeList}" var="store" itemLabel="#{store.storeName}" itemValue="#{store}"
+                                                                   />
+                                                    <p:ajax update="selectStoreInfoList" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectStoreInfoList" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="Item Code:"/>
+
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtItemcode" class="form-control" value="#{itemLocationIssuanceController.itemRegEntity.matCode}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="Item Name:"/>
+
+                                            <div class="col-sm-3">
+                                                <p:inputText id="txtItemName" class="form-control" value="#{itemLocationIssuanceController.itemRegEntity.matName}"/>
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-3">
+                                                <p:commandButton id="btnFindInfo" class="btn btn-primary" icon="ui-icon-search" action="#{itemLocationIssuanceController.searchLocationInformation()}"
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find" />            
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+
+                        <div class="row"> 
+                            <a href="../../../../../../../../../Back-Up/11-12-2021 fold and removecomment/25-06-2021 fold/27-04-2021/EEP-P/EEP_ERP/EEP_ERP-war/src/java/et/gov/eep/mms/controller/ItemLocationIssuanceController.java"></a>
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{itemLocationIssuanceController.mmsLocationDtlSearchInfoDataModel}" var="locInfo" rows="5"
+                                                             selectionMode="single" rowIndexVar="num"
+                                                             selection="#{itemLocationIssuanceController.selectedLocation}" rowKey="#{locInfo.id}" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowSelect" listener="#{itemLocationIssuanceController.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar, :frmRegisterUI:store, :frmRegisterUI:SavePanel, :frmRegisterUI:registerUI, "/>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="S.No" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Item Code" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{locInfo.materialId.matCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Item Name" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{locInfo.materialId.matName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Store" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{locInfo.manageLocationId.storeId.storeName}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Rack Code" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{locInfo.shelfId.rackCode}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Cell Code" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{locInfo.cellId.cellCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Location Quantity" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{locInfo.locationQuantity}"/>
+                                                    </p:column>
+
+                                                </p:dataTable>
+
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{itemLocationIssuanceController.renderPnlCreateLocationissuance}" >
+                <h:panelGroup id="SavePanel" rendered="#{itemLocationIssuanceController.renderPanelSave}">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Item Location(For Issue)</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:panelGroup id="selectOptions">
+                                        <div class="form-horizontal  col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  for="CheckType1" class="control-label col-sm-2" value="Select Option:"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneRadio id="CheckType1" layout="grid" columns="3" value="#{itemLocationIssuanceController.checkType}" required="true" class="col-sm-4"
+                                                                      requiredMessage="Type is Required" valueChangeListener="#{itemLocationIssuanceController.changeCheckRecievableType}">
+                                                        <f:selectItem itemLabel="SIV" itemValue="SIV" />
+
+                                                        <f:selectItem itemLabel="ISIV" itemValue="ISSUEDISIV" />   
+
+
+                                                        <p:ajax process="@this" update="siv,ISIV"  event="valueChange" />  
+                                                    </p:selectOneRadio>                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="store">
+                                        <div class="form-horizontal  col-sm-12"> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel  for="selectStoreInfoList1" class="control-label col-sm-2" value="Store Name:"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu   id="selectStoreInfoList1" style="width: 100%"  required="true"  requiredMessage="Store Name Is required"
+                                                                       converter="entConverter"  value="#{itemLocationIssuanceController.storeInfoEntity}"
+                                                                       valueChangeListener="#{itemLocationIssuanceController.handleSelectStoreName}" 
+                                                                       > 
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems id="selectOneMenuQualification2" 
+                                                                       value="#{itemLocationIssuanceController.storeList}" var="stores" itemLabel="#{stores.storeName}" itemValue="#{stores}"
+                                                                       />
+                                                        <p:ajax update="siv,ISIV,selectOneListSivNo" process="@this" event="change" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="selectStoreInfoList1" display="icon"/>
+
+                                                </div>
+                                            </div>   
+                                        </div>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="siv">
+                                        <h:panelGroup id="frmGatePassDtlInfo" rendered="#{itemLocationIssuanceController.renderSiv}">
+                                            <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                            <div class="form-horizontal  col-sm-12"> 
+
+
+                                                <div class="form-group textBoxMargin6px required">
+
+                                                    <h:outputLabel id="lblsivApprovedno" class="control-label col-sm-2" value="SIV:" />
+                                                    <div class="col-sm-4">
+                                                        <p:selectOneMenu id="selectOneListSivNo"  style="width: 100%;" disabled="#{itemLocationIssuanceController.disableSivNoList}"
+                                                                         converter="entConverter"  value="#{itemLocationIssuanceController.sivEntity}" required="true" requiredMessage="SIV Number is Required"
+                                                                         valueChangeListener="#{itemLocationIssuanceController.handleSelectSivNo}"  
+                                                                         filterMatchMode="contains" filter="true" >
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" />  
+                                                            <f:selectItems id="selectservicepanaless" value="#{itemLocationIssuanceController.approvedSivList}" 
+                                                                           var="siv" itemLabel="#{siv.sivNo}" itemValue="#{siv}"/>                            
+                                                            <p:ajax update=":frmRegisterUI:selectOneListBoxGrnMatCodeList" process="@this" event="change" />
+                                                        </p:selectOneMenu>  
+                                                        <p:message for="selectOneListSivNo" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+                                    <h:panelGroup id="ISIV">
+                                        <h:panelGroup id="frmGatePassDtlInfo2" rendered="#{itemLocationIssuanceController.renderIsivIssuance}">
+
+                                            <div class="form-horizontal  col-sm-12"> 
+
+
+                                               <div class="form-group textBoxMargin6px required">
+
+                                                    <h:outputLabel id="lblisivApprovedno" class="control-label col-sm-2" value="ISIV:" />
+                                                    <div class="col-sm-4">
+                                                        <p:selectOneMenu id="selectOneListIsivNo"  style="width: 100%;" disabled="#{itemLocationIssuanceController.disableIsivNoList}"
+                                                                         converter="entConverter"    value="#{itemLocationIssuanceController.isivEntity}" 
+                                                                         required="true" requiredMessage="ISIV Number is required"
+                                                                         valueChangeListener="#{itemLocationIssuanceController.handleSelectIsivNo}"  
+                                                                         filterMatchMode="contains" filter="true" > 
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" />  
+                                                            <f:selectItems id="selectservicepanaless2" value="#{itemLocationIssuanceController.approvedIsivList}" var="isivitem" itemLabel="#{isivitem.transferNo}" itemValue="#{isivitem}"/>                            
+                                                            <p:ajax update=":frmRegisterUI:selectOneListBoxGrnMatCodeList" process="@this" event="change" />
+                                                        </p:selectOneMenu>  
+                                                        <p:message for="selectOneListIsivNo" display="icon"/>
+                                                    </div>
+
+
+                                                </div>
+
+
+
+
+                                            </div>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Item Location Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGrnMaterialInfo"  >
+
+                                    <div class="form-horizontal col-sm-12"> 
+
+                                        <div class="form-group textBoxMargin6px required"> 
+
+                                            <h:outputLabel class="control-label col-sm-2"  value="Item List:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="selectOneListBoxGrnMatCodeList"  converter="entConverter"
+                                                                 style="width: 100%;" value="#{itemLocationIssuanceController.itemRegEntity}"
+                                                                 valueChangeListener="#{itemLocationIssuanceController.handleSelectMaterial}" filterMatchMode="contains" filter="true" 
+                                                                 required="true" requiredMessage="Item List is Required" >
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                    <f:selectItems id="selectItemListBoxGrnMatCodeList" var="matcodes"   value="#{itemLocationIssuanceController.itemInfoList}"  itemLabel="#{matcodes.matName}" itemValue="#{matcodes}" />                            
+                                                    <p:ajax update="selectOneListBoxGrnMatCodeList,txtGrnMatCodes,:frmRegisterUI:txtGrnMatName,txtGrnTotalQuantity,txtGrnQuantity,:frmRegisterUI:tblViewMaterial1,:frmRegisterUI:selectOneListSivNo,:frmRegisterUI:selectOneListIsivNo" process="@this" event="change" />
+                                                </p:selectOneMenu>
+                                                <p:message for="selectOneListBoxGrnMatCodeList" display="icon"/>
+                                            </div>
+
+                                            <h:outputLabel   class="control-label col-sm-2" value="Total Quantity:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtGrnTotalQuantity" required="true"  readonly="true"
+                                                               value="#{itemLocationIssuanceController.mmsManageLocationDtlEntity.totalQuantity}"/>
+                                                <p:message for="txtGrnTotalQuantity" display="icon"/>
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px"> 
+
+                                            <h:outputLabel  for="txtGrnMatCodes" class="control-label col-sm-2" value="Item Code:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtGrnMatCodes"   readonly="true"
+
+                                                               value="#{itemLocationIssuanceController.itemRegEntity.matCode}" />
+                                                <p:message for="txtGrnMatCodes" display="icon"/>
+                                            </div>
+
+                                            <h:outputLabel  for="txtGrnMatName" class="control-label col-sm-2" value="Item Name:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtGrnMatName"   readonly="true"
+
+                                                               value="#{itemLocationIssuanceController.itemRegEntity.matName}"/>
+                                                <p:message for="txtGrnMatName" display="icon"/>
+                                            </div>
+
+
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel  for="txtGrnQuantity"  class="control-label col-sm-2" value="Location Quantity:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtGrnQuantity" readonly="true" 
+                                                               value="#{itemLocationIssuanceController.mmsManageLocationDtlEntity.locationQuantity}"
+                                                               ><p:ajax></p:ajax>
+
+                                                </p:inputText>
+                                                <p:message for="txtGrnQuantity" display="icon" />
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel  for="txtAdjustQuantity"  class="control-label col-sm-2" value="Quantity:" rendered="#{itemLocationIssuanceController.readOnlyquantiy}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtAdjustQuantity" class="form-control" rendered="#{itemLocationIssuanceController.readOnlyquantiy}"
+                                                               required="true" requiredMessage="Quantity is required"  converterMessage="Pls Enter Only Digits"
+                                                               value="#{itemLocationIssuanceController.mmsManageLocationDtlEntity.quantityAdjustment}"
+                                                               />
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  for="txtQuantity"  class="control-label col-sm-2" value="Deduct Quantity:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtQuantity" class="form-control" readonly="#{itemLocationIssuanceController.readOnlyDeductquantiy}"
+                                                               required="true" requiredMessage="Quantity is required" converterMessage="Pls Enter Only Digits"
+                                                               value="#{itemLocationIssuanceController.mmsManageLocationDtlEntity.deductedQuantity}"/>
+                                                <p:message for="txtQuantity" display="icon"/>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnAddButton"  class="btn btn-primary" disabled="{itemLocationIssuanceController.disableBtnAdd}" 
+                                                                  action="#{itemLocationIssuanceController.addDetail}" icon="ui-icon-add" validateClient="true" 
+                                                                  process="frmGrnMaterialInfo" 
+                                                                  update=":frmRegisterUI:frmTblGrnMaterialInfo,:frmRegisterUI:viewLocationInfo,frmGrnMaterialInfo"
+                                                                  value="#{itemLocationIssuanceController.addorModify}"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblGrnMaterialInfo" >
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblGrnMaterial" class="dataTable"
+                                                             value="#{itemLocationIssuanceController.deductionDataModel}" 
+                                                             var="material"   rowIndexVar="num" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowEdit" listener="#{itemLocationIssuanceController.edit2(event)}" update=":frmRegisterUI:frmGrnMaterialInfo" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="S.No"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column >                                                             
+                                                        <f:facet name="header">
+                                                            <h:outputLabel   value="Item Code"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{material.materialId.matCode}"/>
+                                                    </p:column>    
+                                                    <p:column >                                                             
+                                                        <f:facet name="header">
+                                                            <h:outputLabel   value="Item Name"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{material.materialId.matName}"/>
+                                                    </p:column>    
+                                                    <p:column  >                                    
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Cell Code"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{material.cellId.cellCode}"/>               
+                                                    </p:column>
+                                                    <p:column   >                                    
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Shelf Code"/>  
+                                                        </f:facet>
+                                                        <h:outputText  value="#{material.shelfId.rackCode}"/>
+                                                    </p:column>
+                                                    <p:column rendered="#{itemLocationIssuanceController.renderPanelSave}">                                                             
+                                                        <f:facet name="header">
+                                                            <h:outputLabel   value="Previous Quantity" />
+                                                        </f:facet>
+                                                        <h:outputText  value="#{material.locationQuantity + material.deductedQuantity}"/>
+                                                    </p:column>   
+                                                    <p:column  rendered="#{itemLocationIssuanceController.renderPanelSave}">                                                             
+                                                        <f:facet name="header" >
+                                                            <h:outputLabel   value="Amount Deducted"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{material.deductedQuantity}"/>
+                                                    </p:column>   
+                                                    <p:column >                                                             
+                                                        <f:facet name="header">
+                                                            <h:outputLabel   value="Current Location Quantity"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{material.locationQuantity}"/>
+                                                    </p:column>   
+                                                    <p:column >                                                                                                 
+                                                        <p:commandLink value="Edit" action="#{itemLocationIssuanceController.edit2(event)}"  update="tblGrnMaterial,:frmRegisterUI:frmGrnMaterialInfo"
+                                                                       process="@this" >
+                                                        </p:commandLink>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup id="viewLocationInfo" rendered="#{itemLocationIssuanceController.renderPanelSave}">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblViewMaterial1" class="dataTable"
+                                                             value="#{itemLocationIssuanceController.locationDetailDataModel}" 
+                                                             var="location" rows="5"   rowIndexVar="num" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowEdit" listener="#{itemLocationIssuanceController.edit(event)}" update="tblViewMaterial1,:frmRegisterUI:frmGrnMaterialInfo" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="S.No"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column >                                                             
+                                                        <f:facet name="header">
+                                                            <h:outputLabel   value="Item Code"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{location.materialId.matCode}"/>
+                                                    </p:column>    
+                                                    <p:column >                                                             
+                                                        <f:facet name="header">
+                                                            <h:outputLabel   value="Item Name"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{location.materialId.matName}"/>
+                                                    </p:column>    
+                                                    <p:column  >                                    
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Cell Code"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{location.cellId.cellCode}"/>               
+                                                    </p:column>
+                                                    <p:column   >                                    
+                                                        <f:facet name="header">
+                                                            <h:outputLabel  value="Shelf Code"/>  
+                                                        </f:facet>
+                                                        <h:outputText  value="#{location.shelfId.rackCode}"/>
+                                                    </p:column>
+                                                    <p:column >                                                             
+                                                        <f:facet name="header">
+                                                            <h:outputLabel   value="Current Location Quantity"/>
+                                                        </f:facet>
+                                                        <h:outputText  value="#{location.locationQuantity}"/>
+                                                    </p:column>   
+                                                    <p:column >                                                                                                 
+                                                        <p:commandLink value="Edit" action="#{itemLocationIssuanceController.edit(event)}"  update=":frmRegisterUI:frmGrnMaterialInfo"
+                                                                       process="@this" >
+                                                        </p:commandLink>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSaveGrnButton" class="btn btn-primary" action="#{itemLocationIssuanceController.saveItemLocationIssuance()}"  validateClient="true" 
+                                                                 process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:store
+                                                                 :frmRegisterUI:frmGatePassDtlInfo2,
+                                                                 :frmRegisterUI:frmTblGrnMaterialInfo"
+                                                                 update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblGrnMaterialInfo,:frmRegisterUI:frmGatePassDtlInfo2,:frmRegisterUI" 
+                                                                 value="#{itemLocationIssuanceController.saveorUpdateBundle}"/> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

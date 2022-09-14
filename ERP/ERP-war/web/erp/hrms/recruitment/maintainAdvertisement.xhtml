@@ -1,0 +1,434 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">        
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li> 
+        <li><a href="recruitmentRequests.xhtml"> <span>Recruitment Request</span></a></li> 
+        <li><a href="recruitmentApprove.xhtml">Recruitment Approve</a></li>        
+        <li><a href="candidateRegistration.xhtml">Candidate Registration</a></li>
+        <li><a href="assessmentWeight.xhtml" title="Exam Percentage">Assessment Weight</a></li>
+        <li><a href="shortlistCandidates.xhtml">Shortlist Candidates</a></li>
+        <li><a href="filterCandidate.xhtml">Filter Candidate</a></li>
+    </ui:define>
+
+    <ui:define name="contents">   
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                       <h:panelGroup id="pnlPlus"  rendered="#{hrMentainAdvertisement.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{hrMentainAdvertisement.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white"  title="New Or Search"
+                                         process="@this" update="@this,:frmAdvert,frmSample" 
+                                         />
+                        <span class="ui-separator">
+
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton validateClient="true" action="#{hrMentainAdvertisement.createNewGatePassInfo()}"
+                                     icon="#{hrMentainAdvertisement.icone}" style="background-color: white;border-color: white" 
+                                     process="@this" update="@this,:frmAdvert" title="#{hrMentainAdvertisement.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="maintainAdvertisement.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>                        
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form> 
+        <h:form id="frmAdvert"> 
+            <h:panelGroup id="pnlDtSearch" rendered="#{hrMentainAdvertisement.renderPnlCreateGatePass}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"> Search <small> Maintain Advertisement ...</small></h3>                       
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="col-md-12">   
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <p:dataTable id="tblRequestList" value="#{hrMentainAdvertisement.advertiseDataModel}" widgetVar="mainAdvet"
+                                                             var="rqst" selectionMode="single" rowIndexVar="num" paginator="true" class="dataTable" 
+                                                             rows="15" paginatorPosition="bottom" rowsPerPageTemplate="10,20,30" rowKey="#{rqst.id}">
+                                                    <p:ajax event="rowSelect" listener="#{hrMentainAdvertisement.populateMentainAdvertisement}"
+                                                            process="@this,tblRequestList" update="@this,:frmSample,:frmAdvert"/>
+                                                    <p:column headerText="No" style="width: 50px">
+                                                        <h:outputText value="#{num + 1}"/>
+                                                    </p:column>
+                                                    <p:column headerText="Vacancy No" filterMatchMode="contains" filterBy="#{rqst.batchCode}">
+                                                        <h:outputText value="#{rqst.batchCode}"/>
+                                                    </p:column> 
+                                                    <p:column filterBy="#{rqst.advertType}" headerText="Announcment Type" filterMatchMode="contains">
+                                                        <f:facet name="filter">
+                                                            <p:selectOneMenu onchange="PF('mainAdvet').filter()">
+                                                                <f:selectItems value="#{hrMentainAdvertisement.type}"/>
+                                                            </p:selectOneMenu> 
+                                                        </f:facet>
+                                                        <h:outputText value="#{rqst.advertType}"/>
+                                                    </p:column>
+                                                    <p:column headerText="Start Date">
+                                                        <h:outputText value="#{rqst.advertDateFrom}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="End Date">
+                                                        <h:outputText value="#{rqst.advertDateTo}"/>
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+            <h:panelGroup id="inputAdvetisement" rendered="#{hrMentainAdvertisement.renderPnlManPage}">
+                <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/> 
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"> Maintain Advertisement <small></small></h3>                       
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <h:panelGroup id="pnl1">  
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <div class="form-group">
+                                                            <div class=" col-sm-12">
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-sm-12 form-horizontal form-group form-group required">
+                                                                        <h:outputLabel for="drdBatchCode" class="control-label col-sm-4" value="Vacancy No: " rendered="#{hrMentainAdvertisement.batchCode1}"/>
+                                                                        <div class="col-sm-8">
+                                                                            <p:selectOneMenu id="drdBatchCode" value="#{hrMentainAdvertisement.hrRecruitmentRequests.batchCode}"
+                                                                                             valueChangeListener="#{hrMentainAdvertisement.handleBatchCodeEvent}" style="width:100%"
+                                                                                             rendered="#{hrMentainAdvertisement.batchCode1}" required="true" requiredMessage="Select batch code">                                                          
+                                                                                <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                <f:selectItems value="#{hrMentainAdvertisement.getBatchCodeList()}"/>
+                                                                                <p:ajax event="change" process="@this" update="tblRecruitment"/>
+                                                                            </p:selectOneMenu> 
+                                                                            <p:message for="drdBatchCode" display="icon"/>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-sm-12 form-horizontal form-group" >
+                                                                        <h:outputLabel for="txtVacancyNo" value="Vacancy No:" rendered="#{hrMentainAdvertisement.batchCode2}"
+                                                                                       class="control-label col-sm-4"/>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText id="txtVacancyNo" value="#{hrMentainAdvertisement.batchCode}"                                                                                           
+                                                                                         readonly="true" rendered="#{hrMentainAdvertisement.batchCode2}"/>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="drdAnnouncmentType" class="control-label col-sm-4" value="Announcment Type: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneRadio id="drdAnnouncmentType" value="#{hrMentainAdvertisement.hrAdvertisements.advertType}"
+                                                                                                  valueChangeListener="#{hrMentainAdvertisement.vlcRenderedMedia}"  
+                                                                                                  required="true" requiredMessage="Select announcment type" class="col-sm-6">
+                                                                                    <f:selectItem itemLabel="Inside" itemValue="Inside"/>
+                                                                                    <f:selectItem itemLabel="Outside" itemValue="Outside"/> 
+                                                                                    <p:ajax event="change" process="@this,drdAnnouncmentType" 
+                                                                                            update=":frmAdvert,:frmAdvert:tblMedia"/>
+                                                                                </p:selectOneRadio>
+                                                                                <p:message for="drdAnnouncmentType" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <div class="form-group">
+                                                            <div class="col-md-12" style="margin-top: 20px;">
+                                                                <div class="form-group form-horizontal col-sm-12">
+                                                                    <p:dataTable id="tblRecruitment" value="#{hrMentainAdvertisement.hrAdvertisedJobsModel}"
+                                                                                 var="advJob" class="dataTable" rowIndexVar="num"> 
+                                                                        <p:column style="width: 50px"> 
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="No"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{num+1}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Job Code"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{advJob.jobId.jobCode}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Job Title"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{advJob.jobId}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Grade"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{advJob.jobId.jobGradeId.gradeId.grade}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Recruitment Type"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{advJob.middleName}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Number of Employees"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{advJob.height}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Number of Requests"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{advJob.weight}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Departments"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{advJob.lastName}"/>
+                                                                        </p:column>                                        
+                                                                    </p:dataTable> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </section>
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <div class=" col-sm-12">
+                                                            <div class="col-sm-6">
+                                                                <div class="col-sm-12 form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtStartDate" class="control-label col-sm-4" value="Start Date: "/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtStartDate" value="#{hrMentainAdvertisement.hrAdvertisements.advertDateFrom}"
+                                                                                     required="true" requiredMessage="Enter vacancy announcement start date" placeholder="Announcement start date"
+                                                                                     onclick="displayCalendar('frmAdvert:txtStartDate', 'frmAdvert:txtStartDate');" class="form-control"
+                                                                                     validator="#{validatorManagedBean.Date}" validatorMessage="Start date should be in date formate" 
+                                                                                     title="Announcement start date"/>                                                                                                                                                    
+                                                                        <p:message for="txtStartDate" display="icon" />
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <div class="col-sm-12 form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtEndDate" class="control-label col-sm-4" value="End Date: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtEndDate" value="#{hrMentainAdvertisement.hrAdvertisements.advertDateTo}"
+                                                                                     required="true" requiredMessage="Enter vacancy announcement end date" placeholder="Announcement end date"
+                                                                                     onclick="displayCalendar('frmAdvert:txtEndDate', 'frmAdvert:txtEndDate');" class="form-control"
+                                                                                     validator="#{validatorManagedBean.Date}" validatorMessage="End date should be in date formate"
+                                                                                     title="Announcement end date"/>                                                                                                                                                    
+                                                                        <p:message for="txtEndDate" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </section>                                                
+                                            </h:panelGroup>
+                                            <h:panelGroup id="inputMedia" rendered="#{hrMentainAdvertisement.renderedMedia}">  
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <div class="form-group">
+                                                            <div class=" col-sm-12">
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-sm-12 form-horizontal form-group required">
+                                                                        <p:outputLabel class="control-label col-sm-4" value="Media Type: "/>
+                                                                        <div class="col-sm-7">
+                                                                            <p:selectOneMenu id="drdMediaType" value="#{hrMentainAdvertisement.hrLuMediaTypes.mediaType}"
+                                                                                             valueChangeListener="#{hrMentainAdvertisement.changeMediatype}" 
+                                                                                             required="true" requiredMessage="Select media type" style="width:100%">
+                                                                                <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                                                <f:selectItems value="#{hrMentainAdvertisement.findhrluMedias()}"/>
+                                                                                <p:ajax event="change" onstart="true" process="@this"/> 
+                                                                            </p:selectOneMenu>
+                                                                            <p:message for="drdMediaType
+                                                                                       " display="icon"/>
+                                                                        </div>
+                                                                        <div class ="col-sm-1">
+                                                                            <p:commandButton id="btnMediaType" value="+" onclick="PF('mediaTypeDlg').show();"
+                                                                                             title="Click to register media type" type="button" style="background: transparent;"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div> 
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-sm-12 form-horizontal form-group required">
+                                                                        <p:outputLabel value="Occurrence: " class="control-label col-sm-4"/>
+                                                                        <div class="col-sm-8">                                
+                                                                            <p:inputText id="txtOccurrence" required="true" requiredMessage="Enter occurrence"
+                                                                                         value="#{hrMentainAdvertisement.hrMedias.occurrence}" class="form-control"/>
+                                                                            <!-- <p:calendar id="txtOccurrence" pattern="HH:mm" timeOnly="true"/>-->
+                                                                            <p:message for="txtOccurrence" display="icon"/>
+                                                                        </div>     
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-12">
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-sm-12 form-horizontal">
+                                                                        <div class="col-sm-4">                                                              
+                                                                        </div>                                                                    
+                                                                        <div class="col-sm-3">
+                                                                            <center>
+                                                                                <p:commandButton id="btnAdd" value="#{hrMentainAdvertisement.addOrModify}" class="btn  btn-block btn-primary col-sm-4" 
+                                                                                                 action="#{hrMentainAdvertisement.addMediaToAdvert()}"
+                                                                                                 process="@this,inputMedia" update="@this,tblMedia,inputMedia"/>
+                                                                            </center>                                                                            
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <p:dataTable id="tblMedia" value="#{hrMentainAdvertisement.hrMediasModel}" selectionMode="single"
+                                                                                 rowIndexVar="num" var="md" rowKey="#{md.mediaTypeId.mediaType}" widgetVar="md"  
+                                                                                 rows="20" rendered="#{hrMentainAdvertisement.renderedMedia}" styleClass="dataTable">
+                                                                        <p:ajax event="rowSelect" listener="#{hrMentainAdvertisement.editDataTable}" update=":frmAdvert,:frmSample"/>
+                                                                        <p:column style="width: 50px"> 
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="No"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{num+1}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Media Type"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{md.mediaTypeId.mediaType}"/>
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Occurrence"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{md.occurrence}"/>
+                                                                        </p:column>
+                                                                    </p:dataTable> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section> 
+                                                </section>   
+                                            </h:panelGroup>
+                                            <h:panelGroup id="dlgpnl">
+                                                <p:dialog id="mediaTypeDlg" header="Register media type" widgetVar="mediaTypeDlg" 
+                                                          height="300" width="600" modal="true" resizable="tru" showEffect="explode">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="row">
+                                                                <div class="box-body">
+                                                                    <div class="form-horizontal col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtMediaType" class="control-label col-sm-4" value="Media Type: "/> 
+                                                                            <div class="col-sm-8">
+                                                                                <h:inputText id="txtMediaType" value="#{hrMentainAdvertisement.hrLuMediaTypes.mediaType}"  
+                                                                                             requiredMessage="Enter media type" required="true" title="Media Type" class="form-control"/>
+                                                                                <p:message for="txtMediaType" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div> 
+                                                                    <div class="form-horizontal col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtdlgDescription" class="control-label col-sm-4" value="Description:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <h:inputTextarea id="txtdlgDescription" value="#{hrMentainAdvertisement.hrLuMediaTypes.description}"
+                                                                                                 validator="#{validatorManagedBean.Remark}"   
+                                                                                                 rows="1" cols="3" title="Description" class="form-control"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                    <div class="form-horizontal col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtUpdate" class="control-label col-sm-4"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:autoComplete id="txtUpdate" completeMethod="#{hrMentainAdvertisement.searchByMediaType}"
+                                                                                                emptyMessage="no data found" placeholder="Search media type to update"
+                                                                                                title="Only for updating" style="width:100%" styleClass="forItxt"
+                                                                                                var="mediaList" itemValue="#{mediaList.mediaType}" itemLabel="#{mediaList}">  
+                                                                                    <p:ajax event="itemSelect" listener="#{hrMentainAdvertisement.getByMediaType}" 
+                                                                                            process="@this" update="dlgpnl" oncomplete="PF('mediaTypeDlg').show();"/>  
+                                                                                    <p:column headerText="Media Type">
+                                                                                        <h:outputText value="#{mediaList.mediaType}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="Description">
+                                                                                        <h:outputText value="#{mediaList.description}"/>
+                                                                                    </p:column>
+                                                                                </p:autoComplete>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                    <div class="form-horizontal col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <div class="col-md-4 "></div>
+                                                                            <div class="col-sm-3">
+                                                                                <p:commandButton id="btnDlgSave" value="#{hrMentainAdvertisement.popupSaveOrUpdate}"                                              
+                                                                                                 action="#{hrMentainAdvertisement.saveMediaType()}"
+                                                                                                 process="@this,dlgpnl" update="dlgpnl,drdMediaType"
+                                                                                                 oncomplete="PF('mediaTypeDlg').show();" class="btn  btn-block btn-primary col-lg-4"/> 
+                                                                            </div>
+                                                                            <div class="col-sm-3">
+                                                                                <p:commandButton id="btnCancel" value="Cancel" class="btn  btn-block btn-primary col-lg-4"                                           
+                                                                                                 action="#{hrMentainAdvertisement.btnCancel()}"
+                                                                                                 title="Cancel" process="@this" update="dlgpnl"
+                                                                                                 oncomplete="PF('mediaTypeDlg').show();"/> 
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </p:dialog> 
+                                            </h:panelGroup>
+                                            <h:panelGroup id="pnlSave">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4"/>                                           
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" value="#{hrMentainAdvertisement.saveorUpdate}"
+                                                                                     action="#{hrMentainAdvertisement.saveMaintainAdvertisement()}" 
+                                                                                     class="btn  btn-block btn-primary col-lg-4"
+                                                                                     process="@this,:frmAdvert:drdAnnouncmentType,:frmAdvert:txtStartDate,:frmAdvert:drdBatchCode
+                                                                                     :frmAdvert:txtEndDate,:frmAdvert:tblMedia" update="@this,inputAdvetisement,frmAdvert"/>  
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                            </h:panelGroup>
+                                        </div>     
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                   
+                </div>
+            </h:panelGroup>
+        </h:form> 
+    </ui:define>
+</ui:composition>
+

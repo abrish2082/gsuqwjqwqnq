@@ -1,0 +1,169 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package et.gov.eep.hrms.entity.evaluation;
+
+import et.gov.eep.hrms.entity.employee.HrEmployees;
+import et.gov.eep.hrms.entity.organization.HrDepartments;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+/**
+ *
+ * @author INSA
+ */
+@Entity
+@Table(name = "HR_BSC")
+@XmlRootElement
+@NamedQueries({
+    @NamedQuery(name = "HrBsc.findAll", query = "SELECT h FROM HrBsc h"),
+    @NamedQuery(name = "HrBsc.findById", query = "SELECT h FROM HrBsc h WHERE h.id = :id"),
+    @NamedQuery(name = "HrBsc.findByDeptId", query = "SELECT h FROM HrBsc h WHERE h.deptId = :deptId"),
+    
+    @NamedQuery(name = "HrBsc.findEmployee", query = "SELECT h FROM HrEmployees h WHERE h.deptId.depId = :deptId"),
+    @NamedQuery(name = "HrBsc.findByDepName", query = "SELECT h FROM HrBsc h WHERE h.deptId.depName = :depName"),
+    
+    @NamedQuery(name = "HrBsc.findByPreparedBy", query = "SELECT h FROM HrBsc h WHERE h.preparedBy = :preparedBy"),
+    @NamedQuery(name = "HrBsc.findByPreparedOn", query = "SELECT h FROM HrBsc h WHERE h.preparedOn = :preparedOn")})
+public class HrBsc implements Serializable {
+    private static final long serialVersionUID = 1L;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "HR_BSC_SEQ")
+    @SequenceGenerator(name = "HR_BSC_SEQ", sequenceName = "HR_BSC_SEQ", allocationSize = 1)
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "ID")
+    private Integer id;
+    @Size(max = 20)
+    @Column(name = "PREPARED_ON")
+    private String preparedOn;
+    
+    @OneToMany(mappedBy = "bscId", cascade = CascadeType.ALL)
+    private List<HrBscResults> hrBscResultsList = new ArrayList<>();
+    
+    @JoinColumn(name = "SESSION_ID", referencedColumnName = "ID")
+    @ManyToOne
+    private HrBscSessions sessionId;
+    
+    @JoinColumn(name = "DEPT_ID", referencedColumnName = "DEP_ID")
+    @ManyToOne
+    private HrDepartments deptId;
+    
+    @JoinColumn(name = "PREPARED_BY", referencedColumnName = "ID")
+    @ManyToOne
+    private HrEmployees preparedBy;
+
+    public HrBsc() {
+    }
+
+    public HrBsc(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getPreparedOn() {
+        return preparedOn;
+    }
+
+    public void setPreparedOn(String preparedOn) {
+        this.preparedOn = preparedOn;
+    }
+
+    @XmlTransient
+    public List<HrBscResults> getHrBscResultsList() {
+        if (hrBscResultsList == null) {
+            hrBscResultsList = new ArrayList<>();
+        }
+        return hrBscResultsList;
+    }
+
+    public void setHrBscResultsList(List<HrBscResults> hrBscResultsList) {
+        this.hrBscResultsList = hrBscResultsList;
+    }
+
+    public HrBscSessions getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(HrBscSessions sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public HrDepartments getDeptId() {
+        return deptId;
+    }
+
+    public void setDeptId(HrDepartments deptId) {
+        this.deptId = deptId;
+    }
+
+    public HrEmployees getPreparedBy() {
+        return preparedBy;
+    }
+
+    public void setPreparedBy(HrEmployees preparedBy) {
+        this.preparedBy = preparedBy;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof HrBsc)) {
+            return false;
+        }
+        HrBsc other = (HrBsc) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    public void addBSCResult(HrBscResults hrBscResults) {
+        if (hrBscResults.getBscId() != this) {
+            this.getHrBscResultsList().add(hrBscResults);
+            hrBscResults.setBscId(this);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "entity.HrBsc[ id=" + id + " ]";
+    }
+    
+}

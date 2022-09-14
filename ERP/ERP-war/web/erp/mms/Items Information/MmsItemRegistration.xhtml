@@ -1,0 +1,683 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+
+
+
+        <li><a href="MmsBinCard.xhtml"><i class="fa fa-circle-o"></i> <span>BinCard</span></a></li> 
+        <li><a href="MmsInspection.xhtml"><i class="fa fa-circle-o"></i> <span>Inspection</span></a></li> 
+
+
+    </ui:define>
+    <ui:define name="contents">
+
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{itemRegistrationController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch1" action="#{itemRegistrationController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>              
+                    <p:commandButton id="btnSearch" action="#{itemRegistrationController.btn_Search_Action()}" icon="#{itemRegistrationController.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{itemRegistrationController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/Items Information/MmsItemRegistration.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{itemRegistrationController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px"> 
+                                <h:panelGroup id="frmSearchGatePass"> 
+
+
+                                    <div class="form-horizontal  col-sm-12">
+
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%" converter="entConverter" 
+                                                                   value="#{itemRegistrationController.columnNameResolver.col_Name_FromTable}"                                                                  
+                                                                   valueChangeListener="#{itemRegistrationController.columnNameChangeEvent}"> 
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{itemRegistrationController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2" value="#{MMS.Searching_By}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{itemRegistrationController.papmsItemRegistration.columnValue}"/>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSearch" class="btn btn-primary"  icon="ui-icon-search" action="#{itemRegistrationController.searchItemInformation()}"
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find" />            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px"> 
+                                <h:form id="frmGatepass">   
+
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{itemRegistrationController.mmsItemRegSearchInfoDataModel}" var="itemregInfo" rows="5" selectionMode="single"
+                                                             selection="#{itemRegistrationController.selectedItem}" rowKey="#{itemregInfo.materialId}" rowIndexVar="num"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowSelect" listener="#{itemRegistrationController.onRowEdit}" update=":frmRegisterUI,:frmRegisterUI:frmGatePassDtlInfo, :frmMainUI, :frmToolbar" />      
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{itemregInfo.matCode}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{itemregInfo.matName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Category}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{itemregInfo.matCategory.catName}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Store_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{itemregInfo.storeId.storeName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Part_Number}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{itemregInfo.partNumber}"/>
+                                                    </p:column>
+
+
+                                                </p:dataTable>
+
+                                            </div>                 
+                                        </div>    
+
+
+
+                                    </div>  
+
+
+
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+
+        <h:form id="frmRegisterUI" >
+            <p:growl id="growl" showDetail="true" severity="information,fatal" autoUpdate="true" />
+
+
+
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{itemRegistrationController.renderPnlCreateItemRegistration}" >
+
+                <!-- Registration Form-->
+                <div class="box box-primary ">
+                    <div class="box-header">
+                        <h3 class="box-title">Item Registration</h3>                   
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body ">
+                        <div class="box-body">
+                            <div class="row"> 
+                                <div class="col-md-12 textBoxMargin6px"> 
+                                    <h:panelGroup id="frmGatePassDtlInfo">
+                                        <div class="form-horizontal  col-sm-12"> 
+                                            <div class="col-md-6">
+
+
+
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <h:outputLabel id="lbl_categories" for="dropdownCategory"  class="control-label col-sm-4" value="#{MMS.Category}:" />
+                                                    <div class="col-sm-6">
+                                                        <p:selectOneMenu id="dropdownCategory" required="true"   requiredMessage="category is required"
+                                                                         style="width:100%" filter="true" filterMatchMode="contains"
+                                                                         valueChangeListener="#{itemRegistrationController.changeListener}"
+                                                                         value="#{itemRegistrationController.category.catId}"> 
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems value="#{itemRegistrationController.listsOfCategory}" var="cats" itemLabel="#{cats.catName}" itemValue="#{cats.catId}" />
+                                                            <p:ajax   event="change" update="frmGatePassDtlInfo" process="@this"  />
+
+                                                        </p:selectOneMenu>
+                                                        <p:message for="dropdownCategory" display="icon"/>
+                                                    </div>
+                                                    <div class ="col-sm-2">
+                                                        <p:commandButton id="btnAdd" value="Add" class="btn btn-primary" 
+                                                                         type="button" onclick="PF('catdig1').show();"/>
+
+                                                    </div>  
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">  
+                                                    <h:outputLabel id="lbl_categories23" for="dropDown_subcategries"  class="control-label col-sm-4" value="#{MMS.Sub_Category}:"/>
+                                                    <div class="col-sm-6">
+                                                        <p:selectOneMenu id="dropDown_subcategries"  filter="true" filterMatchMode="contains"
+                                                                         style="width:100%" required="true" requiredMessage="subcategory is required"
+                                                                         value="#{itemRegistrationController.subcat}"  converter="entConverter"
+                                                                         valueChangeListener="#{itemRegistrationController.SubcatchangeListener}"
+                                                                         >
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems value="#{itemRegistrationController.subcatList}"  var="sub" itemLabel="#{sub.subCatName}" itemValue="#{sub}"   />
+                                                            <p:ajax   event="change"  process="@this" update="txtItemCode" />
+
+                                                        </p:selectOneMenu>
+                                                        <p:message for="dropDown_subcategries" display="icon"/>
+                                                    </div>
+                                                    <div class ="col-sm-2">
+                                                        <p:commandButton id="btnAdd1" value="Add" class="btn btn-primary"  type="button" onclick="PF('subcatdig1').show();"/>
+                                                    </div>  
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">  
+                                                    <h:outputLabel  for="selectType" class="control-label col-sm-4" value="#{MMS.Stock_Movement_Type}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="searchdrdFACategory"  value="#{itemRegistrationController.ifrsDepreciationSetup.id}" converter="entConverter"
+                                                                         style="width: 100%" required="true"  requiredMessage="Stock Movement Type is requrired"
+                                                                         valueChangeListener="#{itemRegistrationController.handleSelectDepreciationType}" >
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                            <f:selectItems id="searchFACategory2" value="#{itemRegistrationController.stockMoveLists}"
+                                                                           var="fixedAssetGroupList"
+                                                                           itemLabel="#{fixedAssetGroupList.depreciationType}" itemValue="#{fixedAssetGroupList.id}" />
+                                                        </p:selectOneMenu>    
+                                                        <p:message display="icon"  for="searchdrdFACategory"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lbl_ItemCode"  class="control-label col-sm-4"  value="#{MMS.Item_Code}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtItemCode" requiredMessage="Item Code is Required" 
+                                                                       readonly="true"
+                                                                       value="#{itemRegistrationController.papmsItemRegistration.matCode}"
+                                                                       />
+                                                    </div>  
+                                                </div> 
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">  
+                                                    <h:outputLabel id="lbl_ItemName" for="txtItemName"  class="control-label col-sm-4"  value="#{MMS.Item_Name}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtItemName" class="form-control" readonly="false"
+                                                                       required="true" requiredMessage="Item Name is Required" 
+                                                                       validator="#{validatorManagedBean.Text}" 
+                                                                       value="#{itemRegistrationController.papmsItemRegistration.matName}"/>
+
+
+                                                        <p:message  for="txtItemName" display="icon"/>
+                                                    </div>  
+                                                </div>
+
+
+
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">  
+                                                    <h:outputLabel id="lbl_Unitmeaasure1" for="dropdownUnitMeasure"  class="control-label col-sm-4"  value="#{MMS.Unit_Measure}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="dropdownUnitMeasure" required="true"   filter="true" filterMatchMode="contains"
+                                                                         style="width:100%" requiredMessage="Unit Measure is required"
+                                                                         value="#{itemRegistrationController.papmsItemRegistration.unitOfMeasure}"
+                                                                         >
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems value="#{itemRegistrationController.unitMeasures}"  />
+                                                            <p:ajax   event="change" process="@this" />
+
+                                                        </p:selectOneMenu>
+                                                        <p:message for="dropdownUnitMeasure" display="icon"/>
+                                                    </div>  
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                    <h:outputLabel id="lbl_Unitmeaasure2" for="dropdownUnitMeasure2"  class="control-label col-sm-4"  value="#{MMS.Unit_Measure}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="dropdownUnitMeasure2" required="false"   filter="true" filterMatchMode="contains"
+                                                                         style="width:100%"
+                                                                         value="#{itemRegistrationController.papmsItemRegistration.unitMeasure2}"
+                                                                         >
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems value="#{itemRegistrationController.unitMeasures}" />
+                                                            <p:ajax   event="change" process="@this" />
+
+                                                        </p:selectOneMenu>
+                                                        <p:message for="dropdownUnitMeasure2" display="icon"/>
+                                                    </div>  
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">  
+                                                    <h:outputLabel id="lbl_ItemType" for="dropdownitemType"  class="control-label col-sm-4"  value="#{MMS.Item_Property}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="dropdownitemType" required="true"   requiredMessage="Item Property is required"
+                                                                         style="width:100%"
+                                                                         value="#{itemRegistrationController.papmsItemRegistration.itemType}" 
+                                                                         >
+                                                            <f:selectItems value="#{itemRegistrationController.listOfItemType}" />
+                                                            <p:ajax   event="change" process="@this" />
+
+                                                        </p:selectOneMenu>
+                                                        <p:message for="dropdownitemType" display="icon"/>
+                                                    </div>  
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                    <h:outputLabel id="lbl_ServiceYear"   class="control-label col-sm-4" value="#{MMS.Service_Year}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtserviceyear" class="form-control" 
+
+                                                                       converterMessage="Enter Numbers only"
+                                                                       value="#{itemRegistrationController.papmsItemRegistration.serviceYear}"/>
+                                                        <p:message  for="txtserviceyear" display="icon"/>
+                                                    </div>  
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                    <h:outputLabel id="lbl_minreorderLevel"   class="control-label col-sm-4"  value="#{MMS.Minimum_Level}:" />
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtminreorderLevel" class="form-control" readonly="false"
+                                                                       converterMessage="Enter Numbers only"
+
+
+                                                                       value="#{itemRegistrationController.papmsItemRegistration.minReorderLevel}">
+
+                                                        </p:inputText>
+                                                        <p:message  for="txtminreorderLevel" display="icon"/>
+                                                    </div>  
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                    <h:outputLabel id="lbl_maxreorderLevel"   class="control-label col-sm-4"  value="#{MMS.Maximum_Level}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtmaxreorderLevel" class="form-control" 
+
+
+                                                                       converterMessage="Enter Numbers only"
+                                                                       value="#{itemRegistrationController.papmsItemRegistration.maxReorderLevel}"/>
+                                                        <p:message  for="txtmaxreorderLevel" display="icon"/>
+                                                    </div>  
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                    <h:outputLabel id="lbl_reorderLevel"   class="control-label col-sm-4" value="#{MMS.Reorder_Level}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtreorderLevel" class="form-control" 
+
+                                                                       converterMessage="Enter Numbers only"
+
+                                                                       value="#{itemRegistrationController.papmsItemRegistration.reorderLevel}"/>
+
+                                                        <p:message  for="txtreorderLevel" display="icon"/>
+                                                    </div>  
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                    <h:outputLabel id="lbl_safteyStock"   class="control-label col-sm-4"  value="#{MMS.Saftey_Stock}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtsafteyStock" class="form-control" 
+                                                                       value="#{itemRegistrationController.papmsItemRegistration.safteyStock}"
+                                                                       converterMessage="Enter Numbers only"
+
+                                                                       />
+                                                        <p:message  for="txtsafteyStock" display="icon"/>
+                                                    </div>  
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                    <h:outputLabel id="lbl_partNumber"  class="control-label col-sm-4"  value="#{MMS.Part_Number}:"/>
+                                                    <div class="col-sm-8 ">
+                                                        <p:inputText   id="txtpartNumber" 
+                                                                       class="form-control" 
+
+                                                                       value="#{itemRegistrationController.papmsItemRegistration.partNumber}" />
+
+                                                    </div>
+                                                </div>
+
+
+
+
+
+
+                                                <h:panelGroup id="padding">
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                        <h:outputLabel id="lbl_categories1" for="txtAssetType"  class="control-label col-sm-4" value="#{MMS.Item_Status}:"  rendered="#{itemRegistrationController.renderStoreInfo}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneRadio id="txtAssetType"   rendered="#{itemRegistrationController.renderStoreInfo}"
+                                                                              value="#{itemRegistrationController.papmsItemRegistration.matStatus}">
+                                                                <f:selectItem itemLabel="Active" itemValue="1"  />
+                                                                <f:selectItem itemLabel="In Active" itemValue="0" />    
+                                                                <p:ajax update="txtAssetType"  event="change" process="@this" />
+                                                            </p:selectOneRadio>
+                                                            <p:message for="txtAssetType" display="icon"/>
+                                                        </div>
+                                                    </div> 
+                                                </h:panelGroup>
+
+
+
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">  
+                                                    <h:outputLabel id="lbl_itemcategory" for="txtAssetcategories"  class="control-label col-sm-4" value="#{MMS.Item_Category}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneRadio id="txtAssetcategories"   
+                                                                          required="true" requiredMessage="item category is required" value="#{itemRegistrationController.papmsItemRegistration.itemGroup}">
+                                                            <f:selectItem itemLabel="Fixed " itemValue="1"  />
+                                                            <f:selectItem itemLabel="Non Fixed" itemValue="0" />    
+
+                                                        </p:selectOneRadio>
+                                                        <p:message for="txtAssetcategories" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <h:outputLabel id="lbl_intendedPurpose"  class="control-label col-sm-4"  value="#{MMS.Intended_Purpose}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputTextarea   id="txtintendedPurpose" 
+                                                                           class="form-control" readonly="false"
+                                                                           validator="#{validatorManagedBean.AlphaNumericText}"
+                                                                           style="height: 70px;"
+                                                                           value="#{itemRegistrationController.papmsItemRegistration.intendedPurpose}"></p:inputTextarea>
+                                                        <p:message for="txtintendedPurpose" display="icon"/>
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="AddCategory">
+                                        <p:dialog id="catdig1" header="Register Categories" widgetVar="catdig1" height="350"
+                                                  width="750" modal="true" resizable="false" showEffect="explode">
+                                            <div class="panel-body col-sm-12">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <h:outputLabel class="control-label col-sm-2"  value="#{MMS.name}:" />
+                                                    <div class="col-sm-4">
+                                                        <p:inputText id="txtCatNames" class="form-control" value="#{itemRegistrationController.categoryPopUp.catName}"
+
+                                                                     required="true" requiredMessage="Category name is required"><p:ajax></p:ajax></p:inputText>
+
+                                                        <p:message for="txtCatNames" display="icon"/>
+                                                    </div>
+                                                    <h:outputLabel for="txtcatename"  class="control-label col-sm-2"  value="#{MMS.Code}:" />
+                                                    <div class="col-sm-4">
+                                                        <p:inputText id="txtcatename" class="form-control" value="#{itemRegistrationController.categoryPopUp.catCode}"
+                                                                     maxlength="2" 
+                                                                     required="true" requiredMessage="category code is required" ><p:ajax></p:ajax></p:inputText>
+
+                                                        <p:message for="txtcatename" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px ">
+                                                    <h:outputLabel class="control-label col-sm-2" for="txtsearchCategory"  value="#{MMS.update}:" />
+                                                    <div class="col-sm-4">
+                                                        <p:autoComplete id="txtsearchCategory"  emptyMessage="no data found"                                                 
+                                                                        value="#{itemRegistrationController.categoryPopUp.catCode}" 
+                                                                        completeMethod="#{itemRegistrationController.searchByCategoryName}" 
+
+                                                                        var="catinfo" itemValue="#{catinfo.catCode}" itemLabel="#{catinfo}"  >  
+                                                            <p:ajax  event="itemSelect" process="txtsearchCategory" listener="#{itemRegistrationController.getByCategoryNames}" 
+                                                                     update="txtCatNames,txtcatename,txtDescriptionsss,btnAddcat" oncomplete="PF('catdig1').show();"/>  
+                                                            <p:column headerText="Category Name"  >
+                                                                <h:outputText value="#{catinfo.catName}" />
+                                                            </p:column>
+                                                            <p:column  headerText="Category Code">
+                                                                <h:outputText value="#{catinfo.catCode}" />
+                                                            </p:column>
+                                                        </p:autoComplete>  
+                                                        <p:message for="txtsearchCategory" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <h:outputLabel value="Description:"  class="control-label col-sm-2" />
+                                                    <div class="col-sm-4">
+                                                        <p:inputTextarea  id="txtDescriptionsss" class="form-control"  
+                                                                          style="height: 80px"
+
+                                                                          value="#{itemRegistrationController.categoryPopUp.catDescription}"><p:ajax></p:ajax></p:inputTextarea>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <h:outputLabel class="control-label col-sm-2" id="invisibaled" />
+                                                    <div class="col-sm-4">
+                                                        <p:commandButton id="btnAddcat" class="btn btn-primary"
+                                                                         value="#{itemRegistrationController.btn_categories}"  
+                                                                         action="#{itemRegistrationController.createCategory()}"
+                                                                         process="catdig1"
+                                                                         update="AddCategory,frmGatePassDtlInfo"
+                                                                         oncomplete="PF('catdig1').show();"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p:dialog> 
+                                    </h:panelGroup>
+
+                                    <h:panelGroup id="AddSubCategory">
+                                        <p:dialog id="subcatdig1" header="Register Sub Categories" widgetVar="subcatdig1" height="400" width="600" modal="true" closable="true" resizable="false" showEffect="explode">
+                                            <div class="panel-body col-sm-12">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <h:outputLabel  class="control-label col-sm-4"  value="#{MMS.Category}:" />
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="dropdownsubCategory" style="width:100%;"
+                                                                         required="true" requiredMessage="category is required" filter="true" filterMatchMode="startsWith"
+                                                                         value="#{itemRegistrationController.categoryPopUp.catName}"
+                                                                         valueChangeListener="#{itemRegistrationController.handleSelectCategoryNamePopup}" 
+                                                                         >
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems value="#{itemRegistrationController.listsOfCategory}" var="catlist" itemLabel="#{catlist.catName}" itemValue="#{catlist.catName}" />
+                                                            <p:ajax event="change" process="dropdownsubCategory" update="txtCaatcode"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="dropdownsubCategory" display="icon"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <h:outputLabel  class="control-label col-sm-4" id="lbl_cat_code" value="#{MMS.Category_Code}:"  />
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCaatcode" value="#{itemRegistrationController.categoryPopUp.catCode}"
+                                                                     class="form-control"
+                                                                     readonly="true" />
+                                                        <p:message for="txtCaatcode" display="icon"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <h:outputLabel  id="lbl_accountTitle" class="control-label col-sm-4"  value="#{MMS.AcCount_Title}:"  />
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdAccountTitle" style="width:100%;" converter="entConverter"
+                                                                         required="true" requiredMessage="AcCount is required" filter="true" filterMatchMode="startsWith"
+                                                                         value="#{itemRegistrationController.fmsGeneralLedgerEntity}"
+                                                                         valueChangeListener="#{itemRegistrationController.handleSelectAccountTitle}" 
+                                                                         >
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                            <f:selectItems value="#{itemRegistrationController.generalLedgerList}" var="accList" itemLabel="#{accList.accountTitle}" itemValue="#{accList}" />
+                                                            <p:ajax event="change" process="drdAccountTitle" update="txtAccountcode"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="drdAccountTitle" display="icon"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <h:outputLabel  class="control-label col-sm-4" id="lbl_account_code"  value="#{MMS.Account_Code}:" />
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtAccountcode" value="#{itemRegistrationController.fmsGeneralLedgerEntity.generalLedgerCode}"
+                                                                     class="form-control"
+                                                                     readonly="true" />
+                                                        <p:message for="txtAccountcode" display="icon"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <h:outputLabel  class="control-label col-sm-4" for="txtsubcatcode"  value="#{MMS.SubCat_Code}:" />
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtsubcatcode" value="#{itemRegistrationController.subcatPopup.subcatCode}"
+                                                                     class="form-control"  validator="#{validatorManagedBean.Number}"  
+                                                                     />
+                                                        <p:message for="txtsubcatcode" display="icon"/>
+                                                    </div>
+                                                </div>
+
+
+
+
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <h:outputLabel class="control-label col-sm-4"  for="txtsubcatname"  value="#{MMS.SubCat_Name}:"  />
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtsubcatname" value="#{itemRegistrationController.subcatPopup.subCatName}"
+                                                                     validator="#{validatorManagedBean.AlphaNumericText}" class="form-control"
+                                                                     required="true"   requiredMessage="subcategory name is required" />
+                                                        <p:message for="txtsubcatname" display="icon"/>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <h:outputLabel class="control-label col-sm-4"  value="#{MMS.SubCat_Name}:" />
+                                                    <div class="col-sm-8">
+                                                        <p:inputTextarea  id="txtsubcatedesc" class="form-control"  
+                                                                          style="height: 80px"
+                                                                          validator="#{validatorManagedBean.Remark}"
+                                                                          value="#{itemRegistrationController.subcatPopup.subCatDescription}"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <h:outputLabel class="control-label col-sm-4" id="invisibaleds" />
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnAddsubcat" class="btn btn-primary"
+                                                                         value="Create" process="subcatdig1" 
+                                                                         action="#{itemRegistrationController.createsubCategory()}"
+                                                                         update="frmGatePassDtlInfo,subcatdig1"
+                                                                         oncomplete="PF('subcatdig1').show();"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </p:dialog> 
+                                    </h:panelGroup>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary ">
+
+                    <!-- /.box-header -->
+                    <div class="box-body ">
+                        <div class="box-body">
+                            <div class="row"> 
+                                <div class="col-md-12 textBoxMargin6px"> 
+
+
+
+
+
+                                    <h:panelGroup id="frmWorkFlowInfo">
+                                        <div class="form-horizontal  col-sm-12"> 
+                                            <div class="col-md-6">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">  
+                                                    <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-4"  value="Prepared by:"/>
+
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtprepareby" 
+                                                                       value="#{itemRegistrationController.userName}" readonly="true"
+                                                                       required="true" requiredMessage="prepared is required"
+                                                                       />                                             
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">  
+                                                    <h:outputLabel for="txtApprovedDate" class="control-label col-sm-4" value="Prepared On:"/>                                                                        
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtApprovedDate" class="form-control" value="#{itemRegistrationController.wfMmsProcessed.processedOn}"
+                                                                     required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                                     onclick="displayCalendar('frmRegisterUI:txtApprovedDate', 'frmRegisterUI:txtApprovedDate');" />                                                                                                                                                    
+                                                        <p:message for="txtApprovedDate" display="icon"/>
+                                                    </div> 
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">  
+                                                    <h:outputLabel class="control-label col-sm-4" />
+                                                    <div class="col-sm-4">
+                                                        <p:commandButton  id="btnSave" class="btn btn-primary " validateClient="true"
+                                                                          value="#{itemRegistrationController.saveorUpdateBundle}" 
+
+                                                                          action="#{itemRegistrationController.saveItemRegistration()}" 
+                                                                          process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmWorkFlowInfo"
+                                                                          update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI,:frmRegisterUI:frmWorkFlowInfo" />
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

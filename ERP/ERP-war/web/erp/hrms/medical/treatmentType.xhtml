@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Go to Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="medicalInstitution.xhtml"><i class="fa fa-circle-o "></i><span>Medical Institution</span></a></li>
+        <li><a href="medicalCreditBill.xhtml"><i class="fa fa-circle-o "></i><span>Medical Credit Bill Request</span></a></li>
+        <li><a href="medicaCreditBillApprove.xhtml"><i class="fa fa-circle-o "></i><span>Medical Credit Bill Approve</span></a></li>
+        <li><a href="medicalCashRefund.xhtml"><i class="fa fa-circle-o "></i><span>Medical Cash Refund Request</span></a></li>
+        <li><a href="medicalCashRefundApprove.xhtml"><i class="fa fa-circle-o "></i><span>Medical Cash Refund Approve</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" title="#{treatmentTypeController.newOrSearch}" validateClient="true"
+                                     action="#{treatmentTypeController.btnNewOrSearch()}"
+                                     icon="#{treatmentTypeController.icone}" style="background-color: white;border-color: white" 
+                                     process="@this" update="@this,:frmTreatmentType,:frmToolbar"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/medical/treatmentType.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmTreatmentType"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>             
+            <h:panelGroup id="pnlSearch" rendered="#{treatmentTypeController.rndSearchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"> Search <small>Treatment Type ...</small></h3>                       
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-sm-8"> 
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group"> 
+                                                    <h:outputLabel for="srcCriteriaName" value="Treatment Type:" class="control-label col-sm-2"/> 
+                                                    <div class="col-sm-5">  
+                                                        <p:selectOneMenu id="srcTreatmentType" value="#{treatmentTypeController.srcMedTreatmentType.treatmentType}"
+                                                                         valueChangeListener="#{treatmentTypeController.findTreatmentType}" 
+                                                                         filterMatchMode="startsWith" filter="true" style="width:100%">
+                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                            <f:selectItems value="#{treatmentTypeController.treatmentTypeList}"/>
+                                                            <f:selectItem itemLabel="Load all" itemValue="Load all"/>
+                                                            <p:ajax event="change" process="@this" update="tblTreatment"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="col-md-12">  
+                                        <div class="form-group">
+                                            <p:dataTable id="tblTreatment" value="#{treatmentTypeController.treatmentTypeDataModel}"
+                                                         var="varTeartment" selectionMode="single" rowIndexVar="num" class="dataTable" 
+                                                         rowKey="#{varTeartment.id}" selection="#{treatmentTypeController.hrLocalMedTreatmentType}">
+                                                <p:ajax event="rowSelect" process="@this,tblTreatment" listener="#{treatmentTypeController.populateTreatmnet}"
+                                                        update=":frmTreatmentType,:frmToolbar"/>
+                                                <p:column headerText="No." style="width: 50px;">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Treatment Type">
+                                                    <h:outputText value="#{varTeartment.treatmentType}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Covered By"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{varTeartment.coveredBy}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Description"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{varTeartment.description}"/>
+                                                </p:column>    
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+            <h:panelGroup id="pnlMainpage" rendered="#{treatmentTypeController.rndNewPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Treatment Type <small>Setup page</small></h3>                       
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <h:panelGroup id="pnlTreatmentType" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="txtTreatmentType" class="control-label col-sm-4" value="Treatment Type: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtTreatmentType" value="#{treatmentTypeController.hrLocalMedTreatmentType.treatmentType}" 
+                                                                                     validator="#{validatorManagedBean.Text}" validatorMessage="Treatment type should be a string"
+                                                                                     class="form-control" required="true" requiredMessage="Enter treatment type" title="Treatment Type"/>
+                                                                        <p:message for="txtTreatmentType" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="drdCoveredBy" value="Covered By: " class="control-label col-sm-4"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneRadio id="drdCoveredBy" value="#{treatmentTypeController.hrLocalMedTreatmentType.coveredBy}"
+                                                                                          required="true" requiredMessage="Select covered by" class="col-sm-10">
+                                                                            <f:selectItem itemLabel="Company" itemValue="Company"/>
+                                                                            <f:selectItem itemLabel="Employee" itemValue="Employee"/>
+                                                                            <f:selectItem itemLabel="Both" itemValue="Both"/>
+                                                                        </p:selectOneRadio>
+                                                                        <p:message for="drdCoveredBy" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtDescription" class="control-label col-sm-4" value="Description:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtDescription" value="#{treatmentTypeController.hrLocalMedTreatmentType.description}" 
+                                                                                         rows="1" cols="5" autoResize="false" title="Description" class="form-control"
+                                                                                         placeholder="Write some description ....."/>
+                                                                        <p:message for="txtDescription" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel class="control-label col-sm-4" value="*&nbsp; Required field"
+                                                                                   style="color: red; font-size: 12px; margin-top: 10px"/>
+                                                                </div>                                               
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup id="pnlSave">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                     value="#{treatmentTypeController.saveOrUpdate}"
+                                                                                     action="#{treatmentTypeController.saveTreatmentType()}" 
+                                                                                     process="@this,pnlTreatmentType" update=":frmTreatmentType"/>  
+                                                                </div>
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnReset" value="Reset" class="btn btn-block btn-primary col-lg-4"
+                                                                                     action="#{treatmentTypeController.resetTreatmentType()}"
+                                                                                     process="@this" update=":frmTreatmentType" title="Reset"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

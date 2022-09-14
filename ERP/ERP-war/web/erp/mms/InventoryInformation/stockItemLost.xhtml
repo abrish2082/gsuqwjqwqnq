@@ -1,0 +1,607 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">         
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+            </div>
+        </h:form>       
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li><a href="mmsLostFixedAsset.xhtml"><i class="fa fa-refresh"></i> <span>Lost Fixed Asset</span></a></li> 
+        <li><a href="FixedAssetTransfer.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Transfer</span></a></li> 
+        <li><a href="FixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Return </span></a></li> 
+        <li><a href="NonFixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Non Fixed Asset Return</span></a></li> 
+        <li><a href="FixedAssetItemDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Disposal Collection</span></a></li> 
+        <li><a href="Disposal.xhtml  "><i class="fa fa-circle-o"></i> <span>Fixed Asset Disposal</span></a></li> 
+        <li><a href="StockDisposal.xhtml"><i class="fa fa-circle-o"></i> <span>Stock Item Disposal</span></a></li> 
+        <li><a href="InventoryBalanceSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Balance Sheet</span></a></li> 
+        <li><a href="InventoryCountSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Count Sheet</span></a></li> 
+        <li><a href="NeedAssessment.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment</span></a></li> 
+        <li><a href="NeedAssessmentCollected.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment Collected</span></a></li> 
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackSarch" rendered="#{stockItemLostController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnBackToSearch" action="#{stockItemLostController.goBackToSearchpageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                        style="background-color: white;border-color: white"
+                                        process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample"
+                                        title="Back to Search" />
+                       <span class="ui-separator">
+                           <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                       </span>    
+                    </h:panelGroup>
+                    <p:commandButton id="btnIone" action="#{stockItemLostController.createNewLostItemInfo()}"
+                                     icon="#{stockItemLostController.icone}"  validateClient="true" style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,frmSample" rendered="#{stockItemLostController.isRenderCreate}" 
+                                     title="#{stockItemLostController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{stockItemLostController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{stockItemLostController.mmsLostList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Lost Item  List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{stockItemLostController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="srListVar" value="#{stockItemLostController.mmsLostList}"
+                                                            itemValue="#{srListVar}"  itemLabel="#{srListVar.lostItemNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI, :frmSample"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{stockItemLostController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>                        
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{stockItemLostController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.decision}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                        <a href="stockItemLost.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                        <a href="../MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{stockItemLostController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Search} ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <h:panelGroup id="searchpnl">
+                                    <div class="form-horizontal  col-sm-12">
+                                         <div class="form-group textBoxMargin6px"> 
+                                             <h:outputLabel class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="txtPartyName" value="#{stockItemLostController.columnNameResolver.col_Name_FromTable}"
+                                                                 valueChangeListener="#{stockItemLostController.changeEventColumnName}" converter="entConverter"
+                                                                 style="width: 100%">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue=""/>
+                                                    <f:selectItems value="#{stockItemLostController.columnNameResolverList}" var="StockItemLostFAColName"
+                                                                   itemValue="#{StockItemLostFAColName.col_Name_FromTable}" itemLabel="#{StockItemLostFAColName.parsed_Col_Name}"/>
+                                                                   
+                                                    <p:ajax event="change" process="@this" update="searchpnl"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblColumnName" class="control-label col-sm-2" value=" #{stockItemLostController.columnNameResolver.parsed_Col_Name}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtColumnValue" class="form-control" value="#{stockItemLostController.stockLostEntity.columnValue}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="findbtn" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                              <p:commandButton id="btnSearch" class="btn btn-primary" action="#{stockItemLostController.searchLostItemInformation1()}" icon="ui-icon-search" 
+                                                                 process="@this,searchpnl" update="searchpnl,:frmMainUI:mainUI"
+                                                                 value="#{MMS.find}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </h:panelGroup>
+                                </h:form>
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" var="LostItemInfo" rows="5" 
+                                                             style="font-family: Cambria; "  
+                                                             rowIndexVar="num"   
+                                                             selection="#{stockItemLostController.hpSelect}"
+                                                             rowKey="#{LostItemInfo.lostStockId}"  selectionMode="single" 
+                                                             value="#{stockItemLostController.stkLostSearchInfoDataModel}"
+                                                             class="dataTable"
+                                                             paginator="true" paginatorPosition="bottom">
+                                                    <p:ajax event="rowSelect" listener="#{stockItemLostController.rowSelect}" update=":frmRegisterUI, :frmMainUI, :frmSample" />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Lost_Item_no}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LostItemInfo.lostItemNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Processed_By}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LostItemInfo.processedBy}"/>
+                                                    </p:column>
+                                                                                                     
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Registration_Date}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LostItemInfo.regDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Department}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LostItemInfo.department}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+      
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" life="3500" autoUpdate="true" />
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{stockItemLostController.renderPnlCreateLostItem}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Lost_Stock_Item_Registration}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required"> 
+                                            <h:outputLabel class="col-sm-2" style="text-align: right" value="#{MMS.Lost_Stock_Item_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtGatePassNumber" readonly="true"  
+                                                             value="#{stockItemLostController.generateLostItemNo()}"/>
+                                            </div>
+                                            <h:outputLabel id="lblDateAccepted1" class="control-label col-sm-2" value="#{MMS.Registration_Date}:"/>
+                                            <div class="col-sm-4">
+                                                
+                                                <p:inputText id="calAceptedDate" value="#{stockItemLostController.stockLostEntity.regDate}"
+                                                             placeholder="#{MMS.dd_mm_yyyy}" required="true" requiredMessage="Date is required" 
+                                                             onclick="displayCalendar('frmRegisterUI:calAceptedDate', 'frmRegisterUI:calAceptedDate');"  validator="#{validatorManagedBean.Date}" readonly="#{workFlow.readonly}"/>
+                                                <p:message for="calAceptedDate" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Region_Name}:" />
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="selectRegion"   required="true" 
+                                                                   style="width: 100%;" requiredMessage="Region Name is Required"
+                                                                   value="#{stockItemLostController.stockLostEntity.regionName}"  
+                                                                   disabled="#{workFlow.readonly}">  
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue="" />
+                                                    <f:selectItem itemLabel="Addis Ababa" itemValue="Addis Ababa" />
+                                                    <f:selectItem itemLabel="Oromia" itemValue="Oromia" />
+                                                    <f:selectItem itemLabel="Tigray" itemValue="Tigray" />
+                                                    <f:selectItem itemLabel="Afar" itemValue="Afar" />
+                                                    <f:selectItem itemLabel="Dire Dawa" itemValue="Dire Dawa" />
+                                                    <f:selectItem itemLabel="Gambella" itemValue="Gambella" />
+                                                    <f:selectItem itemLabel="Amhara" itemValue="Amhara" />
+                                                    <f:selectItem itemLabel="Benshangul" itemValue="Benshangul" />
+                                                    <f:selectItem itemLabel="Somalia" itemValue="Somalia" />
+                                                    <f:selectItem itemLabel="SNNPR" itemValue="SNNPR" />
+                                                    <f:selectItem itemLabel="SNN" itemValue="SNN" />
+                                                    <p:ajax update=":frmRegisterUI:frmTblMaterialInfo:" event="change" />
+                                                </p:selectOneMenu> 
+                                                <p:message for="selectRegion" display="icon"/>
+                                            </div>
+                                            <div>
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.Store_Name}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="stNameFx" value="#{stockItemLostController.storeInfoEntity.storeId}"  style="width: 100%" 
+                                                                     valueChangeListener="#{stockItemLostController.handleSelectStoreName1}" converter="entConverter"
+                                                                     required="true" disabled="#{workFlow.readonly}"
+                                                                     requiredMessage="Store Name is Required">
+                                                        <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                        <f:selectItems value="#{stockItemLostController.storeInfoLst}" var="listStF" itemLabel="#{listStF.storeName}" itemValue="#{listStF.storeId}" />
+                                                        <p:ajax update="@this" event="change" />
+                                                    </p:selectOneMenu> 
+                                                    <p:message for="stNameFx" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required"> 
+                                            <p:outputLabel  class="control-label col-sm-2" value="#{MMS.Department}:"/> 
+                                            <div class="col-sm-3">
+                                                <p:inputText   id="txtDepartment"  required="true" 
+                                                               requiredMessage="Department is required" title="department" placeholder="Use Only From + Button" onmousedown="return false;"
+                                                               value="#{stockItemLostController.hrDepartmentsEntity.depName}"  />
+                                                <p:message for="txtDepartment" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p:commandButton id="btnTree" onclick="PF('dlgDpt').show();"  partialSubmit="true" style="background: transparent;" value="+"/>
+                                            </div>
+                                            <h:outputLabel class=" col-sm-2" value="#{MMS.Status}:" style="text-align: right" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="drdTypeOfTransfer" readonly="true"  
+                                                             value="#{stockItemLostController.stockLostEntity.status}"/>
+
+                                            </div>
+                                        </div>                                       
+                                        <p:dialog id="dlgDpt" header="Departments" widgetVar="dlgDpt" height="300" width="500" showEffect="explode">
+                                            <h:panelGrid columns="3" style="border-color: #ffffff ">
+                                                <p:tree value="#{stockItemLostController.root2}" var="nodes" style="border: transparent; width: 100%"
+                                                        selectionMode="single" selection="#{stockItemLostController.selectedNode}" >
+                                                    <p:ajax event="select" listener="#{stockItemLostController.onNodeSelect}" process="@this" 
+                                                            update=":frmRegisterUI:txtDepartment"/>
+                                                    <p:treeNode>
+                                                        <h:outputText value="#{nodes}" />
+                                                    </p:treeNode>
+                                                </p:tree>                                       
+                                            </h:panelGrid>
+                                        </p:dialog> 
+                                  
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Lost_Stock_Item_Detail}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmMaterialInfo"  >
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Item_Code}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="stName2" value="#{stockItemLostController.bincardEntity}"  style="width: 100%"  filter="true" filterMatchMode="contains"
+                                                                 valueChangeListener="#{stockItemLostController.handleBincard}" converter="entConverter"
+                                                                 required="true"  requiredMessage="Item Code is required" disabled="#{workFlow.readonly}">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                    <f:selectItems value="#{stockItemLostController.binCardDtlList}" var="listSt" itemLabel="#{listSt.materialId.matCode}" itemValue="#{listSt}" />
+                                                    <p:ajax update="@this,frmMaterialInfo" event="change" />
+                                                </p:selectOneMenu> 
+                                                <p:message for="stName2" display="icon"/>
+                                            </div>
+
+                                            <h:outputLabel id="txtItemName" class=" col-sm-2" style="text-align: right" value="#{MMS.Item_Name}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="lblMatCode" 
+                                                             value="#{stockItemLostController.stockLostDtlEntity.itemName}"
+                                                             readonly="true"/>
+                                                <p:message for="lblMatCode" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel  for="txtQuantity"  class="control-label col-sm-2" value="#{MMS.Description}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtQuantity"
+
+                                                               value="#{stockItemLostController.stockLostDtlEntity.description}"
+                                                               readonly="#{workFlow.readonly}"/>
+                                                <p:message for="txtQuantity" display="icon" />
+                                            </div>
+                                            <h:outputLabel  for="txtUnit"  class="control-label col-sm-2" value="#{MMS.Unit_Price}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtUnit"  
+                                                               readonly="true"
+                                                               value="#{stockItemLostController.stockLostDtlEntity.bookValue}"
+                                                               />
+                                                <p:message for="txtUnit" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Duration}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtDescription"  validator="#{validatorManagedBean.Text}"
+                                                             value="#{stockItemLostController.stockLostDtlEntity.duration}"
+                                                             required="true"
+                                                             requiredMessage="Duration is required" readonly="#{workFlow.readonly}"/>
+                                                <p:message for="txtDescription" display="icon"  />
+                                            </div>
+                                            <h:outputLabel  class="col-sm-2" style="text-align: right" value="#{MMS.Item_Quantity}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtAccCode" 
+                                                             value="#{stockItemLostController.stockLostDtlEntity.quantity}"  readonly="true"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel for="txtRemark" class="control-label col-sm-2" value="#{MMS.Remark}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtRemark"  validator="#{validatorManagedBean.Text}"
+                                                                 value="#{stockItemLostController.stockLostDtlEntity.remark}" readonly="#{workFlow.readonly}"/>
+                                                <p:message for="txtRemark" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnAdd" class="btn btn-primary" action="#{stockItemLostController.addtoLostItemInfoDetail}" icon="ui-icon-add" validateClient="true" 
+                                                                 process="frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmMaterialInfo"
+                                                                 value="#{stockItemLostController.addOrModifyBundle}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br></br>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblMaterial" value="#{stockItemLostController.stkLostAddDetailDataModel}" rowIndexVar="rowContact" var="LostItem"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowEdit"  update="" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{rowContact+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LostItem.itemCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LostItem.itemName}"/>
+                                                    </p:column>
+                                                    <p:column headerText="#{MMS.Description}">
+                                                        <p:cellEditor>
+                                                            <f:facet name="output"><h:outputText value="#{LostItem.description}" /></f:facet>
+                                                            <f:facet name="input"><p:inputText id="remark3" value="#{LostItem.description}" style="width:100%"/></f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Price}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{LostItem.bookValue}"/>
+                                                    </p:column>
+                                                    <p:column headerText="#{MMS.Duration}">
+                                                        <p:cellEditor>
+                                                            <f:facet name="output"><h:outputText value="#{LostItem.duration}" /></f:facet>
+                                                            <f:facet name="input"><p:inputText id="remark5" value="#{LostItem.duration}" style="width:100%"/></f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column headerText="#{MMS.Remark}">
+                                                        <p:cellEditor>
+                                                            <f:facet name="output"><h:outputText value="#{LostItem.remark}" /></f:facet>
+                                                            <f:facet name="input"><p:inputText id="remarkd" value="#{LostItem.remark}" style="width:100%"/></f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column headerText="#{MMS.Option}">
+                                                        <p:commandLink action="#{stockItemLostController.editDataTable}" value="Edit" 
+                                                                       process="@this,:frmRegisterUI:tblMaterial"
+                                                                       update="@this,:frmRegisterUI:frmMaterialInfo"/>
+                                                    </p:column> 
+                                                </p:dataTable>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">                               
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" >                               
+                                <h:panelGroup id="frmApproverInfo">
+                                    <div class="form-horizontal col-sm-12">
+                                        <h:form id="formcontract" prependId="false" enctype="multipart/form-data" dir="" >            
+                                            <p:panelGrid columns="1" style="float: left;"> 
+                                                <h:outputLabel id="uploadfile1" class="control-label col-sm-2" value="#{MMS.Attach_File}:"/>                                              
+                                                <p:fileUpload  id="fileUplod" cancelLabel="#{contenu.annuler}"
+                                                               fileUploadListener="#{stockItemLostController.uploadHandling}"
+                                                               value="#{stockItemLostController.mmsLuDmArchive.documentId}" 
+                                                               allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                               invalidFileMessage="This type of file is not Allowed"
+                                                               invalidSizeMessage="The size is not Allowed"
+                                                               multiple="false" mode="advanced" sizeLimit="100000" auto="true" process="tblSavedDoc" update="tblSavedDoc"/>
+                                                <p:dataTable id="tblSavedDoc"  var="currentRow" sortBy="#{currentRow.fileName}"  rowIndexVar="current" value="#{disposalController.mmsLuDmArchivesDModel}"
+                                                             paginator="true" selectionMode="single" rowKey="#{currentRow.documentId}" paginatorPosition="bottom"
+                                                             selection="#{stockItemLostController.mmsLuDmArchiveSelection}"
+                                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                             rowsPerPageTemplate="5,10,15" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:950px;">
+                                                    <p:ajax event="rowSelect" listener="#{stockItemLostController.onRowSelectFileUploaded}" update="tblSavedDoc" />
+                                                    <f:facet name="header">
+                                                        <p:column headerText="File Name From DBMS">
+                                                            <p:outputLabel value="#{currentRow.fileName}"/>
+                                                        </p:column>
+                                                        <p:column headerText="Download">
+                                                            <p:panelGrid>
+                                                                <p:commandButton id="cmdDownd" ajax="false" icon="ui-icon-arrowthick-1-s" title="Downloading">
+                                                                    <p:fileDownload value="#{stockItemLostController.download}" />
+                                                                </p:commandButton> 
+                                                            </p:panelGrid>
+                                                        </p:column>
+                                                    </f:facet>
+                                                </p:dataTable>
+                                            </p:panelGrid>
+                                        </h:form>
+                                    </div>
+                                    <br></br>
+                                    <br></br>
+                                    <br></br>
+                                    <br></br>   
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">                                    
+                                            <p:outputLabel id="lbl_committe" class="control-label col-sm-2" value="#{MMS.Committee}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdCommitte" value="#{stockItemLostController.hrcommittesEntity.committeeName}" style="width: 100%" 
+                                                                 required="true" requiredMessage="Committee is required" filter="true" filterMatchMode="contains" disabled="#{workFlow.readonly}"
+                                                                 valueChangeListener="#{stockItemLostController.handleSelectCommittee}"  >
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                    <f:selectItems id="selectOneMenuISivNumber" 
+                                                                   value="#{stockItemLostController.committees}" var="com" itemLabel="#{com.committeeName}" itemValue="#{com.committeeName}"
+                                                                   />
+                                                    <p:ajax  event="change" process="@this" update="drdCommitte,drdComitteeMembers" />
+                                                </p:selectOneMenu> 
+                                                <p:message for="drdCommitte" display="icon"/>
+                                            </div>                                            
+                                            <p:outputLabel id="lbl_ComitteeMembers" class="control-label col-sm-2" value="#{MMS.Committee_Members}:" />
+                                            <div class="col-sm-4">
+                                                <p:selectManyMenu id="drdComitteeMembers" value="#{stockItemLostController.selectedMembers}"  disabled="#{workFlow.readonly}" 
+                                                                  required="true" requiredMessage="Committee members are required" style="width: 100%"
+                                                                  scrollHeight="100"  filter="true" filterMatchMode="contains" showCheckbox="true">
+                                                    <f:selectItems value="#{stockItemLostController.committeeMembers}" var="committee" itemLabel="#{committee.empId.firstName}"   />                                                                                                                                       
+                                                </p:selectManyMenu>
+                                                <p:message for="drdComitteeMembers" display="icon"/>                                                                                                              
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">                                        
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtRequestedBy"
+                                                             value="#{stockItemLostController.userName}"
+                                                             required="true"
+                                                             requiredMessage="Prepared By is required" readonly="true"/>
+                                                <p:message for="txtRequestedBy" display="icon" />
+                                            </div> 
+                                        </div>                                      
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="calRequsitionDate"  value="#{stockItemLostController.wfMmsProcessed.processedOn}"
+                                                             required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:calRequsitionDate', 'frmRegisterUI:calRequsitionDate');" />                                                                                                                                                    
+                                                <p:message for="calRequsitionDate" display="icon"/>
+                                            </div>                                     
+                                        </div>                                                                                  
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="Decision:" rendered="#{stockItemLostController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{stockItemLostController.selectedValue}" rendered="#{stockItemLostController.renderDecision}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>   
+                                            </div> 
+                                            <h:outputLabel for="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="comment:" rendered="#{stockItemLostController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="lbl_prepareRemxasrk"  value="#{stockItemLostController.wfMmsProcessed.commentGiven}"  rendered="#{stockItemLostController.renderDecision}"/>     
+                                            </div> 
+                                        </div>                                          
+
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="btnsave" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnSave" class=" btn btn-primary" action="#{stockItemLostController.saveStockItemLost()}" icon="ui-icon-new" validateClient="true" 
+                                                                 process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmApproverInfo"  
+                                                                 update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI" 
+                                                                 value="#{stockItemLostController.saveorUpdateBundle}"/> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup> 
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

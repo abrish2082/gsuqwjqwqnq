@@ -1,0 +1,530 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">        
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li> 
+        <li><a href="salaryDelegationApprove.xhtml"><i class="fa fa-fw fa-refresh"></i> <span>Refresh Page</span></a></li>    
+        <li><a href="salaryDelegationRequest.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Salary Delegation Request</span></a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{salaryDelegationApproveController.delegationRequestInfo()}"
+                                     icon="#{salaryDelegationApproveController.icone}" style="background-color: white" 
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmSalary" 
+                                     value="#{salaryDelegationApproveController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/salaryDelegation/salaryDelegationApprove.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{salaryDelegationApproveController.chooseMainPage}" style="border: 0px; background-color: transparent">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">  
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchList">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{salaryDelegationApproveController.filiterByStatus_Vcl}">
+                                                                <f:selectItems value="#{salaryDelegationApproveController.filterByStatus}"/>   
+                                                                <p:ajax event="change" process="@this" update=":frmSearch:tblRequestList"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblRequestList" value="#{salaryDelegationApproveController.requestsListDataModel}"
+                                                         var="rqst" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                         selection="#{salaryDelegationApproveController.hrSalaryDelegationRequest}" rowKey="#{rqst.id}" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" process="@this,tblRequestList" listener="#{salaryDelegationApproveController.populate}"
+                                                        update=":frmToolBar,:frmSearch,:frmSalary"/>
+                                                <p:column headerText="No." style="width:100px;">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Employee Name" filterMatchMode="contains" filterBy="#{rqst.empId.firstName}">
+                                                    <h:outputText value="#{rqst.empId.firstName} #{rqst.empId.middleName} #{rqst.empId.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Employee Id" filterMatchMode="contains" filterBy="#{rqst.empId.empId}" style="width:200px;">
+                                                    <h:outputText value="#{rqst.empId.empId}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Delegate Type"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{rqst.delegateFrom}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>                                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmSalary"> 
+           <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainpage" style="border: 0px; background-color: transparent" rendered="#{salaryDelegationApproveController.chooseCreatePage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Salary Delegation Approve</h3>
+                            </div>
+                            <div class="box-body ">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl1" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-md-6 ">  
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="searchAutocomplete" value="Delegator Name:" class="control-label col-sm-4"/>  
+                                                                            <div class="col-sm-8">                                            
+                                                                                <p:inputText id="searchAutocomplete" title="Delegator Name" readonly="true"
+                                                                                             value="#{salaryDelegationApproveController.hrEmployees.firstName}"/>                                                                                        
+                                                                            </div>
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSalary" value="Salary:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSalary" required="true"
+                                                                                             value="#{salaryDelegationApproveController.hrEmployees.basicSalary}" 
+                                                                                             title="Salary" readonly="true"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPosition" class="control-label col-sm-4" value="Job Titel:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPosition" value="#{salaryDelegationApproveController.hrJobTypes.jobTitle}"
+                                                                                             readonly="true" title="Position"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>                                                 
+                                                                </div>
+
+                                                                <div class="col-md-6 ">
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmployeeID" class="control-label col-sm-4" value="Employee ID:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmployeeID" value="#{salaryDelegationApproveController.hrEmployees.empId}"
+                                                                                             readonly="true" title="Employee ID"/>
+                                                                                <p:message for="txtEmployeeID" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>  
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtDepartment" class="control-label col-sm-4" value="Department:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtDepartment" value="#{salaryDelegationApproveController.hrDepartments.depName}" 
+                                                                                             readonly="true" title="Department"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+
+                                                                </div>   
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section> 
+
+                                            <div class="box-header">
+                                                <h1 class="box-title"> Delegate Information </h1>                       
+                                            </div>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl2" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="DelegateFrom" class="control-label col-sm-4" value="Delegate Type:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="DelegateFrom" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.delegateFrom}"
+                                                                                             required="true" readonly="true" title="Delegate From"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                </div>
+                                                            </div>                                               
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup id="pnl3" class="col-sm-12" rendered="#{salaryDelegationApproveController.chooseEEPemp}">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="empsearch" class="control-label col-sm-2" value="Employee Name:" />
+                                                                        <div class="col-sm-4">
+                                                                            <p:inputText id="empsearch" style="width:92%; left: 10px" value="#{salaryDelegationApproveController.empdelegator.firstName}"
+                                                                                         readonly="true" title="Employee Name" />
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+                                                            </div>                                               
+                                                        </div>
+                                                    </h:panelGroup>
+                                                    <h:panelGroup id="pnl4" rendered="#{salaryDelegationApproveController.chooseFamily}" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtFamilyName" class="control-label col-sm-2" value="Familly Name:"/>
+                                                                        <div class="col-sm-4">
+                                                                            <p:inputText id="txtFamilyName" style="width:92%; left: 10px" value="#{salaryDelegationApproveController.hrEmpFamilies.firstName}"
+                                                                                         readonly="true" title="Familly Name" />
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+                                                            </div>                                               
+                                                        </div>
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup id="pnl5" rendered="#{salaryDelegationApproveController.chooseOtheremp}" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-sm-6" >
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtIdentificationType" class="control-label col-sm-4" value="Identification Type:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtIdentificationType" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.identificationType}"
+                                                                                             readonly="true" title="Identification Type"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>   
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtFirstName" class="control-label col-sm-4" value="First Name:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtFirstName" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.firstName}"
+                                                                                             required="true" title="First Name" readonly="true" requiredMessage="First Name cannot be empty."/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>                                            
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtMiddleName" class="control-label col-sm-4" value="Middle Name:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtMiddleName" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.middleName}"
+                                                                                             required="true" title="Middle Name" readonly="true" requiredMessage="Middle Name cannot be empty."/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>                                               
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtLastName" class="control-label col-sm-4" value="Last Name:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtLastName" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.lastName}"
+                                                                                             readonly="true" required="true" title="Last Name"/>
+                                                                            </div>                                                                
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtAddress" class="control-label col-sm-4" value="Address:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtAddress" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.address}" 
+                                                                                             required="true" title="Address" readonly="true" requiredMessage="Address cannot be empty."/>                                    
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                </div>          
+
+                                                                <div class="col-sm-6" > 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtIdentificationo" class="control-label col-sm-4" value="Identification No.:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtIdentificationo" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.identificationNum}"
+                                                                                             required="true" title="Identification Number" readonly="true"/>                                                                  
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtOrganization" class="control-label col-sm-4" value="Organization:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtOrganization" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.organization}"
+                                                                                             required="true" title="Organization" readonly="true" requiredMessage="Organization cannot be empty."/>
+                                                                            </div>                 
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="rdoSex" class="control-label col-sm-4" value="Sex:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="rdoSex" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.sex}"
+                                                                                             required="true" title="Sex" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtTelPhone" class="control-label col-sm-4" value="Tel. Phone:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtTelPhone" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.telPhone}"
+                                                                                             required="true" title="Telephon Number" readonly="true" />
+                                                                            </div>                  
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtFax" class="control-label col-sm-4" value="Fax Number.:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtFax" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.fax}"
+                                                                                             required="true" title="Fax" readonly="true"/>
+                                                                            </div>                  
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section> 
+
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">                                                             
+                                                    <h:panelGroup id="pnl6" class="col-sm-12">                                                                   
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-sm-6">   
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel value="From Date:" for="calDateofDelegated" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="calDateofDelegated" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.dateOfDelegated}"
+                                                                                             readonly="true" title="Date of Delegated"/>  
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtReason" class="control-label col-sm-4" value="Remark:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="txtReason" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.reason}"  class="form-control"
+                                                                                                 rows="1" cols="5" autoResize="false" title="Reason" validator="#{validatorManagedBean.Remark}" readonly="true"/>
+                                                                                <p:message for="txtReason" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel value="To Date:" for="calEndofDelegated" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">                                                                  
+                                                                                <p:inputText id="calEndofDelegated" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.endOfDelegated}"
+                                                                                             readonly="true" title="End Of Delegated Date"/>                                                              
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="sorpaymenttype" class="control-label col-sm-4" value="Amount Type:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="sorpaymenttype" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.delegateType}"
+                                                                                             valueChangeListener="#{salaryDelegationApproveController.handelDelegateType}"
+                                                                                             required="true" title="Amount Type" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>  
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtAmount" value="Amount:" rendered="#{salaryDelegationApproveController.chooseMonthlySalary}" class="control-label col-sm-4"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtAmount" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.amount}"
+                                                                                             rendered="#{salaryDelegationApproveController.chooseMonthlySalary}"
+                                                                                             required="true" title="Amount" readonly="true"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div> 
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+
+                                            <div class="box-header">
+                                                <h1 class="box-title"> Approver Detail</h1>                       
+                                            </div>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl7" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-sm-6"> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtDecsion" class="control-label col-sm-4" value="Decision:"/> 
+                                                                            <div class="col-sm-8">  
+                                                                                <p:selectOneMenu id="txtDecsion" required="true" style="width:100%"
+                                                                                                 valueChangeListener="#{salaryDelegationApproveController.handleselectOptions}" requiredMessage="Select your Decision">        
+                                                                                    <f:selectItem itemLabel="--- Select One ---" noSelectionOption="true"/>
+                                                                                    <f:selectItem itemLabel="Approved" itemValue="1"/>
+                                                                                    <f:selectItem itemLabel="Reject" itemValue="2"/>   
+                                                                                    <f:selectItem itemLabel="Forwared" itemValue="3"/> 
+                                                                                    <f:selectItem itemLabel="Resubmmit" itemValue="4"/> 
+                                                                                    <p:ajax process="@this" event="change"/>
+                                                                                </p:selectOneMenu>    
+                                                                                <p:message for="txtDecsion" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="txtRemark" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.remark}"
+                                                                                                 rows="1" cols="5" autoResize="false" title="Remark" class="form-control">
+                                                                                    <p:ajax  /></p:inputTextarea>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-sm-6"> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtApproveBy" class="control-label col-sm-4" value="Approved By:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtApproveBy" value="#{salaryDelegationApproveController.hrSalaryDelegationRequest.approvedBy}" required="true" title="Approve By" class="form-control"
+                                                                                             requiredMessage="Enter Approver."><p:ajax  /></p:inputText>
+                                                                                <p:message for="txtApproveBy" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>  
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 "><div class="form-group form-horizontal">
+                                                                            <h:outputLabel value="Approved Date:" for="calApprovedate" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:calendar pattern="dd/MM/yyyy" id="calApprovedate"  
+                                                                                            required="true" title="Approve Date" requiredMessage="Enter Approved Date">
+                                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                                    <p:ajax   event="change"  process="@this" />
+                                                                                </p:calendar>
+                                                                                <p:message for="calApprovedate" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                                                                                       
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <h:panelGroup id="pnl8" class="col-sm-12">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                     value="Approve"
+                                                                                     action="#{salaryDelegationApproveController.insert()}"
+                                                                                     process="@this,pnl1,pnl2,pnl3,pnl4,pnl5,pnl6,pnl7"                                            
+                                                                                     update=":frmSalary"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form> 
+    </ui:define>
+</ui:composition>
+

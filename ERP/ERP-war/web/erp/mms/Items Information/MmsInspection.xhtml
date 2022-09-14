@@ -1,0 +1,969 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+
+
+
+        <li><a href="MmsBinCard.xhtml"><i class="fa fa-circle-o"></i> <span>BinCard</span></a></li> 
+        <li><a href="MmsItemRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Item Registration</span></a></li> 
+
+
+    </ui:define>
+
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{inspectionController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch" action="#{inspectionController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>                
+                    <p:commandButton id="btnNew" action="#{inspectionController.createNewInspectionInfo()}" icon="#{inspectionController.icone}"  validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{inspectionController.createOrSearchBundle}"  />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{inspectionController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{inspectionController.mmsInspectionList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Inspection List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{inspectionController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="InspectionListVar" value="#{inspectionController.mmsInspectionList}"
+                                                            itemValue="#{InspectionListVar}"  itemLabel="#{InspectionListVar.inspectionNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI, :frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="pnlWorkflow" rendered="#{inspectionController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{inspectionController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <a href="../../mms/Items Information/MmsInspection.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{inspectionController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"                                                                     
+                                                                   converter="entConverter"  value="#{inspectionController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{inspectionController.columnNameChangeEvent}"> 
+
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{inspectionController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2"  value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{inspectionController.inspection.columnValue}"/>
+                                            </div>
+                                        </div> 
+                                        <div class="form-group"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnFind" class="btn btn-primary" action="#{inspectionController.searchInspectionInformation1()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{inspectionController.mmsInspectionSearchInfoDataModel}"
+                                                             var="InspectionInfo" rows="5" selectionMode="single" rowIndexVar="num"
+                                                             selection="#{inspectionController.selectedInspection}" rowKey="#{InspectionInfo.inspectionId}" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+                                                    <p:ajax event="rowSelect" listener="#{inspectionController.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.S_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Inspection_no}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InspectionInfo.inspectionNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Purchase_No}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InspectionInfo.purchaseOId.pacNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Contract_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{InspectionInfo.contractId.contractNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Inspection_date}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InspectionInfo.inspectionDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Store_Name}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{InspectionInfo.storeId.storeName}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{inspectionController.renderPnlCreateInspection}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Item Inspection</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information,fatal" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+
+                                        <div class="form-group textBoxMargin6px">  
+                                            <h:outputLabel id="lbl_inspectionnumber"  class="control-label col-sm-2" value="Inspection Number:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtinpsenei"  readonly="true"
+                                                               value="#{inspectionController.inspection.inspectionNo}"
+                                                               />
+                                            </div>  
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  for="CkeckPurchaseType" class="control-label col-sm-2"  value="#{MMS.Select_Option}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneRadio id="CkeckPurchaseType" layout="grid" columns="2" value="#{inspectionController.checkInspectionType}" 
+                                                                  required="true" requiredMessage="Select Option is requird" converter="entConverter"  class="col-sm-4"
+                                                                  disabled="#{workFlow.readonly}"    valueChangeListener="#{inspectionController.changeCheckInspectionType}">
+                                                    <f:selectItem itemLabel="Purchase" itemValue="1" />
+                                                    <f:selectItem itemLabel="Other" itemValue="2" />   
+                                                    <p:ajax process="@this,CkeckPurchaseType" update=":frmRegisterUI:registerUI, :frmRegisterUI:lblInvoiceType"  event="valueChange" />  
+                                                </p:selectOneRadio>     
+                                                <p:message for="CkeckPurchaseType" display="icon"/>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel for="txtInspectionDate" class="control-label col-sm-2"  value="#{MMS.Inspection_date}:"/>                                                                        
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtInspectionDate" class="form-control" readonly="#{workFlow.readonly}"
+                                                                 value="#{inspectionController.inspection.inspectionDate}"
+                                                                 required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                                 onclick="displayCalendar('frmRegisterUI:txtInspectionDate', 'frmRegisterUI:txtInspectionDate');" />                                                                                                                                                    
+                                                    <p:message for="txtInspectionDate" display="icon"/>
+                                                </div> 
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px required">
+
+                                            <h:outputLabel id="lbl_ponumber" class="control-label col-sm-2"  value="#{MMS.P_O_Number}:" rendered="#{inspectionController.renderPurchase}" />
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="selectOneListPonumber"  style="width: 100%;" rendered="#{inspectionController.renderPurchase}" disabled="#{inspectionController.disablePoDropdown}"
+                                                                 value="#{inspectionController.purchaseOrdereEntity}" converter="entConverter" required="true" requiredMessage="Po Number Is Required"
+                                                                 valueChangeListener="#{inspectionController.handleSelectPoNo}"   
+                                                                 filterMatchMode="contains" filter="true" >
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />  
+                                                    <f:selectItems id="selectservicepanale1" value="#{inspectionController.purchaseOrderList}" var="polist" itemLabel="#{polist.pacNo}" itemValue="#{polist}"  />                            
+                                                    <p:ajax update="renderalways,selectOneListContractnumber" process="@this" event="change" />
+                                                </p:selectOneMenu>  
+                                                <p:message for="selectOneListPonumber" display="icon"/>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Contract_No}:"  rendered="#{inspectionController.renderPurchase}"/>
+                                                <div class="col-sm-4 ">
+                                                    <p:selectOneMenu id="selectOneListContractnumber"   style="width: 100%;"  rendered="#{inspectionController.renderPurchase}" disabled="#{inspectionController.dissableContractDropdown}"
+                                                                     value="#{inspectionController.contractEntity}" required="true" requiredMessage="Contract Number is Required"  converter="entConverter"
+                                                                     valueChangeListener="#{inspectionController.handleSelectContractNo}"  
+                                                                     filterMatchMode="contains" filter="true" >
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" />  
+                                                        <f:selectItems id="selectContract" value="#{inspectionController.contractNoList}" var="contractList" itemLabel="#{contractList.contractNo}" itemValue="#{contractList}"  />                            
+                                                        <p:ajax update="frmMaterialInfo,:frmRegisterUI:registerUI" process="@this" event="change" />
+                                                    </p:selectOneMenu>  
+                                                    <p:message for="selectOneListContractnumber" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl_commercialInvoivce"  class="control-label col-sm-2"  value="#{MMS.Commercial_Invoice}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtcommercialInvoivce"  
+                                                               class="form-control" readonly="#{workFlow.readonly}"
+                                                               value="#{inspectionController.inspection.commercialInvoiceNo}" />
+                                                <p:message for="txtcommercialInvoivce" display="icon"/>
+                                            </div>  
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel id="lbl_WorkOrserNo"  class="control-label col-sm-2" value="#{MMS.Work_Order_No}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtWorkOrderNo"  
+                                                                   class="form-control" readonly="#{workFlow.readonly}"
+                                                                   value="#{inspectionController.inspection.workOrderNo}" />
+                                                    <p:message for="txtWorkOrderNo" display="icon"/>
+                                                </div>  
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel for="txtWaybillDate" class="control-label col-sm-2" value="#{MMS.Way_Bill_Date}:"  />                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtWaybillDate" class="form-control"  readonly="#{workFlow.readonly}"
+                                                             value="#{inspectionController.inspection.waybillArrivalDate}"
+                                                             required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtWaybillDate', 'frmRegisterUI:txtWaybillDate');" />                                                                                                                                                    
+                                                <p:message for="txtWaybillDate" display="icon"/>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel id="lbl_contractDeliveryDate" class="control-label col-sm-2" value="#{MMS.Delivery_Date}:"/>                                                                        
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtcontractDeliveryDate" 
+                                                                 disabled="#{inspectionController.dissableContractDropdown}"
+                                                                 value="#{inspectionController.inspection.contractDeliveryDate}" readonly="#{workFlow.readonly}"
+                                                                 required="true"   requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                                 onclick="displayCalendar('frmRegisterUI:txtcontractDeliveryDate', 'frmRegisterUI:txtcontractDeliveryDate');" />                                                                                                                                                    
+                                                    <p:message for="txtcontractDeliveryDate" display="icon"/>
+                                                </div> 
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <p:outputLabel id="lbl_Storename"   class="control-label col-sm-2"  value="#{MMS.Store_Name}:" />
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="searchBystoreNames" 
+                                                                requiredMessage="Store Name Required"
+                                                                emptyMessage="no data" forceSelection="true" 
+                                                                style="width: 100%;"
+                                                                required="true" readonly="#{workFlow.readonly}"
+                                                                value="#{inspectionController.storeInfoEntity.storeName}"
+                                                                completeMethod="#{inspectionController.searchStoreInformation}"
+                                                                var="storeInfoEntitys" itemValue="#{storeInfoEntitys.storeName}" itemLabel="#{storeInfoEntitys}"  size="15"> 
+                                                    <p:ajax  event="itemSelect" listener="#{inspectionController.getPapmsStoreInfo}" process="@this" update="searchBystoreNames" />  
+                                                    <p:column headerText="Store Name " >
+                                                        <h:outputText  value="#{storeInfoEntitys.storeName}" />
+                                                    </p:column>
+                                                    <p:column headerText="Warehouse"  >
+                                                        <h:outputText value="#{storeInfoEntitys.warehouseId.name}" />
+                                                    </p:column>
+                                                    <p:column  headerText="Store Number">
+                                                        <h:outputText value="#{storeInfoEntitys.storeNo}" />
+                                                    </p:column>
+                                                </p:autoComplete>
+                                                <p:message for="searchBystoreNames" display="icon"/>
+                                            </div> 
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel  id="lblInvoiceType" class="control-label col-sm-2"  value="#{MMS.Invoice_Type}:" rendered="#{inspectionController.renderOther}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdInvoiceType" disabled="#{inspectionController.renderPurchase}" rendered="#{inspectionController.renderOther}"
+                                                                     value="#{inspectionController.inspection.invoiceType}"
+                                                                     required="true" requiredMessage="Pls Select Invoice Type"
+                                                                     valueChangeListener="#{inspectionController.handleSelectInvoiceType}"  style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" />  
+                                                        <f:selectItems value="#{inspectionController.listOfInvoiceType}" />
+
+                                                        <p:ajax process="@this" update="txtdonor,txtproducer" event="change"/>
+                                                    </p:selectOneMenu> 
+                                                    <p:message for="drdInvoiceType" display="icon"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel id="lbl_Donor"  class="control-label col-sm-2"  value="#{MMS.Donor}:" rendered="#{inspectionController.renderOther}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtdonor"  rendered="#{inspectionController.renderOther}" disabled="#{inspectionController.disableDonor}"
+                                                               class="form-control" readonly="#{workFlow.readonly}"
+                                                               value="#{inspectionController.inspection.donorName}" />
+                                                <p:message for="txtdonor" display="icon"/>
+                                            </div>  
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel id="lbl_Producer"  class="control-label col-sm-2" value="Producer:" value="#{MMS.Producer}:" rendered="#{inspectionController.renderOther}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputText   id="txtproducer"   rendered="#{inspectionController.renderOther}" disabled="#{inspectionController.disableProducer}"
+                                                                   class="form-control"  readonly="#{workFlow.readonly}"
+                                                                   value="#{inspectionController.inspection.producerName}" />
+                                                    <p:message for="txtproducer" display="icon"/>
+                                                </div> 
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl_supplier"  class="control-label col-sm-2" value="#{MMS.Supplier}:" rendered="#{inspectionController.dissableContractDropdown}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtsupplier"  
+                                                               rendered="#{inspectionController.dissableContractDropdown}"  readonly="true"
+                                                               value="#{inspectionController.purchaseOrdereEntity.awardId.suppId.vendorName}" />
+                                                <p:message for="txtsupplier" display="icon"/>
+                                            </div>  
+                                        </div>
+                                        <!--  <div class="form-group textBoxMargin6px">
+
+
+                                              <h:outputLabel id="lbl_WorkshopNo"  class="control-label col-sm-2" value="Work Shop No:" rendered="#//{inspectionController.renderOther}"/>
+                                                 <div class="col-sm-4">
+                                                     <p:inputText   id="txtWorkShopNo"   rendered="#//{inspectionController.renderOther}" disabled="#//{inspectionController.disableProducer}"
+                                                                    class="form-control" 
+                                                                    value="//#//{inspectionController.inspection.workShopNo}" />
+                                                     <p:message for="txtproducer" display="icon"/>
+                                                 </div> 
+                                           
+                                       </div> -->
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl_supplier2"  class="control-label col-sm-2"  value="#{MMS.Supplier}:" rendered="#{inspectionController.disablePoDropdown}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtsupplier2"  
+                                                               readonly="true" rendered="#{inspectionController.disablePoDropdown}"
+                                                               value="#{inspectionController.contractEntity.awardId.suppId.vendorName}" />
+                                                <p:message for="txtsupplier2" display="icon"/>
+                                            </div>  
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Inspection Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+
+
+
+                                <h:panelGroup id="renderalways">
+                                    <h:panelGroup id="frmMaterialInfo" rendered="#{inspectionController.renderPurchase}"   >
+
+                                        <div class="form-horizontal col-sm-12"> 
+                                            <div class="form-group col-sm-12 textBoxMargin6px required" >
+                                                <h:outputLabel  class="control-label col-sm-2" value="#{MMS.Item_Name}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="selectOneListBoxGrnMatCodeList"  converter="entConverter"
+                                                                     disabled="#{workFlow.readonly}"   style="width: 100%;"
+                                                                     value="#{inspectionController.itemregistrationEntity}"
+                                                                     valueChangeListener="#{inspectionController.MaterialCodeListInspection}"
+                                                                     filterMatchMode="contains" filter="true" required="true" requiredMessage="Pls Select Item Name" >
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems id="selectItemListBoxGrnMatCodeList" var="matcodes"   value="#{inspectionController.itemInfoList}" itemLabel="#{matcodes.matName}" itemValue="#{matcodes}"/>                            
+                                                        <p:ajax update="txtItemcode,txtunitMeasure,txtUnitPrices,txtquantity" process="@this" event="change" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="selectOneListBoxGrnMatCodeList" display="icon"/>
+                                                </div>
+
+
+                                                <h:outputLabel for="txtItemcode" value="Item Code:" class="control-label col-sm-2"  />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtItemcode" value="#{inspectionController.itemregistrationEntity.matCode}"
+                                                                 readonly="true" required="true" requiredMessage="Item name must have code"
+                                                                 />
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <h:outputLabel for="txtunitMeasure" class="control-label col-sm-2"  value="#{MMS.Unit_Measure}:"  />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtunitMeasure" value="#{inspectionController.itemregistrationEntity.unitOfMeasure}"
+                                                                 readonly="true"
+                                                                 />
+                                                </div>
+                                                <h:outputLabel for="txtUnitPrices" class="control-label col-sm-2" value="#{MMS.Unit_Price}:" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtUnitPrices" value="#{inspectionController.inspectionDetail.unitPrice}"
+                                                                 readonly="true"
+                                                                 />
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <h:outputLabel class="control-label col-sm-2" value="#{MMS.Quantity}:" />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtquantity" readonly="true"  value="#{inspectionController.inspectionDetail.poQuantity}"
+
+                                                                 /> 
+                                                    <p:message  for="txtquantity" display="icon"/>
+                                                </div>
+
+                                                <h:outputLabel for="txtRejectedquantity" class="control-label col-sm-2" value="#{MMS.Rejected_Quantity}:" rendered="#{inspectionController.renderRejectedQuantity}"  />
+                                                <div class="col-sm-4">
+                                                    <p:inputText id="txtRejectedquantity" required="true" requiredMessage="Pls Enter Rejected Quantity" rendered="#{inspectionController.renderRejectedQuantity}"
+                                                                 value="#{inspectionController.inspectionDetail.rejectedQuantity}"
+                                                                 class="form-control" 
+                                                                 validator="#{validatorManagedBean.Number}" converterMessage="Pls Enter Only Digit Numbers"/> 
+                                                    <p:message  for="txtRejectedquantity" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <h:outputLabel class="control-label col-sm-2"  value="#{MMS.Remark}:"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputTextarea id="txtRemark"   class="form-control" value="#{inspectionController.inspectionDetail.remark}" 
+                                                                     disabled="#{workFlow.readonly}"
+                                                                     />
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <h:outputLabel class="control-label col-sm-2" />
+                                                <div class="col-sm-4">
+                                                    <p:commandButton id="btnAdd" class="btn btn-primary" value="#{inspectionController.addorModifiy}" 
+                                                                     action="#{inspectionController.addInspectionInfoDetail}"
+                                                                     process="frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmMaterialInfo"
+                                                                     />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+
+                                <h:panelGroup id="frmTblMaterialInfo"  rendered="#{inspectionController.renderPurchase}"  >
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tbldataModel" var="inspResultDtl" 
+                                                             value="#{inspectionController.mmsInspectionDetailsModel}" 
+                                                             selectionMode="single"
+                                                             selection="#{inspectionController.selectedInspectionDetail}" rowKey="#{inspResultDtl.itemId}"
+
+                                                             disabledSelection=" #{workFlow.readonly}" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowSelect" listener="#{inspectionController.updateInspectionDetail}"  update=":frmRegisterUI:frmMaterialInfo" />
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>  
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.matName}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.matCode}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Measure}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.unitOfMeasure}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Unit_Price}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.unitPrice}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Total_Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.poQuantity}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Accepted_Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.poQuantity - inspResultDtl.rejectedQuantity}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Rejected_Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.rejectedQuantity}"/>
+                                                    </p:column>
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Remark}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.remark}"/>
+                                                    </p:column>                    
+
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+
+
+
+
+
+                                <h:panelGroup id="frmMaterialInfo3"  rendered="#{inspectionController.renderOther}" >
+
+                                    <div class="form-horizontal col-sm-12"> 
+
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel  class="control-label col-sm-2"  value="#{MMS.Item_Name}:" />
+                                            <div class="col-sm-4">
+                                                <p:autoComplete id="searchItemNames" required="true" requiredMessage="Item Name is required"
+                                                                readonly="#{workFlow.readonly}" value="#{inspectionController.itemregistrationEntity.matName}" 
+                                                                completeMethod="#{inspectionController.ItemInformationList}" 
+
+                                                                style="width: 100%;"
+                                                                var="mat" itemValue="#{mat.matName}" itemLabel="#{mat}" forceSelection="true" 
+                                                                emptyMessage="no data">  
+                                                    <p:ajax event="itemSelect"  process="@this" listener="#{inspectionController.getMmsItemInformation}"
+                                                            update="txtItemCode3,searchItemNames,txtUnit3,txtDescription3"/>  
+                                                    <p:column headerText="Item Name" >
+                                                        <h:outputText  value="#{mat.matName}" />
+                                                    </p:column>
+
+                                                </p:autoComplete>   
+                                                <p:message for="searchItemNames" display="icon" />
+                                            </div>
+
+
+                                            <h:outputLabel id="lblMatCode3" class="control-label col-sm-2" value="#{MMS.Item_Code}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText  id="txtItemCode3" 
+                                                              value="#{inspectionController.itemregistrationEntity.matCode}"
+                                                              required="true" requiredMessage="Item Name must have Code "
+                                                              readonly="true"
+                                                              />
+                                                <p:message for="txtItemCode3" display="icon"/>
+                                            </div>
+
+                                        </div>
+
+
+
+                                        <div class="form-group textBoxMargin6px required ">
+                                            <p:outputLabel  class="control-label col-sm-2"  value="#{MMS.Quantity}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtQuantity3" 
+                                                               required="true" requiredMessage="Quantity is Required" 
+                                                               value="#{inspectionController.inspectionDetail.quantity}"
+                                                               validator="#{validatorManagedBean.Number}" converterMessage="Pls Use Only Digits">
+                                                    <p:clientValidator event="keyup"/>
+                                                </p:inputText>
+
+                                                <p:message for="txtQuantity3" display="icon" />
+                                            </div>
+                                            <h:outputLabel  for="txtUnit3"  class="control-label col-sm-2"  value="#{MMS.Unit_Of_Measure}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtUnit3" 
+                                                               readonly="true"
+                                                               value="#{inspectionController.itemregistrationEntity.unitOfMeasure}"
+                                                               required="true"
+
+                                                               />
+                                                <p:message for="txtUnit3" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel for="txtDescription3" class="control-label col-sm-2"  value="#{MMS.Description}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtDescription3"  disabled="true"
+
+                                                                 value="#{inspectionController.itemregistrationEntity.matCategory.catName}"
+
+                                                                 />
+
+                                                <p:message for="txtDescription3" display="icon" />
+                                            </div>
+
+                                            <h:outputLabel for="txtARemark" class="control-label col-sm-2"  value="#{MMS.Remark}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtARemark" class="form-control" disabled="#{workFlow.readonly}"
+                                                                 value="#{inspectionController.inspectionDetail.remark}"
+                                                                 validator="#{validatorManagedBean.Remark}">
+
+                                                </p:inputTextarea>
+
+                                                <p:message for="txtARemark" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnAddOtherDtl" class="btn btn-primary" action="#{inspectionController.addInspectionInfoforOther()}" icon="ui-icon-new" validateClient="true" 
+                                                                  process="frmMaterialInfo3" update=":frmRegisterUI:frmTblMaterialInfo3,frmMaterialInfo3" readonly="#{workFlow.readonly}" 
+                                                                  value="Add"/>            
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo3" rendered="#{inspectionController.renderOther}">
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tbldataModel3" var="inspResultDtl" 
+                                                             value="#{inspectionController.mmsInspectionOtherDtlModel}" 
+                                                             selectionMode="single"
+                                                             selection="#{inspectionController.selectedInspectionDetail}" rowKey="#{inspResultDtl.itemId}"
+                                                             disabledSelection=" #{workFlow.readonly}" 
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowSelect" listener="#{inspectionController.updateInspectionDetail}"  update=":frmRegisterUI:frmMaterialInfo3" />
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>  
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.matName}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.matCode}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Unit_Measure}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.unitOfMeasure}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.quantity}"/>
+                                                    </p:column>
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Remark}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.remark}"/>
+                                                    </p:column>                    
+
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+
+
+                                <section class="panel panel-info">
+                                    <section class="panel-body">  
+                                        <div class="col-md-12 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel  class="col-md-2 control-label"  value="#{MMS.Attach_Inspection_File}:"/>
+                                                <div class="col-sm-2"> 
+
+                                                    <p:panelGrid columns="1" style="float: left;"> 
+                                                        <p:fileUpload  id="fileUplod" cancelLabel="#{contenu.annuler}" disabled="#{workFlow.readonly}"
+                                                                       fileUploadListener="#{inspectionController.uploadListener}"
+                                                                       value="#{inspectionController.file}" 
+                                                                       allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                       invalidFileMessage="This type of file is not valid"
+                                                                       invalidSizeMessage="The size is not Allowed"
+                                                                       multiple="false" mode="advanced" sizeLimit="52428800" auto="true" process="tblSavedDoc" update="tblSavedDoc"/>
+                                                        <p:dataTable id="tblSavedDoc" var="currentRow" sortBy="#{currentRow.name}"  rowIndexVar="current" value="#{inspectionController.docValueModel}"
+                                                                     paginator="true" selectionMode="single" rowKey="#{currentRow.id}" disabledSelection=" #{workFlow.readonly}"
+                                                                     selection="#{inspectionController.documentModel}" paginatorPosition="bottom"
+                                                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                     rowsPerPageTemplate="5,10,15" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:1100px">
+                                                            <p:ajax event="rowSelect" listener="#{inspectionController.onRowSelect}" update="tblSavedDoc"/>
+                                                            <p:column id="docNames"   style="border: none; font-size: 10px; text-align: left;"> 
+                                                                <h:outputText id="txtcoScale" value="#{currentRow.name}"/>
+                                                            </p:column>
+                                                            <p:column  style="border: none; font-size: 10px; text-align: left;">
+                                                                <h:panelGrid style="border: none " columns="2" 
+                                                                             id="pnlGridtblDoccolOptions" >
+                                                                    <p:commandButton process="tblSavedDoc"                                               
+                                                                                     icon="ui-icon-arrowthickstop-1-s"  ajax="false"  >
+                                                                        <p:fileDownload value="#{inspectionController.file}" />
+                                                                    </p:commandButton>
+                                                                    <p:outputPanel id="buttonDetail">
+                                                                        <p:commandButton  process="tblSavedDoc" title="#{dmsBundle.delete}" id="docRemove" 
+                                                                                          update="tblSavedDoc" immediate="true" ajax="true" 
+                                                                                          icon="ui-icon-trash" style="border: none; color: #0B70F9">
+                                                                            <p:confirm header="Confirmation" message="Are you sure?"  icon="ui-icon-alert" />
+                                                                        </p:commandButton>
+                                                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                                            <p:commandButton value="Yes" action="#{inspectionController.remove(currentRow)}" immediate="true" process="@this" update="tblSavedDoc" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                                        </p:confirmDialog>
+                                                                    </p:outputPanel>
+                                                                </h:panelGrid>
+                                                            </p:column>  
+                                                        </p:dataTable>
+                                                    </p:panelGrid>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </section>
+
+                                <h:panelGroup id="frmApproverInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+
+                                        <div class="form-group textBoxMargin6px required">   
+                                            <h:panelGroup id="testpanel">
+                                                <p:outputLabel id="lbl_committe" class="control-label col-sm-2"  value="#{MMS.Committee}:"
+                                                               />
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdCommitte" value="#{inspectionController.hrcommittesEntity.committeeName}" style="width: 100%" 
+                                                                     required="true" requiredMessage="comitte is required" filter="true" filterMatchMode="contains"
+                                                                     disabled="#{workFlow.readonly}"
+                                                                     valueChangeListener="#{inspectionController.handleSelectCommittee}"  >
+
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems id="selectOneMenuISivNumber" 
+                                                                       value="#{inspectionController.committees}" var="com" itemLabel="#{com.committeeName}" itemValue="#{com.committeeName}"
+                                                                       />
+                                                        <p:ajax  event="change" process="@this" update="drdComitteeMembers" />
+
+                                                    </p:selectOneMenu> 
+                                                    <p:message for="drdCommitte" display="icon"/>
+                                                </div>
+                                                <p:outputLabel id="lbl_ComitteeMembers" class="control-label col-sm-2"  value="#{MMS.Committee_Members}:" />
+                                                <div class="col-sm-4">
+                                                    <p:selectManyMenu id="drdComitteeMembers" value="#{inspectionController.selectedMembers}" disabled="#{workFlow.readonly}"
+                                                                      required="true" requiredMessage="Committee members are required" style="width: 100%"
+                                                                      scrollHeight="220"  filter="true" filterMatchMode="contains" showCheckbox="true">
+                                                        <f:selectItems value="#{inspectionController.committeeMembers}" var="committee" itemLabel="#{committee.empId.firstName}"   />                                                                                                        
+                                                    </p:selectManyMenu>
+                                                    <p:message for="drdComitteeMembers" display="icon"/>                                                                                                     
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>                                                                                           
+                                        <div class="form-group textBoxMargin6px required">                                       
+                                            <p:outputLabel id="lbl_tetprepareby" class="control-label col-sm-2"  value="#{MMS.Processed_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby"  
+                                                               value="#{inspectionController.userName}" readonly="true"
+                                                               required="true" requiredMessage="prepared is required"
+                                                               />                                             
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel for="txtProcessedOn" class="control-label col-sm-2"  value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtProcessedOn" class="form-control" value="#{inspectionController.wfMmsProcessed.processedOn}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtProcessedOn', 'frmRegisterUI:txtProcessedOn');" />                                                                                                                                                    
+                                                <p:message for="txtProcessedOn" display="icon"/>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="#{MMS.comment}:" rendered="#{inspectionController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{inspectionController.wfMmsProcessed.commentGiven}" rendered="#{inspectionController.renderDecision}"/>     
+                                            </div> 
+
+
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2"  value="#{MMS.Decision}:" rendered="#{inspectionController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{inspectionController.selectedValue}" rendered="#{inspectionController.renderDecision}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>   
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <h:outputLabel id="noremeaa"  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="btnSaveButton" class="btn btn-primary" validateClient="true"
+                                                                  value="#{inspectionController.saveorUpdateBundle}"
+                                                                  action="#{inspectionController.saveInspection()}"  
+                                                                  process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmApproverInfo"  
+                                                                  update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI,:frmToolbar" 
+                                                                  />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

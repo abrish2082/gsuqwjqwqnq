@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li><a href="FmsInventoryCountSheet.xhtml"><i class="fa fa-circle-o"></i> Inventory Count Sheet</a></li>
+        <li><a href="StockLedgerCard.xhtml"><i class="fa fa-circle-o"></i> Stock Ledger Card</a></li>
+        <li><a href="StockRevaluation.xhtml"><i class="fa fa-circle-o"></i> Stock Item Revaluation</a></li>
+        <li><a href="FmsStockReport.xhtml"><i class="fa fa-circle-o"></i>  Stock Report</a></li> 
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="backface-visibility: hidden;border-color:transparent;background: #ffffff " >
+                <f:facet name="right">
+                    <a href="StockItemInitialBalance.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">#{FCMS.Stock_Item_Initial_Balance}</h3>
+                </div>
+                <div class="panel panel-body">
+                    <div class="panel-body">
+                        <div class="col-md-12" > 
+                            <h:panelGroup id="searchPaydEntryForm" class="col-sm-12">  
+                                <div class="col-md-12 textBoxMargin6px">     
+                                    <div class="form-group">  
+                                        <h:outputLabel for="selectMatByStore" value="Unregistered Material List" class="control-label col-sm-6"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">     
+                                    <div class="form-group">  
+                                        <div class="col-sm-8">                                                               
+                                            <p:selectOneListbox id="selectMatByStore" class="col-sm-8" style="width: 350px; height: 170px;" filterMatchMode="contains" filter="true"
+                                                                valueChangeListener="#{fmsStockItemInitialBalanceController.getUnregisteredMartialList}" scrollHeight="120">
+                                                <f:selectItem itemLabel="--- Select store ---" itemValue="" />
+                                                <f:selectItems  value="#{fmsStockItemInitialBalanceController.unregisteredMartialBYStoreNameList}" var="storeVar"
+                                                                itemLabel="#{storeVar.storeName}" itemValue="#{storeVar.storeId}"/>
+                                                <p:ajax event="valueChange"  process="@this" update=":frmRegisterUI,:frmRegisterUI:tblperiod"/>
+                                            </p:selectOneListbox>
+                                        </div>                               
+                                    </div> 
+                                </div> 
+                                <div class="col-md-12 textBoxMargin6px">     
+                                    <div class="form-group">  
+                                        <div class="col-sm-8">
+                                            <h:outputText value="#{FCMS.Has_weighted_Avarage_price}: "/>
+                                            <p:selectBooleanCheckbox id="SelectType" value="#{fmsStockItemInitialBalanceController.renderChkBox}" onchange=""
+                                                                     valueChangeListener="#{fmsStockItemInitialBalanceController.getUnregisteredMartialList1}"> 
+                                                <p:ajax  event="valueChange" process="@this" update=":frmRegisterUI,:frmRegisterUI:tblperiod"/> 
+                                            </p:selectBooleanCheckbox> 
+                                        </div>                               
+                                    </div> 
+                                </div> 
+                                <div class="form-horizontal  col-sm-12">                            
+                                    <div class="form-group">
+                                        <p:dataTable id="tblperiod" editable="true" editMode="cell"
+                                                     value="#{fmsStockItemInitialBalanceController.mmsMaterialModel}" rowSelectMode="multiple"
+                                                     rowIndexVar="num"  rows="10" selection="#{fmsStockItemInitialBalanceController.selectedMmsItem}" 
+                                                     rowKey="#{dtStokBalance.materialId}" paginator="true" paginatorPosition="Bottom" var="dtStokBalance" rowsPerPageTemplate="5,10,15"
+                                                      resizableColumns="true" >
+                                            <p:ajax event="rowSelectCheckbox" listener="#{fmsStockItemInitialBalanceController.check}" />  
+                                            <p:ajax event="rowUnselectCheckbox" listener="#{fmsStockItemInitialBalanceController.uncheck}" />  
+                                            <p:column selectionMode="multiple" width="70" style="width:16px;text-align:center"/>
+                                            <p:ajax event="cellEdit" listener="#{fmsStockItemInitialBalanceController.onCellEdit}"  />
+                                            <p:column headerText="#{FCMS.No}" width="80">
+                                                <h:outputText value="#{num+1}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Account_Code}" filterBy="#{dtStokBalance.mmsBinCard.materialId.generalLedgerId}" filterMatchMode="contains" sortBy="#{dtStokBalance.mmsBinCard.materialId.fmsGeneralLedger}">
+                                                <h:outputText value="#{dtStokBalance.mmsBinCard.materialId.generalLedgerId}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Material_Code}" filterBy="#{dtStokBalance.mmsBinCard.materialId.matCode}" filterMatchMode="contains" sortBy="#{dtStokBalance.mmsBinCard.materialId.matCode}">
+                                                <h:outputText value="#{dtStokBalance.matCode}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Material_Name}" filterBy="#{dtStokBalance.mmsBinCard.materialId.matName}" filterMatchMode="contains" sortBy="#{dtStokBalance.mmsBinCard.materialId.matName}" style="text-align: left" width="310">
+                                                <h:outputText value="#{dtStokBalance.matName}"/>
+                                            </p:column>  
+                                            <p:column headerText="#{FCMS.Initial_Stock_Quantity}" style="text-align: right">
+                                                <h:outputText value="#{dtStokBalance.mmsBinCard.initalQuantity}"/>
+                                            </p:column>
+                                            <p:column  headerText="#{FCMS.Initial_Stock_Price}" style="text-align: right">
+                                                <p:cellEditor>
+                                                    <f:facet name="output"><h:outputText  value="#{dtStokBalance.mmsBinCard.unitPrice}"/></f:facet>
+                                                    <f:facet name="input"><p:inputText id="txtStockVal" value="#{dtStokBalance.mmsBinCard.unitPrice}" 
+                                                                                       disabled="#{fmsStockItemInitialBalanceController.initialStockPriceReadonly}"
+                                                                                       style="width:100%">
+                                                            <p:ajax event="blur" update="txtPrice" /></p:inputText></f:facet>
+                                                </p:cellEditor>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Stock_Value}" style="text-align: right">
+                                                <h:outputText id="txtPrice" value="#{dtStokBalance.mmsBinCard.initalQuantity * dtStokBalance.mmsBinCard.unitPrice}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                    <div class="col-md-12 textBoxMargin6px">     
+                                        <div class="form-group">  
+                                            <div class="col-sm-8"> 
+                                                <p:commandButton  id="btnSave" action="#{fmsStockItemInitialBalanceController.saveStockItemInitialBalance()}"
+                                                                  class=" btn btn-primary" validateClient="true" value="Save"
+                                                                  process="@this,frmRegisterUI" update=":frmRegisterUI"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>          

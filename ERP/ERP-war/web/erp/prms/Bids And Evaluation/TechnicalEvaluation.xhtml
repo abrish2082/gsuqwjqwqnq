@@ -1,0 +1,935 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-dashboard "></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="BidCriteria.xhtml"><i class="fa fa-circle-o "></i> <span>Bid’s Criteria</span></a></li> 
+        <li><a href="BidRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Bid Registration</span></a></li> 
+        <li><a href="BidRegistrationAmend.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Amendment</span></a></li> 
+        <li><a href="PreminilaryEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Preliminary Evaluation</span></a></li> 
+        <li><a href="FinancialEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Financial Evaluation</span></a></li> 
+        <li><a href="PRMSEvaluationResult.xhtml"><i class="fa fa-circle-o"></i><span>Evaluation Result</span></a></li>
+        <li><a href="PostQualification.xhtml"><i class="fa fa-circle-o "></i><span>Bids Post Qualification</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlBackToSearch" rendered="#{technicalEvaluationCOntroller.renderpnlToSearchPage}" >
+                        <p:commandButton  id="btnBacktoSarch" action="#{technicalEvaluationCOntroller.goBackToSearchPageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                          title="Back to Search" process="@this" update="@this,:frmMainUI, :BidSubmissionMain, :frmSample"  style="background-color: white; border-color: white;" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton  id="btnNew" action="#{technicalEvaluationCOntroller.createNewParty()}" icon="#{technicalEvaluationCOntroller.icone}" 
+                                      style="background-color: white;border-color: white"  rendered="#{technicalEvaluationCOntroller.isRendercreate}"
+                                      process="@this" update="@this,:frmMainUI, :BidSubmissionMain, :frmSample"
+                                      title="#{technicalEvaluationCOntroller.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="PGNotification" rendered="#{technicalEvaluationCOntroller.renderDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{technicalEvaluationCOntroller.prmsThechnicalEvaluations.size()}"
+                                       style="color: red;background-color: white; border-color: white"/>
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Evaluation List"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{technicalEvaluationCOntroller.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="purchaseReqlst"
+                                               value="#{technicalEvaluationCOntroller.prmsThechnicalEvaluations}"
+                                               itemValue="#{purchaseReqlst}" itemLabel="#{purchaseReqlst.evaluationNo}"/>               
+                                <p:ajax event="valueChange"  update="@this,:frmMainUI,:BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:BidSubmissionMain:checklistTbl,:BidSubmissionMain:performaaTbl" />                             
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{technicalEvaluationCOntroller.wfprmsTechnicalModelList}"
+                                                             var="currentRow" selectionMode="single" rowIndexVar="num" rows="10" paginator="true"
+                                                             rowKey="#{currentRow.processedId}" paginatorPosition="bottom">
+
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{row+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{technicalEvaluationCOntroller.logerName}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{currentRow.processedOn}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <a href="TechnicalEvaluation.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+
+            </p:toolbar>
+        </h:form>
+
+
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{technicalEvaluationCOntroller.renderPnlManPage}">
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" >
+                                <h:form id="frmSearchParty"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="Searching By:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{technicalEvaluationCOntroller.prmsThechnicalEvaluation.columnName}"
+                                                                     valueChangeListener="#{technicalEvaluationCOntroller.selectedParamChangeEvent}" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{technicalEvaluationCOntroller.thechnicalEvaluationLst}"
+                                                                       var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                        <p:ajax event="change" process="@this," update="lblTechnicalNo,txtTechnicalNo"/>
+                                                    </p:selectOneMenu>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                <h:outputLabel id="lblTechnicalNo" class="control-label col-sm-4" value="Search By #{technicalEvaluationCOntroller.prmsThechnicalEvaluation.columnName}:"/>
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtTechnicalNo" value="#{technicalEvaluationCOntroller.prmsThechnicalEvaluation.columnValue}"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMarginTop6px"> 
+
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnFind" action="#{technicalEvaluationCOntroller.searchThecnEvaluationByEvaluationNo()}" icon="ui-icon-search" 
+                                                                     process="@this,frmSearchParty" update=":frmMainUI:frmParty:tblPartyInfo"
+                                                                     value="Find" class="btn btn-primary col-lg-4" />            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmParty">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblPartyInfo" value="#{technicalEvaluationCOntroller.prmsThechnicalEvaluationsModel}" var="SuppSpecficationList" rows="10" 
+                                                                 selection="#{technicalEvaluationCOntroller.evaluationSelection}"
+                                                                 rowKey="#{SuppSpecficationList.evaluationId}"  selectionMode="single" 
+                                                                 paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                        <p:ajax event="rowSelect" listener="#{technicalEvaluationCOntroller.rowSelect}" 
+                                                                update=":BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:frmSample,:frmMainUI,:BidSubmissionMain:checklistTbl,:BidSubmissionMain:performaaTbl,:BidSubmissionMain:tblSavedDoc" /> 
+
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Evaluation No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{SuppSpecficationList.evaluationNo }"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Date Rigistered" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{SuppSpecficationList.dateRigistered}"/>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Prepared By" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{technicalEvaluationCOntroller.logerName}"/>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                </div>                 
+                                            </div>    
+                                        </div>  
+                                    </div>                           
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="BidSubmissionMain">
+            <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{technicalEvaluationCOntroller.renderPnlCreateParty}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Technical Evaluation</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" >  
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="checkListInfoPanel" >
+                                    <div class="form-horizontal  col-sm-12">
+
+                                        <div class="col-sm-6" >
+                                            <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <h:outputLabel id="lblSpecificationNo" class="control-label col-sm-4" value="Evaluation No:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtSpecificationNo" readonly="true"  
+                                                                       value="#{technicalEvaluationCOntroller.generateCheckListNo()}"/>
+                                                        <p:message display="icon" for="txtSpecificationNo" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  id="prtypes"  >
+                                                <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <h:outputLabel class="control-label col-sm-4" value="Award Type"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneRadio style="width: 100%"  required="true" requiredMessage="Value is required" disabled="#{workFlow.readonly}"  value="#{technicalEvaluationCOntroller.prmsThechnicalEvaluation.evaluationType}"
+                                                                              valueChangeListener="#{technicalEvaluationCOntroller.changeItemService}"  id="txtprtype" >
+                                                                <f:selectItem itemLabel="Bid" itemValue="Bid" />
+                                                                <f:selectItem itemLabel="Performa" itemValue="Performa" />
+                                                                <p:ajax process="@this"  event="change" update=":BidSubmissionMain:checkListDetailPanell,:BidSubmissionMain:checkListInfoPanel,checklistTbl"/>
+                                                            </p:selectOneRadio>
+                                                            <p:message display="icon" for="txtprtype" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{technicalEvaluationCOntroller.renderBidItem}">
+                                                <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-horizontal col-sm-12"> 
+                                                        <h:outputLabel id="lblserviceBidNoForNone"  class="control-label col-sm-4" value="Bid No:"  />
+                                                        <div class="col-sm-8"> 
+                                                            <p:selectOneMenu id="txtserviceBidNoForNone" disabled="#{workFlow.readonly}"  style="width: 100%" required="true"  value="#{technicalEvaluationCOntroller.prmsBid}"
+                                                                             converter="entConverter" valueChangeListener ="#{technicalEvaluationCOntroller.getItemNameFromBidDetail}">
+                                                                <f:selectItems value="#{technicalEvaluationCOntroller.referenceNo}" />              
+                                                                <p:ajax event="change" update="txtpurchaseType,:BidSubmissionMain:checkListDetailPanell,@this,BidSubmissionMain:pnlgoodDetail,txtSupplierCodeGoods,:BidSubmissionMain:checkListDetailPanel" process="@this" />
+
+                                                            </p:selectOneMenu>  
+                                                            <p:message display="icon" for="txtserviceBidNoForNone" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <h:outputLabel class="control-label col-sm-4" value="Purchase Type:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtpurchaseType" readonly="true" value="#{technicalEvaluationCOntroller.prmsBid.bidCategory}"  />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{technicalEvaluationCOntroller.performa}"  >
+                                                <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-horizontal col-sm-12"> 
+                                                        <h:outputLabel id="lblSrNo" class="control-label col-sm-4"  value="Perfoma No"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtPerfomaNo"  required="true" style="width: 100%"  value="#{technicalEvaluationCOntroller.prmsQuotation}" disabled="#{workFlow.readonly}"
+                                                                             valueChangeListener="#{technicalEvaluationCOntroller.getValueofQuotationNo}"     converter="entConverter"
+                                                                             >
+                                                                <f:selectItems value="#{technicalEvaluationCOntroller.getQuotationNo()}"/>
+                                                                <p:ajax event="change" update="txtpurchaseTypee,checkListDetailPanell,@this" process="@this" />
+
+                                                            </p:selectOneMenu>
+                                                            <p:message for="txtPerfomaNo" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <h:outputLabel class="control-label col-sm-4" value="Purchase Type:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtpurchaseTypee" disabled="#{workFlow.readonly}" readonly="true" value="#{technicalEvaluationCOntroller.prmsQuotation.purchaseType}"  />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+
+
+                                        </div>
+                                        <div class="col-sm-6" >
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <h:outputLabel id="lblRigisteredDate" class="control-label col-sm-4" value="Registered Date:"  />
+                                                    <div class="col-sm-8">                                   
+                                                        <p:calendar id="txtRigisteredDate" required="true" requiredMessage="Value is required" readonlyInput="true"  mindate="today" maxdate="today"                         
+                                                                    value="#{technicalEvaluationCOntroller.prmsThechnicalEvaluation.dateRigistered}" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" >               
+
+                                                        </p:calendar>
+                                                        <p:message display="icon" for="txtRigisteredDate" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <h:outputLabel id="lblBidDocumentAttachment" class="control-label col-sm-4" value="File UpLoad:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:growl id="messages" showDetail="true" severity="information,fatal"/>  
+                                                        <p:fileUpload  id="fileUplod" cancelLabel="#{contenu.annuler}"
+                                                                       fileUploadListener="#{technicalEvaluationCOntroller.uploadListener}"
+                                                                       value="#{technicalEvaluationCOntroller.file}" allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                       invalidFileMessage="This type of file is not valid" invalidSizeMessage="The size is not Allowed"
+                                                                       multiple="false" mode="advanced" sizeLimit="52428800" auto="true" process="tblSavedDoc" update="tblSavedDoc"/>
+                                                        <p:dataTable id="tblSavedDoc"  var="currentRow" sortBy="#{currentRow.name}"  rowIndexVar="current" value="#{technicalEvaluationCOntroller.docValueModel}"
+                                                                     paginator="true" selectionMode="single" rowKey="#{currentRow.id}"
+                                                                     selection="#{technicalEvaluationCOntroller.documentModel}"
+                                                                     >
+                                                            <p:ajax event="rowSelect" listener="#{technicalEvaluationCOntroller.onRowSelect}" update="tblSavedDoc" />
+                                                            <p:column id="docNames"   style="border: none; font-size: 10px; text-align: left;"> 
+                                                                <h:outputText id="txtcoScale" value="#{currentRow.name}"/>
+                                                            </p:column>
+                                                            <p:column  style="border: none; font-size: 10px; text-align: left;">
+                                                                <h:panelGrid style="border: none " columns="2"
+                                                                             id="pnlGridtblDoccolOptions">
+                                                                    <p:commandButton process="@this,tblSavedDoc"  update="tblSavedDoc"                                             
+                                                                                     icon="ui-icon-arrowthickstop-1-s"  ajax="false"  >
+                                                                        <p:fileDownload value="#{technicalEvaluationCOntroller.file}" />
+                                                                    </p:commandButton>
+                                                                    <p:outputPanel id="buttonDetail">
+                                                                        <p:commandButton  process="tblSavedDoc" title="#{dmsBundle.delete}" id="docRemove" 
+                                                                                          update="tblSavedDoc" immediate="true" ajax="true" 
+                                                                                          icon="ui-icon-trash" style="border: none; color: #0B70F9">
+                                                                            <p:confirm header="Confirmation" message="Are you sure?"  icon="ui-icon-alert" />
+                                                                        </p:commandButton>
+                                                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                                            <p:commandButton value="Yes" action="#{technicalEvaluationCOntroller.remove(rowselect)}" immediate="true" process="@this" update="tblSavedDoc" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                                        </p:confirmDialog>
+                                                                    </p:outputPanel>
+                                                                </h:panelGrid>
+                                                            </p:column>  
+                                                        </p:dataTable>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Technical Evaluation Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-sm-12" > 
+                                <div class="panel-body">
+                                    <h:panelGroup style="border: 0px; background-color: transparent"  id="checkListDetailPanell"  >
+                                        <div class="form-horizontal col-sm-12">   
+
+                                            <h:panelGroup style="border: 0px; background-color: transparent" id="checkListDetailPanel" rendered="#{technicalEvaluationCOntroller.renderBid}" >
+                                                <h:panelGroup style="border: 0px; background-color: transparent" id="pnlgoodDetail" >
+                                                    <div class="col-sm-6" >
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblGoodsName" class="control-label col-sm-4" value="Item Name:" rendered="#{technicalEvaluationCOntroller.renderBidGoods}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="txtGoodsName" style="width: 100%" required="true" disabled="#{workFlow.readonly}"  value="#{technicalEvaluationCOntroller.itemRegistration}" 
+                                                                                     converter="entConverter"
+                                                                                     valueChangeListener ="#{technicalEvaluationCOntroller.changeEventItemspecficationList}"
+                                                                                     rendered="#{technicalEvaluationCOntroller.renderBidGoods}"> 
+                                                                        <f:selectItem itemLabel="---Select One---" />
+                                                                        <f:selectItems value="#{technicalEvaluationCOntroller.itemListS}" var="itemName"
+                                                                                       itemLabel="#{itemName.matName}" itemValue="#{itemName}"
+                                                                                       />
+                                                                        <p:ajax event="change" update="pnlgoodDetail,checkListDetailPanel,txtSupplierCodeGoods" process="@this" />
+                                                                    </p:selectOneMenu> 
+                                                                    <p:message display="icon" for="txtGoodsName" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblserName" class="control-label col-sm-4" value="Service Name:" rendered="#{technicalEvaluationCOntroller.renderBidService}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="txtserviceName" style="width: 100%" disabled="#{workFlow.readonly}"  value="#{technicalEvaluationCOntroller.prmsServiceAndWorkReg}" 
+                                                                                     converter="entConverter" required="true" requiredMessage="Value is required"
+                                                                                     valueChangeListener ="#{technicalEvaluationCOntroller.handleServiceAndWork}"
+                                                                                     rendered="#{technicalEvaluationCOntroller.renderBidService}"> 
+                                                                        <f:selectItem itemLabel="---Select One---" />
+                                                                        <f:selectItems value="#{technicalEvaluationCOntroller.serviceList}" var="serName"
+                                                                                       itemLabel="#{serName.serviceName}" itemValue="#{serName}"
+                                                                                       />
+                                                                        <p:ajax event="change" update="pnlgoodDetail,checkListDetailPanel,txtUnitMeasreServiceAndWork,txtSupplierCodeGoods" process="@this" />
+                                                                    </p:selectOneMenu> 
+                                                                    <p:message display="icon" for="txtserviceName" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblSupplierCodeGoods"   class="control-label col-sm-4" value="Bidder code"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="txtSupplierCodeGoods" requiredMessage="Value is required" required="true" style="width: 100%"  disabled="#{workFlow.readonly}"
+                                                                                     value="#{technicalEvaluationCOntroller.prmsThechincalEvaluationDet.preliminaryDetId}"    converter="entConverter">
+
+                                                                        <f:selectItem itemLabel="---Select One---" itemValue=""/>
+
+                                                                        <f:selectItems value="#{technicalEvaluationCOntroller.preminilaryEvaluationsLists}" var="itemcode" itemLabel="#{itemcode.supplierCode}" />
+
+
+                                                                    </p:selectOneMenu> 
+
+                                                                    <p:message display="icon" for="txtSupplierCodeGoods" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblphonenoGoods" class="control-label col-sm-4" value="Score:*" 
+                                                                               rendered="#{technicalEvaluationCOntroller.renderMerit}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtPhoneNoGoods"  class="form-control"  required="true" disabled="#{workFlow.readonly}"
+                                                                                     rendered="#{technicalEvaluationCOntroller.renderMerit}"
+                                                                                     value="#{technicalEvaluationCOntroller.prmsThechincalEvaluationDet.score}"/>
+                                                                    <p:message display="icon" for="txtPhoneNoGoods" />
+                                                                </div></div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblworkName" class="control-label col-sm-4" value="Work Name:" rendered="#{technicalEvaluationCOntroller.renderBidWork}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="txtWorkName" style="width: 100%" disabled="#{workFlow.readonly}"  value="#{technicalEvaluationCOntroller.serviceAndWorkReg}" 
+                                                                                     converter="entConverter"
+                                                                                     valueChangeListener ="#{technicalEvaluationCOntroller.handleServiceAndWork}"
+                                                                                     rendered="#{technicalEvaluationCOntroller.renderBidWork}"> 
+                                                                        <f:selectItem itemLabel="---Select One---" />
+                                                                        <f:selectItems value="#{technicalEvaluationCOntroller.workList}" var="workName"
+                                                                                       itemLabel="#{workName.workName}" itemValue="#{workName}"
+                                                                                       />
+                                                                        <p:ajax event="change" update="pnlgoodDetail,checkListDetailPanel,UnitMeasreFrmWork,txtSupplierCodeGoods" process="@this" />
+                                                                    </p:selectOneMenu> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblUnitMeasreServiceAndWork" rendered="#{technicalEvaluationCOntroller.renderBidService}" class="control-label col-sm-4" value="Unit Measure:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtUnitMeasreServiceAndWork" rendered="#{technicalEvaluationCOntroller.renderBidService}" class="form-control" disabled="#{workFlow.readonly}"  
+
+                                                                                 value="#{technicalEvaluationCOntroller.prmsServiceAndWorkReg.unitMeasures}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblUnitMeasreFrmWork" rendered="#{technicalEvaluationCOntroller.renderBidWork}" class="control-label col-sm-4" value="Unit Measure:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtUnitMeasreFrmWork" rendered="#{technicalEvaluationCOntroller.renderBidWork}" class="form-control" disabled="#{workFlow.readonly}"  
+
+                                                                                 value="#{technicalEvaluationCOntroller.prmsServiceAndWorkReg.unitMeasures}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblunitMeasurefrmBid" rendered="#{technicalEvaluationCOntroller.renderBidGoods}" class="control-label col-sm-4" value="Unit Measure:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtunitMeasurefrmBid" rendered="#{technicalEvaluationCOntroller.renderBidGoods}" class="form-control" disabled="#{workFlow.readonly}"  
+
+                                                                                 value="#{technicalEvaluationCOntroller.itemRegistration.unitOfMeasure}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblLimtGoods" class="control-label col-sm-2" value="Pass Limt:"
+                                                                               rendered="#{technicalEvaluationCOntroller.renderMerit}"/>
+                                                                <div class="col-sm-3">
+                                                                    <p:inputText  id="txtLimtGoods"  class="form-control"   disabled="#{workFlow.readonly}"
+                                                                                  rendered="#{technicalEvaluationCOntroller.renderMerit}"
+                                                                                  value="#{technicalEvaluationCOntroller.prmsThechnicalEvaluation.passLimit}"/>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+
+                                                                <h:outputLabel id="lblRemarkGoods" class="control-label col-sm-4" value="Remark:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtRemarkGoods"  class="form-control" autoResize="false" disabled="#{workFlow.readonly}" 
+
+                                                                                     value="#{technicalEvaluationCOntroller.prmsThechincalEvaluationDet.remark}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <h:outputLabel id="lblEvaluation" class="control-label col-sm-4" value="Evaluation :"
+                                                                               rendered="#{technicalEvaluationCOntroller.renderCompliance}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu rendered="#{technicalEvaluationCOntroller.renderCompliance}" disabled="#{workFlow.readonly}"
+                                                                                     value="#{technicalEvaluationCOntroller.prmsThechincalEvaluationDet.evaluation}">
+                                                                        <f:selectItem itemLabel="---select one---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Pass" itemValue="Pass"/>
+                                                                        <f:selectItem itemLabel="Fail" itemValue="Fail"/>
+
+
+                                                                    </p:selectOneMenu>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{technicalEvaluationCOntroller.renderBidGoods}" >
+                                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                <div class="col-sm-12 form-horizontal">
+                                                                    <div class="col-lg-4"></div>
+                                                                    <div class="col-sm-8">
+                                                                        <p:commandButton id="btnAddItem" action="#{technicalEvaluationCOntroller.addThechincalEvaluationDet()}" icon="ui-icon-add" validateClient="true"  
+                                                                                         process="checkListDetailPanel" update=" :BidSubmissionMain:checklistTbl,checkListDetailPanel" class="btn btn-primary col-lg-4 "
+                                                                                         value="#{technicalEvaluationCOntroller.addOrUpdateBundle}" />   
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                        <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{technicalEvaluationCOntroller.renderBidService}" >
+                                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                <div class="col-sm-12 form-horizontal">
+                                                                    <div class="col-lg-4"></div>
+                                                                    <div class="col-sm-8">
+                                                                        <p:commandButton id="btnAddService" action="#{technicalEvaluationCOntroller.addThechincalEvaluationDetService()}" icon="ui-icon-add" validateClient="true"  
+                                                                                         process="checkListDetailPanel" update=" :BidSubmissionMain:checklistTbl,checkListDetailPanel" class="btn btn-primary col-lg-4 "
+                                                                                         value="#{technicalEvaluationCOntroller.addOrUpdateBundle}" />   
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                        <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{technicalEvaluationCOntroller.renderBidWork}" >
+                                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                <div class="col-sm-12 form-horizontal">
+                                                                    <div class="col-lg-4"></div>
+                                                                    <div class="col-sm-8">
+                                                                        <p:commandButton id="btnAddWork" action="#{technicalEvaluationCOntroller.addThechincalEvaluationDetWork()}" icon="ui-icon-add" validateClient="true"  
+                                                                                         process="checkListDetailPanel" update=" :BidSubmissionMain:checklistTbl,checkListDetailPanel" class="btn btn-primary col-lg-4 "
+                                                                                         value="#{technicalEvaluationCOntroller.addOrUpdateBundle}" />   
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </div>
+                                                </h:panelGroup>
+
+
+                                            </h:panelGroup>
+                                        </div>
+                                        <h:panelGroup style="border: 0px; background-color: transparent"  id="PerformaDetailPanel" rendered="#{technicalEvaluationCOntroller.performa}" >
+                                            <div class="form-horizontal col-sm-12">  
+                                                <div class="col-sm-6" >
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel id="lblItmm" class="control-label col-sm-4" value="Item Name:"
+                                                                           rendered="#{technicalEvaluationCOntroller.renderProformaGoods}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtitemname" style="width: 100%" disabled="#{workFlow.readonly}" value="#{technicalEvaluationCOntroller.itemRegistration}" 
+                                                                                 converter="entConverter" rendered="#{technicalEvaluationCOntroller.renderProformaGoods}"
+                                                                                 valueChangeListener="#{technicalEvaluationCOntroller.changeEventItemspecfication}">
+                                                                    <f:selectItem itemLabel="---Select One---" itemValue="" />
+                                                                    <f:selectItems value="#{technicalEvaluationCOntroller.registrations}" var="itemCode"
+                                                                                   itemLabel="#{itemCode.matName}" itemValue="#{itemCode}"    />
+                                                                    <p:ajax event="change"
+                                                                            update="txtMeasureee,txtSupplieName,PerformaDetailPanel,checkListDetailPanell" process="@this"  />
+                                                                </p:selectOneMenu> 
+
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel id="lblserviceProfoma" class="control-label col-sm-4" value="Service Name:"
+                                                                           rendered="#{technicalEvaluationCOntroller.renderProformaService}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtserviceProfoma" style="width: 100%" value="#{technicalEvaluationCOntroller.prmsServiceAndWorkReg}"
+                                                                                 rendered="#{technicalEvaluationCOntroller.renderProformaService}" converter="entConverter"
+                                                                                 valueChangeListener="#{technicalEvaluationCOntroller.handleServiceForPrfoma}">
+
+                                                                    <f:selectItem itemLabel="---Select One---" />
+                                                                    <f:selectItems value="#{technicalEvaluationCOntroller.proformaServiceList}" var="serviceCode"
+                                                                                   itemLabel="#{serviceCode.serviceName}" itemValue="#{serviceCode}" />
+                                                                    <p:ajax event="change"  update="txtMeasureee,txtSupplieName" process="@this"  />
+                                                                </p:selectOneMenu> 
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel id="lblworkProfoma" class="control-label col-sm-4" value="Work Name:"
+                                                                           rendered="#{technicalEvaluationCOntroller.renderProformaWork}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="txtworkProforma" style="width: 100%" 
+                                                                                 rendered="#{technicalEvaluationCOntroller.renderProformaWork}">
+
+                                                                    <f:selectItem itemLabel="---Select One---" />
+                                                                    <f:selectItems value="#{technicalEvaluationCOntroller.registrations}" var="workCode"
+                                                                                   itemLabel="#{workCode.matName}"     />
+                                                                    <p:ajax event="select" listener="#{technicalEvaluationCOntroller.changeEventItemspecfication}" update="txtMeasureee,txtSupplieName" process="@this"  />
+                                                                </p:selectOneMenu> 
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel id="lblMeasureee" class="control-label col-sm-4" value="Unit Measure:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtMeasureee"  class="form-control"   
+
+                                                                             value="#{technicalEvaluationCOntroller.itemRegistration.unitOfMeasure}"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel id="lblPasss" class="control-label col-sm-4" value="Evaluation :"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu value="#{technicalEvaluationCOntroller.prmsThechincalEvaluationDet.evaluation}">
+                                                                    <f:selectItem itemLabel="---select one ---" itemValue=""/>
+                                                                    <f:selectItem itemLabel="Pass" itemValue="Pass"/>
+                                                                    <f:selectItem itemLabel="Fail" itemValue="Fail"/>
+                                                                </p:selectOneMenu>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel id="lblSupplieName"   class="control-label col-sm-4" value="Bidder Name:"/>
+                                                            <div class="col-sm-8"> 
+                                                                <p:selectOneMenu id="txtSupplieName" style="width: 100%"  required="true" 
+                                                                                 value="#{technicalEvaluationCOntroller.prmsQuotationDetail.supId}"                                                                         
+                                                                                 converter="entConverter">
+                                                                    <f:selectItems value="#{technicalEvaluationCOntroller.supplierProforma}"
+                                                                                   var="supp" itemLabel="#{supp.vendorName}" itemValue="#{supp}"/>
+                                                                </p:selectOneMenu>  
+                                                                <p:message display="icon" for="txtSupplieName" />
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel id="lblRemar" class="control-label col-sm-4" value="Remark:"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputTextarea id="txtRemar"  class="form-control"  autoResize="false" 
+
+                                                                                 value="#{technicalEvaluationCOntroller.prmsThechincalEvaluationDet.remark}"/>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <div class="col-lg-4"></div>
+                                                            <div class="col-sm-8">
+                                                                <p:commandButton id="btnAdd1" action="#{technicalEvaluationCOntroller.addThechincalEvaluationForPerforma()}" icon="ui-icon-add" validateClient="true" 
+                                                                                 process="PerformaDetailPanel"  update=":BidSubmissionMain:performaaTbl, PerformaDetailPanel" class="btn btn-primary col-lg-4  " 
+                                                                                 value="Add" />   
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h:panelGroup style="border: 0px; background-color: transparent" id="performaaTbl" rendered="#{technicalEvaluationCOntroller.performa}" >
+                                                <div class="form-horizontal col-sm-12">
+                                                    <div class="form-group">                                        
+                                                        <div class="col-sm-12">
+                                                            <p:dataTable id="submissDt" value="#{technicalEvaluationCOntroller.prmsThechincalEvaluationDetsModel}" rowIndexVar="rowContact" var="contact"
+                                                                         paginator="true" paginatorPosition="bottom" editable="true">
+                                                                <p:ajax event="rowEdit" listener="#{technicalEvaluationCOntroller.onContactRowEdit}" update="submissDt" />
+                                                                <p:ajax event="rowEditCancel" listener="#{technicalEvaluationCOntroller.onContactRowCancel}" update="submissDt" />
+                                                                <p:column headerText="No">
+                                                                    #{rowContact+1}
+                                                                </p:column>
+                                                                <p:column headerText="Bidder Name">
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{contact.quotationDetailId.supId.vendorName}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText  value="#{contact.quotationDetailId.supId.vendorName}" style="width:100%"/></f:facet>
+                                                                    </p:cellEditor>
+                                                                </p:column>
+                                                                <p:column headerText="Item Name" rendered="#{technicalEvaluationCOntroller.renderProformaGoods}">
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{contact.quotationDetailId.materialCodeId.matName}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText  value="#{contact.quotationDetailId.materialCodeId.matName}" style="width:100%"/></f:facet>
+                                                                    </p:cellEditor>
+                                                                </p:column>
+                                                                <p:column headerText="Unit Measure" >
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{contact.quotationDetailId.materialCodeId.unitOfMeasure}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText  value="#{contact.quotationDetailId.materialCodeId.unitOfMeasure}" style="width:100%"/></f:facet>
+                                                                    </p:cellEditor>
+                                                                </p:column>
+                                                                <p:column headerText="Service Name" rendered="#{technicalEvaluationCOntroller.renderProformaService}">
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{contact.quotationDetailId.purchaseReqServiceId.serviceId.serviceName}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText  value="#{contact.quotationDetailId.purchaseReqServiceId.serviceId.serviceName}" style="width:100%"/></f:facet>
+                                                                    </p:cellEditor>
+                                                                </p:column>
+
+                                                                <p:column headerText="Work Name" rendered="#{technicalEvaluationCOntroller.renderProformaWork}">
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{contact.quotationDetailId.purchaseReqServiceId.serviceId.workName}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText  value="#{contact.quotationDetailId.purchaseReqServiceId.serviceId.workName}" style="width:100%"/></f:facet>
+                                                                    </p:cellEditor>
+                                                                </p:column>
+                                                                <p:column headerText="Evaluation">
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{contact.evaluation}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText id="Evaluation" value="#{contact.evaluation}" style="width:100%"/></f:facet>
+                                                                    </p:cellEditor>
+                                                                </p:column>
+
+                                                                <p:column headerText="Remark">
+                                                                    <p:cellEditor>
+                                                                        <f:facet name="output"><h:outputText value="#{contact.remark}" /></f:facet>
+                                                                        <f:facet name="input"><p:inputText id="mak" value="#{contact.remark}" style="width:100%"/></f:facet>
+                                                                    </p:cellEditor>
+                                                                </p:column>
+                                                                <p:column headerText="Option"> 
+                                                                    <p:commandLink action="#{technicalEvaluationCOntroller.editItemDataTblForPerforma()}" value="Edit" disabled="#{workFlow.readonly}"
+                                                                                   process="@this,submissDt" update="@this,:BidSubmissionMain:PerformaDetailPanel"/>
+                                                                </p:column>
+                                                            </p:dataTable>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup style="border: 0px; background-color: transparent" id="checklistTbl" rendered="#{technicalEvaluationCOntroller.goodsDataTable}" >
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group">                                        
+                                                    <div class="col-sm-12">
+                                                        <p:dataTable id="biddDt" value="#{technicalEvaluationCOntroller.prmsThechincalEvaluationDetsModel}" rowIndexVar="rowContact" var="contact"
+                                                                     paginator="true" paginatorPosition="bottom" editable="true">
+                                                            <p:ajax event="rowEdit" listener="#{technicalEvaluationCOntroller.onContactRowEdit}" update="biddDt" />
+                                                            <p:ajax event="rowEditCancel" listener="#{technicalEvaluationCOntroller.onContactRowCancel}" update="biddDt" />
+                                                            <p:column headerText="No">
+                                                                #{rowContact+1}
+                                                            </p:column>
+                                                            <p:column headerText="Bidder Code" >
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.preliminaryDetId.supplierCode}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="evaluationBy" value="#{contact.preliminaryDetId.supplierCode}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column headerText="Item Name" rendered="#{technicalEvaluationCOntroller.renderBidGoods}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.bidDetailId.itemRegId.matName}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="itemName" value="#{contact.bidDetailId.itemRegId.matName}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column headerText="Service Name" rendered="#{technicalEvaluationCOntroller.renderBidService}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.serviceId.serviceName}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="ServiceNam" value="#{contact.serviceId.serviceName}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column headerText="Works Name" rendered="#{technicalEvaluationCOntroller.renderBidWork}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.serviceId.workName}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="worksName" value="#{contact.serviceId.workName}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Unit Measure" rendered="#{technicalEvaluationCOntroller.renderBidWork}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.itemRegId.unitOfMeasure}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="ITemUnitMeasure" value="#{contact.itemRegId.unitOfMeasure}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Unit Measure" rendered="#{technicalEvaluationCOntroller.renderBidService}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.serviceId.unitMeasures}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText value="#{contact.serviceId.unitMeasures}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column headerText="Unit Measure" rendered="#{technicalEvaluationCOntroller.renderBidWork}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.serviceId.unitMeasures}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText value="#{contact.serviceId.unitMeasures}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column headerText="Pass Limit" rendered="#{technicalEvaluationCOntroller.renderServiceAwardType}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.thechnicalId.passLimit}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="ServiceAwardType" value="#{contact.thechnicalId.passLimit}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column headerText="Evaluation" rendered="#{technicalEvaluationCOntroller.renderCompliance}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.evaluation}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText  value="#{contact.evaluation}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column headerText="Score" rendered="#{technicalEvaluationCOntroller.renderMerit}">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.score}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="score" value="#{contact.score}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column headerText="Remark">
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{contact.remark}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="remak" value="#{contact.remark}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column headerText="Option"> 
+                                                                <p:commandLink action="#{technicalEvaluationCOntroller.editItemDataTbl()}" value="Edit" disabled="#{workFlow.readonly}"
+                                                                               process="@this,biddDt" update="@this,:BidSubmissionMain:checkListDetailPanel"/>
+                                                            </p:column>
+                                                        </p:dataTable>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <h:panelGroup id="PGRequester" >
+                                            <div class="form-group col-sm-12 textBoxMargin6px ">
+                                                <div class="col-sm-6">
+                                                    <div class=" form-horizontal col-sm-12">
+                                                        <p:outputLabel class="control-label col-sm-4"
+                                                                       id="lblPrepatedy1" value="Processed By:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText  id="txtprey1" value="#{technicalEvaluationCOntroller.logerName}" readonly="true" title="processer"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-group col-sm-12 required ">
+                                                        <p:outputLabel id="lblApproved" value="Processed Date:"  class="control-label col-sm-4" />
+                                                        <div class="col-sm-8">
+                                                            <p:calendar id="calprocessed" required="true" requiredMessage="value is required" placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"
+                                                                        readonlyInput="true"  mindate="today" maxdate="today"
+                                                                        autocomplete="off" value="#{technicalEvaluationCOntroller.wfPrmsProcessed.processedOn}">
+
+                                                            </p:calendar>
+                                                            <p:message display="icon" for="calprocessed" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="col-sm-6" >
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel  for="txtDecision" id="lblDecision" value="Decision:"  class="control-label col-sm-4" rendered="#{technicalEvaluationCOntroller.renderDecision}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtDecision" value="#{technicalEvaluationCOntroller.wfPrmsProcessed.decision}" style="width: 100%"
+                                                                             valueChangeListener="#{technicalEvaluationCOntroller.handleselectOptions}" rendered="#{technicalEvaluationCOntroller.renderDecision}">
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                                <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                            </p:selectOneMenu>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <h:outputLabel id="lblRemark" class="control-label col-sm-4"  value="Comment Given:" rendered="#{technicalEvaluationCOntroller.renderDecision}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputTextarea id="txtRemark" class="form-control" value="#{technicalEvaluationCOntroller.wfPrmsProcessed.commentGiven}" rendered="#{technicalEvaluationCOntroller.renderDecision}"/>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+
+
+                                        <div class="form-group textBoxMarginTop6px "> 
+                                            <div class="col-lg-2" />
+                                            <div class="col-sm-3">
+
+                                                <p:commandButton id="btnSave" value="#{technicalEvaluationCOntroller.saveorUpdateBundle}" icon="ui-icon-new" validateClient="true" 
+                                                                 class="btn btn-primary col-lg-4" 
+                                                                 process="@this,checkListInfoPanel,checklistTbl,PGRequester"  
+                                                                 update="@this,checklistTbl, performaaTbl,checkListInfoPanel,PGRequester" 
+                                                                 action="#{technicalEvaluationCOntroller.saveForTechncalEvalution()}" /> 
+
+                                            </div>
+                                        </div>
+
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>          
+

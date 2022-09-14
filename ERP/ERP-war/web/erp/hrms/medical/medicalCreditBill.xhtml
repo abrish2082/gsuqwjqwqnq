@@ -1,0 +1,507 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Go to Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="medicalInstitution.xhtml"><i class="fa fa-circle-o "></i><span>Medical Institution</span></a></li>
+        <li><a href="medicaCreditBillApprove.xhtml"><i class="fa fa-circle-o "></i><span>Medical Credit Bill Approve</span></a></li>
+        <li><a href="medicalCashRefund.xhtml"><i class="fa fa-circle-o "></i><span>Medical Cash Refund Request</span></a></li>
+        <li><a href="medicalCashRefundApprove.xhtml"><i class="fa fa-circle-o "></i><span>Medical Cash Refund Approve</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{medicalBillController.btnNewOrSearch()}"
+                                     icon="#{medicalBillController.icone}" title="#{medicalBillController.newOrSearch}"
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmMedicalBill"
+                                     style="background-color: white; border-color: white"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{medicalBillController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{medicalBillController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmToolBar,:frmSearch,:frmMedicalBill" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup> 
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-gear" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWorkflow" value="#{medicalBillController.workflowDataModel}"
+                                                                 var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                 rowKey="#{currentRow.workflowId}" paginatorPosition="bottom">
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Decision"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.decision}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Comment Given"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Processed Date"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                        </p:column> 
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup> 
+                    <a href="../../hrms/medical/medicalCreditBill.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{medicalBillController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" title="Search medical medical credit on request">Search...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                    <div class="col-sm-5">
+                                                        <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                         valueChangeListener="#{medicalBillController.loadByStatus}">
+                                                            <f:selectItems value="#{medicalBillController.statusList}"/>   
+                                                            <p:ajax event="change" process="@this" update="tblMedInvoiceList"/>
+                                                        </p:selectOneMenu> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblMedInvoiceList" value="#{medicalBillController.medInvoiceDataModel}" widgetVar="instType"
+                                                         var="medInvoice" selectionMode="single" rowIndexVar="num" rows="15" paginator="true" 
+                                                         rowsPerPageTemplate="5,10,15" paginatorPosition="bottom" class="dataTable"
+                                                         selection="#{medicalBillController.hrLocalMedInvoices}" rowKey="#{medInvoice.id}">
+                                                <p:ajax event="rowSelect" listener="#{medicalBillController.populateMdicalInvoice}" 
+                                                        process="@this,tblMedInvoiceList" update=":frmToolBar,:frmSearch,:frmMedicalBill"/>
+                                                <p:column headerText="No." style="width:60px">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Institution Type" filterBy="#{medInvoice.institutionId.type}" filterMatchMode="contains">
+                                                    <f:facet name="filter">
+                                                        <p:selectOneMenu onchange="PF('instType').filter()">
+                                                            <f:selectItems value="#{medicalBillController.inst_Type}"/>
+                                                        </p:selectOneMenu> 
+                                                    </f:facet>
+                                                    <h:outputText value="#{medInvoice.institutionId.type}"/>
+                                                </p:column>
+                                                <p:column headerText="Source of Bill" filterMatchMode="startsWith" filterBy="#{medInvoice.institutionId.name}">
+                                                    <h:outputText value="#{medInvoice.institutionId.name}"/>
+                                                </p:column> 
+                                                <p:column headerText="Invoice / Reference No.">                
+                                                    <h:outputText value="#{medInvoice.invoiceOrRefNumber}" title="Invoice or Reference Number"/>
+                                                </p:column>
+                                                <p:column headerText="Invoice Date">                
+                                                    <h:outputText value="#{medInvoice.invoiceDate}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmMedicalBill"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainpage" rendered="#{medicalBillController.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Medical Credit Bill Requests</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl1" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="drdInstitutionType" class="control-label col-sm-4" value="Institution Type: "/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneRadio id="drdInstitutionType" value="#{medicalBillController.selectedInsType}"
+                                                                                          valueChangeListener="#{medicalBillController.institutionTypeVlc}" class="col-sm-9">
+                                                                            <f:selectItem itemLabel="Hospital/Clinic" itemValue="Hospital"/>
+                                                                            <f:selectItem itemLabel="Pharmacy" itemValue="Pharmacy"/>
+                                                                            <p:ajax event="change" process="@this" update="drdSourceOfBill"/>
+                                                                        </p:selectOneRadio>
+                                                                        <p:message for="drdInstitutionType" display="icon"/>
+                                                                    </div>
+                                                                </div>                                               
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">                                                                               
+                                                                    <h:outputLabel  for="drdSourceOfBill" class="control-label col-sm-4" value="Source Of Bill: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu id="drdSourceOfBill" value="#{medicalBillController.hrLocalMedInvoices.institutionId}" 
+                                                                                         valueChangeListener="#{medicalBillController.handleSelectedName}" converter="entConverter"
+                                                                                         required="true" requiredMessage="Select source of bill"
+                                                                                         filterMatchMode="startsWith" filter="true" style="width:100%">
+                                                                            <f:selectItems value="#{medicalBillController.list}"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="drdSourceOfBill" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div> 
+                                                        </div>     
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtInvoiceNumber" class="control-label col-sm-4" value="Invoice/Ref No: "/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtInvoiceNumber" value="#{medicalBillController.hrLocalMedInvoices.invoiceOrRefNumber}"
+                                                                                     required="true" title="Invoice / Reference Number" requiredMessage="Enter invoice number"
+                                                                                     class="form-control"/>
+                                                                        <p:message for="txtInvoiceNumber" display="icon"/>
+                                                                    </div>  
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="calInvoicedate" value="Invoice Date: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calInvoicedate" value="#{medicalBillController.hrLocalMedInvoices.invoiceDate}" title="Invoice Date"
+                                                                                     converter="dateConverter" validator="#{validatorManagedBean.Date}" validatorMessage="Should be a date"
+                                                                                     onclick="displayCalendar('frmMedicalBill:calInvoicedate', 'frmMedicalBill:calInvoicedate');"
+                                                                                     required="true" requiredMessage="Enter invoice date" class="form-control"/>
+                                                                        <p:message for="calInvoicedate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl2" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="drdSearchBy" value="Search By:" class="control-label col-sm-4" title="Filter Criteria"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneRadio id="drdSearchBy" value="#{medicalBillController.selected}"
+                                                                                          valueChangeListener="#{medicalBillController.searchCriteria}" class="col-sm-9">
+                                                                            <f:selectItem itemLabel="Patient Id" itemValue="Employee ID"/>
+                                                                            <f:selectItem itemLabel="Patient Name" itemValue="Employee Name"/>
+                                                                            <p:ajax event="change" process="@this" update="@this,pnl2"/>
+                                                                        </p:selectOneRadio>
+                                                                    </div>
+                                                                </div>                                               
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="srcPatientID" value="Patient Id: "  class="control-label col-sm-4"/>  
+                                                                    <div class="col-sm-8">
+                                                                        <p:autoComplete id="srcPatientID" value="#{medicalBillController.hrEmployees}" scrollHeight="300"
+                                                                                        completeMethod="#{medicalBillController.searchByPatientId}" forceSelection="true" 
+                                                                                        required="true" requiredMessage="Enter patient Id to search" placeholder="Search by patient Id"
+                                                                                        itemValue="#{emp}" itemLabel="#{emp.empId}" size="20" var="emp" emptyMessage="no data" converter="entConverter"
+                                                                                        disabled="#{medicalBillController.disableEmpID}" title="Employee ID" style="width:100%">
+                                                                            <p:ajax event="itemSelect" listener="#{medicalBillController.getPatientById}"
+                                                                                    process="@this" update="@this,srcPatientName"/>   
+                                                                            <p:column headerText="Employee Id">
+                                                                                <h:outputText value="#{emp.empId}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Full Name">
+                                                                                <h:outputText value="#{emp.firstName} #{emp.middleName} #{emp.lastName}"/>
+                                                                            </p:column>                                                                              
+                                                                        </p:autoComplete>
+                                                                        <p:message for="srcPatientID" display="icon"/>
+                                                                    </div> 
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="srcPatientName" value="Patient Name: "  class="control-label col-sm-4"/>  
+                                                                    <div class="col-sm-8">
+                                                                        <p:autoComplete id="srcPatientName" value="#{medicalBillController.hrEmployees.firstName}" scrollHeight="300" 
+                                                                                        completeMethod="#{medicalBillController.searchPatientByName}" forceSelection="true" 
+                                                                                        required="true" requiredMessage="Enter patient name to search" placeholder="Search by patient name"
+                                                                                        itemValue="#{emp.firstName}" itemLabel="#{emp}" size="20" var="emp" emptyMessage="no data" 
+                                                                                        disabled="#{medicalBillController.disableEmpName}" title="Employee Name" style="width:100%"> 
+                                                                            <p:column headerText="Full Name">
+                                                                                <h:outputText value="#{emp.firstName} #{emp.middleName} #{emp.lastName}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Employee Id">
+                                                                                <h:outputText value="#{emp.empId}"/>
+                                                                            </p:column>
+                                                                            <p:ajax event="itemSelect" listener="#{medicalBillController.getPatientByName}"
+                                                                                    process="@this" update="@this,srcPatientID"/>     
+                                                                        </p:autoComplete>
+                                                                        <p:message for="srcPatientName" display="icon"/>
+                                                                    </div> 
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal"> 
+                                                                    <h:outputLabel for="txtDescription" class="control-label col-sm-4" value="Description:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtDescription" value="#{medicalBillController.hrLocalMedInvoiceDetail.description}"  
+                                                                                         class="form-control" rows="1" autoResize="false" title="Description" 
+                                                                                         placeholder="Write some description ....."/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="txtAmount" class="control-label col-sm-4" value="Amount: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtAmount" value="#{medicalBillController.hrLocalMedInvoiceDetail.amount}" title="Amount"
+                                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Company share should be a number" 
+                                                                                     required="true" requiredMessage="Enter amount of company share" class="form-control">
+                                                                            <p:ajax event="keyup" update="txtCompanyShare,txtEmployeeShare"/>
+                                                                        </p:inputText>
+                                                                        <p:message for="txtAmount" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="txtCompanyShare" class="control-label col-sm-4" value="Company Share: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtCompanyShare" value="#{medicalBillController.hrLocalMedInvoiceDetail.companyShare}" 
+                                                                                     readonly="true" title="Company Share"/>
+                                                                        <p:message for="txtCompanyShare" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="txtEmployeeShare" class="control-label col-sm-4" value="Employee Share: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtEmployeeShare" value="#{medicalBillController.hrLocalMedInvoiceDetail.employeeShare}"
+                                                                                     readonly="true" title="Employee Share" />
+                                                                        <p:message for="txtEmployeeShare" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="calTreatmentdate" value="Treatment Date: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calTreatmentdate" value="#{medicalBillController.hrLocalMedInvoiceDetail.treatmentDate}" title="Treatment Date"
+                                                                                     converter="dateConverter" validator="#{validatorManagedBean.Date}" validatorMessage="It should be a date"
+                                                                                     onclick="displayCalendar('frmMedicalBill:calTreatmentdate', 'frmMedicalBill:calTreatmentdate');" class="form-control"/>
+                                                                        <p:message for="calTreatmentdate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="col-sm-6">
+                                                        <div class="col-sm-12 form-horizontal">
+                                                            <div class="col-sm-4">                                                              
+                                                            </div>                                                                    
+                                                            <div class="col-sm-3">
+                                                                <center>
+                                                                    <p:commandButton id="btnAdd" value="#{medicalBillController.addOrUpdate}" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                     action="#{medicalBillController.addInvoiceDetail()}" style="margin-top: 10px"
+                                                                                     disabled="#{medicalBillController.disableBtn}" title="Add invoice detail"
+                                                                                     process="@this,pnl2" update="@this,pnl2,tblInvoiceDetail"/>
+                                                                </center>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                                <br></br><br></br><br></br>
+                                                <br></br><br></br><br></br> 
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-12">                                                                      
+                                                            <div class="form-group form-horizontal">  
+                                                                <p:dataTable id="tblInvoiceDetail" value="#{medicalBillController.invoiceDetailDataModel}"
+                                                                             rows="5" paginator="true"  paginatorPosition="bottom"
+                                                                             class="dataTable" var="invoiceDetail" rowIndexVar="rowIndex">                                                                                       
+                                                                    <p:column style="width:40px">
+                                                                        <f:facet name="header">No.</f:facet>
+                                                                        <p:outputLabel value="#{rowIndex+1}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Patient Id">
+                                                                        <h:outputText value="#{invoiceDetail.empId.empId}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Patient Name">
+                                                                        <h:outputText value="#{invoiceDetail.empId.firstName} #{invoiceDetail.empId.middleName} #{invoiceDetail.empId.lastName}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Amount">
+                                                                        <h:outputText value="#{invoiceDetail.amount}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Company Share [ETB]">
+                                                                        <h:outputText value="#{invoiceDetail.companyShare}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Employee Share [ETB]" footerText="#{medicalBillController.employeeShare}">
+                                                                        <h:outputText value="#{invoiceDetail.employeeShare}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Treatment Date" footerText="Total">
+                                                                        <h:outputText value="#{invoiceDetail.treatmentDate}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Edit" style="width:60px">
+                                                                        <p:commandLink action="#{medicalBillController.editDataTable()}" value="Edit" 
+                                                                                       process="@this,tblInvoiceDetail" update="@this,:frmMedicalBill:pnl2"/>
+                                                                    </p:column>
+                                                                    <p:columnGroup type="footer">
+                                                                        <p:row>
+                                                                            <p:column colspan="3" footerText="Total"/>
+                                                                            <p:column footerText="#{medicalBillController.subTotal}"/>
+                                                                            <p:column footerText="#{medicalBillController.companyShare}"/>
+                                                                            <p:column footerText="#{medicalBillController.employeeShare}"/>
+                                                                        </p:row>
+                                                                    </p:columnGroup>
+                                                                </p:dataTable>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlWorkflow" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group required form-horizontal">
+                                                                    <h:outputLabel for="txtProcessedBy" value="Processed By: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtProcessedBy" value="#{workFlow.userName}" 
+                                                                                     title="Your name" readonly="true"/>
+                                                                        <p:message for="txtProcessedBy" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtProcessedDate" value="Processed Date: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtProcessedDate" value="#{medicalBillController.wfHrProcessed.processedOn}"
+                                                                                     converter="dateConverter" readonly="true" title="processed On"
+                                                                                     validator="#{validatorManagedBean.Date}" validatorMessage="processed date should be in date format"/>
+                                                                        <p:message for="txtProcessedDate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtCommentGiven" class="control-label col-sm-4" value="Comment Given:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtCommentGiven" value="#{medicalBillController.wfHrProcessed.commentGiven}"
+                                                                                         rows="1" autoResize="false" title="Comment"
+                                                                                         validator="#{validatorManagedBean.Remark}" class="form-control"/>
+                                                                        <p:message for="txtCommentGiven" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <h:panelGroup id="pnlSave" class="col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="#{medicalBillController.saveOrUpdate}" 
+                                                                             action="#{medicalBillController.saveMedicalCreditBillRequest()}"
+                                                                             disabled="#{medicalBillController.disableBtn}" title="#{medicalBillController.saveOrUpdate}"
+                                                                             process="@this,pnl1,pnlWorkflow,tblInvoiceDetail" class="btn  btn-block btn-primary col-lg-4"                                       
+                                                                             update=":frmMedicalBill"/>
+                                                        </div>
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                             action="#{medicalBillController.resetCreditBillRqst()}" title="Cancel"
+                                                                             process="@this" update=":frmMedicalBill"/> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

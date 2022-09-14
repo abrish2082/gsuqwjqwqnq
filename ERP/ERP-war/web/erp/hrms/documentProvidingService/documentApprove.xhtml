@@ -1,0 +1,522 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="documentRequest.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Document Request</span></a></li> 
+        <li><a href="generateDocument.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Generate Document </span></a></li> 
+
+    </ui:define>
+
+    <ui:define name="contents">
+
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlWfIcon"  rendered="#{documentProvidignServiceControllers.pnlrWfIcon}"> 
+                        <p:outputLabel id="lblNotwf" value="" class="fa fa-fw fa-gear" style="color: #245269" />
+                    </h:panelGroup>
+                     <p:overlayPanel widgetVar="lblNotwf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotwf"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="box-body">
+                            <div class="col-md-12">                                       
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblHistory" value="#{documentProvidignServiceControllers.workFlowDataModel}"
+                                                     var="WF" class="dataTable" rowKey="#{WF.id}" widgetVar="tblNeedRequestDetail"
+                                                     rowIndexVar="num" editable="true">      
+                                            <p:column headerText="No." style="width:40px">
+                                                <h:outputText value="#{num + 1}"/>
+                                            </p:column>                                                                
+                                            <p:column headerText="Prepared By">
+                                                <h:outputText value="#{WF.processedBy}"/>
+                                            </p:column>
+                                            <p:column headerText="Prepared On">
+                                                <h:outputText value="#{WF.processedOn}"/>
+                                            </p:column>
+                                            <p:column headerText="Approved By">
+                                                <h:outputText value="#{WF.commentGiven}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>        
+                        </div>
+
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <p:outputLabel id="lblNotf" value="#{documentProvidignServiceControllers.requestNotificationCounter} " class="fa fa-bell" style="color: red" />
+
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="lblNotf"
+                                    class="col-md-4" style="height: 400px">
+
+                        <div class="box-body">
+                            <div class="col-md-12">                                       
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblDocList" value="#{documentProvidignServiceControllers.requesstlist}" rowsPerPageTemplate="10,20,30"
+                                                     var="req" selectionMode="single" rowIndexVar="num" rows="10"
+                                                     selection="#{documentProvidignServiceControllers.hrDocumentRequests}" rowKey="#{req.id}" class="dataTable" >
+                                            <p:ajax event="rowSelect" process="@this,tblDocList" listener="#{documentProvidignServiceControllers.DocumentApprove_processMyEvent}" 
+                                                    update=":frmDocumentapprove,:frmSample"/>
+                                            <p:column headerText=" Employee Name" filterStyle ="true" filterMatchMode="contains" filterBy="#{req.requesterId.firstName}"  >
+                                                <h:outputText value="#{req.requesterId.firstName} #{req.requesterId.middleName} #{req.requesterId.lastName}"/>
+                                            </p:column> 
+                                            <p:column headerText=" Employee ID" filterMatchMode="contains" filterBy="#{req.requesterId.empId}">
+                                                <h:outputText value="#{req.requesterId.empId}"/>
+                                            </p:column> 
+                                            <p:column headerText="Document Type" >
+                                                <h:outputText value="#{req.documentType.documentType}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>        
+                        </div>
+
+                    </p:overlayPanel>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/documentProvidingService/documentApprove.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmDocumentapprove"> 
+            <p:growl id="growl"  autoUpdate="true" severity="information,fatal" showDetail="true" />
+            <h:panelGroup id="pnlSearch" style="border: 0px; background-color: transparent" rendered="#{documentProvidignServiceControllers.chooseMainPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Document Approve</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-8">  
+                                        <h:panelGroup id="pnlSearchEvaLevel">
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                    <div class="col-sm-6">
+                                                        <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                         valueChangeListener="#{documentProvidignServiceControllers.filiterByStatus_Vcl}">
+                                                            <f:selectItems value="#{documentProvidignServiceControllers.filterByStatus}"/>   
+                                                            <p:ajax event="change" process="@this" update=":frmDocumentapprove:tblDocList"/>
+                                                        </p:selectOneMenu> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <section class="panel panel-info">
+                                <section class="panel-body">
+                                    <div class="box-body">
+                                        <div class="col-md-12">                                       
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <p:dataTable id="tblDocList" value="#{documentProvidignServiceControllers.requestsListDataModel}" rowsPerPageTemplate="10,20,30"
+                                                                 var="req" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                                 selection="#{documentProvidignServiceControllers.hrDocumentRequests}" rowKey="#{req.id}" class="dataTable" >
+                                                        <p:ajax event="rowSelect" process="@this,tblDocList" listener="#{documentProvidignServiceControllers.DocumentApprove_processMyEvent}" 
+                                                                update=":frmDocumentapprove,:frmSample"/>
+                                                        <p:column headerText="No.">
+                                                            <h:outputText value="#{num + 1}"/>
+                                                        </p:column>
+                                                        <p:column headerText=" Employee Name" filterMatchMode="contains" filterBy="#{req.requesterId.firstName}"  >
+                                                            <h:outputText value="#{req.requesterId.firstName} #{req.requesterId.middleName} #{req.requesterId.lastName}"/>
+                                                        </p:column> 
+                                                        <p:column headerText=" Employee ID" filterMatchMode="contains" filterBy="#{req.requesterId.empId}">
+                                                            <h:outputText value="#{req.requesterId.empId}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="RequestDate"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{req.requestDate}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Document Type" >
+                                                            <h:outputText value="#{req.documentType.documentType}"/>
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>        
+                                    </div>
+                                </section>
+                            </section>
+                        </div>
+                    </div>
+
+                </div>
+            </h:panelGroup>
+            <h:panelGroup id="pnlMainpage" style="border: 0px; background-color: transparent " rendered="#{documentProvidignServiceControllers.chooseCreatePage}" >
+                <section class="panel panel-info">
+                    <section class="panel-body">
+                        <div class="box-body">
+                            <div class="box-body">
+                                <section class="panel panel-info">
+                                    <section class="panel-body">
+                                        <h:panelGroup id="pnl4" class="col-sm-12">
+                                            <div class="form-group" >
+                                                <div class="col-sm-12">
+                                                    <div class="col-md-6"> 
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="searchAutocomplete1" value="Employee Name:" class="control-label col-sm-4"/>  
+                                                                <div class="col-sm-8">
+                                                                    <p:autoComplete id="searchAutocomplete1" style="width:100%" placeholder="Select From Search Datatable"
+                                                                                    value="#{documentProvidignServiceControllers.requester.firstName}"
+                                                                                    completeMethod="#{documentProvidignServiceControllers.SearchByFnameRequest}"
+                                                                                    var="delegateList" required="true" requiredMessage="Select Employee from Search Datatable"
+                                                                                    itemValue="#{delegateList.firstName}" itemLabel="#{delegateList}" forceSelection="true" 
+                                                                                    size="20" emptyMessage="no data" readonly="true">  
+                                                                        <p:ajax event="itemSelect" listener="#{documentProvidignServiceControllers.getByDelegateName}" process="@this"  
+                                                                                update="txtDepartment,txtPosition,txtGender,txtServiceYear"/>     
+                                                                    </p:autoComplete> 
+                                                                    <p:message for="searchAutocomplete1" display="icon"/>
+                                                                </div> 
+                                                            </div>                                                                                          
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtDepartment"  class="control-label col-sm-4" value="Department:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtDepartment" title="Department" value="#{documentProvidignServiceControllers.hrDepartments.depName}" 
+                                                                                 required="true" readonly="true"/>
+                                                                    <p:message for="txtDepartment" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtGender"  class="control-label col-sm-4" value="Gender:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtGender" title="gender" value="#{documentProvidignServiceControllers.requester.sex}" 
+                                                                                 required="true" readonly="true"/>
+                                                                    <p:message for="txtGender" display="icon"/>
+                                                                </div>                                                               
+                                                            </div>                                                                                          
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtPosition"  class="control-label col-sm-4" value="Job Title:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtPosition" value="#{documentProvidignServiceControllers.hrJobTypes.jobTitle}"  
+                                                                                 title="Job Position" required="true" readonly="true"/>
+                                                                    <p:message for="txtPosition" display="icon"/>
+                                                                </div>                                                               
+                                                            </div>                                                                                          
+                                                        </div> 
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtServiceYear" class="control-label col-sm-4" value="Service Year:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtServiceYear"  readonly="true" value="#{documentProvidignServiceControllers.experience}"/>
+                                                                    <p:message for="txtServiceYear" display="icon"/>
+                                                                </div>                                                              
+                                                            </div>                                                                                          
+                                                        </div> 
+                                                    </div>
+
+                                                    <div  class="form-horizontal col-sm-6">
+                                                        <div class="col-md-4"></div>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section> 
+                                </section>
+                                <section class="panel panel-info">
+                                    <section class="panel-body">
+                                        <h:panelGroup id="pnl5" class="col-sm-12">
+                                            <div class="form-group" >
+                                                <div class="col-sm-12">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtdoctype" class="control-label col-sm-4" value="Document Type:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtdoctype" style="width: 100%" value="#{documentProvidignServiceControllers.hrDocumentRequests.documentType.documentType}"
+                                                                                 readonly="true" >
+                                                                        <p:message for="txtdoctype" display="icon"/>  
+                                                                    </p:inputText>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="RequestDate" class="control-label col-sm-4" value="Request Date:"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="RequestDate"  value="#{documentProvidignServiceControllers.hrDocumentRequests.requestDate}" converter="dateConverter"
+                                                                                 required="true" requiredMessage="To Date can not be empty." title="To Date"  readonly="true" />
+                                                                    <p:message for="RequestDate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtReason" class="control-label col-sm-4" value="Reason"/> 
+                                                                <div class="col-sm-8">
+                                                                    <h:inputTextarea id ="txtReason"  value="#{documentProvidignServiceControllers.hrDocumentRequests.reason}"  
+                                                                                     readonly="true" style="width:100%" > </h:inputTextarea>
+                                                                    <p:message for="txtReason" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div> 
+
+                                                    </div>
+                                                    <div class="col-md-6"> 
+                                                        <h:panelGroup id ="gurantee" rendered="#{documentProvidignServiceControllers.guranteepnl}">
+
+                                                            <div class="col-md-12 textBoxMargin6px ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtPersonname" class="control-label col-sm-4" value="Guarantee Person:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id ="txtPersonname"  value="#{documentProvidignServiceControllers.hrDocumentRequests.guarantee_person}"
+                                                                                     required="true" requiredMessage="guarantee person name" readonly="true"
+                                                                                     validator="#{validatorManagedBean.Text}"  style="width:100%"/>
+                                                                        <p:message for="txtPersonname" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px d">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtorganization" class="control-label col-sm-4" value="Guarantee Organization :"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id ="txtorganization"  value="#{documentProvidignServiceControllers.hrDocumentRequests.guarantee_person_organization}" 
+                                                                                     required="true" requiredMessage="guarantee organization" readonly="true"
+                                                                                     validator="#{validatorManagedBean.Text}"  style="width:100%" />
+                                                                        <p:message for="txtorganization" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtCountry" class="control-label col-sm-4" value="Adddress "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtCountry" value="#{documentProvidignServiceControllers.hrAddresses.addressName}" 
+                                                                                     required="true" requiredMessage=" select address" readonly="true"/>
+
+                                                                        <p:message for="txtCountry" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section> 
+                                </section>
+
+                                <section class="panel panel-info">
+                                    <section class="panel-body">
+                                        <h:panelGroup id="pnl5A" class="col-sm-12">
+                                            <div class="form-group" >
+                                                <div class="col-sm-12">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtDecsion" class="control-label col-sm-4" value="Decision:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu id="txtDecsion"  required="true" style="width:100%" requiredMessage="Please select your Decision."
+                                                                                         value="#{documentProvidignServiceControllers.selectedValue}"
+                                                                                         valueChangeListener="#{documentProvidignServiceControllers.handleselectOptions}">        
+                                                                            <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                            <f:selectItem itemLabel="Approved" itemValue="3"/>
+                                                                            <f:selectItem itemLabel="Rejected" itemValue="-1"/>
+                                                                            <f:selectItem itemLabel="Revoke/Void" itemValue="2"/>
+                                                                            <p:ajax process="@this" event="change"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="txtDecsion" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <h:inputTextarea id ="txtRemark"  value="#{documentProvidignServiceControllers.hrDocumentRequests.remark}"  
+                                                                                         validator="#{validatorManagedBean.Remark}"  validatorMessage="invalid format" class="form-control" style="width:100%" > </h:inputTextarea>
+                                                                        <p:message for="txtRemark" display="icon"/>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>     
+
+
+
+
+
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtNoOfCopy" class="control-label col-sm-4" value="NO Of Copies"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <h:inputText id ="txtNoOfCopy"  value="#{documentProvidignServiceControllers.hrDocumentRequests.noOfCopies}"
+                                                                                     validator="#{validatorManagedBean.Number}" title="Number of copies" validatorMessage="invalid format" class="form-control" style="width:100%" ></h:inputText>
+                                                                        <p:message for="txtNoOfCopy" display="icon"/>
+
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal form-group required" >
+                                                                    <h:outputLabel for="txtApprovetDate" class="control-label col-sm-4" value="Approve Date:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtApprovetDate" value="#{documentProvidignServiceControllers.hrDocumentRequests.approveDate}"
+                                                                                     onclick="displayCalendar('frmDocumentapprove:txtApprovetDate', 'frmDocumentapprove:txtApprovetDate');"
+                                                                                     validator="#{validatorManagedBean.Date}"
+                                                                                     title="Strt Date" class="form-control" required="true" requiredMessage="Please Select approve date "/>
+                                                                        <p:message for="txtApprovetDate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+
+                                    </section> 
+                                </section>
+
+                                <h:panelGroup id="pnl1a" class="col-sm-12"   style="border: 0px; background-color: transparent" rendered="#{documentProvidignServiceControllers.enableleSaveOrUpdateBtn1}">
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <div class="col-md-6"> 
+                                                        <div class="col-md-12 textBoxMargin6px form-group required">
+                                                            <div class="form-group form-horizontal"> 
+                                                                <h:outputLabel for="txtxreqdate" class="control-label col-sm-4" value="Prepared On: "/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtxreqdate" value="#{documentProvidignServiceControllers.wfHrProcessed.processedOn}"
+                                                                                 onclick="displayCalendar('frmDocumentapprove:txtxreqdate', 'frmDocumentapprove:txtxreqdate');"
+                                                                                 title="prepared on" class="form-control" required="true" requiredMessage="Please Select date" validator="#{validatorManagedBean.Date}"/>
+                                                                    <p:message for="txtxreqdate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>  
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtReqestedBY" class="control-label col-sm-4"  value="Prepared By:"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtReqestedBY" value="#{documentProvidignServiceControllers.fullName}"
+                                                                                 title="txtReqestedBY" readonly="true" />
+                                                                    <p:message for="txtReqestedBY" display="icon"/>
+                                                                </div>
+
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="SomeComment" class="control-label col-sm-4"  value="Comment Given:"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="SomeComment" value="#{documentProvidignServiceControllers.wfHrProcessed.commentGiven}"
+                                                                                     title="SomeComment"  class="form-control"/>
+                                                                    <p:message for="SomeComment" display="icon"/>
+                                                                </div>
+
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                </h:panelGroup>
+
+
+
+                                <h:panelGroup id="pnl6"  style="border: 0px; background-color: transparent" rendered="#{documentProvidignServiceControllers.enableleSaveOrUpdateBtn1}" >
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4">                                                              
+                                                    </div>                                                                    
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-sm-2 " 
+                                                                         value="Save"
+                                                                         action="#{documentProvidignServiceControllers.saveDocumentApprove}"
+                                                                         process="@this,frmDocumentapprove"                                            
+                                                                         update="frmDocumentapprove"/>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnCancel" class="btn  btn-block btn-primary col-sm-2 " 
+                                                                         value="Reset"
+                                                                         action="#{documentProvidignServiceControllers.Reset}"
+                                                                         process="@this"                                            
+                                                                         update="frmDocumentapprove"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+
+                            </div>
+                        </div>
+                    </section>
+                </section>
+            </h:panelGroup>
+
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

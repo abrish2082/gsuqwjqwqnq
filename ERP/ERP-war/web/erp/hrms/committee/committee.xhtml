@@ -1,0 +1,502 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa fa-circle-o text-red"></i> <span>Dashboard</span></a></li>
+
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white" >
+                <f:facet name="right">
+                    <p:commandButton  action="#{committeeControllers.createNewAdditionalAmount()}" 
+                                      icon="#{committeeControllers.icone}" validateClient="true"   style="background-color: white;border-color: white" 
+                                      process="@this" update="@this,:frmCommittee,:frmSample"
+                                      />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="committee.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+
+            </p:toolbar>
+
+        </h:form>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-header">
+                        <h3 class="box-title">Committee Registration</h3>                       
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body ">
+                        <div class="box-body ">
+
+                            <h:form id="frmCommittee"  > 
+                                <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+
+                                <h:panelGroup id="pnlCommittee" class="col-sm-12"  rendered="#{committeeControllers.renderPnlCreateAdditional}">
+
+                                    <div class="col-sm-12 textBoxMarginTop6px" >
+                                        <div   class="col-md-6  form-group required form-horizontal">
+                                            <p:outputLabel  value="Committee Type:" class="control-label col-sm-4"/>
+                                            <div class="col-sm-8">
+                                                <p:selectOneMenu id="somCommitteType" value="#{committeeControllers.hrCommittees.type}"  converter="entConverter" 
+                                                                 valueChangeListener="#{committeeControllers.changeSEndDate}"  required="true" style="width: 100%">
+                                                    <f:selectItem itemLabel="-- Select --" noSelectionOption="true"/>
+                                                    <f:selectItem itemLabel="Permanent" itemValue="Permanent" />
+                                                    <f:selectItem itemLabel="Contract" itemValue="Contract" />
+                                                    <p:ajax  event="change" process="@this"  update="txtValidTo,@form"/>
+                                                </p:selectOneMenu> 
+
+                                                <p:message for="somCommitteType:" display="icon"/>   
+                                            </div>                                       
+                                        </div>
+                                        <div   class="col-md-6 form-group required form-horizontal"> 
+                                            <p:outputLabel  value="Committee Name:" class="control-label col-sm-4"/>
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtCommeiteeName" value="#{committeeControllers.hrCommittees.committeeName}"  required="true" />
+                                                <p:message for="txtCommeiteeName" display="icon"/>
+                                            </div> 
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 textBoxMarginTop6px" >
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <p:outputLabel  class="control-label col-sm-4" value="Estabilished Date:"/>
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtDate" value="#{committeeControllers.hrCommittees.establishedDate}" 
+                                                             validator="#{validatorManagedBean.Date}"        converter="dateConverter" onclick="displayCalendar('frmCommittee:txtDate', 'frmCommittee:txtDate');" />
+                                                <f:attribute name="txtDate" value="TEXT_PATTERN"/>
+                                            </div>                                         
+                                        </div> 
+                                    </div>
+                                    <div class="col-sm-12 textBoxMarginTop6px" >
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <p:outputLabel  for="txtValidFrom" class="control-label col-sm-4" value="Valid From:" rendered="#{committeeControllers.validFromTo}" />
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtValidFrom" rendered="#{committeeControllers.validFromTo}" value="#{committeeControllers.hrCommittees.validFrom}"  
+                                                             validator="#{validatorManagedBean.Date}"       converter="dateConverter" placeholder="dd/mm/yyyy" onclick="displayCalendar('frmCommittee:txtValidFrom', 'frmCommittee:txtValidFrom');" />
+                                            </div> 
+                                        </div>  
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <p:outputLabel class="control-label col-sm-4" value="Valid To:"  rendered="#{committeeControllers.validFromTo}"/>
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtValidTo" value="#{committeeControllers.hrCommittees.validTo}"  rendered="#{committeeControllers.validFromTo}"
+                                                             validator="#{validatorManagedBean.Date}" converter="dateConverter" placeholder="dd/mm/yyyy" onclick="displayCalendar('frmCommittee:txtValidTo', 'frmCommittee:txtValidTo');" />
+                                            </div>    
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 textBoxMarginTop6px" >
+                                        <div class="col-sm-6 form-horizontal"> 
+                                            <p:outputLabel  value="Description:" class="control-label col-sm-4" />
+                                            <div class="col-sm-8">
+                                                <p:inputTextarea id="txtDescriptions" value="#{committeeControllers.hrCommittees.remark}" validator="#{validatorManagedBean.Remark}"  
+                                                                 class="form-control" rows="1" cols="5" autoResize="false" />
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </h:panelGroup>
+
+                                <h:panelGroup id="pnlCommitteeMember" class="col-sm-12"  rendered="#{committeeControllers.renderPnlCreateAdditional}" >                                                        
+                                    <br></br>  
+                                    <div class="box box-primary ">
+                                        <div class="box-header">
+                                            <h3 class="box-title">Internal Committee Members Registration</h3> 
+                                            <br></br>
+                                            <br></br>
+                                            <br></br>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 textBoxMarginTop6px" >      
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <p:outputLabel  class="control-label col-sm-4" value="Employee Name:"/> 
+                                            <div class="col-sm-8">
+                                                <p:autoComplete id="txtEmpName" value="#{committeeControllers.hrEmployees.firstName}" style="width: 100%" required="true" 
+                                                                completeMethod="#{committeeControllers.SearchByFname}" 
+                                                                var="empList" 
+                                                                itemValue="#{empList.firstName}" itemLabel="#{empList}" 
+                                                                size="2" emptyMessage="no data">  
+                                                    <f:facet name="item" >
+                                                        <h:panelGrid columns="2" cellpadding="" style="width: 300px">                        
+                                                            <h:outputText value="first Name " />
+                                                            <h:outputText value="#{empList.firstName}" />                      
+
+                                                            <h:outputText value="middle Name: " />
+                                                            <h:outputText value="#{empList.middleName}" />
+
+                                                            <h:outputText value="Last Name: " />
+                                                            <h:outputText value="#{empList.lastName}" />
+                                                        </h:panelGrid>
+                                                    </f:facet>
+                                                    <p:ajax event="itemSelect"  
+                                                            listener="#{committeeControllers.getByFirstName}" process="@this"  update="pnlCommitteeMember" /> 
+                                                </p:autoComplete>
+                                                <p:message for="txtEmpName" display="icon"/> 
+                                            </div>
+                                        </div>  
+
+                                        <div class="col-sm-6 form-horizontal"> 
+                                            <p:outputLabel  class="control-label col-sm-4" value="Employee ID:"/>
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtFirstName" value="#{committeeControllers.hrEmployees.empId}"     readonly="true" />
+                                            </div>
+                                        </div> 
+                                    </div> 
+                                    <div class="col-sm-12 textBoxMarginTop6px" >                                 
+                                        <div class="col-sm-6 form-horizontal"> 
+                                            <h:outputLabel class="control-label col-sm-4" value="Department:"/> 
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtDept" value="#{committeeControllers.departments.depName}"     readonly="true"  />
+                                            </div>   
+                                        </div>
+                                        <div class="col-sm-6  form-horizontal">                 
+                                            <h:outputLabel  class="control-label col-sm-4" value="Job Title:"/>   
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtJobTitle" value="#{committeeControllers.hrJobTypes.jobTitle}"     readonly="true" />
+                                            </div>  
+                                        </div>
+                                    </div> 
+                                    <div class="col-sm-12 textBoxMarginTop6px" >       
+                                        <div class="col-sm-6  form-horizontal"> 
+                                            <h:outputLabel  class="control-label col-sm-4" value="Employment Type:"/>   
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtEmpType" value="#{committeeControllers.hrEmployees.employmentType}" required="true"   readonly="true" />
+                                                <p:message for="txtEmpType" display="icon"/>   
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 form-horizontal"> 
+                                            <h:outputLabel  class="control-label col-sm-4" value="Sex:"/>   
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtSex" value="#{committeeControllers.hrEmployees.sex}"    readonly="true"  />
+                                                <p:message for="txtSex" display="icon"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 textBoxMarginTop6px" >       
+                                        <div class="col-sm-6  form-horizontal"> 
+                                            <h:outputLabel class="control-label col-sm-4" value="Responsibility:"/> 
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtResp"  value="#{committeeControllers.hrCommitteeMembers.responsiblity}" validator="#{validatorManagedBean.FullName}"
+                                                             class="form-control"   />
+                                                <p:message for="txtResp" display="icon"/>       
+                                            </div>
+                                        </div> 
+                                    </div> 
+                                    <div class="col-sm-12 textBoxMarginTop6px" >       
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <h:outputLabel  class="control-label col-sm-4" value="Assigned Date:"/>
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtAssignDate" value="#{committeeControllers.hrCommitteeMembers.assignedDate}" 
+                                                             validator="#{validatorManagedBean.Date}"       converter="dateConverter" placeholder="dd/mm/yyyy" onclick="displayCalendar('frmCommittee:txtAssignDate', 'frmCommittee:txtAssignDate');" />
+                                            </div>  
+                                        </div> 
+
+                                        <div class="col-sm-6 form-horizontal"> 
+                                            <p:outputLabel  value="Remark:" class="control-label col-sm-4"/>
+                                            <div class="col-sm-8">
+                                                <p:inputTextarea id="txtRmk" value="#{committeeControllers.hrCommitteeMembers.remark}" 
+                                                                 validator="#{validatorManagedBean.Remark}" class="form-control" rows="1" cols="5" autoResize="false" />
+
+                                            </div> 
+                                        </div>
+                                    </div> 
+
+                                    <div class="col-sm-12 ">
+                                        <div class="col-sm-6">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <div class="col-sm-4">       
+
+                                                </div>                                                                    
+                                                <div class="col-sm-4">
+                                                    <center>
+                                                        <p:commandButton id="btnAddMembers" class="btn  btn-block btn-primary col-sm-4 "  value="Add"
+                                                                         action="#{committeeControllers.addCommitteeMembers}" 
+                                                                         process="pnlCommitteeMember,pnlCommittee" 
+                                                                         update="@this,:frmCommittee:dtComMembers,:frmCommittee:pnlCommitteeMember"   
+                                                                         />
+                                                    </center>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:panelGroup>
+
+                                <h:panelGroup id="pnlEmpDetails" class="col-sm-12"  rendered="#{committeeControllers.renderPnlCreateAdditional}">                                                   
+                                    <div class="col-md-12">                                       
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <br></br>
+                                                <p:dataTable id="dtComMembers" var="committeMembers" value="#{committeeControllers.hrCommitteeMemberModel}" 
+                                                             class="dataTable"     rows="10"
+                                                             paginator="true" paginatorPosition="bottom"
+                                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                             rowsPerPageTemplate="5,10,15"    >
+                                                    <f:facet name="header">
+                                                        <p:outputLabel value="" style=" font-size: 16px;"/>
+                                                    </f:facet>
+                                                    <p:column headerText="Employee Name">
+                                                        <h:outputText value="#{committeMembers.empId}" />
+                                                    </p:column>
+                                                    <p:column headerText="Assigned Date">
+                                                        <h:outputText value="#{committeMembers.assignedDate}" />
+                                                    </p:column>  
+
+                                                    <p:column headerText="Responsibility">
+                                                        <h:outputText value="#{committeMembers.responsiblity}" />
+                                                    </p:column>
+
+                                                    <p:column headerText="Remark">
+                                                        <h:outputText value="#{committeMembers.remark}" />
+                                                    </p:column>  
+
+                                                    <p:column headerText="Edit">
+                                                        <p:commandLink action="#{committeeControllers.edit()}" value="Edit" 
+                                                                       process="@this,:frmCommittee:dtComMembers" update="@this,:frmCommittee:pnlCommitteeMember"  />
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:panelGroup>
+                                <h:panelGroup id="pnlOutsideCommitteeMember" class="col-sm-12" rendered="#{committeeControllers.renderPnlCreateAdditional}"  >                                                        
+                                    <br></br>  
+                                    <div class="box box-primary "></div>
+                                    <div class="box-header">
+                                        <h3 class="box-title">External Committee Members Registration</h3>  
+                                        <br></br>
+                                        <br></br>
+                                        <br></br>
+                                    </div>
+                                    <div class="col-sm-12 textBoxMarginTop6px" >       
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <p:outputLabel  class="control-label col-sm-4" value="Member Name:"/> 
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtMemberName" value="#{committeeControllers.hrExComitteMembers.memberName}" required="true"  />
+                                                <p:message for="txtMemberName" display="icon"/>   
+                                            </div>
+                                        </div>  
+
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <p:outputLabel  class="control-label col-sm-4" value="Organization:"/>
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtOutOrganization" value="#{committeeControllers.hrExComitteMembers.organization}" />
+                                            </div>
+                                        </div> 
+                                    </div> 
+
+                                    <div class="col-sm-12 textBoxMarginTop6px" >                                
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <h:outputLabel class="control-label col-sm-4" value="Position:"/> 
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtoutPossion" value="#{committeeControllers.hrExComitteMembers.posion}" />
+                                            </div>   
+                                        </div>
+                                        <div class="col-sm-6 form-horizontal">                  
+                                            <h:outputLabel  class="control-label col-sm-4" value="Responsibility:"/>   
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtoutResponsibility" value="#{committeeControllers.hrExComitteMembers.responsibility}"  />
+                                            </div>  
+                                        </div>
+                                    </div> 
+
+                                    <div class="col-sm-12 textBoxMarginTop6px" >       
+                                        <div class="col-sm-6 form-group required form-horizontal"> 
+                                            <h:outputLabel  class="control-label col-sm-4" value="Phone:"/>   
+                                            <div class="col-sm-8">
+                                                <p:inputText id="txtPhoneNo" value="#{committeeControllers.hrExComitteMembers.phoneNumber}"  
+                                                             validator="#{validatorManagedBean.Phone}"   />
+                                                <p:message for="txtPhoneNo" display="icon"/> 
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <br></br>
+                                    <br></br>
+                                    <br></br>
+                                    <br></br>
+                                    <br></br>
+                                    <br></br>
+                                    <div class="col-sm-12 ">
+                                        <div class="col-sm-6">
+                                            <div class="col-sm-12 form-horizontal">
+                                                <div class="col-sm-4">       
+
+                                                </div>                                                                    
+                                                <div class="col-sm-4">
+                                                    <center>
+                                                        <p:commandButton id="btnoutsideAddMembers" class="btn  btn-block btn-primary col-sm-4 "  value="Add"
+                                                                         action="#{committeeControllers.addExCommitteeMembers}" 
+                                                                         process="@this,:frmCommittee:pnlOutsideCommitteeMember,frmCommittee:pnlCommittee" 
+                                                                         update=":frmCommittee:dtExComMembers,:frmCommittee:pnlOutsideCommitteeMember"   
+                                                                         />
+                                                    </center>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:panelGroup>
+                                <h:panelGroup id="pnlOutsideEmpDetails" class="col-sm-12"  rendered="#{committeeControllers.renderPnlCreateAdditional}">                                                   
+                                    <div class="col-md-12">                                       
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <br></br>
+                                                <p:dataTable id="dtExComMembers" var="excommitteMembers" value="#{committeeControllers.hrExCommitteeMemberModel}" 
+                                                             class="dataTable"     rows="10"
+                                                             paginator="true" paginatorPosition="bottom"
+                                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                             rowsPerPageTemplate="5,10,15"    >
+                                                    <f:facet name="header">
+                                                        <p:outputLabel value="" style=" font-size: 16px;"/>
+                                                    </f:facet>
+                                                    <p:column headerText="Member Name">
+                                                        <h:outputText value="#{excommitteMembers.memberName}" />
+                                                    </p:column>
+                                                    <p:column headerText="Organization">
+                                                        <h:outputText value="#{excommitteMembers.organization}" />
+                                                    </p:column>  
+
+                                                    <p:column headerText="Possion">
+                                                        <h:outputText value="#{excommitteMembers.posion}" />
+                                                    </p:column>
+                                                    <p:column headerText="Responsibility">
+                                                        <h:outputText value="#{excommitteMembers.responsibility}" />
+                                                    </p:column>
+                                                    <p:column headerText="Phone">
+                                                        <h:outputText value="#{excommitteMembers.phoneNumber}" />
+                                                    </p:column>
+                                                    <p:column headerText="Edit">
+                                                        <p:commandLink action="#{committeeControllers.editEx()}" value="Edit" 
+                                                                       process="@this,:frmCommittee:dtExComMembers" update="@this,:frmCommittee:dtExComMembers,:frmCommittee:pnlOutsideCommitteeMember"  />
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:panelGroup>
+                                <h:panelGroup id="pnlSaveEmp" rendered="#{committeeControllers.renderPnlCreateAdditional}">
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4">                                                              
+                                                    </div>                                                                    
+                                                    <div class="col-sm-4">
+                                                        <p:commandButton  class="btn  btn-block btn-primary col-lg-4 " id="btnSavea" value="#{committeeControllers.saveOrUpdateButton}"
+                                                                          process="@this,:frmCommittee:pnlCommittee,pnlSaveEmp" action="#{committeeControllers.saveCommittee}" 
+                                                                          update="@this,:frmCommittee"/>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <p:commandButton id="btnNew" value="Reset" class="btn  btn-block btn-primary col-lg-4" action="#{committeeControllers.clearCommittee}"                                          
+                                                                         process="@this,:frmCommittee:pnlCommittee,pnlSaveEmp" update="@this,:frmCommittee"  />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+
+                                <h:panelGroup id="pnlCommitteeDataTable" class="col-sm-12"  rendered="#{committeeControllers.renderPnlManPage}">
+
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">                                           
+                                            <div class="form-group col-sm-12 form-group required textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12 ">
+                                                    <h:outputLabel for="drdSearchBy" value="Search By:" class="control-label col-sm-4"/>   
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchBy" style="width: 90%" value="#{committeeControllers.columnNameResolver.col_Name_FromTable}"
+                                                                         valueChangeListener="#{committeeControllers.selectedParamChangeEvent}"  >
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{committeeControllers.columnNameResolverList}"
+                                                                           var="paramLists" itemLabel="#{paramLists.parsed_Col_Name}" itemValue="#{paramLists.col_Name_FromTable}"/>
+                                                            <p:ajax event="change" process="@this" update="drdSearchBy,pnlCommitteeDataTable"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>                       
+                                        </div>
+                                    </div>
+                                   <div class="col-md-12">
+                                        <div class="col-md-6">                                           
+                                            <div class="form-group col-sm-12 form-group required textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12 ">
+                                                        <p:outputLabel  value="#{committeeControllers.columnNameResolver.parsed_Col_Name}" class="control-label col-sm-4"/>
+                                                        <div class="col-sm-8 ">
+                                                            <p:inputText id="txtCommitteeName"   value="#{committeeControllers.hrCommittees.col_Value}" class="form-control" />
+                                                        </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-12"> 
+                                        <div class="col-md-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-md-4">                                                    
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnSearch" class="btn btn-primary" value="Search" action="#{committeeControllers.findByCommitteeName()}"
+                                                                     process="@this,txtCommitteeName"   update="dtCommittee"  icon="ui-icon-search" />  
+
+
+                                                </div>                                                
+                                            </div>
+                                        </div>
+                                    </div>  
+                                    <div class="col-md-12">                                       
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <br></br>
+                                                <p:dataTable  id="dtCommittee" var="committee"   value="#{committeeControllers.committeList}" 
+                                                              selection="#{committeeControllers.hrCommittees}" rowKey="#{committee.id}" rowIndexVar="rowIndex" selectionMode="single" 
+                                                              rows="10" 
+                                                              paginator="true" paginatorPosition="bottom"
+                                                              paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                              rowsPerPageTemplate="5,10,15">
+                                                    <p:ajax event="rowSelect" listener="#{committeeControllers.populate}" process="@this,dtCommittee" update=":frmCommittee,:frmSample"  />
+                                                    <p:column headerText="NO">
+                                                        #{rowIndex+1} 
+                                                    </p:column>
+                                                    <p:column headerText="Committee Name">
+                                                        <h:outputText value="#{committee.committeeName}" />
+                                                    </p:column>
+
+
+
+
+                                                </p:dataTable>  
+                                            </div>
+                                        </div>
+                                    </div>   
+                                </h:panelGroup>
+                            </h:form>      
+                        </div>  
+                    </div>
+                    <div class="box-footer ">                       
+                    </div>
+                </div>                   
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+

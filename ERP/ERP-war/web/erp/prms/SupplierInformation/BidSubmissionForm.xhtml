@@ -1,0 +1,601 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="search">  
+
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="BidOpeningCheckList.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Opening CheckList</span></a></li>
+        <li><a href="BidderRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>Bidder Registration</span></a></li> 
+        <li><a href="SupplierPerformanceInformation.xhtml"><i class="fa fa-circle-o "></i> <span>Supplier Performance Information</span></a></li>
+        <li><a href="SupplierProfile.xhtml"><i class="fa fa-circle-o "></i> <span>Suppliers Profile</span></a></li>
+        <li><a href="SupplierSpecfication.xhtml"><i class="fa fa-circle-o"></i> <span>Supplier Specification</span></a></li> 
+
+    </ui:define>
+    <ui:define name="contents">
+
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+
+                    <h:panelGroup id="pngBackToSearch" rendered="#{bidSubmissionController.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{bidSubmissionController.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                         process="@this"  update="@this,:frmMainUI, :BidSubmissionMain, :frmSample"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew" action="#{bidSubmissionController.createNewParty()}" icon="#{bidSubmissionController.icone}" validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this"  update="@this,:frmMainUI, :BidSubmissionMain, :frmSample" 
+                                     title="#{bidSubmissionController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+
+                    <a href="BidSubmissionForm.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{bidSubmissionController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearch"> 
+
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="Searching By:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{bidSubmissionController.prmsBidSubmission.columnName}"
+                                                                         valueChangeListener="#{bidSubmissionController.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{bidSubmissionController.bidSummSearchParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblCriteriaNo,txtCriteriaNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblCriteriaNo" class="control-label col-sm-4" value="Search By #{bidSubmissionController.prmsBidSubmission.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCriteriaNo" value="#{bidSubmissionController.prmsBidSubmission.columnValue}"/>
+                                                    </div>
+                                                </div>
+
+                                            <div class="form-group textBoxMarginTop6px"> 
+
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnFind" action="#{bidSubmissionController.searchBidSubmission()}" icon="ui-icon-search" 
+                                                                     process="frmSearch, @this " update=":frmMainUI:frmParty:tblSubmissionDt"
+                                                                     value="Find" class="btn btn-primary col-lg-4" />            
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmParty">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblSubmissionDt" value="#{bidSubmissionController.prmsBidSubmissionDataModel}" var="SubmissionList" rows="15" rowIndexVar="no"
+                                                                 selection="#{bidSubmissionController.submissionSelection}"
+                                                                 rowKey="#{SubmissionList.bidSubId}"  selectionMode="single" 
+                                                                 paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                        <p:ajax event="rowSelect" listener="#{bidSubmissionController.rowSelect}" 
+                                                                update=":BidSubmissionMain,:BidSubmissionMain:checkListInfoPanel,:frmSample,:frmMainUI,:BidSubmissionMain:checklistTbl" />    
+                                                        <p:column headerText="S.No">
+                                                            #{no+1}
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Submission No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{SubmissionList.bidSubmNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Registared Date" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{SubmissionList.dateRigistered}">
+                                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Prepared By" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{bidSubmissionController.logerName}"/>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                </div>                 
+                                            </div>    
+                                        </div>  
+                                    </div>                           
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="BidSubmissionMain">
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{bidSubmissionController.renderPnlCreateServiceRegistration}">
+                <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Bid  Submission</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="checkListInfoPanel" >
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group required"> 
+                                            <p:outputLabel id="lblmarketAssid" class="control-label col-sm-2"   value="Submission No:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText  id="txtmarketAssid" readonly="true" class="form-control"
+                                                              value="#{bidSubmissionController.generateBidSubmissionNo()}"/>
+
+                                            </div>
+                                            <p:outputLabel id="lblRigisteredDate" class="control-label col-sm-2" value="Registered Date:"/>
+                                            <div class="col-sm-3">                                   
+                                                <p:calendar id="txtRigisteredDate" required="true"  mindate="today"  maxdate="today" readonlyInput="true"
+                                                            requiredMessage="Registered Date is required"                     
+                                                            value="#{bidSubmissionController.prmsBidSubmission.dateRigistered}"                   
+                                                            pattern="yyyy/MM/dd" tabindex="4">
+
+                                                </p:calendar>
+                                                <p:message display="icon" for="txtRigisteredDate" />
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group required"> 
+
+                                            <p:outputLabel id="lblBidNo"   class="control-label col-sm-2" value="Bid No:"/>
+                                            <div class="col-sm-3"> 
+                                                <p:selectOneMenu id="txtendUser" style="width: 100%" required="true"  requiredMessage="Bid No is required"
+                                                                 value="#{bidSubmissionController.eepBidReg}"
+                                                                 valueChangeListener="#{bidSubmissionController.BidDateGetter}"
+                                                                 converter="entConverter">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItems value="#{bidSubmissionController.getBidNo()}" />
+                                                    <p:ajax event="change" process="@this" update=":BidSubmissionMain:checkListDetailPanel,txtoeningDate,txtClosingdate,txtprocurmentMethod,txtpurchaseType,txtProcurmentCatagories,txtCompany
+                                                            "/>
+
+                                                </p:selectOneMenu>  
+
+                                                <p:message display="icon" for="txtendUser" />
+                                            </div>
+                                            <p:outputLabel id="lblOpeningDate" class="control-label col-sm-2" value="Bid Opening Date:"/>
+                                            <div class="col-sm-3">                                   
+                                                <p:calendar id="txtoeningDate"   disabled="true"                 
+                                                            value="#{bidSubmissionController.eepBidReg.bidOpenDateTime}" readonly="true"                  
+                                                            pattern="MM/dd/yyyy HH:mm:ss" tabindex="4">
+                                                    <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+
+                                                </p:calendar>
+                                                <p:message display="icon" for="txtoeningDate" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group"> 
+                                            <p:outputLabel id="lblclosingDate" class="control-label col-sm-2" value="Bid closing Date:"/>
+                                            <div class="col-sm-3">                                   
+                                                <p:calendar id="txtClosingdate"   disabled="true"  style="font-weight: bold "               
+                                                            value="#{bidSubmissionController.eepBidReg.bidCloseDateTime}" readonly="true"                  
+                                                            pattern="MM/dd/yyyy HH:mm:ss" tabindex="4">
+                                                    <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+
+                                                </p:calendar>
+                                                <p:message display="icon" for="txtClosingdate" />
+                                            </div>
+
+                                            <p:outputLabel id="lblprocurmentMethod" class="control-label col-sm-2"   value="Procurement Method:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText  id="txtprocurmentMethod"   readonly="true"
+                                                              value="#{bidSubmissionController.eepBidReg.purchaseMethd}"/>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group"> 
+                                            <p:outputLabel id="lblpurchaseType"   class="control-label col-sm-2" value="Purchase Types:"/>
+
+                                            <div class="col-sm-3">
+                                                <p:inputText  id="txtpurchaseType"  readonly="true"
+                                                              value="#{bidSubmissionController.eepBidReg.bidType}"/>
+
+                                            </div>
+
+                                            <p:message display="icon" for="txtpurchaseType" />
+
+
+
+                                            <p:outputLabel id="lblProcurmentCatagories" class="control-label col-sm-2"   value="Procurement Catagories:"/>
+                                            <div class="col-sm-3">
+                                                <p:inputText  id="txtProcurmentCatagories"  readonly="true"
+                                                              value="#{bidSubmissionController.eepBidReg.bidCategory}"/>
+
+                                            </div>
+                                            <p:message display="icon" for="txtProcurmentCatagories" />
+                                        </div>
+
+                                    </div>
+
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Bid  Submission Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="panel-body">
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="checkListDetailPanel" >
+                                        <div class="form-horizontal col-sm-12">   
+                                            <div class="form-group required">
+                                                <p:outputLabel id="lblCompany" class="control-label col-sm-2" value="Bidding Company:" />
+                                                <div class="col-sm-3"> 
+                                                    <p:selectOneMenu id="txtCompany" style="width: 100%"  required="true"  requiredMessage="Bidding Company is required"
+                                                                     value="#{bidSubmissionController.prmsSupplyProfile}" converter="entConverter"
+                                                                     valueChangeListener="#{bidSubmissionController.getVendorName}">
+
+                                                        <p:ajax event="change" process="@this" update="txtTelPnoneno,txtFax,txtMobile,txtPoBox,txtEmaill,txttinNO,txtCountry"/>
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{bidSubmissionController.prmsSupplyProfiles1}" var="vedorName" itemValue="#{vedorName}" itemLabel="#{vedorName}"  />
+
+                                                    </p:selectOneMenu> 
+
+                                                    <p:message display="icon" for="txtCompany" />
+                                                </div>
+
+                                                <p:outputLabel id="lblReceived" class="control-label col-sm-2" value="Received By:" />
+                                                <div class="col-sm-3"> 
+                                                    <p:selectOneMenu id="txtReceivedBy" style="width: 100%" required="true"   requiredMessage="Received By is required"
+                                                                     value="#{bidSubmissionController.prmsBidSubmissionDetail.employeeId}" converter="entConverter">
+                                                        <f:selectItem itemLabel="--- Select One ---"  itemValue=""/>
+                                                        <f:selectItems value="#{bidSubmissionController.employeeList}" var="empName"/>
+                                                    </p:selectOneMenu>  
+                                                    <p:message display="icon" for="txtReceivedBy" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMarginTop6px">
+                                                <h:outputLabel class="control-label col-sm-2" value="Tel No:" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtTelPnoneno" value="#{bidSubmissionController.prmsSupplyProfile.telOffice}" readonly="true" />
+
+                                                </div>
+                                                <h:outputLabel class="control-label col-sm-2" value="Mobile No:" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtMobile" value="#{bidSubmissionController.prmsSupplyProfile.telMobile}" readonly="true" />
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMarginTop6px">
+                                                <h:outputLabel class="control-label col-sm-2" value="Po.Box:" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtPoBox" value="#{bidSubmissionController.prmsSupplyProfile.pobox}" readonly="true" />
+
+                                                </div>
+                                                <h:outputLabel class="control-label col-sm-2" value="Email:" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtEmaill" value="#{bidSubmissionController.prmsSupplyProfile.email}" readonly="true" />
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMarginTop6px">
+                                                <h:outputLabel class="control-label col-sm-2" value="Fax:" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtFax" value="#{bidSubmissionController.prmsSupplyProfile.fax}" readonly="true" />
+
+                                                </div>
+                                                <h:outputLabel class="control-label col-sm-2" value="Country:" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtCountry" value="#{bidSubmissionController.prmsSupplyProfile.countryId}" readonly="true" />
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMarginTop6px required">
+                                                <h:outputLabel class="control-label col-sm-2" value="TIN No:" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txttinNO" value="#{bidSubmissionController.prmsSupplyProfile.tinNo}" readonly="true" />
+
+                                                </div>
+
+                                                <p:outputLabel id="lbldateSub" class="control-label col-sm-2" value="Submission Date:"/>
+                                                <div class="col-sm-3">                                   
+                                                    <p:calendar id="txtdateSub"   required="true" readonlyInput="true"   requiredMessage="Submission Date is required"                     
+                                                                value="#{bidSubmissionController.prmsBidSubmissionDetail.dateSub}"                    
+                                                                pattern="yyyy/MM/dd" tabindex="4" mindate="today">
+
+                                                    </p:calendar>
+                                                    <p:message display="icon" for="txtdateSub"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required">
+                                                <p:outputLabel id="lblTime" class="control-label col-sm-2" value="Submission Time:"/>
+                                                <div class="col-sm-3">                                   
+                                                    <p:calendar id="txttime"   required="true" readonlyInput="true"    requiredMessage="Submission Time is required"                    
+                                                                value="#{bidSubmissionController.prmsBidSubmissionDetail.timeSub }"                    
+                                                                pattern="HH:mm" tabindex="4" timeOnly="true">
+
+                                                    </p:calendar>
+                                                    <p:message display="icon" for="txttime"/>
+                                                </div>
+
+                                                <h:outputLabel class="control-label col-sm-2" value="Status:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="txtStatus" style="width: 100%" required="true"   requiredMessage=" value is required"
+                                                                     value="#{bidSubmissionController.prmsBidSubmissionDetail.status}">
+                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                        <f:selectItem itemLabel="Late" itemValue="Late" />
+                                                        <f:selectItem itemLabel="On Time" itemValue="On Time" />
+                                                    </p:selectOneMenu>
+                                                    <p:message display="icon" for="txtStatus" />
+                                                </div>
+
+
+                                            </div>
+                                            <div class="form-group">
+                                                <p:outputLabel id="lblSubmitted"  class="control-label col-sm-2" value="Submitted By:" />
+                                                <div class="col-sm-3 required">
+                                                    <p:inputText id="txtSubmitted" value="#{bidSubmissionController.prmsBidSubmissionDetail.submittedBy}" 
+                                                                 validator="#{validatorManagedBean.Text}"  />
+
+                                                </div>
+                                                <p:outputLabel id="lblProposal"  class="control-label col-sm-2" value="No Of Boxes(Proposal):" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtProposal"  value="#{bidSubmissionController.prmsBidSubmissionDetail.noProposal}" 
+                                                                 validator="#{validatorManagedBean.Number}"  />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <p:outputLabel id="lblOriginal" class="control-label col-sm-2" value="No of Original:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtOriginal" class="form-control" 
+                                                                 value="#{bidSubmissionController.prmsBidSubmissionDetail.numberOfOriginal}"/>
+
+                                                </div>
+                                                <p:outputLabel id="lblCopy"  class="control-label col-sm-2" value="No Of Copy:" />
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtCopy" value="#{bidSubmissionController.prmsBidSubmissionDetail.numberOfCopy}" validator="#{validatorManagedBean.Number}" />
+
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <p:outputLabel id="lblRemark" class="control-label col-sm-2" value="Remark:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputTextarea id="txtRemark"  class="form-control"  autoResize="false" 
+
+                                                                     value="#{bidSubmissionController.prmsBidSubmissionDetail.remark}"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group textBoxMarginTop6px"> 
+
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-3">
+                                                    <p:commandButton id="btnAdd" action="#{bidSubmissionController.addSubmissionDetail()}" icon="ui-icon-add" validateClient="true"  
+                                                                     process="@this,checkListDetailPanel" update=":BidSubmissionMain:checklistTbl, :BidSubmissionMain:checkListDetailPanel" class="btn btn-primary col-lg-4"
+                                                                     value="#{bidSubmissionController.addOrModifyBundle}" />   
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </h:panelGroup>
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="checklistTbl" >
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="submissDt" value="#{bidSubmissionController.prmsBidSubmissionDetailsDataModel}" rowIndexVar="rowContact" var="contact"
+                                                                 paginator="true" paginatorPosition="bottom" editable="true">
+                                                        <p:ajax event="rowEdit" listener="#{bidSubmissionController.onContactRowEdit}" update="submissDt" />
+                                                        <p:ajax event="rowEditCancel" listener="#{bidSubmissionController.onContactRowCancel}" update="submissDt" />
+                                                        <p:column headerText="No">
+                                                            #{rowContact+1}
+                                                        </p:column>
+                                                        <p:column headerText="Bidding Company">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.supplierId.vendorName}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="Company" value="#{contact.supplierId.vendorName}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Recieved By">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.employeeId}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="Recieved" value="#{contact.employeeId}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Tel No">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.supplierId.telOffice}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="TelNo" value="#{contact.supplierId.telOffice}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Mobile No">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.supplierId.telMobile}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="mobnou" value="#{contact.supplierId.telMobile}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Po.Box">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.supplierId.pobox}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="poboxx" value="#{contact.supplierId.pobox}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Email">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.supplierId.email}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="Emailll" value="#{contact.supplierId.email}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Fax">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.supplierId.fax}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="faxx" value="#{contact.supplierId.fax}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Country">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.supplierId.countryId}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="countrry" value="#{contact.supplierId.countryId}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+                                                        <p:column headerText="TIN No">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.supplierId.tinNo}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="tin" value="#{contact.supplierId.tinNo}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+                                                        <p:column headerText="Date">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.dateSub}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="dateSub" value="#{contact.dateSub}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Time">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.timeSub}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="time" value="#{contact.timeSub}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Status">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.status}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="status" value="#{contact.status}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="No Of Proposal/Boxes">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.noProposal}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="Proposal" value="#{contact.noProposal}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="No Of Orginal">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.numberOfOriginal}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="Orginal" value="#{contact.numberOfOriginal}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="No Of Copy">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.numberOfCopy}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="Copy" value="#{contact.numberOfCopy}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+
+                                                        <p:column headerText="Submitted By">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.submittedBy}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="Submitted" value="#{contact.submittedBy}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Remark">
+                                                            <p:cellEditor>
+                                                                <f:facet name="output"><h:outputText value="#{contact.remark}" /></f:facet>
+                                                                <f:facet name="input"><p:inputText id="remak" value="#{contact.remark}" style="width:100%"/></f:facet>
+                                                            </p:cellEditor>
+                                                        </p:column>
+                                                        <p:column headerText="Option"> 
+                                                            <p:commandLink action="#{bidSubmissionController.editBidSubmissionDataTbl()}" value="Edit" 
+                                                                           process="@this,submissDt" update="@this,:BidSubmissionMain:checkListDetailPanel"/>
+                                                        </p:column>
+                                                    </p:dataTable>
+
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">   
+                                                <p:outputLabel id="lblPrepare"  class="control-label col-sm-2" value="Prepared By:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtPrepare" class="form-control"  
+
+                                                                 value="#{bidSubmissionController.workFlow.userName}" disabled="true"/>
+                                                    <p:message display="icon" for="txtPrepare"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group textBoxMarginTop6px "> 
+                                                <div class="col-lg-2" />
+                                                <div class="col-sm-3">
+
+                                                    <p:commandButton id="btnSave" value="#{bidSubmissionController.saveorUpdateBundle}" icon="ui-icon-new" validateClient="true" 
+                                                                     class="btn btn-primary col-lg-4" 
+                                                                     process="@this,BidSubmissionMain:checklistTbl,BidSubmissionMain:checkListInfoPanel"   
+                                                                     update=",BidSubmissionMain:checklistTbl, BidSubmissionMain:checkListInfoPanel" 
+                                                                     action="#{bidSubmissionController.saveForBidSubmission()}" /> 
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>          
+

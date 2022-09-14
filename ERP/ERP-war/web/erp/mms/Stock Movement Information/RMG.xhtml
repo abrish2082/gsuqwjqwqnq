@@ -1,0 +1,504 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+
+        <!-- /.search form -->
+    </ui:define>
+
+    <ui:define name="navigaion_content">
+
+
+
+        <li><a href="MmsSIV.xhtml"><i class="fa fa-circle-o"></i> <span>Store Issue Voucher</span></a></li> 
+        <li><a href="GatePassInformation.xhtml"><i class="fa fa-circle-o"></i> <span>GatePass Information</span></a></li> 
+        <li><a href="ISIV.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV (For Issue)</span></a></li> 
+        <li><a href="ISIV_Received.xhtml"><i class="fa fa-circle-o"></i> <span>ISIV(For Receiving)</span></a></li>
+        <li><a href="MmsGRN.xhtml"><i class="fa fa-circle-o"></i> <span>Goods Receiving Note</span></a></li> 
+
+
+    </ui:define>
+
+    <ui:define name="contents">   
+
+
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlSearchPage" rendered="#{rmgController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnSearch" action="#{rmgController.goBackSearchButtonAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span> 
+                    </h:panelGroup>             
+                    <p:commandButton id="btnNew" action="#{rmgController.createNewRMGInfo()}" icon="#{rmgController.icone}"  validateClient="true" 
+                                     style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{rmgController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" /> 
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{rmgController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{rmgController.mmsRmgList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Local Per Diem Request List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{rmgController.onSelectRmgRequest}" scrollHeight="400">
+                                            <f:selectItems  var="RmgListVar" value="#{rmgController.mmsRmgList}"
+                                                            itemValue="#{RmgListVar}"  itemLabel="#{RmgListVar.rmgNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmToolbar"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{rmgController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{rmgController.workflowDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.wfDecison}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>     
+                    </h:panelGroup>
+                    <a href="../../mms/Stock Movement Information/RMG.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{rmgController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group  textBoxMargin6px">   
+                                            <h:outputLabel   class="control-label col-sm-2"  value="#{MMS.Search}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu   id="drdSearchName" style="width: 100%"                                                                     
+                                                                   converter="entConverter"  value="#{rmgController.columnNameResolver.col_Name_FromTable}"
+                                                                   valueChangeListener="#{rmgController.columnNameChangeEvent}"> 
+
+                                                    <f:selectItem itemLabel="--- Select one ---" itemValue="" /> 
+                                                    <f:selectItems value="#{rmgController.columnNamesList}" 
+                                                                   var="colNameList" itemValue="#{colNameList.col_Name_FromTable}" itemLabel="#{colNameList.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this"  update="lblSearchName,txtSearchName"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblSearchName" class="control-label col-sm-2"  value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtSearchName" class="form-control" value="#{rmgController.rmgentity.columnValue}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnFind" class="btn btn-primary" action="#{rmgController.searchRmgInformation()}" icon="ui-icon-search" 
+                                                                 process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                 value="Find"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+
+
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" value="#{rmgController.mmsRmgSearchInfoDataModel}" var="RmgInfo" rows="5" selectionMode="single"
+                                                             selection="#{rmgController.selectedItem}" rowKey="#{RmgInfo.rmgId}" rowIndexVar="num"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowSelect" listener="#{rmgController.onRowEdit}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.RMG_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{RmgInfo.rmgNo}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Job_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{RmgInfo.jobNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Workshop}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{RmgInfo.workshop}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Receiver}:" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{RmgInfo.receivedBy}"/>
+                                                    </p:column>
+
+
+
+                                                </p:dataTable>
+
+                                            </div>                 
+                                        </div>    
+
+
+
+                                    </div>  
+
+
+
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information" autoUpdate="true" />
+
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{rmgController.renderPnlCreateRmg}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Receivable Manufactured Goods</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel id="lbl_inspectionnumber"  class="control-label col-sm-2"  value="#{MMS.RMG_No}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtrmgNo"  readonly="true"
+                                                               value="#{rmgController.generateRmgNo()}"
+                                                               />
+                                            </div>  
+                                            <h:outputLabel id="lbl_approvedRemark"  class="control-label col-sm-2"  value="#{MMS.WareHouse}:"/>
+                                            <div class="col-sm-4 ">
+                                                <p:inputText   id="txtWarehouse"  readonly="true"
+                                                               requiredMessage="Field Required"
+                                                               required="false"
+                                                               value="#{rmgController.inspectionEntity.storeId.warehouseId.name}" />
+                                            </div>                                                                                                                                                                                                                                                                                                                                                                    
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">  
+                                            <h:panelGroup id="test">
+                                                <h:outputLabel id="lblinspectionResxult" class="control-label col-sm-2"  value="#{MMS.Inspection_Id}:"/>
+                                                <div class="col-sm-4"> 
+                                                    <p:selectOneMenu   id="selectinspNumber"  required="true" converter="entConverter" requiredMessage="Inspection Number is required"
+                                                                       value="#{rmgController.inspectionEntity}" style="width: 100%;" disabled="#{workFlow.readonly}"  
+                                                                       valueChangeListener="#{rmgController.handleSelectInspectionNo}"  >   
+                                                        <f:selectItem itemLabel="---select one---" itemValue="" /> 
+                                                        <f:selectItems id="selectOneMenuBidNumber" 
+                                                                       value="#{rmgController.inspectionResultList}" var="insp" itemLabel="#{insp.inspectionNo}" itemValue="#{insp}"/>
+
+                                                        <p:ajax update="frmMaterialInfo,txtWarehouse,txtStore" process="@this" event="change" />
+                                                    </p:selectOneMenu>   
+                                                    <p:message for="selectinspNumber" display="icon"/>
+                                                </div>
+
+
+
+                                            </h:panelGroup>
+                                            <h:outputLabel id="lbl_ponumber"  class="control-label col-sm-2"  value="#{MMS.Account_Code}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtaccountNo" required = "true" requiredMessage="Account Number Required" class="form-control" readonly="#{workFlow.readonly}"
+                                                               value="#{rmgController.rmgentity.accountNo}" />
+                                                <p:message for="txtaccountNo" display="icon"/>
+
+                                            </div> 
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">  
+                                            <h:outputLabel id="lbl_contratNumber"  class="control-label col-sm-2"  value="#{MMS.Workshop}:"/>
+                                            <div class="col-sm-4 ">
+                                                <p:inputText   id="txtworkshop" class="form-control" readonly="#{workFlow.readonly}"
+                                                               requiredMessage="Field Required"
+                                                               required="false"
+                                                               value="#{rmgController.rmgentity.workshop}" />
+                                                <p:message for="txtworkshop" display="Message"/>
+
+                                            </div>
+                                            <h:outputLabel id="lbl_store"  class="control-label col-sm-2" value="#{MMS.Receiving_Store}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtStore"   readonly="true"
+                                                               value="#{rmgController.inspectionEntity.storeId.storeName}" />
+                                                <p:message for="txtStore" display="icon"/>
+
+                                            </div>  
+
+
+
+
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">  
+
+                                            <h:outputLabel id="lbl_JobNo"  class="control-label col-sm-2"  value="#{MMS.Job_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtJobNo"  
+                                                               required="true" requiredMessage="Job No is Required" class="form-control" readonly="#{workFlow.readonly}"
+                                                               value="#{rmgController.rmgentity.jobNo}" />
+                                                <p:message for="txtJobNo" display="icon"/>
+                                            </div>  
+
+
+                                            <h:outputLabel for="txtReceivedDate" class="control-label col-sm-2" value="#{MMS.Received_Date}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtReceivedDate" class="form-control" readonly="#{workFlow.readonly}" value="#{rmgController.rmgentity.dates}"
+                                                             required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtReceivedDate', 'frmRegisterUI:txtReceivedDate');" />                                                                                                                                                    
+                                                <p:message for="txtReceivedDate" display="icon"/>
+                                            </div> 
+
+
+                                        </div>
+
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">RMG Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+
+
+
+
+                                <h:panelGroup id="frmMaterialInfo">
+
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px">                                      
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tbldataModel" var="inspResultDtl" value="#{rmgController.rmgDetailDataModel}"  
+                                                             rowIndexVar="num" paginator="true" paginatorPosition="bottom" editable="true">
+
+                                                    <p:ajax event="rowEdit"  update="" />
+                                                    <p:ajax event="rowEditCancel"  update="" />
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.S_No}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>  
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Code}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.matCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText  value="#{MMS.Item_Name}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.matName}"/>
+                                                    </p:column>
+
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Measure}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.itemId.unitMeasure1}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Quantity}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.quantity}"/>
+                                                    </p:column>
+
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Remark}:"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{inspResultDtl.remark}"/>
+                                                    </p:column>                    
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmApproverInfo">                                                             
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel id="lbl_inspected1"  class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtprepareby1"  readonly="true"  
+                                                               value="#{rmgController.userName}" 
+                                                               required="true" requiredMessage="prepared is required"
+                                                               />                                             
+                                            </div>  
+                                            <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="#{MMS.Decision}:" rendered="#{rmgController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{rmgController.selectedValue}"
+                                                                 required="true" requiredMessage="Decision is required" rendered="#{rmgController.renderDecision}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                    <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                </p:selectOneMenu>   
+                                            </div>                                            
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required"> 
+                                            <h:outputLabel for="txtApprovedDate" class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtApprovedDate" class="form-control" value="#{rmgController.wfMmsProcessed.processedOn}"
+                                                             required="true" requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtApprovedDate', 'frmRegisterUI:txtApprovedDate');" />                                                                                                                                                    
+                                                <p:message for="txtApprovedDate" display="icon"/>
+                                            </div>                                         
+                                            <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="#{MMS.comment}:" rendered="#{rmgController.renderDecision}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{rmgController.wfMmsProcessed.commentGiven}"  rendered="#{rmgController.renderDecision}"/>     
+                                            </div>            
+                                        </div>                                        
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="Save"  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton  id="saveButton" class="btn btn-primary "
+
+                                                                  value="#{rmgController.saveorUpdateBundle}"
+                                                                  action="#{rmgController.saveRmg()}"  
+                                                                  process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo,:frmRegisterUI:frmApproverInfo"  
+                                                                  update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmMaterialInfo,:frmRegisterUI,:frmToolbar" 
+                                                                  />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

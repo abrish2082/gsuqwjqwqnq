@@ -1,0 +1,466 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="displineOffenseType.xhtml"><i class="fa fa-circle-o "></i> <span>Offense Registration </span></a></li>
+        <li><a href="penalitys.xhtml"><i class="fa fa-circle-o "></i> <span>Penalty Registration </span></a></li> 
+        <li><a href="penalityForOffenseType.xhtml"><i class="fa fa-circle-o"></i><span> Penalty for Offense  </span></a></li>  
+        <li> <a href="disciplineRequest.xhtml"><i class="fa fa-circle-o "></i> <span> Discipline Request</span> </a> </li>
+        <li><a href="disciplineApprove.xhtml"><i class="fa fa-circle-o "></i> <span>Discipline Approve </span> </a> </li>  
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar  style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton  id="btnNew" action="#{adjudicateDisciplineAppealController.createNewAdditionalAmount()}" 
+                                      icon="#{adjudicateDisciplineAppealController.icone}" validateClient="true" 
+                                      style="background-color: white; border-color: white"
+                                      process="@this" update=":frmDisciplineApprove,:frmSample"
+                                      title="#{adjudicateDisciplineAppealController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="adjudicateDisciplineAppeal.xhtml"><i class="fa fa-fw fa-refresh"></i> </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-body ">
+                        <h:form id="frmDisciplineApprove">
+                            <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/> 
+                            <h:panelGroup id="pnlFindAlls" rendered="#{adjudicateDisciplineAppealController.renderPnlManPage}"> 
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Search...  <small></small></h3>   
+                                </div> 
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="col-md-12">                                       
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <br></br>
+                                                    <div class="box box-primary ">
+                                                        <p:dataTable  id="dtReqst" var="reqst" value="#{adjudicateDisciplineAppealController.appealApprovedList}" styleClass="forDataTable"  
+                                                                      selection="#{adjudicateDisciplineAppealController.disciplineRequests}" rowIndexVar="num" rowKey="#{reqst.id}" selectionMode="single"
+                                                                      paginator="true" paginatorPosition="bottom" rows="10" rowsPerPageTemplate="5,10,15"
+                                                                      sortBy="#{reqst.offenceDate}" sortOrder="ascending" emptyMessage="No Request">
+                                                            <p:ajax event="rowSelect" listener="#{adjudicateDisciplineAppealController.populate}"
+                                                                    process="@this"      update="@this,:frmDisciplineApprove,:frmSample" />
+                                                            <f:facet name="header">
+                                                                <p:outputLabel value="" style=" font-size: 16px;"/>
+                                                            </f:facet>
+                                                            <p:column headerText="No." width="50">
+                                                                <h:outputText value="#{num+1}"/>
+                                                            </p:column>
+                                                            <p:column headerText="Applicant Name" filterMatchMode="startsWith" filterBy="#{reqst.offenderId.firstName}">
+                                                                <h:outputText value="#{reqst.offenderId.firstName}"  />
+                                                            </p:column>
+                                                            <p:column headerText="Applicant Id" filterMatchMode="startsWith" filterBy="#{reqst.offenderId.empId}">
+                                                                <h:outputText value="#{reqst.offenderId.empId}" />
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                            <h:panelGroup id="pnlMain" class="col-sm-12" rendered="#{adjudicateDisciplineAppealController.renderPnlCreateAdditional}">  
+                                <div class="box-header">
+                                    <h3 class="box-title">Adjudicate Discipline Appeal </h3>  
+                                </div>
+                                <section class="panel panel-info"  >
+                                    <section class="panel-body" >
+                                        <h:panelGroup id="pnlAccused" class="col-sm-12" rendered="#{adjudicateDisciplineAppealController.renderPnlCreateAdditional}">
+                                            <div class="row">
+                                                <div class="box-body">
+                                                    <div class="col-md-12">  
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <p:outputLabel  for="accused" value="Requester(Applied By): " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                                        <p:autoComplete id="accused" value="#{adjudicateDisciplineAppealController.hrEmployeesRequester.firstName}" readonly="true" style="width: 100%"
+                                                                                        completeMethod="#{adjudicateDisciplineAppealController.SearchByFnameAccused}" 
+                                                                                        var="empListReq" itemValue="#{empListReq.firstName}" itemLabel="#{empListReq}" 
+                                                                                        size="2" emptyMessage="no data"> 
+                                                                            <p:ajax event="itemSelect"  process="@this,pnlAccuser"  listener="#{adjudicateDisciplineAppealController.getByFirstNameAccused}" 
+                                                                                    update="@this,txtAccusedName,txtAccusedJobTitle,txtAccusedDept,txtAccusedGrade,txtAccusedSalary" />   
+                                                                        </p:autoComplete>    
+                                                                        <p:message for="accused" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <p:outputLabel  for="txtAccusedDept" class="control-label col-sm-4" value="Department: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtAccusedDept" value="#{adjudicateDisciplineAppealController.departmentsOfAccused.depName}" readonly="true"   />
+                                                                    </div>   
+                                                                </div> 
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <p:outputLabel  for="txtAccusedGrade" value="Grade: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtAccusedGrade" value="#{adjudicateDisciplineAppealController.hrLuGradesAccuser.grade}" readonly="true"  />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <p:outputLabel  for="txtAccusedName" value="Emp ID: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtAccusedName" value="#{adjudicateDisciplineAppealController.hrEmployeesRequester.empId}" readonly="true"  />
+                                                                    </div>
+                                                                </div>    
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <p:outputLabel  for="txtAccusedJobTitle" value="Job Title: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtAccusedJobTitle" value="#{adjudicateDisciplineAppealController.hrJobTypesOfAccused.jobTitle}" readonly="true"  />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <p:outputLabel  for="txtAccusedSalary" value="Salary: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtAccusedSalary" value="#{adjudicateDisciplineAppealController.hrEmployeesRequester.basicSalary}" readonly="true"  />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <section class="panel panel-info"  >
+                                    <section class="panel-body" > 
+                                        <h:panelGroup id="pnlAccuser" class="col-sm-12" rendered="#{adjudicateDisciplineAppealController.renderPnlCreateAdditional}">  
+
+                                            <div class="row">
+                                                <div class="col-md-12"> 
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel value="Offender Name: " class="control-label col-sm-4"/>
+                                                                <div class="col-lg-8">
+                                                                    <p:autoComplete id="searchAutocomplete" value="#{adjudicateDisciplineAppealController.hrEmployeesAccuser.firstName}" readonly="true" style="width: 100%" validator="#{validatorManagedBean.FullName}"
+                                                                                    completeMethod="#{adjudicateDisciplineAppealController.SearchByFname}" 
+                                                                                    var="empList" itemValue="#{empList.firstName}" itemLabel="#{empList}" 
+                                                                                    size="2" emptyMessage="no data">  
+                                                                        <p:ajax event="itemSelect"  process="@this,pnlAccuser" listener="#{adjudicateDisciplineAppealController.getByFirstName}" 
+                                                                                update="@this,txtRequesterName,txtRequesterDept,txtRequesterPos,txtRequesterGrade,txRequesterJobSalary" />   
+                                                                    </p:autoComplete>    
+                                                                    <p:message for="searchAutocomplete" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  for="txtRequesterDept" class="control-label col-sm-4" value="Department: "/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtRequesterDept" value="#{adjudicateDisciplineAppealController.departmentsOfAccuser.depName}" readonly="true" style="width: 100%"  />
+                                                                </div>   
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  for="txtRequesterGrade" class="control-label col-sm-4" value="Grade: "/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtRequesterGrade" value="#{adjudicateDisciplineAppealController.hrLuGradesAccused.grade}" readonly="true" style="width: 100%"  />
+                                                                </div>   
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  for="txtRequesterName" value="Emp ID:" class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText  id="txtRequesterName" value="#{adjudicateDisciplineAppealController.hrEmployeesAccuser.empId}" readonly="true" style="width: 100%" />
+                                                                </div>
+                                                            </div>    
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  for="txtRequesterPos" value="Job Title: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtRequesterPos" value="#{adjudicateDisciplineAppealController.hrJobTypesOfAccuser.jobTitle}" readonly="true"  style="width: 100%" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  for="txRequesterJobSalary" value="Salary: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txRequesterJobSalary" value="#{adjudicateDisciplineAppealController.hrEmployeesAccuser.basicSalary}" readonly="true"  />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <section class="panel panel-info">
+                                    <section class="panel-body" > 
+                                        <h:panelGroup id="pnlOffenceDetails" class="col-sm-12" rendered="#{adjudicateDisciplineAppealController.renderPnlCreateAdditional}">  
+                                            <div class="row">
+                                                <div class="col-md-12"> 
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  for="txtOffenceDate" value="Offence Date: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtOffenceDate" value="#{adjudicateDisciplineAppealController.disciplineRequests.offenceDate}" validator="#{validatorManagedBean.Date}"
+                                                                                 converter="dateConverter" readonly="true"
+                                                                                 placeholder="dd/mm/yyyy"/>
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="offence Name: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="slctOffence"  value="#{adjudicateDisciplineAppealController.offenceTypes.offenceName}"  readonly="true"/>
+
+                                                                </div>   
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  for="txtDescription" class="control-label col-sm-4" value="Description:"/>
+                                                                <div class="col-sm-8">
+                                                                    <h:inputTextarea id="txtDescription" style="width: 100%" readonly="true" value="#{adjudicateDisciplineAppealController.disciplineRequests.descriptionOfOffence}"/>
+                                                                </div>  
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel    value="Reported Date:" class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtReportedDate" value="#{adjudicateDisciplineAppealController.disciplineRequests.reportedDate}" 
+                                                                                 converter="dateConverter" readonly="true"
+                                                                                 placeholder="dd/mm/yyyy"/>
+
+                                                                    <p:message for="txtReportedDate" display="icon"/> 
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel    value="Prepared By:" class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtPreparedBy" value="#{adjudicateDisciplineAppealController.disciplineRequests.preparedBy}" 
+                                                                                 converter="dateConverter" readonly="true"/>
+
+                                                                    <p:message for="txtPreparedBy" display="icon"/> 
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  for="txtPhaseOutTime" value="Phase Out Time(Month): " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:inputText id="txtPhaseOutTime" value="#{adjudicateDisciplineAppealController.phaseOutTime}" readonly="true"  style="width: 100%" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  for="txtReptition" value="Repitition: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtReptition" value="#{adjudicateDisciplineAppealController.disciplineRequests.repititionOfOffence}" readonly="true"  style="width: 100%" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  for="txtRemark" class="control-label col-sm-4" value="Remark:"/>
+                                                                <div class="col-sm-8">
+                                                                    <h:inputTextarea id="txtRemark" style="width: 100%" readonly="true" value="#{adjudicateDisciplineAppealController.disciplineRequests.requestRemark}"/>
+                                                                </div>  
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8 textBoxMargin6px">
+                                                                    <br></br>
+                                                                </div>
+                                                            </div> 
+                                                        </div>
+
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  for="txtPreparedOn" class="control-label col-sm-4" value="Prepared On:"/>
+                                                                <div class="col-sm-8 textBoxMargin6px">
+                                                                    <h:inputText id="txtPreparedOn"  class="form-control col-md-12" value="#{adjudicateDisciplineAppealController.disciplineRequests.preparedOn}"/>
+                                                                </div>  
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup> 
+                                    </section>
+                                </section>
+                                <section class="panel panel-info">
+                                    <section class="panel-body" > 
+                                        <h:panelGroup id="pnlDecision12"  class="col-sm-12" rendered="#{adjudicateDisciplineAppealController.renderPnlCreateAdditional}">
+                                            <div class="row">
+                                                <div class="col-md-12">  
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  value="Option:" class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneRadio id="txtRadio" class="col-sm-6" required="true" value="#{adjudicateDisciplineAppealController.slectedC}"
+                                                                                      valueChangeListener="#{adjudicateDisciplineAppealController.handleDecition}">
+                                                                        <f:selectItem itemLabel="Accept" itemValue="Accept" />
+                                                                        <f:selectItem itemLabel="Other" itemValue="Other" />    
+                                                                        <p:ajax event="change" process="@this" update="frmDisciplineApprove"/>
+                                                                    </p:selectOneRadio>
+                                                                    <p:message for="txtRadio" display="icon"/> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <h:panelGroup id ="pnlrend" rendered="#{adjudicateDisciplineAppealController.pnlAccept}">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <p:outputLabel  for="txtDecisionOnPenalityAccept" value="Decision on Penalty:" class="control-label col-sm-4 "/>
+                                                                    <div class="col-sm-8">
+                                                                        <h:inputTextarea id="txtDecisionOnPenalityAccept" style="width: 100%" value="#{adjudicateDisciplineAppealController.disciplineRequests.decisionOnPenality}" readonly="true"/>
+                                                                        <p:message for="txtDecisionOnPenalityAccept" display="icon"/> 
+                                                                    </div>
+                                                                </div>    
+                                                            </div>
+                                                        </h:panelGroup> 
+                                                        <h:panelGroup id ="pnlrend1" rendered="#{adjudicateDisciplineAppealController.pnlOther}">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel   for="txtDecisionOnPenalityOther" value="Penalty:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                                        <h:inputTextarea id="txtDecisionOnPenalityOther"  class="form-control col-md-12" value="#{adjudicateDisciplineAppealController.penalty}"/>
+                                                                    </div>  
+                                                                </div> 
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  for="txtApprovedOn" class="control-label col-sm-4" value="Approved On: "/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtApprovedOn" value="#{adjudicateDisciplineAppealController.disciplineRequests.approvedOn}"  title="Approved On"
+                                                                                 converter="dateConverter" placeholder="dd/mm/yyyy" onclick="displayCalendar('frmDisciplineApprove:txtApprovedOn', 'frmDisciplineApprove:txtApprovedOn');"
+                                                                                 validator="#{validatorManagedBean.Date}" required="true" requiredMessage="Please select date"/>
+                                                                    <p:message for="txtApprovedOn" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <section class="panel panel-info">
+                                    <section class="panel-body">  
+                                        <h:panelGroup id="pnlworkflow" class="col-sm-12" rendered="#{adjudicateDisciplineAppealController.renderPnlCreateAdditional}">
+                                            <div class="row">
+                                                <div class="col-md-12">                      
+                                                    <div class="box-body">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-group required form-horizontal">
+                                                                    <h:outputLabel for="drddecision" class="control-label col-sm-4" value="Decision On Appeal: " />
+                                                                    <div class="col-md-8 textBoxMargin6px">
+                                                                        <p:selectOneMenu id="drddecision" value="#{adjudicateDisciplineAppealController.disciplineRequests.status}" 
+                                                                                         valueChangeListener="#{adjudicateDisciplineAppealController.handleSelectOptions}"  converter="entConverter" 
+                                                                                         required="true"    requiredMessage="Select Decision" style="width: 100%">
+                                                                            <f:selectItem itemLabel="---Select---" itemValue=""/>
+                                                                            <f:selectItem itemLabel="Approve" itemValue="1"/>
+                                                                            <f:selectItem itemLabel="Reject" itemValue="2"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="drddecision" display="icon"/>
+                                                                    </div>
+                                                                </div>    
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel  for="txtRemarkOnAppeal" class="control-label col-sm-4" value="Remark:"/>
+                                                                    <div class="col-sm-8 textBoxMargin6px">
+                                                                        <h:inputTextarea id="txtRemarkOnAppeal"  class="form-control col-md-12" value="#{adjudicateDisciplineAppealController.disciplineRequests.requestRemark}"/>
+                                                                    </div>  
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group">
+                                                                    <p:outputLabel  for="txttxtProcessedBy" class="control-label col-sm-4" id="lblPrepatedy1" value="Processed By:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText  id="txttxtProcessedBy" value="#{workFlow.userName}" title="Procced By"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+                                <h:panelGroup id="pnl" class="col-sm-12" rendered="#{adjudicateDisciplineAppealController.renderPnlCreateAdditional}"> 
+                                    <div class="panel-body col-sm-12">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4"></div>                                           
+                                                    <div class="col-sm-3">
+                                                        <p:commandButton id="btnSave" value="Save" 
+                                                                         action="#{adjudicateDisciplineAppealController.saveaAjudicateDisciplineAppeal}"
+                                                                         class="btn  btn-block btn-primary col-lg-4 "
+                                                                         process="@this,pnlDecision12,pnlworkflow" update="@this,:frmDisciplineApprove" />  
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup> 
+                            </h:panelGroup>
+                        </h:form>
+                    </div>
+                </div>                   
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

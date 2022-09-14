@@ -1,0 +1,834 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li><a href="CountryRegistration.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Country Registration</a></li>
+        <li><a href="PerDiemRateRegistration.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Per-Diem Rate Registration</a></li>
+        <li><a href="AdditionalAmountRegistration.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Additional Amount Registration</a></li>
+        <li><a href="GoodWillingPayment.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Good Willing Payment Registration</a></li>
+        <li><a href="PerDiemSettlementLocal.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Per-diem Settlement</a></li>
+        <li><a href="PerDiemRequestForeign.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Per-diem Request Foreign</a></li> 
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="backface-visibility: hidden;border-color:transparent;background: #ffffff " >
+                <f:facet name="right">
+                    <h:panelGroup id="pnlGBtnNew" rendered="#{fmsFieldAllowanceManagedBean.isRenderedBtnNew}">
+                        <p:commandButton id="btnIcone" style="background-color: white; border-color: white" 
+                                         action="#{fmsFieldAllowanceManagedBean.createNewPerdiemLocal()}" 
+                                         icon="ui-icon-plus" validateClient="true" 
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample"
+                                         title="New" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnIcon1" style="background-color: white; border-color: white" 
+                                     action="#{fmsFieldAllowanceManagedBean.searchPerdiemLocal()}" 
+                                     icon="ui-icon-search" validateClient="true" 
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample"
+                                     title="Search" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{fmsFieldAllowanceManagedBean.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{fmsFieldAllowanceManagedBean.fmsFAList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       rendered="#{fmsFieldAllowanceManagedBean.isRenderedIconNitification}"
+                                       title="Notifications" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Local Per Diem Request List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{fmsFieldAllowanceManagedBean.onSelectFARequest}" scrollHeight="300">
+                                            <f:selectItems  var="faListVar" value="#{fmsFieldAllowanceManagedBean.fmsFAList}"
+                                                            itemValue="#{faListVar}"  itemLabel="#{faListVar.requestNo}  --  #{faListVar.empId.firstName} #{faListVar.empId.middleName}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmSample"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlGworkflowIcon" rendered="#{fmsFieldAllowanceManagedBean.isRenderedIconWorkFlow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{fmsFieldAllowanceManagedBean.wfFcmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom"   rowsPerPageTemplate="5,10,15"
+                                                                 resizableColumns="true" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <a href="PerDiemRequestLocal.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" 
+                          rendered="#{fmsFieldAllowanceManagedBean.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Search_Local_Per_diem_Request} ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12 textBoxMargin6px" > 
+                                <h:panelGroup id="pnlSearchPerdREqLocal">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Employee_Name}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtEmpName1" value="#{fmsFieldAllowanceManagedBean.empEnty.firstName}" class="form-control"> 
+                                                        </p:inputText> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Employee_ID}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtEmpId1" class="form-control" value="#{fmsFieldAllowanceManagedBean.empEnty.empId}">
+                                                        </p:inputText>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton  id="btnSearch" class="btn btn-primary" 
+                                                                          action="#{fmsFieldAllowanceManagedBean.findFALocal()}"
+                                                                          icon="ui-icon-search" 
+                                                                          process="@this,pnlSearchPerdREqLocal,txtEmpName1,txtEmpId1" 
+                                                                          update="@this,:frmMainUI,:frmMainUI:tblPerDiemDetailSearch"
+                                                                          value="Find" />             
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="panel-body">
+                                    <div class="form-horizontal col-sm-12">
+                                        <p:dataTable id="tblPerDiemDetailSearch" value="#{fmsFieldAllowanceManagedBean.fieldAllowanceDataModel}" 
+                                                     selection="#{fmsFieldAllowanceManagedBean.selectRequest}" scrollable="true" class="dataTable"
+                                                     selectionMode="single" rowKey="#{perDiemList.id}" var="perDiemList" paginator="true"
+                                                     paginatorPosition="bottom"   rowsPerPageTemplate="5,10,15"
+                                                     resizableColumns="true"  rowIndexVar="num" rows="10">
+                                            <p:ajax event="rowSelect" listener="#{fmsFieldAllowanceManagedBean.selectRequestRow}"
+                                                    process="@this" update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmSample" />
+                                            <p:column headerText="#{FCMS.No}" width="100">
+                                                <h:outputText value="#{num+1}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Employee_ID}" filterBy="#{perDiemList.empId.empId}" filterMatchMode="contains" sortBy="#{perDiemList.empId.empId}" width="80">
+                                                <h:outputText value="#{perDiemList.empId.empId}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Employee_Name}" filterBy="#{perDiemList.empId.firstName}" resizable="true" filterMatchMode="contains" sortBy="#{perDiemList.empId.firstName}" width="130">
+                                                <h:outputText value="#{perDiemList.empId.firstName} #{perDiemList.empId.middleName}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Departement_Date}" width="100">
+                                                <h:outputText value="#{perDiemList.fromDate}"><f:convertDateTime  pattern="dd/MMM/yyyy" /></h:outputText> 
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Return_Date}" width="80">
+                                                <h:outputText value="#{perDiemList.toDate}"><f:convertDateTime  pattern="dd/MMM/yyyy" /></h:outputText> 
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Days}" width="50">
+                                                <h:outputText value="#{perDiemList.noOfDays}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Departure}" width="80">
+                                                <h:outputText value="#{perDiemList.departureAddressId.addressName}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Destination}" width="100">
+                                                <h:outputText value="#{perDiemList.returnedAddressId.addressName}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Transport_Mode}" width="85">
+                                                <h:outputText value="#{perDiemList.modeOfTransport}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Travel}"  width="85">
+                                                <h:outputText value="#{perDiemList.travelExpense}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Food}"  width="85">
+                                                <h:outputText value="#{perDiemList.mealsExpense}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Lodging}"  width="85">
+                                                <h:outputText value="#{perDiemList.hotelExpense}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Miscellaneous}"  width="120">
+                                                <h:outputText value="#{perDiemList.miscellaneousExpense}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.total}" width="50">
+                                                <h:outputText value="#{perDiemList.totalExpense}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Account_Code}" width="150">
+                                                <h:outputText value="#{perDiemList.display_conn}"/>
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Request_Date}" sortBy="#{perDiemList.preparedDate}" width="80">
+                                                <h:outputText value="#{perDiemList.preparedDate}"><f:convertDateTime  pattern="dd/MMM/yyyy" /></h:outputText> 
+                                            </p:column>
+                                            <p:column headerText="#{FCMS.Status}" filterMatchMode="equals" width="85" filterBy="#{perDiemList.status}" style="text-align: left">
+                                                <h:outputText value="#{perDiemList.wfStatus}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form  id="frmRegisterUI" class="form-horizontal"> 
+            <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" 
+                          rendered="#{fmsFieldAllowanceManagedBean.renderPnlCreatePerDiemLocal}" class="col-sm-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">#{FCMS.Travel_Advance_Request_Local}</h3>                       
+                            </div> 
+                            <div class="box-body">
+                                <div class="row"> 
+                                    <div class="col-sm-12 textBoxMargin6px"> 
+                                        <div class="col-sm-6 ">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Request_Number}: "/>
+                                            <div class="col-sm-8"> 
+                                                <p:inputText id="txtRequestNo" readonly="true" value="#{fmsFieldAllowanceManagedBean.reqNo}" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group required col-sm-12 textBoxMargin6px">                           
+                                        <div class="col-sm-6 ">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Employee_ID}: "/>
+                                            <div class="col-sm-3">
+                                                <p:autoComplete id="searchAutocomplete" value="#{fmsFieldAllowanceManagedBean.empEnty.empId}" 
+                                                                completeMethod="#{fmsFieldAllowanceManagedBean.SearchByEmpId}" style="width: 100%" 
+                                                                var="empLists"  itemValue="#{empLists.empId}" itemLabel="#{empLists}" readonly="#{workFlow.readonly}"
+                                                                forceSelection="true" placeholder="Search by ID"  scrollHeight="480"
+                                                                size="20" emptyMessage="no data" required="true" requiredMessage="Value is required: Search Employee ID"> 
+                                                    <p:ajax event="itemSelect" process="@this" update="@this,txtfname,searchAutocomplete"  
+                                                            listener="#{fmsFieldAllowanceManagedBean.getEmpId}" />
+                                                    <p:column headerText="#{FCMS.Employee_ID}" >
+                                                        <h:outputText  value="#{empLists.empId}" />
+                                                    </p:column>
+                                                    <p:column headerText="#{FCMS.Employee_Name}" >
+                                                        <h:outputText  value="#{empLists.firstName} #{empLists.middleName} #{empLists.lastName}" />
+                                                    </p:column>
+                                                </p:autoComplete> 
+                                                <p:message for="searchAutocomplete" display="icon" />
+                                            </div>
+                                            <div class="col-sm-5"> 
+                                                <p:inputText id="txtfname" placeholder="#{FCMS.Employee_Name}" readonly="true" value="#{fmsFieldAllowanceManagedBean.empEnty.firstName} #{fmsFieldAllowanceManagedBean.empEnty.middleName} #{fmsFieldAllowanceManagedBean.empEnty.lastName }" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class=" col-sm-12 textBoxMargin6px">                            
+                                        <div class="col-sm-6 form-group required">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Departure_Date}: "/>
+                                            <div class="col-sm-4">
+                                                <p:calendar id="departureDate" pattern="dd/MMM/yyyy" placeholder="dd/mm/yyyy" required="true"  requiredMessage="Value is required please select date " 
+                                                            readonly="#{workFlow.readonly}" converterMessage="Value must be in Date format"
+                                                            value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.fromDate}">
+                                                    <p:ajax event="dateSelect" listener="#{fmsFieldAllowanceManagedBean.FromDate}" 
+                                                            update="@this, txtReturnedDate, btnSave" />
+                                                </p:calendar>
+                                                <p:message for="departureDate" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 form-group required">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Departure_Place}: "/>
+                                            <div class="col-sm-6">
+                                                <p:inputText id="txtVisitedPlace" value="#{fmsFieldAllowanceManagedBean.allAddressUnitAsOne2}" placeholder="Select from the + button"
+                                                             class="form-control" required="true"  requiredMessage="Value is required please select from the + button "
+                                                             readonly="true" title="Departure Address">
+                                                </p:inputText>
+
+                                            </div>
+                                            <div class="col-sm-2">                                                                            
+                                                <p:commandButton id="btnFullAddress1" onclick="PF('dlgDestinAddress2').show();"  title="Add Departure Address"
+                                                                 partialSubmit="true" class="btn btn-primary" value="+"  disabled="#{workFlow.readonly}">
+                                                </p:commandButton> 
+                                                <p:message for="txtVisitedPlace" display="icon"/>
+                                            </div>
+
+                                        </div>  
+                                    </div>
+                                    <div class=" col-sm-12 textBoxMargin6px"> 
+                                        <div class="col-sm-6 form-group required">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Return_Date}: "/>
+                                            <div  class="col-sm-4" >
+                                                <p:calendar id="txtReturnedDate" pattern="dd/MMM/yyyy" placeholder="dd/mm/yyyy" required="true"  requiredMessage="Value is required please select date "
+                                                            mindate="today" converterMessage="Value must be in Date format"
+                                                            value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.toDate}"
+                                                            disabled="#{fmsFieldAllowanceManagedBean.txtRDatevisibility}" readonly="#{workFlow.readonly}">  
+                                                    <p:ajax event="dateSelect" update="txtNoOfDays, btnSave" 
+                                                            listener="#{fmsFieldAllowanceManagedBean.datdiff}"/>
+                                                </p:calendar> 
+                                                <p:message for="txtReturnedDate" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <p:inputText id="txtNoOfDays" value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.noOfDays} Days" 
+                                                             readonly="true" class="form-control"/> 
+                                            </div>
+                                        </div>              
+                                        <div class="col-sm-6 form-group required">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Destination_Place}: "/>
+                                            <div class="col-sm-6">
+                                                <p:inputText id="txtVisitedPlace1" value="#{fmsFieldAllowanceManagedBean.allAddressUnitAsOne}" placeholder="Select from + button"
+                                                             class="form-control" required="true"  requiredMessage="Value is required please select one from the + button"
+                                                             readonly="true" title="Destination Address">
+                                                </p:inputText>
+                                                <p:message for="txtVisitedPlace1" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-2">                                                                            
+                                                <p:commandButton id="btnFullAddress2" onclick="PF('dlgDestinAddress').show();" title="#{FCMS.Add_Destination_Address}"
+                                                                 partialSubmit="true" class="btn btn-primary" value="+"  disabled="#{workFlow.readonly}"/> 
+                                            </div>
+                                        </div>    
+                                    </div>
+                                    <div class="form-group required col-sm-12 textBoxMargin6px"> 
+                                        <div class="col-sm-6">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Departure_Time}: "/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="departureTime" style="width: 100%" required="true"  requiredMessage="Value is required please select one "
+                                                                 disabled="#{workFlow.readonly}"
+                                                                 value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.fromTime}">
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel=" After 2AM " itemValue="After 2AM"/>
+                                                    <f:selectItem itemLabel=" After 7PM " itemValue="After 7PM"/>
+                                                    <f:selectItem itemLabel=" After 2:30PM " itemValue="After 2:30PM"/>
+                                                    <p:ajax event="change" process="@this" listener="#{fmsFieldAllowanceManagedBean.getDtime(e)}"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="departureTime" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <h:outputLabel id="lblPrepareDate" class="control-label col-sm-4" value="#{FCMS.Prepared_Date}: "/>
+                                            <div class="col-sm-4"> 
+                                                <p:calendar id="preparedDate" pattern="dd/MMM/yyyy" placeholder="dd/mm/yyyy" required="true"  requiredMessage="Value is required please select date "
+                                                            readonly="#{workFlow.readonly}" converterMessage="Value Must be a Date"
+                                                            value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.preparedDate}" >  
+                                                </p:calendar>                      
+                                                <p:message  for="preparedDate" display="icon"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group required col-sm-12 textBoxMargin6px"> 
+                                        <div class="col-sm-6">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Returned_Time}: "/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="returnedTime" required="true"  requiredMessage="Value is required please select one "
+                                                                 value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.toTime}"
+                                                                 disabled="#{workFlow.readonly}" style="width: 100%"> 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel=" After 2AM " itemValue="After 2AM"/>
+                                                    <f:selectItem itemLabel=" After 7PM " itemValue="After 7PM"/>
+                                                    <f:selectItem itemLabel=" After 12PM " itemValue="After 12PM"/>
+                                                    <p:ajax   event="change" process="@this" listener="#{fmsFieldAllowanceManagedBean.getRtime(e)}" 
+                                                              update="@this,txtHotel,txtMeals"/>
+                                                </p:selectOneMenu>
+                                                <p:message for="returnedTime" display="icon"/>
+                                            </div>
+                                        </div> 
+                                        <div class="col-sm-6">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Mode_of_Transport}: "/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="modeOfTransport" style="width: 100%" required="true"  requiredMessage="Value is required please select one "
+                                                                 disabled="#{workFlow.readonly}"
+                                                                 value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.modeOfTransport}"> 
+                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                    <f:selectItem itemLabel=" Bus " itemValue="Bus"/>
+                                                    <f:selectItem itemLabel=" Car " itemValue="Car"/>
+                                                    <f:selectItem itemLabel=" Plane " itemValue="Plane"/>
+                                                    <f:selectItem itemLabel=" Train " itemValue="Train"/>
+                                                    <p:ajax    event="change" process="@this" />
+                                                </p:selectOneMenu>
+                                                <p:message for="modeOfTransport" display="icon"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group required col-sm-12 textBoxMargin6px"> 
+                                        <div class="col-sm-6">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Purpose}: "/>
+                                            <div class="col-sm-8">
+                                                <p:column headerText="#{FCMS.Purpose}">
+                                                    <h:inputTextarea id="txtPurpose" value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.purpose}" 
+                                                                     required="true"  requiredMessage="Value is required please enter the purpose " 
+                                                                     class="form-control" readonly="#{workFlow.readonly}" style="width: 100%" 
+                                                                     validator="#{validatorManagedBean.AlphaNumericText}" converterMessage="Value must be a text"/>
+                                                </p:column>
+                                                <p:message for="txtPurpose" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Remark}:"/>
+                                            <div class="col-sm-8">
+                                                <p:column headerText="#{FCMS.Remark}">
+                                                    <h:inputTextarea id="txtRemark" value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.preparedRemark}" 
+                                                                     required="true"  requiredMessage="Value is required please enter a remark "
+                                                                     validator="#{validatorManagedBean.Remark}" converterMessage="Value must be a remark"
+                                                                     class="form-control" readonly="#{workFlow.readonly}" style="width: 100%" />
+                                                </p:column>
+                                                <p:message for="txtRemark" display="icon"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Expenses</h3>                       
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-sm-12 textBoxMargin6px">                         
+                            <div class="col-sm-6 form-group required ">
+                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Travel}: "/>
+                                <div class="col-sm-5">
+                                    <p:inputText id="txtTravel" value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.travelExpense}" 
+                                                 converter="#{fmsFieldAllowanceForeignManagedBean.numberConverter}" validator="#{validatorManagedBean.Money}"
+                                                 converterMessage="Value must be a number"
+                                                 required="true"  requiredMessage="Value is required please enter a value or select the box "
+                                                 class="form-control" readonly="#{fmsFieldAllowanceManagedBean.isCheckedNoneTravel}"> 
+                                        <p:ajax process="@this" update="txtTotal" listener="#{fmsFieldAllowanceManagedBean.travel(event)}" 
+                                                event="change" />
+                                    </p:inputText>  
+                                    <p:message for="txtTravel" display="icon"/>
+                                </div>
+                                <div class="col-sm-3">
+                                    <p:selectBooleanCheckbox id="chkIsNoneTravel" value="#{fmsFieldAllowanceManagedBean.isCheckedNoneTravel}" 
+                                                             valueChangeListener="#{fmsFieldAllowanceManagedBean.onCheckNoneTravelEvent}"
+                                                             disabled="#{workFlow.readonly}">
+                                        <p:ajax event="valueChange" process="@this" update="txtTravel,txtTotal" />
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel for="chkIsNoneTravel" value="  #{FCMS.None_Travel}" style="color: #0072b1;"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 ">
+                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Lodging}: "/>
+                                <div class="col-sm-4"> 
+                                    <p:inputText id="txtHotel" value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.hotelExpense}" 
+                                                 readonly="true" class="form-control" converter="#{fmsFieldAllowanceForeignManagedBean.numberConverter}"/> 
+                                    <p:message for="txtHotel" display="icon"/>
+                                </div>
+                                <div class="col-sm-4">
+                                    <p:selectBooleanCheckbox id="chkIsNoneLodging" value="#{fmsFieldAllowanceManagedBean.isCheckedNoneLodging}" 
+                                                             valueChangeListener="#{fmsFieldAllowanceManagedBean.onCheckNoneLodgingEvent}"
+                                                             disabled="#{workFlow.readonly}">
+                                        <p:ajax event="valueChange" process="@this" update="txtHotel,txtTotal" />
+                                    </p:selectBooleanCheckbox>
+                                    <p:outputLabel for="chkIsNoneLodging" value="  #{FCMS.None_Lodging}" style="color: #0072b1;"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" col-sm-12 textBoxMargin6px">                          
+                            <div class="col-sm-6 form-group required">
+                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Miscellaneous}: "/>
+                                <div class="col-sm-8"> 
+                                    <p:inputText id="txtMiscellaneous" value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.miscellaneousExpense}"
+                                                 validator="#{validatorManagedBean.Money}" converterMessage="Value must be a number"
+                                                 required="true"  requiredMessage="Value is required please enter a value"
+                                                 class="form-control" readonly="#{workFlow.readonly}"> 
+                                        <p:ajax event="change" process="@this" update="txtTotal" 
+                                                listener="#{fmsFieldAllowanceManagedBean.totalExpense}"/>
+                                    </p:inputText>
+                                    <p:message for="txtMiscellaneous" display="icon"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Food}: "/>
+                                <div class="col-sm-8">
+                                    <p:inputText id="txtMeals"  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.mealsExpense}"
+                                                 readonly="true" class="form-control"/> 
+                                    <p:message for="txtMeals" display="icon"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="textBoxMargin6px col-sm-12">                           
+                            <div class="col-sm-6">
+                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Processed_By}: "/>
+                                <div class="col-sm-8"> 
+                                    <p:inputText id="txtPreparedBy" value="#{fmsFieldAllowanceManagedBean.userName}"
+                                                 readonly="true" class="form-control"/>
+                                    <p:message for="txtPreparedBy" display="icon"  class="col-sm-6 control-label"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.total}: "/>
+                                <div class="col-sm-8">
+                                    <p:inputText id="txtTotal" value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.totalExpense}"
+                                                 readonly="true" class="form-control"/> 
+                                    <p:message for="txtTotal" display="icon"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="textBoxMargin6px col-sm-12">
+                            <div class="col-sm-6">
+                                <p:outputLabel  for="txtProcessedOn" class="control-label col-sm-4"
+                                                id="lblApproved" value="#{FCMS.Processed_Date}:" />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtProcessedOn" readonly="true" class="form-control"  placeholder="dd/mm/yyyy"
+                                                 value="#{fmsFieldAllowanceManagedBean.wfFcmsProcessed.processedOn}"  
+                                                 title="ProcessedOn"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Account_Code}:"/>
+                                <div class="col-sm-6">
+                                    <p:inputText id="txtDebitCode1" value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.display_conn}" 
+                                                 class="form-control"  readonly="true" placeholder="Select from the + button"/>
+                                </div>
+                                <div class="col-sm-2">
+                                    <p:commandButton id="btnAddCreditCode" partialSubmit="true" class="btn btn-primary" value="+" onclick="PF('dig1').show();" title="#{FCMS.Add_Account_Code}"
+                                                     disabled="#{workFlow.readonly}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="textBoxMargin6px col-sm-12">
+                            <div class="col-sm-6">
+                                <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Decision}" rendered="#{fmsFieldAllowanceManagedBean.isRenderDecision}"/>
+                                <div class="col-sm-6">
+                                    <p:selectOneRadio id="rdoDecision" style="width: 100%" rendered="#{fmsFieldAllowanceManagedBean.isRenderDecision}" 
+                                                      value="#{fmsFieldAllowanceManagedBean.selectedDecision}" required="true">
+                                        <f:selectItem itemLabel="Approve" itemValue="Approved"/>
+                                        <f:selectItem itemLabel="Reject" itemValue="Rejected"/>
+                                    </p:selectOneRadio>
+                                    <p:message for="rdoDecision" display="icon"/>
+                                </div>    
+                            </div> 
+                        </div>
+                        <div class="textBoxMargin6px col-sm-12">
+                            <div class="col-sm-6">
+                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Comment}" rendered="#{fmsFieldAllowanceManagedBean.isRenderDecision}"/>
+                                <div class="col-sm-8">
+                                    <p:column headerText="#{FCMS.Comment}">
+                                        <h:inputTextarea id="txtReparedRemark" value="#{fmsFieldAllowanceManagedBean.wfFcmsProcessed.commentGiven}"
+                                                         rendered="#{fmsFieldAllowanceManagedBean.isRenderDecision}"
+                                                         class="form-control"  style="width: 100%" > </h:inputTextarea> 
+                                    </p:column> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="textBoxMargin6px col-sm-12">
+                            <div class="col-sm-6">
+                                <h:outputLabel class="control-label col-sm-4" value=""/>
+                                <div class="col-sm-3"> 
+                                    <p:commandButton  id="btnSave" class="btn btn-primary " value="#{fmsFieldAllowanceManagedBean.saveorUpdateBundle}"
+                                                      action="#{fmsFieldAllowanceManagedBean.saveFieldAllowanceLocal()}" 
+                                                      disabled="#{fmsFieldAllowanceManagedBean.txtRDatevisibility}"
+                                                      process="@this,frmRegisterUI" update="@this,frmRegisterUI,:frmSample"/>  
+                                </div>
+                                <div class="col-sm-3 ">
+                                    <p:commandButton id="btnPrint" value="#{FCMS.Print}" class="btn btn-primary " 
+                                                     rendered="#{fmsFieldAllowanceManagedBean.renderBtnPrint}" >
+                                        <p:printer target="pnlPrint" />
+                                    </p:commandButton>                                          
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </h:panelGroup>
+            <p:dialog id="dig1" header="Account Code"  widgetVar="dig1" height="260" width="650" showEffect="explode" resizable="false">
+                <h:panelGroup id="pnlCreditcode" class="col-sm-12">
+                    <div class="col-md-12 textBoxMargin6px">                                                                
+                        <div class="form-group required form-horizontal">
+                            <h:outputLabel  for="sysSearch" class="control-label col-sm-4" value="#{FCMS.System}:"/>
+                            <div class="col-sm-8">
+                                <p:selectOneMenu id="sysSearch" value="#{bankDebitAdviceController.fmsLuSystem}"
+                                                 filterMatchMode="contains" filter="true" converter="entConverter"
+                                                 valueChangeListener="#{bankDebitAdviceController.onChangeSystem}" required="true" requiredMessage="Value is Required" style="width: 100%">
+                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                    <f:selectItems value="#{bankDebitAdviceController.systemList}" var="sys" itemLabel="#{sys.systemCode}" itemValue="#{sys}" />
+                                    <p:ajax event="change" process="@this" update="drdCostCenter,pnljob,glSearch"/>
+                                </p:selectOneMenu> 
+                                <p:message for="sysSearch" display="icon"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 textBoxMargin6px">                                                                
+                        <div class="form-group required form-horizontal">
+                            <h:outputLabel  for="drdCostCenter"  class="control-label col-sm-4" value="#{FCMS.Cost_Center}"/>
+                            <div class="col-sm-8">
+                                <p:selectOneMenu id="drdCostCenter" value="#{bankDebitAdviceController.fmsCostcSystemJunction}" 
+                                                 converter="entConverter"  filterMatchMode="contains" filter="true" required="true" requiredMessage="Value is Required"
+                                                 valueChangeListener="#{bankDebitAdviceController.onChangeCostCenter}" style="width: 100%">
+                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                    <f:selectItems value="#{bankDebitAdviceController.ssCcJunctionList}" var="costC"
+                                                   itemLabel="#{costC.fmsCostCenter.systemName} " itemValue="#{costC}"/>
+                                    <p:ajax event="change" process="@this" />
+                                </p:selectOneMenu>
+                                <p:message for="drdCostCenter" display="icon"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 textBoxMargin6px">                                                                
+                        <div class="form-group required form-horizontal">
+                            <h:outputLabel  for="glSearch" class="control-label col-sm-4" value="#{FCMS.General_Ledger}:"/>
+                            <div class="col-sm-8">
+                                <p:selectOneMenu id="glSearch" value="#{bankDebitAdviceController.fmsGeneralLedger}"
+                                                 converter="entConverter" filterMatchMode="contains" filter="true" 
+                                                 valueChangeListener="#{bankDebitAdviceController.onChangeGeneralLedger}"  
+                                                 required="true" requiredMessage="Value is required: Select General Ledger" style="width: 100%">
+                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                    <f:selectItems value="#{bankDebitAdviceController.glList}" var="glVarr"
+                                                   itemLabel="#{glVarr.generalLedgerCode}" itemValue="#{glVarr}"/>
+                                    <p:ajax event="change" process="@this" update="selectSubL" />
+                                </p:selectOneMenu>   
+                                <p:message for="glSearch" display="icon"/>
+                            </div>
+                        </div>
+                    </div>
+                    <h:panelGroup id="pnljob">
+                        <h:panelGroup id="pnlJOBNO" rendered="#{bankDebitAdviceController.renderJobNo}">
+                            <div class="col-md-12 textBoxMargin6px">                                                                
+                                <div class="form-group required form-horizontal">
+                                    <h:outputLabel  for="jbSearch" class="control-label col-sm-4" value="#{FCMS.Job_No}:"/>
+                                    <div class="col-sm-8">
+                                        <p:selectOneMenu id="jbSearch"  value="#{bankDebitAdviceController.fmsSystemJobJunction}" 
+                                                         converter="entConverter" filterMatchMode="contains" filter="true" 
+                                                         valueChangeListener="#{bankDebitAdviceController.onChangeJobNo}" 
+                                                         required="true" requiredMessage="Value is required: Select Job Number" style="width: 100%" >
+                                            <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                            <f:selectItems value="#{bankDebitAdviceController.sysJobNOList}" var="sysJobVar"
+                                                           itemLabel="#{sysJobVar.jobNo}" itemValue="#{sysJobVar}"/>
+                                            <p:ajax event="change" process="@this"/>
+                                        </p:selectOneMenu>
+                                        <p:message for="jbSearch" display="icon"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                    <div class="col-md-12 textBoxMargin6px">                                                                
+                        <div class="form-group required form-horizontal">
+                            <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Subsidiary_Ledger}:" />
+                            <div class="col-sm-8">
+                                <p:selectOneMenu id="selectSubL" value="#{fmsFieldAllowanceManagedBean.fmsSubsidiaryLedger}"
+                                                 converter="entConverter" filterMatchMode="contains" filter="true" 
+                                                 valueChangeListener="#{fmsFieldAllowanceManagedBean.onChangeSubsidiaryLedger}"  
+                                                 required="true" requiredMessage="Value is required: Select Subsidiary Ledger" style="width: 100%">
+                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                    <f:selectItems value="#{bankDebitAdviceController.slList}" var="slVar"
+                                                   itemLabel="#{slVar.subsidiaryCode}" itemValue="#{slVar}"/>
+                                    <p:ajax event="change" process="@this" update="@this" />
+                                </p:selectOneMenu>  
+                                <p:message for="selectSubL" display="icon"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 textBoxMargin6px">                                                                
+                        <div class="form-group form-horizontal">
+                            <h:outputLabel id="buttonaddDtl" class="control-label col-sm-4"/>
+                            <div class="col-sm-8">
+                                <p:commandButton id="btnAdd" class="btn btn-primary" value="#{FCMS.Add}" validateClient="true" 
+                                                 action="#{fmsFieldAllowanceManagedBean.addAccountInfoDetail()}"
+                                                 process="@this,dig1" update="@this,dig1,:frmRegisterUI:txtDebitCode1" /> 
+                            </div>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </p:dialog>
+            <!--Departure Address-->
+            <p:dialog id="dlgDestinAddress2" header="#{FCMS.Departure_Address }" widgetVar="dlgDestinAddress2" height="300" width="500" showEffect="explode">
+                <h:panelGrid columns="3" >
+                    <p:tree id="addressTree2" value="#{fmsFieldAllowanceManagedBean.addressRoot2}" var="node2" dynamic="true" 
+                            selectionMode="single" animate="true" selection="#{fmsFieldAllowanceManagedBean.addressSelectedNode2}"  
+                            style="width: 100%; height: 100%; overflow: auto; display: block; border: transparent; border-style: inset" class="col-lg-12">
+                        <p:treeNode id="treeNode2" expandedIcon="ui-icon ui-icon-folder-open" 
+                                    collapsedIcon="ui-icon ui-icon-folder-collapsed">
+                            <h:outputText value="#{node2}" id="nodetxt2"/>                                                                
+                        </p:treeNode>
+                        <p:ajax event="select" listener="#{fmsFieldAllowanceManagedBean.onAddressNodeSelect2}"
+                                process="@this,:frmRegisterUI:txtVisitedPlace" 
+                                update=":frmRegisterUI:txtVisitedPlace"  oncomplete="PF('dlgDestinAddress2').hide();"/>
+                    </p:tree>                                   
+                </h:panelGrid>
+            </p:dialog>
+            <!--Return Address = Destination Address --> 
+            <p:dialog id="dlgDestinAddress" header="Destination Address" widgetVar="dlgDestinAddress" height="300" width="500"  showEffect="explode">
+                <h:panelGrid columns="3" >
+                    <p:tree id="addressTree" value="#{fmsFieldAllowanceManagedBean.addressRoot}" var="node" dynamic="true" 
+                            selectionMode="single" animate="true" selection="#{fmsFieldAllowanceManagedBean.addressSelectedNode}"  
+                            style="width: 100%; height: 100%; overflow: auto; display: block; border: transparent; border-style: inset" class="col-lg-12">
+                        <p:treeNode id="treeNode" expandedIcon="ui-icon ui-icon-folder-open" 
+                                    collapsedIcon="ui-icon ui-icon-folder-collapsed">
+                            <h:outputText value="#{node}" id="nodetxt"/>                                                                
+                        </p:treeNode>
+                        <p:ajax event="select" listener="#{fmsFieldAllowanceManagedBean.onAddressNodeSelect}"
+                                process="@this,:frmRegisterUI:txtVisitedPlace1" 
+                                update=":frmRegisterUI:txtVisitedPlace1" oncomplete="PF('dlgDestinAddress').hide();"/>
+                    </p:tree>                                   
+                </h:panelGrid>
+            </p:dialog>
+            <p:panel id="pnlPrint" class="visible-print" style="border: 0">
+                <div id="wrapper">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-12 text-center">
+                                    <img src="/ERP-war/resources/image/trrtrret.png" alt="EEP logo"/>
+                                    <h4><b> Ethiopian Electric Power</b></h4>
+                                    <h4><b>Travel Advance Request Form</b> </h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-right">   
+                                <h3><b>ORIGINAL</b></h3>
+                                <small>[For Travel Advance for journey]</small><br></br>
+                                <small>Date: <h:outputText value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.preparedDate}"><f:convertDateTime  pattern="dd/MM/yyyy" /></h:outputText> </small>      
+                            </div>
+                            <div class="col-md-12 ">
+                                <h5>1. Employee No.:<p:spacer width="30" height="20" /><h:outputText value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.empId.empId}"/></h5>
+                                <h5>2. Name:<p:spacer width="80" height="20" /><h:outputText value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.empId.firstName} #{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.empId.middleName} #{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.empId.lastName}"/> </h5>         
+                                <h5>3. Designation: <p:spacer width="40" height="20" /><h:outputText value="#{fmsFieldAllowanceManagedBean.empEnty.deptId.depName}" /></h5>
+                                <h5><h:outputText value="" /><p:spacer width="160" height="20" /><u><h:outputText value="Date" /></u> <p:spacer width="115" height="20" /><u><h:outputText value="Time" /></u></h5>
+                                <h5>4. Departure Date: <p:spacer width="40" height="20" /><h:outputText  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.fromDate}" ><f:convertDateTime  pattern="dd/MM/yyyy" /></h:outputText> <p:spacer width="70" height="20" /><h:outputText  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.fromTime}" /> </h5>
+                                <h5>5. Returned Date: <p:spacer width="46" height="20" /><h:outputText  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.toDate}" ><f:convertDateTime  pattern="dd/MM/yyyy" /></h:outputText><p:spacer width="70" height="20" /><h:outputText  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.toTime}" /> </h5>
+                                <h5>6. Mode of Transport:<p:spacer width="26" height="20" /><h:outputText  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.modeOfTransport}"/> </h5>
+                                <h5>7. Total No. of Days at the Destination:<p:spacer width="20" height="27" /><h:outputText  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.noOfDays}"/><p:spacer width="10" height="20" /><h:outputText value="Days" /> </h5>
+                                <h5>8. Purpose of Tour:<p:spacer width="150" height="20" /><h:outputText  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.purpose}"/> </h5>
+                                <h5>9. Names of the Place Visited:<p:spacer width="80" height="20" /><u><h:outputText  value="#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.returnedAddressId}"/> </u></h5>
+                                <h5>10. Signature of the Office authorizing:<p:spacer width="20" height="0" /><h:outputText value="__________________________"/> </h5>
+                                <h5>11. Actual Expenses </h5>
+                            </div>         
+                        </div>
+                        <div class="row">
+                            <div class="form-horizontal col-md-12">                            
+                                <p:panelGrid style="margin-top:0px">
+                                    <f:facet name="header">
+                                        <p:row>
+                                            <p:column >Expenses</p:column>
+                                            <p:column style="text-align: center">No. of Days</p:column>
+                                            <p:column ></p:column>
+                                            <p:column width="400">Rate (Birr)</p:column>
+                                            <p:column width="400">Amount (Birr)</p:column>
+                                        </p:row>
+                                    </f:facet>
+                                    <p:row>
+                                        <p:column >Meals</p:column>
+                                        <p:column style="text-align: center">#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.noOfDays}</p:column>
+                                        <p:column >  X </p:column>
+                                        <p:column style="text-align: right">#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.mealsExpense}</p:column>
+                                        <p:column style="text-align: right">#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.noOfDays * fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.mealsExpense}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column >Lodging</p:column>
+                                        <p:column style="text-align: center">#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.noOfDays}</p:column>
+                                        <p:column > X </p:column>
+                                        <p:column style="text-align: right">#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.hotelExpense}</p:column>
+                                        <p:column style="text-align: right">#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.noOfDays * fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.hotelExpense}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column  colspan="4">Bus, Taxi, Plane, etc.</p:column>
+                                        <p:column  style="text-align: right">#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.travelExpense}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column  colspan="4" >Miscellaneous Expenses </p:column>
+                                        <p:column  style="text-align: right">#{fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.miscellaneousExpense} </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column  colspan="4" > Total Cash Advance Requested </p:column>
+                                        <p:column  colspan="4" style="font-weight: bold;text-align: right"> #{(fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.noOfDays * fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.mealsExpense)+
+                                                                                                              (fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.noOfDays * fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.hotelExpense)+ 
+                                                                                                              fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.miscellaneousExpense + 
+                                                                                                              fmsFieldAllowanceManagedBean.fmsFieldAllowanceEnty.travelExpense} 
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column  colspan="5" >
+                                            Amount in Words (amount in words here)
+                                        </p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                            </div>                                          
+                        </div> 
+                        <p:spacer height="20"/>
+                        <div class="row" >
+                            <div class="col-md-12">
+                                <p>I Agree that with in two weeks of my return from the trip identified above I will submit my receipts and other documentation of
+                                    business expenses to clear the advance and repay any excess. In the event I fail to comply, I here by authorize deduction of the 
+                                    amounts from my salary.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row" >                                                      
+                            <div class="col-md-12 ">
+                                <h5>Signature of Employee: _____________________<p:spacer width="25" height="20" />Date_____________</h5>
+                                <h5>Finance Department: _______________________<p:spacer width="25" height="20" />Date_____________ </h5>         
+                                <h5>Checked by: ______________________________<p:spacer width="25" height="20" />Date_____________</h5>
+                                <h5>Approved by: _____________________________<p:spacer width="28" height="20" />Date_____________ </h5>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </p:panel>
+        </h:form>          
+    </ui:define>
+</ui:composition>          

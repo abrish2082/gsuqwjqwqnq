@@ -1,0 +1,819 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li>
+            <a href="RevenueContract.xhtml"><i class="fa fa-circle-o"></i>Revenue Contract </a>
+        </li>
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone" action="#{financialInstrumentRegisterController.createNewAdditionalAmount()}" 
+                                     icon="#{financialInstrumentRegisterController.icone}" validateClient="true" style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title ="#{financialInstrumentRegisterController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    <a href="FinancialInstrumentRegister.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dasboard"></i>  </a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: white; background-color: transparent" id="mainUI" rendered="#{financialInstrumentRegisterController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Financial_Instrument_Search}</h3>
+                    </div>
+                    <div class="box-body">
+
+                        <div class="box-body">
+                            <div class="col-md-12">                                        
+                                <div class="col-sm-12">
+                                    <div class="col-sm-6"> 
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="form-horizontal col-sm-12">   
+                                                <p:outputLabel  value="#{FCMS.searching_By}: " class="control-label col-sm-4"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="columnName" value="#{financialInstrumentRegisterController.columnNameResolver.col_Name_FromTable}" 
+                                                                     valueChangeListener="#{financialInstrumentRegisterController.selectedParamChangeEvent}"
+                                                                     style="width:100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{financialInstrumentRegisterController.columnNameResolverList}"
+                                                                       var="financeIns" itemLabel="#{financeIns.parsed_Col_Name}" itemValue="#{financeIns.col_Name_FromTable}" /> 
+                                                        <p:ajax event="change" process="@this" update="columnName,lbFinanceInst,autoFinanceInst"/>
+                                                    </p:selectOneMenu> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="form-horizontal col-sm-12 "> 
+                                                <h:outputLabel id="lbFinanceInst" class="control-label col-sm-4" value="#{financialInstrumentRegisterController.columnNameResolver.parsed_Col_Name}:"/>
+                                                <div class="col-sm-8">
+                                                    <p:autoComplete id="autoFinanceInst"  style="width: 100%;" value="#{financialInstrumentRegisterController.finInstrumentRegister.columnValue}"
+                                                                    completeMethod="#{financialInstrumentRegisterController.searchByFinancialInstColumn}" var="financialInstList" converter="entConverter"
+                                                                    itemValue="#{financialInstList}" itemLabel="#{financialInstList.issuedDate}" 
+                                                                    forceSelection="true" size="20" emptyMessage="no data" scrollHeight="500">  
+                                                        <p:ajax event="itemSelect" listener="#{financialInstrumentRegisterController.getByFinancialInstColumn}" 
+                                                                process="@this" update="tblFinInstrument,:frmToolbar"/>
+                                                    </p:autoComplete>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p:panel id="pnldtabel" style="border: white">
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <p:dataTable id="tblFinInstrument"
+                                                         value="#{financialInstrumentRegisterController.financialRegisterList}"
+                                                         style="font-size: 11px"
+                                                         rows="10"
+                                                         paginator="true"
+                                                         paginatorPosition="bottom"
+                                                         rowsPerPageTemplate="5,10,15"
+                                                         rowIndexVar="numbers"
+                                                         var="addinfo"
+                                                         selectionMode="single"
+                                                         resizableColumns="true"
+                                                         selection="#{financialInstrumentRegisterController.financialRegSelect}"
+                                                         rowKey="#{addinfo.registerId}" >
+                                                <p:ajax event="rowSelect" listener="#{financialInstrumentRegisterController.getRegNo}"
+                                                        process="@this" update="@(form)">
+                                                </p:ajax>
+                                                <p:column style="width: 60px" headerText ="No" >
+                                                    <h:outputText value="#{numbers+1}"/>  
+                                                </p:column>
+                                                <p:column headerText ="#{FCMS.General_Ledger}">
+                                                    <h:outputText value="#{addinfo.generalLedger}" />
+                                                </p:column> 
+                                                <p:column  headerText ="#{FCMS.Subsidiary_Ledger}">
+                                                    <h:outputText value="#{addinfo.subsidiaryLedger}" />
+                                                </p:column>  
+                                                <p:column headerText ="#{FCMS.Registered_Date}">
+                                                    <h:outputText value="#{addinfo.issuedDate}">
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column> 
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>  
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" 
+                          rendered="#{financialInstrumentRegisterController.renderPnlCreateAdditional}" >
+                <div class="box box-primary">
+                    <p:tabView>
+                        <p:tab id="tabFinReg"  class="box-header with-border" 
+                               title="#{FCMS.Financial_Instrument_Registration}">
+                            <h:form id="frmFinasReg">
+                                <h:panelGroup style="border: 0px; background-color: white" id="PGFinasReg" class="col-sm-12">
+                                    <div class="box-body">
+                                        <div class="col-md-12">
+                                            <div class="col-md-6">
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel class="control-label col-sm-4" for="txtGL" value="#{FCMS.General_Ledger_Code}:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtGL" value="#{financialInstrumentRegisterController.generalLedger.generalLedgerId}"
+                                                                             valueChangeListener="#{financialInstrumentRegisterController.handleSelectGlCode}"
+                                                                             filter="true" style="width: 100%" required="true" requiredMessage="GL Code is required please select one" >
+                                                                <f:selectItem itemValue="" itemLabel="--- Select One ---" />
+                                                                <f:selectItems id="GL2" var="glCode" itemLabel="#{glCode.generalLedgerCode}" 
+                                                                               itemValue="#{glCode.generalLedgerId}" 
+                                                                               value="#{financialInstrumentRegisterController.getGlList()}" />
+                                                                <p:ajax process="@this," update="txtSL"  event="change" />
+                                                            </p:selectOneMenu>    
+                                                            <p:message for="txtGL" display="icon"  />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel for="txtSL" class="control-label col-sm-4" value="#{FCMS.Subsidiary_Ledger}: "></h:outputLabel>   
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtSL"  value="#{financialInstrumentRegisterController.finInstrumentRegister.subsidiaryLedger}" style= "width: 100%"
+                                                                             converter="entConverter" required="true" requiredMessage="subsidiary Ledger is required and please select one">
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItems  value="#{financialInstrumentRegisterController.subsideryCodeList}"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="txtSL" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel for="txtFinInstType" class="control-label col-sm-4" value="#{FCMS.Financial_Instrument_Type}:"/>   
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtFinInstType"  value="#{financialInstrumentRegisterController.finInstType}" 
+                                                                             valueChangeListener="#{financialInstrumentRegisterController.handleMeasurementType}"
+                                                                             converter="entConverter"  style= "width: 100%" required="true" requiredMessage="Instrument type is required and please select one">
+                                                                <f:selectItems  var="instType" itemLabel="#{instType.name}" itemValue="#{instType.name}"
+                                                                                value="#{financialInstrumentRegisterController.financialInstTypeList}" />
+                                                                <p:ajax event="change" process="@this" update="txtFinMeasuType"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="txtFinInstType" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal">
+                                                        <h:outputLabel for="txtFinMeasuType"  class="control-label col-sm-4" value="#{FCMS.Financial_Instrument_Type}:"/>
+                                                        <div class="col-sm-6">
+                                                            <p:selectOneMenu id="txtFinMeasuType"  value="#{financialInstrumentRegisterController.finInstMeasure}"
+                                                                             style="width:100%"  converter="entConverter" 
+                                                                             valueChangeListener="#{financialInstrumentRegisterController.addMeasurmentType}"
+                                                                             required="true" requiredMessage="Measurement Type is required and please select one" > 
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItems  value="#{financialInstrumentRegisterController.finInstMeasureList}"/>
+                                                                <p:ajax event="change" process="@this,txtFinMeasuType" 
+                                                                        update="@this,:frmRegisterUI:measurTypedig,:frmRegisterUI:FVTPLvarpnl" />
+                                                            </p:selectOneMenu>
+                                                            <p:message for="txtFinMeasuType" display="icon"/>
+                                                        </div>
+                                                        <div class ="col-sm-2">
+                                                            <p:commandButton id="btnAdd" value="+" class="btn btn-primary" 
+                                                                             type="button" onclick="PF('measurTypedig').show();"/>
+
+                                                        </div>  
+                                                    </div>
+                                                </div> 
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel for="txtFinAssetType" class="control-label col-sm-4" value="#{FCMS.Financial_Asset_Type}: "></h:outputLabel>   
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtFinAssetType"  value="#{financialInstrumentRegisterController.finAssetType}" 
+                                                                             converter="entConverter" style= "width: 100%" required="true" requiredMessage="measurement type is required and please select one">
+                                                                <f:selectItems  value="#{financialInstrumentRegisterController.financialAssetTypeList}"  />
+
+                                                            </p:selectOneMenu>
+                                                            <p:message for="txtFinAssetType" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-group required  form-horizontal">
+                                                        <h:outputLabel for="txtIssuedDate" class="control-label col-sm-4" value="#{FCMS.Issued_Date}:"></h:outputLabel> 
+                                                        <div class="col-sm-8 ">
+                                                            <p:calendar id="txtIssuedDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" title="End Date"
+                                                                        value="#{financialInstrumentRegisterController.finInstrumentRegister.issuedDate}" required="true"
+                                                                        requiredMessage=" Date value is Required" converterMessage="Value must be in Date formst"/>
+                                                            <p:message for="txtIssuedDate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel for="txtInterestRate" class="control-label col-sm-4" value="#{FCMS.Interest_Rate}: "></h:outputLabel> 
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtInterestRate"   value="#{financialInstrumentRegisterController.finInstrumentRegister.interestRate}"
+                                                                         class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                                         title="TypeId" required="true" requiredMessage="Interest Rate field is required." />
+                                                            <p:message for="txtInterestRate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <h:panelGroup id="pnlSaveEmp">
+                                                    <div class="panel-body col-sm-12">
+                                                        <div class="form-group col-sm-12">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4"></div>                                           
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnsave" class="btn btn-primary"
+                                                                                     action="#{financialInstrumentRegisterController.saveFinancialInstrument()}"
+                                                                                     value="#{financialInstrumentRegisterController.saveUpdate}"
+                                                                                     process="@this,:frmRegisterUI"
+                                                                                     update="@this,:frmRegisterUI"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group  form-horizontal">
+                                                        <h:outputLabel for="searchCurrency" class="control-label col-sm-4" value="#{FCMS.Currency}: "></h:outputLabel> 
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="searchCurrency"  value="#{financialInstrumentRegisterController.fmsLuCurrency}"
+                                                                             style= "width: 100%" converter="entConverter">
+                                                                <f:selectItems  value="#{financialInstrumentRegisterController.currencyList}"  />
+                                                                <p:message for="searchCurrency" display="icon"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal">
+                                                        <h:outputLabel for="txtcarryingAmount" class="control-label col-sm-4" value=" #{FCMS.Initial_Amount} : "></h:outputLabel>   
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtcarryingAmount"
+                                                                         value="#{financialInstrumentRegisterController.finInstrumentRegister.carryngAmount}"  validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                                         class="form-control" converter="#{financialInstrumentRegisterController.numberConverter}" style="width: 100%" >
+                                                                <p:ajax event="select" process="@this" update="@this"/>
+                                                            </p:inputText>  
+                                                            <p:message for="txtcarryingAmount" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group  form-horizontal">
+                                                        <h:outputLabel for="txtBondType" class="control-label col-sm-4" value="#{FCMS.Bond_Type}"></h:outputLabel> 
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtBondType"  value="#{financialInstrumentRegisterController.finInstrumentRegister.bondType}"
+                                                                             style= "width: 100%" converter="entConverter">
+                                                                <f:selectItem itemLabel=" --- select one ---" itemValue="" />
+                                                                <f:selectItems  value="#{financialInstrumentRegisterController.lubondTypeList}"
+                                                                                var="bondType" itemLabel="#{bondType.name}" itemValue="#{bondType.name}"/>
+
+                                                                <p:message for="txtBondType" display="icon"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-group required  form-horizontal">
+                                                        <h:outputLabel for="chkAssetStatus" class="control-label col-sm-4" value="#{FCMS.Asset_Status}:"></h:outputLabel> 
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="chkAssetStatus" required="true" class="col-sm-4"
+                                                                             value="#{financialInstrumentRegisterController.finInstrumentRegister.assetStatus}"
+                                                                             filter="true" style="width: 100%" requiredMessage="Value is Required.">
+                                                                <f:selectItem itemLabel=" ---select one---" itemValue="" />
+                                                                <f:selectItem itemLabel=" Active" itemValue="Active" />
+                                                                <f:selectItem itemLabel=" Cancelled" itemValue="Cancelled" />                            
+                                                                <f:selectItem itemLabel=" Discharged" itemValue="Discharged" />   
+                                                                <f:selectItem itemLabel=" Expired" itemValue="Expired" />  
+                                                            </p:selectOneMenu>
+                                                            <p:message for="chkAssetStatus" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-group required  form-horizontal">
+                                                        <h:outputLabel for="txtReportDate" class="control-label col-sm-4" value="#{FCMS.Reporting_Date}:"></h:outputLabel> 
+                                                        <div class="col-sm-8">
+                                                            <p:calendar id="txtReportDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" title="Reporting Date" converterMessage="Value must be in Date format"
+                                                                        value="#{financialInstrumentRegisterController.finInstrumentRegister.reportingDate}" 
+                                                                        required="true"
+                                                                        requiredMessage=" Date value is Required"/>
+                                                            <p:message for="txtReportDate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px ">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel for ="txtDescription"  class="control-label col-sm-4" value="#{FCMS.Asset_Description}:" />
+                                                        <div class="col-sm-8">
+                                                            <p:column headerText="txtDescription" >
+                                                                <h:inputTextarea id="txtDescription" value="#{financialInstrumentRegisterController.finInstrumentRegister.assetDescription}"
+                                                                                 required="true" requiredMessage="Value is required" class="form-control"  style="width: 100%" validator="#{validatorManagedBean.AlphaNumericText}" 
+                                                                                 converterMessage="Value must be Alpha Numeric Text" > 
+                                                                </h:inputTextarea> 
+                                                            </p:column> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup> 
+                            </h:form>
+                        </p:tab>
+                        <p:tab id="tabTrans"  class="box-header with-border" 
+                               title="Financial Asset Transaction" disabled="#{financialInstrumentRegisterController.disableDetTab}">
+                            <h:form id="frmAddDetailReg">
+                                <h:panelGroup id="pnlFinDetail" class="col-sm-12" >
+                                    <section class="panel panel-info"  >
+                                        <section class="panel-body" >  
+                                            <p:growl id="growl2" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+                                            <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtIssuedDate" class="control-label col-sm-4" value="#{FCMS.Issued_Date}:"></h:outputLabel>   
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtIssuedDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" disabled="true" converterMessage="Value must be in Date format"
+                                                                    value="#{financialInstrumentRegisterController.finInstrumentRegister.issuedDate}" />
+                                                        <p:message for="txtIssuedDate" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtIniAmount" class="control-label col-sm-4" value="#{FCMS.Initial_Amount}: "/>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtIniAmount" value="#{financialInstrumentRegisterController.finInstrumentRegister.carryngAmount}"  
+                                                                     class="form-control" readonly="true">
+                                                        </p:inputText>  
+                                                        <p:message for="txtIniAmount" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtSinCost" class="control-label col-sm-4" value="#{FCMS.Single_Cost}:"></h:outputLabel>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtSinCost"  
+                                                                     value="#{financialInstrumentRegisterController.financialInstrumentDetail.singleCost}" 
+                                                                     required="true" requiredMessage="The Single cost is Required" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"/>
+                                                        <p:message for="txtSinCost" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtTransDate" class="control-label col-sm-4" value="#{FCMS.Transaction_Date}:"></h:outputLabel>   
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtTransDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" converterMessage="Value must be in Date format"
+                                                                    value="#{financialInstrumentRegisterController.financialInstrumentDetail.transactionDate}" 
+                                                                    required="true" requiredMessage="The  field is required date must look like e.g 2017/02/18"/>
+                                                        <p:message for="txtTransDate" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtTranCost" class="control-label col-sm-4" value="#{FCMS.Transaction_Cost}: "
+                                                                   rendered="#{financialInstrumentRegisterController.disableFVTPLvarpnl}"/>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtTranCost" value="#{financialInstrumentRegisterController.financialInstrumentDetail.transactionCost}"  
+                                                                     class="form-control"  style="width: 100%" 
+                                                                     required="true" requiredMessage="Transaction Cost is required and must be number "
+                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                                     rendered="#{financialInstrumentRegisterController.disableFVTPLvarpnl}">
+                                                        </p:inputText>  
+                                                        <p:message for="txtTranCost" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtFairValue" class="control-label col-sm-4" value="#{FCMS.Fair_Value}: "
+                                                                   rendered="#{financialInstrumentRegisterController.disableFVTPLvarpnl}"/>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtFairValue" value="#{financialInstrumentRegisterController.financialInstrumentDetail.fairValue}"  
+                                                                     class="form-control" style="width: 100%" required="true" requiredMessage="Fair Value is required and must be number "
+                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                                     rendered="#{financialInstrumentRegisterController.disableFVTPLvarpnl}">
+                                                        </p:inputText>  
+                                                        <p:message for="txtFairValue" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtTransacCost" class="control-label col-sm-4" value="#{FCMS.Transaction_Cost}: "
+                                                                   rendered="#{financialInstrumentRegisterController.disableFVTOCIvarpnl}"/>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtTransacCost" value="#{financialInstrumentRegisterController.financialInstrumentDetail.transactionCost}"  
+                                                                     class="form-control"  style="width: 100%" 
+                                                                     required="true" requiredMessage="Transaction Cost is required and must be number "
+                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                                     rendered="#{financialInstrumentRegisterController.disableFVTOCIvarpnl}">
+                                                        </p:inputText>  
+                                                        <p:message for="txtTransacCost" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtFairValues" class="control-label col-sm-4" value="#{FCMS.Fair_Value}: "
+                                                                   rendered="#{financialInstrumentRegisterController.disableFVTOCIvarpnl}"/>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtFairValues" value="#{financialInstrumentRegisterController.financialInstrumentDetail.fairValue}"  
+                                                                     class="form-control" style="width: 100%" required="true" requiredMessage="Fair Value is required and must be number "
+                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                                     rendered="#{financialInstrumentRegisterController.disableFVTOCIvarpnl}">
+                                                        </p:inputText>  
+                                                        <p:message for="txtFairValues" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtIntRate" class="control-label col-sm-4" value="#{FCMS.Interest_Rate}: "
+                                                                   rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}"/> 
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtIntRate"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.interestRate}"
+                                                                     class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                                     title="TypeId" required="true" requiredMessage="Interest Rate field is required." 
+                                                                     rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}"/>
+                                                        <p:message for="txtIntRate" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtEffInt" class="control-label col-sm-4" value="#{FCMS.Effective_Interest}: "
+                                                                   rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}"/>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtEffInt" value="#{financialInstrumentRegisterController.financialInstrumentDetail.effectiveInterest}"  
+                                                                     class="form-control"  style="width: 100%" 
+                                                                     required="true" requiredMessage="Value is required and must be number "
+                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                                     rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}">
+                                                        </p:inputText>  
+                                                        <p:message for="txtEffInt" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtCarAmoBeg" class="control-label col-sm-4" value="#{FCMS.Carrying_Amount_Beginning}: "
+                                                                   rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}"/>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCarAmoBeg" value="#{financialInstrumentRegisterController.financialInstrumentDetail.carryingAmountBeginning}"  
+                                                                     class="form-control"  style="width: 100%" readonly="true"
+                                                                     rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}">
+                                                        </p:inputText>  
+                                                        <p:message for="txtCarAmoBeg" display="icon"/>
+                                                    </div>
+                                                </div>
+                                                <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                    <h:outputLabel for="txtCarAmoEnd" class="control-label col-sm-4" value="#{FCMS.Carrying_Amount_Ending}: "
+                                                                   rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}"/>   
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCarAmoEnd" value="#{financialInstrumentRegisterController.financialInstrumentDetail.carryingAmountEnding}"  
+                                                                     class="form-control" style="width: 100%" readonly="true"
+                                                                     rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}">
+                                                        </p:inputText>  
+                                                        <p:message for="txtCarAmoEnd" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6"></div> 
+                                            <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="chkStatus" class="control-label col-sm-4" value="#{FCMS.Status}:"></h:outputLabel> 
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="chkStatus" required="true" class="col-sm-4"
+                                                                     value="#{financialInstrumentRegisterController.financialInstrumentDetail.status}"
+                                                                     filter="true" style="width: 100%" requiredMessage="Value is Required.">
+                                                        <f:selectItem itemLabel=" --- Select One ---" itemValue="" />
+                                                        <f:selectItem itemLabel=" Active" itemValue="Active" />
+                                                        <f:selectItem itemLabel=" Cancelled" itemValue="Cancelled" />                            
+                                                        <f:selectItem itemLabel=" Discharged" itemValue="Discharged" />   
+                                                        <f:selectItem itemLabel=" Expired" itemValue="Expired" />  
+                                                    </p:selectOneMenu>
+                                                    <p:message for="chkStatus" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12" style="padding-bottom: 10px;" >
+                                                    <div class="col-sm-2"></div>
+                                                    <div class="col-sm-2">
+                                                        <p:commandButton id="btnCalc" value="Calculate" class="btn btn-primary"
+                                                                         action="#{financialInstrumentRegisterController.calculateTransaction}"  
+                                                                         process="@this,pnlFinDetail"
+                                                                         update="obDetTable,OCIDTable,dtAmortised,pnlFinDetail"/>
+                                                    </div>  
+                                                </div>
+                                            </div>
+                                            <div class="form-group required col-sm-12">
+                                                <div class="col-md-12 " style="padding-top: 20px">
+                                                    <p:dataTable  id="obDetTable" var="obd" value="#{financialInstrumentRegisterController.financialDetailPLDModel}"  
+                                                                  rows="5" rowIndexVar="num" paginator="true" paginatorPosition="bottom"
+                                                                  resizableColumns="true" rowKey="#{obd.financialInstrumentId}"
+                                                                  selectionMode="single" selection="#{financialInstrumentRegisterController.financialDetailSelect}" 
+                                                                  rendered="#{financialInstrumentRegisterController.disableFVTPLvarpnl}" >
+                                                        <p:ajax event="rowSelect" process="@this" listener="#{financialInstrumentRegisterController.financialDetailPopulate}" 
+                                                                update="@this" />
+                                                        <p:column headerText="#{FCMS.No}">
+                                                            <h:outputText value="#{num+1}" />
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Transaction_Date}">
+                                                            <h:outputText value="#{financialInstrumentRegisterController.transactionDate}" >
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.initial_Recognition}">
+                                                            <h:outputText value="#{financialInstrumentRegisterController.initialRecognition}" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Fair_Value}">
+                                                            <h:outputText value="#{financialInstrumentRegisterController.FVTPL}" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Status}">
+                                                            <h:outputText value="#{financialInstrumentRegisterController.status}" />
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                    <p:dataTable id="OCIDTable" var="OCITB" value="#{financialInstrumentRegisterController.financialDetailOCIDModel}"  
+                                                                 rows="5" rowIndexVar="plIndex" paginator="true" paginatorPosition="bottom"
+                                                                 resizableColumns="true" rowKey="#{OCITB.financialInstrumentId}"
+                                                                 selectionMode="single" selection="#{financialInstrumentRegisterController.financialDetailSelect}" 
+                                                                 rendered="#{financialInstrumentRegisterController.disableFVTOCIvarpnl}" >
+                                                        <p:ajax event="rowSelect" process="@this" listener="#{financialInstrumentRegisterController.financialDetailPopulate}" 
+                                                                update="@this," />
+                                                        <p:column headerText="#{FCMS.No}">
+                                                            <h:outputText value="#{plIndex+1}" />
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Transaction_Date}">
+                                                            <h:outputText value="#{financialInstrumentRegisterController.transactionDate}" >
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.initial_Recognition}">
+                                                            <h:outputText value="#{financialInstrumentRegisterController.initialRecognition}" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Fair_Value_at_OCI}">
+                                                            <h:outputText value="#{financialInstrumentRegisterController.FVTOCI}" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Status}">
+                                                            <h:outputText value="#{financialInstrumentRegisterController.status}" />
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                    <p:dataTable id="dtAmortised" var="amortise" value="#{financialInstrumentRegisterController.financialDetailAmortisedDModel}"  
+                                                                 rows="5" rowIndexVar="indexRow" paginator="true" paginatorPosition="bottom"
+                                                                 resizableColumns="true" rowKey="#{amortise.carryingAmountBeginning}"
+                                                                 selectionMode="single" selection="#{financialInstrumentRegisterController.financialDetailSelect}" 
+                                                                 rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}" >
+                                                        <p:ajax event="rowSelect" process="@this" listener="#{financialInstrumentRegisterController.financialDetailPopulate}" 
+                                                                update="@this" />
+                                                        <p:column headerText="#{FCMS.No}">
+                                                            <h:outputText value="#{indexRow+1}" />
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Issued_Date}">
+                                                            <h:outputText value="#{amortise.issuedDate}" >
+                                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Transaction_Date}">
+                                                            <h:outputText value="#{amortise.transactionDate}" >
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Carrying_Amount_Beginning}">
+                                                            <h:outputText value="#{amortise.carryingAmountBeginning}" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Interest_Recived}">
+                                                            <h:outputText value="#{amortise.interestReceived }" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Cash_Rate}">
+                                                            <h:outputText value="#{amortise.cashflow }" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Redemption}">
+                                                            <h:outputText value="#{amortise.redemption}" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Cash_Recived}">
+                                                            <h:outputText value="#{amortise.cashReceived}" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{FCMS.Carrying_Amount_Ending}">
+                                                            <h:outputText value="#{amortise.carryingAmountEnding}" converter="#{numberConverter.numberConverter}"/>
+                                                        </p:column>
+                                                        <p:column headerText="Status:">
+                                                            <h:outputText value="#{amortise.status}" />
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12" style="padding-bottom: 10px;" >
+                                                    <div class="col-sm-2"></div>
+                                                    <div class="col-sm-2">
+                                                        <p:commandButton id="btnSaveDet" value="Save" class="btn btn-primary"
+                                                                         action="#{financialInstrumentRegisterController.saveFinanDetail()}"  
+                                                                         process="@this"
+                                                                         update="pnlFinDetail"/>
+                                                    </div>  
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                </h:panelGroup>
+                            </h:form>
+
+                        </p:tab>
+                    </p:tabView>
+                </div>
+                <p:dialog id="measurTypedig" header="Register Instrument Detail" widgetVar="measurTypedig" height="350"
+                          width="750" modal="true" resizable="true" showEffect="explode">
+                    <h:panelGroup id="FVTPLvarpnl" rendered="#{financialInstrumentRegisterController.disableFVTPLvarpnl}">
+
+                        <div class="panel-body col-sm-12">
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel for="txtTranCost"  class="control-label col-sm-2" value="#{FCMS.Transaction_Cost}:"  />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtTranCost"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.transactionCost}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtTranCost" display="icon"/>
+                                </div>
+                                <h:outputLabel class="control-label col-sm-2" for="txtSingleCost" value="#{FCMS.Single_Cost}:"  />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtSingleCost"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.singleCost}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtSingleCost" display="icon"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel for="txtFairValue" class="control-label col-sm-2" value="#{FCMS.Fair_Value}:"   />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtFairValue"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.fairValue}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtFairValue" display="icon"/>
+
+                                </div>
+                                <h:outputLabel for="txtMaturity" class="control-label col-sm-2" value="#{FCMS.Maturity}:"   />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtMaturity"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.maturity}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Number}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtMaturity" display="icon"/>
+
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel class="control-label col-sm-2" id="invisibaledr" />
+                                <div class="col-sm-4">
+                                    <p:commandButton id="btnAddTopl" class="btn btn-primary"
+                                                     value="#{FCMS.Add_To_PL }"  
+                                                     action="#{financialInstrumentRegisterController.addToProfitORLossDetail()}"
+                                                     process="@this,FVTPLvarpnl"
+                                                     update="@this"
+                                                     oncomplete="PF('measurTypedig').hide();"/>
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                    <h:panelGroup id="FVTOCIvarpnl" rendered="#{financialInstrumentRegisterController.disableFVTOCIvarpnl}">
+                        <div class="panel-body col-sm-12">
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel for="txtTranCost2"  class="control-label col-sm-2" value="#{FCMS.Transaction_Cost}:"  />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtTranCost2"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.transactionCost}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtTranCost2" display="icon"/>
+                                </div>
+                                <h:outputLabel class="control-label col-sm-2"  value="#{FCMS.Single_Cost}:"  />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtSingleCost2"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.singleCost}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtSingleCost2" display="icon"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel  class="control-label col-sm-2" value="#{FCMS.Fair_Value}:"   />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtFairValue2"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.fairValue}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtFairValue2" display="icon"/>
+
+                                </div>
+                                <h:outputLabel class="control-label col-sm-2" value="#{FCMS.Maturity}:"   />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtMaturity2"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.maturity}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Number}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtMaturity2" display="icon"/>
+
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel class="control-label col-sm-2" id="invisibaledd" />
+                                <div class="col-sm-4">
+                                    <p:commandButton id="btnAddToOCI" class="btn btn-primary"
+                                                     value="Add To OCI"  
+                                                     action="#{financialInstrumentRegisterController.addToOCIDetail()}"
+                                                     process="@this,FVTOCIvarpnl"
+                                                     update="@this"
+                                                     oncomplete="PF('measurTypedig').hide();"/>
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                    <h:panelGroup id="AmortCostvarpnl" rendered="#{financialInstrumentRegisterController.disableAmortCostvarpnl}">
+                        <div class="panel-body col-sm-12">
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel for="txtTranCost3"  class="control-label col-sm-2" value="#{FCMS.Transaction_Cost}:"  />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtTranCost3"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.transactionCost}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtTranCost3" display="icon"/>
+                                </div>
+                                <h:outputLabel class="control-label col-sm-2"  value="#{FCMS.Single_Cost}:"  />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtSingleCost3"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.singleCost}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtSingleCost3" display="icon"/>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel  class="control-label col-sm-2" value="#{FCMS.Effective_Interest}:"   />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtEffInterest3"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.effectiveInterest}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtEffInterest3" display="icon"/>
+
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel  class="control-label col-sm-2" value="#{FCMS.Premium_Value}:"   />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtPremiumValue3"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.premiumRate}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Double}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtPremiumValue3" display="icon"/>
+
+                                </div>
+                                <h:outputLabel class="control-label col-sm-2" value="#{FCMS.Maturity}:"   />
+                                <div class="col-sm-4">
+                                    <p:inputText id="txtMaturity3"   value="#{financialInstrumentRegisterController.financialInstrumentDetail.maturity}"
+                                                 class="form-control"  style="width: 100%" validator="#{validatorManagedBean.Number}" converterMessage="Value must be number"
+                                                 title="TypeId" required="true" requiredMessage="This field is required."
+                                                 converter="#{financialInstrumentRegisterController.numberConverter}"/>
+                                    <p:message for="txtMaturity3" display="icon"/>
+
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                <h:outputLabel class="control-label col-sm-2" id="invisibaled" />
+                                <div class="col-sm-4">
+                                    <p:commandButton id="btnAddToAMo" class="btn btn-primary"
+                                                     value="Add To AMO"  
+                                                     action="#{financialInstrumentRegisterController.addToAmortizedDetail()}"
+                                                     process="@this,AmortCostvarpnl"
+                                                     update="@this"
+                                                     oncomplete="PF('measurTypedig').hide();"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </h:panelGroup>
+                </p:dialog> 
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

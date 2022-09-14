@@ -1,0 +1,685 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li><a href="CountryRegistration.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Country Registration</a></li>
+        <li><a href="PerDiemRateRegistration.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Per-Diem Rate Registration</a></li>
+        <li><a href="AdditionalAmountRegistration.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Additional Amount Registration</a></li>
+        <li><a href="GoodWillingPayment.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Good Willing Payment Registration</a></li>
+        <li><a href="PerDiemRequestLocal.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Per-diem Request Local</a></li> 
+        <li><a href="PerDiemRequestForeign.xhtml"><i class="fa fa-fw fa-circle-o-notch "></i> Per-diem Request Foreign</a></li> 
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="backface-visibility: hidden;border-color:transparent;background: #ffffff " >
+                <f:facet name="right">
+                    <h:panelGroup id="pnlGBtnNew" rendered="#{fmsPerdiemSettlementController.isRenderedBtnNew}">
+                        <p:commandButton id="btnIcone" style="background-color: white; border-color: white" 
+                                         action="#{fmsPerdiemSettlementController.createNewPerdiemSettlementInfo()}" 
+                                         icon="ui-icon-plus" validateClient="true" 
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample"
+                                         title="New" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnIcon1" style="background-color: white; border-color: white" 
+                                     action="#{fmsPerdiemSettlementController.searchPerdiemSettlementLocal()}" 
+                                     icon="ui-icon-search" validateClient="true" 
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample"
+                                     title="Search" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <h:panelGroup id="pnlGNotifica" rendered="#{fmsPerdiemSettlementController.isRenderedIconNitification}">
+                        <span class="NotificationText"> #{fmsPerdiemSettlementController.fmsFaSList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" title="Notifications"
+                                       rendered="#{fmsPerdiemSettlementController.isRenderedIconNitification}"/>
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Foreign Per Diem Request List"/>
+
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{fmsPerdiemSettlementController.onSelectFARequest}" scrollHeight="300">
+                                            <f:selectItems  var="faListVar" value="#{fmsPerdiemSettlementController.fmsFaSList}"
+                                                            itemValue="#{faListVar}"  itemLabel="#{faListVar.allowanceReqId.requestNo}  --  #{faListVar.empId.firstName} #{faListVar.empId.middleName}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI,:frmRegisterUI:registerUI,:frmMainUI,:frmSample"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlGworkflowIcon" rendered="#{fmsPerdiemSettlementController.isRenderedIconWorkFlow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <!--put work flow list here-->
+
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{fmsPerdiemSettlementController.wfFcmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom"   rowsPerPageTemplate="5,10,15"
+                                                                 resizableColumns="true"  >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="PerDiemSettlementLocal.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{fmsPerdiemSettlementController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"> #{FCMS.Search_Per_Diem_Settlements} ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="pnlSearchPSL">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Employee_Name}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtEmpName1" class="form-control" value="#{fmsPerdiemSettlementController.empEnty.firstName}"> 
+                                                        </p:inputText> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Employee_ID}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtEmpId1" class="form-control" value="#{fmsPerdiemSettlementController.empEnty.empId}">
+                                                        </p:inputText>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton  id="btnSearch" class="btn btn-primary" 
+                                                                          action="#{fmsPerdiemSettlementController.searchSettlementByParameter()}"
+                                                                          icon="ui-icon-search" 
+                                                                          process="@this,pnlSearchPSL,txtEmpName1,txtEmpId1" 
+                                                                          update="@this,:frmMainUI,txtEmpName1,:frmMainUI:tblPerDiemSettlement" 
+                                                                          value="Find" />              
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+                                <div class="form-horizontal col-sm-12">
+                                    <div class="form-group">                                        
+                                        <div class="col-sm-12">
+                                            <p:dataTable id="tblPerDiemSettlement" value="#{fmsPerdiemSettlementController.settlementModel}"
+                                                         var="Settlement"  rows="10" paginator="true" paginatorPosition="bottom"   rowsPerPageTemplate="5,10,15"
+                                                         resizableColumns="true"
+                                                         selection="#{fmsPerdiemSettlementController.selectSettlement}" 
+                                                         selectionMode="single" rowKey="#{Settlement.id}" rowIndexVar="num">
+                                                <p:ajax event="rowSelect" listener="#{fmsPerdiemSettlementController.selectSettlementRow}"
+                                                        process="@this" update=":frmRegisterUI,:frmMainUI,:frmSample" />
+                                                <p:column headerText="S/N" width="100">
+                                                    <h:outputText value="#{num+1}"/>
+                                                </p:column>
+                                                <p:column headerText="#{FCMS.Employee_ID}" filterBy="#{Settlement.allowanceReqId.empId.empId}" filterMatchMode="contains" width="80">
+                                                    <h:outputText value="#{Settlement.allowanceReqId.empId.empId}"/>
+                                                </p:column>
+                                                <p:column headerText="#{FCMS.Employee_ID}"  filterBy="#{Settlement.allowanceReqId.empId.firstName}" filterMatchMode="contains" width="130">
+                                                    <h:outputText value="#{Settlement.allowanceReqId.empId.firstName} #{Settlement.allowanceReqId.empId.middleName}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Departement_Date}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.departureDate}"><f:convertDateTime  pattern="dd/MM/yyyy" /></h:outputText> 
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Return_Date}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.returnedDate}"><f:convertDateTime  pattern="dd/MM/yyyy" /></h:outputText> 
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Departure_Time}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.departureTime}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Returned_Time}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.returnedTime}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Date}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.noOfDays}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Travel}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.travelExpense}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Food}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.foodExpense}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Lodging}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.lodgingExpense}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Miscellaneous}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.miscellaneousExpense}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.total}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.totalExpense}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Difference}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{Settlement.returnableAmount}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>                 
+                                    </div>    
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form  id="frmRegisterUI" class="form-horizontal"> 
+            <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" 
+                          rendered="#{fmsPerdiemSettlementController.renderPnlCreateSettlement}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Per_diem_Request_Local}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <h:panelGroup id="frmPerDiemLocal" >
+                                <div class="form-group required form-horizontal textBoxMargin6px">
+                                    <div class="col-sm-6 ">
+                                        <h:outputLabel  for="employee" class="control-label col-sm-4" value="#{FCMS.Employee_Name}: "/>
+                                        <div class="col-sm-6">
+                                            <p:selectOneMenu id="employee" value="#{fmsPerdiemSettlementController.fmsFieldAllowanceEnty.id}"
+                                                             filter="true" filterMatchMode="contains" required="true" requiredMessage="value is required please select one"
+                                                             converter="entConverter" 
+                                                             valueChangeListener="#{fmsPerdiemSettlementController.findByempIdAndStatus}"
+                                                             disabled="#{fmsPerdiemSettlementController.isDisabledDrpDwnEmpName}" style="width: 100%">
+                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                <f:selectItems id="employee1" value="#{fmsPerdiemSettlementController.employeeList}"
+                                                               itemValue="#{settle.id}" var="settle"
+                                                               itemLabel="#{settle.empId.firstName} #{settle.empId.middleName} #{settle.empId.lastName}"/>
+                                                <p:ajax event="change" process="@this" 
+                                                        update="@this,frmRegisterUI"/> 
+                                            </p:selectOneMenu>
+                                            <p:message for="employee" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 textBoxMargin6px">                           
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Departure_Date}: "/>
+                                        <div class="col-sm-4">
+                                            <p:inputText id="lblDepartureDate" value="#{fmsPerdiemSettlementController.fmsFieldAllowanceEnty.fromDate}" class="form-control" 
+                                                         readonly="true"><f:convertDateTime pattern="dd/MM/yyyy" />
+                                            </p:inputText>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Departure_Time}: "/>
+                                        <div class="col-sm-4">
+                                            <p:inputText id="lblDepartureTime" value="#{fmsPerdiemSettlementController.fmsFieldAllowanceEnty.fromTime}" class="form-control"
+                                                         readonly="true"/>
+                                            <p:message for="lblDepartureTime" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 textBoxMargin6px">                           
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Return_Date}: " />
+                                        <div class="col-sm-4">
+                                            <p:inputText id="lblReturnedDate" value="#{fmsPerdiemSettlementController.fmsFieldAllowanceEnty.toDate}" class="form-control" 
+                                                         readonly="true"><f:convertDateTime pattern="dd/MM/yyyy" />
+                                            </p:inputText>
+                                            <p:message for="lblReturnedDate" display="icon"/>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <p:inputText id="txtNoOfDays2" class="form-control" value="#{fmsPerdiemSettlementController.fmsFieldAllowanceEnty.noOfDays} Days"
+                                                         readonly="true"/> 
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Returned_Time}: " />
+                                        <div class="col-sm-4">
+                                            <p:inputText id="lblReturnedTime" value="#{fmsPerdiemSettlementController.fmsFieldAllowanceEnty.toTime}" class="form-control"
+                                                         readonly="true"/>
+                                            <p:message for="lblReturnedDate" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 textBoxMargin6px">                           
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Mode_of_Transport}: "/>
+                                        <div class="col-sm-4">
+                                            <p:inputText id="lblModeOfTransport" value="#{fmsPerdiemSettlementController.fmsFieldAllowanceEnty.modeOfTransport}" class="form-control"
+                                                         readonly="true"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Estimated_Total}: "/>
+                                        <div class="col-sm-4">
+                                            <p:inputText id="lblEstimatedTotal" value="#{fmsPerdiemSettlementController.fmsFieldAllowanceEnty.totalExpense}" class="form-control"
+                                                         converter="#{fmsPerdiemSettlementController.numberConverter}" readonly="true"/>
+                                        </div>                                                
+                                    </div>                                                
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Per_diem_Settlement_Local}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="form-group required form-horizontal textBoxMargin6px">                          
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Departure_Place}: "/>
+                                        <div class="col-sm-4">
+                                            <p:calendar id="departureDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" required="true" requiredMessage="value is required plese select date" 
+                                                        value="#{fmsPerdiemSettlementController.allowanceSettlement.departureDate}"
+                                                        converterMessage="Value must be a Date" > 
+                                                <p:ajax event="dateSelect" update="@this, txtReturnedDate" 
+                                                        listener="#{fmsPerdiemSettlementController.FromDate}"/> 
+                                            </p:calendar>
+                                            <p:message for="departureDate" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 textBoxMargin6px">                           
+                                    <div class="col-sm-6 form-group required form-horizontal textBoxMargin6px">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Return_Date}: " />
+                                        <div class="col-sm-4">
+                                            <p:calendar id="txtReturnedDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy" required="true" requiredMessage="value is required plese select date" 
+                                                        value="#{fmsPerdiemSettlementController.allowanceSettlement.returnedDate}"
+                                                        disabled="#{fmsPerdiemSettlementController.txtReturnDatevisibility}"
+                                                        converterMessage="Value must be a Date" >  
+                                                <p:ajax event="dateSelect" update="txtNoOfDays1" 
+                                                        listener="#{fmsPerdiemSettlementController.datdiff}"/>
+                                            </p:calendar> 
+                                            <p:message for="txtReturnedDate" display="icon"/>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <p:inputText id="txtNoOfDays1" class="form-control" value="#{fmsPerdiemSettlementController.allowanceSettlement.noOfDays} Days"
+                                                         readonly="true"/> 
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Food_Expense}: "/>
+                                        <div class="col-sm-4">
+                                            <p:inputText id="txtFoodExpense" value="#{fmsPerdiemSettlementController.allowanceSettlement.foodExpense}"
+                                                         readonly="true" class="form-control"/> 
+                                            <p:message for="txtFoodExpense" display="icon"/>
+                                        </div>
+                                    </div>             
+                                </div>
+                                <div class="col-sm-12 textBoxMargin6px">   
+                                    <div class="col-sm-6 form-group required form-horizontal textBoxMargin6px">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Departure_Time}: "/>
+                                        <div class="col-sm-4">
+                                            <p:selectOneMenu id="departureTime" required="true" requiredMessage="value is required plese select one" style="width: 100%" 
+                                                             value="#{fmsPerdiemSettlementController.allowanceSettlement.departureTime}">
+                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                <f:selectItem itemLabel=" After 2AM " itemValue="After 2AM"/>
+                                                <f:selectItem itemLabel=" After 7PM " itemValue="After 7PM "/>
+                                                <f:selectItem itemLabel=" After 2:30PM " itemValue=" After 2:30PM"/>
+                                                <p:ajax    event="change" process="@this" listener="#{fmsPerdiemSettlementController.getDtime(e)}"/>
+                                            </p:selectOneMenu>
+                                            <p:message for="departureTime" display="icon"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Lodging_Expense}: " />
+                                        <div class="col-sm-4">
+                                            <p:inputText id="txtLodgingExpense" value="#{fmsPerdiemSettlementController.allowanceSettlement.lodgingExpense}"
+                                                         readonly="true" class="form-control"/>
+                                            <p:message for="txtLodgingExpense" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 textBoxMargin6px">  
+                                    <div class="col-sm-6 form-group required form-horizontal textBoxMargin6px">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Returned_Time}: " />
+                                        <div class="col-sm-4">
+                                            <p:selectOneMenu id="returnedTime" required="true" requiredMessage="value is required plese select one" style="width: 100%"  
+                                                             value="#{fmsPerdiemSettlementController.allowanceSettlement.returnedTime}"> 
+                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                <f:selectItem itemLabel=" After 2AM " itemValue="After 2AM"/>
+                                                <f:selectItem itemLabel=" After 7PM " itemValue="After 7PM"/>
+                                                <f:selectItem itemLabel=" After 12PM " itemValue="After 12PM"/>
+                                                <p:ajax    event="change" process="@this" listener="#{fmsPerdiemSettlementController.getRtime(e)}" 
+                                                           update="@this, txtFoodExpense, txtLodgingExpense"/>
+                                            </p:selectOneMenu>
+                                            <p:message for="returnedTime" display="icon"/>
+                                        </div>
+                                    </div>     
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Total_Expense}: " />
+                                        <div class="col-sm-4">
+                                            <p:inputText id="txtTotal" value="#{fmsPerdiemSettlementController.allowanceSettlement.totalExpense}" 
+                                                         readonly="true" class="form-control"/>
+                                            <p:message for="txtTotal" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 textBoxMargin6px">                           
+                                    <div class="col-sm-6 form-group required form-horizontal textBoxMargin6px">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Travel_Expense}" />
+                                        <div class="col-sm-4">
+                                            <p:inputText id="txtTravelExpense" value="#{fmsPerdiemSettlementController.allowanceSettlement.travelExpense}"
+                                                         readonly="#{fmsPerdiemSettlementController.isReadOnlyTxtTravel}" required="true" 
+                                                         requiredMessage="value is required plese enter Travel Expense" validator="#{validatorManagedBean.Money}" converterMessage="Value must be a number"
+                                                         class="form-control">
+                                                <p:ajax process="@this" listener="#{fmsPerdiemSettlementController.travel(event)}" 
+                                                        event="change" />
+                                            </p:inputText>   
+                                            <p:message for="txtTravelExpense" display="icon"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Difference}: "/>
+                                        <div class="col-sm-4">
+                                            <p:inputText id="txtReturnableAmount" 
+                                                         value="#{fmsPerdiemSettlementController.allowanceSettlement.returnableAmount}  #{fmsPerdiemSettlementController.message}"
+                                                         readonly="true" class="form-control"/> 
+                                            <p:message for="txtReturnableAmount" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 form-group required form-horizontal textBoxMargin6px"> 
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Miscellaneous}: "/>
+                                        <div class="col-sm-4">
+                                            <p:inputText id="txtMiscellaneousExpense" value="#{fmsPerdiemSettlementController.allowanceSettlement.miscellaneousExpense}"
+                                                         required="true" requiredMessage="value is required please enter Miscellenous. Expense" class="form-control"
+                                                         validator="#{validatorManagedBean.Money}" converterMessage="Value must be a number" >
+                                                <p:ajax event="change" process="@this" update="txtTotal" 
+                                                        listener="#{fmsPerdiemSettlementController.totalExpenseSettle(event)}"/>
+                                            </p:inputText> 
+                                            <p:message for="txtMiscellaneousExpense" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 textBoxMargin6px"> 
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Processed_By}: "/>
+                                        <div class="col-sm-4"> 
+                                            <p:inputText id="txtPreparedBy" value="#{fmsPerdiemSettlementController.userName}"
+                                                         readonly="true" class="form-control"/>
+                                            <p:message for="txtPreparedBy" display="icon"  class="col-sm-6 control-label"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="textBoxMargin6px col-sm-12">  
+                                    <div class="col-sm-6">
+                                        <p:outputLabel id="lblApproved" for="txtProcessedOn" class="control-label col-sm-4" value="#{FCMS.Processed_Date}:" />
+                                        <div class="col-sm-4">
+                                            <p:inputText id="txtProcessedOn" readonly="true" class="form-control" placeholder="dd/mm/yyyy"
+                                                         value="#{fmsPerdiemSettlementController.wfFcmsProcessed.processedOn}"  
+                                                         title="Processed On"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="textBoxMargin6px col-sm-12">
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Decision}:" rendered="#{fmsPerdiemSettlementController.isRenderDecision}"/>
+                                        <div class="col-sm-6">
+                                            <p:selectOneRadio id="rdoDecision" style="width: 100%" rendered="#{fmsPerdiemSettlementController.isRenderDecision}"
+                                                              value="#{fmsPerdiemSettlementController.selectedDecision}" required="true" requiredMessage="Value is required">
+                                                <f:selectItem itemLabel="Approve" itemValue="Approved"/>
+                                                <f:selectItem itemLabel="Reject" itemValue="Rejected"/>
+                                            </p:selectOneRadio>
+                                            <p:message for="rdoDecision" display="icon"/>
+                                        </div>    
+                                    </div> 
+                                </div> 
+                                <div class="textBoxMargin6px col-sm-12">
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Comment}:" rendered="#{fmsPerdiemSettlementController.isRenderDecision}"/>
+                                        <div class="col-sm-8">
+                                            <p:column headerText="Remark">
+                                                <h:inputTextarea id="txtReparedRemark" value="#{fmsPerdiemSettlementController.wfFcmsProcessed.commentGiven}"
+                                                                 rendered="#{fmsPerdiemSettlementController.isRenderDecision}" validator="#{validatorManagedBean.Remark}" 
+                                                                 converterMessage="Value must be a Remark"
+                                                                 class="form-control"  style="width: 100%" > 
+                                                </h:inputTextarea> 
+                                            </p:column> 
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-sm-12 textBoxMargin6px"> 
+                                    <div class="col-sm-6">
+                                        <h:outputLabel class="control-label col-sm-4" value=""/>
+                                        <div class="col-sm-2">
+                                            <p:commandButton  id="btnCalculate" value="#{FCMS.Calculate}"  validateClient="true" class="btn btn-primary" 
+                                                              action="#{fmsPerdiemSettlementController.calculateDifference()}" 
+                                                              rendered="#{fmsPerdiemSettlementController.btnVisibility}"
+                                                              process="@this,frmRegisterUI" update="@this,frmRegisterUI,txtReturnableAmount,btnSave"/>
+                                        </div>
+                                        <div class="col-sm-2"> 
+                                            <p:commandButton  id="btnSave" class="btn btn-primary" value="#{fmsPerdiemSettlementController.saveorUpdateBundle}"
+                                                              action="#{fmsPerdiemSettlementController.savePerdiemSettlementLocal()}"
+                                                              process="@this,frmRegisterUI" rendered="#{fmsPerdiemSettlementController.isRenderedBtnSave}" validateClient="true" 
+                                                              update="@this,frmRegisterUI,:frmSample"/>  
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <p:commandButton  id="btnPrint" value="#{FCMS.Print}" class="btn btn-primary " 
+                                                              rendered="#{fmsPerdiemSettlementController.renderBtnPrint}">
+                                                <p:printer target=":frmRegisterUI:pnlPrint" />
+                                            </p:commandButton>                                          
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+            <p:panel id="pnlPrint" class="visible-print" style="border: 0">
+                <div id="wrapper">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-11">
+                                <div class="col-md-12 text-center">
+                                    <img src="/ERP-war/resources/image/trrtrret.png" alt="EEP logo"/>
+                                    <h4><b> Ethiopian Electric Power</b></h4>
+                                    <h4><b>Travel Advance Expense Claim Form</b> </h4>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 ">
+                                <h5>1. Employee No.:<p:spacer width="30" height="20" /><h:outputText value="#{fmsPerdiemSettlementController.allowanceSettlement.empId.empId}"/></h5>
+                                <h5>2. Name:<p:spacer width="80" height="20" /><h:outputText value="#{fmsPerdiemSettlementController.allowanceSettlement.empId.firstName} #{fmsPerdiemSettlementController.allowanceSettlement.empId.middleName} #{fmsPerdiemSettlementController.allowanceSettlement.empId.lastName}"/> </h5>         
+                                <h5>3. Designation: <p:spacer width="40" height="20" /><h:outputText value="#{fmsPerdiemSettlementController.empEnty.deptId.depName}" /></h5>
+                                <h5><h:outputText value="" /><p:spacer width="160" height="20" /><u><h:outputText value="Date" /></u> <p:spacer width="115" height="20" /><u><h:outputText value="Time" /></u></h5>
+                                <h5>4. Departure Date: <p:spacer width="40" height="20" /><h:outputText  value="#{fmsPerdiemSettlementController.allowanceSettlement.departureDate}" ><f:convertDateTime  pattern="dd/MM/yyyy" /></h:outputText> <p:spacer width="70" height="20" /><h:outputText  value="#{fmsPerdiemSettlementController.allowanceSettlement.departureTime}" /> </h5>
+                                <h5>5. Returned Date: <p:spacer width="46" height="20" /><h:outputText  value="#{fmsPerdiemSettlementController.allowanceSettlement.returnedDate}" ><f:convertDateTime  pattern="dd/MM/yyyy" /></h:outputText><p:spacer width="70" height="20" /><h:outputText  value="#{fmsPerdiemSettlementController.allowanceSettlement.returnedTime}" /> </h5>
+                                <h5>6. Mode of Transport:<p:spacer width="26" height="20" /><h:outputText  value="#{fmsPerdiemSettlementController.allowanceSettlement.modeOfTransport}"/> </h5>
+                                <h5>7. Total No. of Days at the Destination:<p:spacer width="20" height="20" /><h:outputText  value="#{fmsPerdiemSettlementController.allowanceSettlement.allowanceReqId.noOfDays}"/><p:spacer width="10" height="20" /><h:outputText value="Days" /> </h5>
+                                <h5>8. Purpose of Tour:<p:spacer width="150" height="20" /><h:outputText  value="#{fmsPerdiemSettlementController.allowanceSettlement.allowanceReqId.purpose}"/> </h5>
+                                <h5>9. Names of the Place Visited:<p:spacer width="80" height="20" /><u><h:outputText  value="#{fmsPerdiemSettlementController.allowanceSettlement.allowanceReqId.returnedAddressId}"/> </u></h5>
+                                <h5>10. Signature of the Office authorizing:<p:spacer width="20" height="20" /><h:outputText value="__________________________"/> </h5>
+                                <h5>11. Expenses </h5>
+                                <h5><p:spacer width="60" height="20"/>[Please give details overleaf and attach tickets/Bill/Cash Memos wherever necessary] </h5>
+                            </div>         
+
+                        </div>
+
+                        <div class="row">
+                            <div class="form-horizontal col-md-12">                            
+                                <p:panelGrid style="margin-top:20px">
+                                    <f:facet name="header">
+                                        <p:row>
+                                            <p:column >Expenses</p:column>
+                                            <p:column style="text-align: center">No. of Days</p:column>
+                                            <p:column ></p:column>
+                                            <p:column width="400">Rate (Birr)</p:column>
+                                            <p:column width="400">Amount (Birr)</p:column>
+                                        </p:row>
+
+                                    </f:facet>
+
+                                    <p:row>
+                                        <p:column >a). Domestic Travel</p:column>
+                                        <p:column style="text-align: center">#{fmsPerdiemSettlementController.allowanceSettlement.noOfDays}</p:column>
+                                        <p:column >  X </p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.travelExpense}</p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.travelExpense}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column >b). Hotel</p:column>
+                                        <p:column style="text-align: center">#{fmsPerdiemSettlementController.allowanceSettlement.noOfDays}</p:column>
+                                        <p:column >  X </p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.lodgingExpense}</p:column>
+                                        <p:column  style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.lodgingExpense}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column >c). Food</p:column>
+                                        <p:column style="text-align: center">#{fmsPerdiemSettlementController.allowanceSettlement.noOfDays}</p:column>
+                                        <p:column >  X </p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.foodExpense}</p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.foodExpense}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column >d). Local Travel</p:column>
+                                        <p:column style="text-align: center">#{fmsPerdiemSettlementController.allowanceSettlement.noOfDays}</p:column>
+                                        <p:column >  X </p:column>
+                                        <p:column style="text-align: right">0.00</p:column>
+                                        <p:column style="text-align: right">0.00</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column >e). Miscellaneous</p:column>
+                                        <p:column style="text-align: center">#{fmsPerdiemSettlementController.allowanceSettlement.noOfDays}</p:column>
+                                        <p:column >  X </p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.miscellaneousExpense}</p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.miscellaneousExpense}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column  colspan="4" style="font-weight: bold;text-align: right;"> Total Expenses</p:column>
+                                        <p:column  colspan="4" style="font-weight: bold;text-align: right;text-underline-position: below;"> #{(fmsPerdiemSettlementController.allowanceSettlement.noOfDays * fmsPerdiemSettlementController.allowanceSettlement.travelExpense)+
+                                                                                                                                              (fmsPerdiemSettlementController.allowanceSettlement.noOfDays * fmsPerdiemSettlementController.allowanceSettlement.lodgingExpense)+ 
+                                                                                                                                              (fmsPerdiemSettlementController.allowanceSettlement.noOfDays * fmsPerdiemSettlementController.allowanceSettlement.foodExpense) + 
+                                                                                                                                              (fmsPerdiemSettlementController.allowanceSettlement.noOfDays * fmsPerdiemSettlementController.allowanceSettlement.foodExpense)+ 
+                                                                                                                                              (fmsPerdiemSettlementController.allowanceSettlement.noOfDays * fmsPerdiemSettlementController.allowanceSettlement.miscellaneousExpense)} 
+                                        </p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column colspan="4" style="text-align: right;">Less Advance (Received on)</p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.allowanceReqId.totalExpense}</p:column>
+                                    </p:row>
+                                    <p:row>
+                                        <p:column colspan="4" style="text-align: right;">Balance Refundable/Recoverable</p:column>
+                                        <p:column style="text-align: right">#{fmsPerdiemSettlementController.allowanceSettlement.returnableAmount}</p:column>
+                                    </p:row>
+                                </p:panelGrid>
+                            </div>                                          
+                        </div> 
+                        <p:spacer height="20"/>
+
+                        <div class="row" >                                                  
+                            <div class="col-md-12 ">
+                                <h5>Reported by: _____________________________</h5>
+                                <h5>Finance Department: _______________________<p:spacer width="25" height="20" />Date_____________ </h5>         
+                                <h5>Checked by: ______________________________<p:spacer width="25" height="20" />Date_____________</h5>
+                                <h5>Approved by: _____________________________<p:spacer width="28" height="20" />Date_____________ </h5>
+                            </div>
+                        </div>                    
+                    </div>
+                </div>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>          

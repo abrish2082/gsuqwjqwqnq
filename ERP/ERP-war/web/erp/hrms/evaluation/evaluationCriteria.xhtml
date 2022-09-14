@@ -1,0 +1,309 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="evaluationLevel.xhtml"><i class="fa fa-circle-o "></i><span>Evaluation Level</span></a></li>
+        <li><a href="evaluationSession.xhtml"><i class="fa fa-circle-o "></i><span>Evaluation Session</span></a></li>  
+        <li><a href="evaluationResult.xhtml"><i class="fa fa-circle-o "></i><span>Evaluation Result</span></a></li>  
+        <li class="treeview">
+            <a href="#treeview-menu">
+                <span> Probation</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="probationCriteria.xhtml"><i class="fa fa-circle-o "></i><span>Probation Criteria</span></a></li>
+                <li><a href="probationResult.xhtml"><i class="fa fa-circle-o "></i><span>Probation Result</span></a></li>
+                <li><a href="probationApprove.xhtml"><i class="fa fa-circle-o "></i><span>Probation Approve</span></a></li>
+            </ul> 
+        </li> 
+        <li class="treeview">
+            <a href="#treeview-menu">
+                <span> BSC</span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li><a href="bscSession.xhtml"><i class="fa fa-circle-o "></i><span>BSC Session</span></a></li>
+                <li><a href="bscResult.xhtml"><i class="fa fa-circle-o "></i><span>BSC Result</span></a></li>
+            </ul>
+        </li> 
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{evaluationCriteriaController.evaluationCriteriaInfo()}"
+                                     icon="#{evaluationCriteriaController.icone}" style="background-color: white; border-color: white" 
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmEvaluationCriteria" 
+                                     title="#{evaluationCriteriaController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{evaluationCriteriaController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{evaluationCriteriaController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmToolBar,:frmSearch,:frmEvaluationCriteria" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../hrms/evaluation/evaluationCriteria.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{evaluationCriteriaController.renderMainPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-sm-8"> 
+                                            <div class="form-horizontal col-md-12">
+                                                <div class="form-group"> 
+                                                    <h:outputLabel for="srcCriteriaName" value="Criteria Name:" class="control-label col-sm-2"/> 
+                                                    <div class="col-sm-5">  
+                                                        <p:selectOneMenu id="srcCriteriaName" value="#{evaluationCriteriaController.srcEvaluationCriteria.criteriaName}"
+                                                                         valueChangeListener="#{evaluationCriteriaController.findByCriteria}" 
+                                                                         filterMatchMode="startsWith" filter="true" style="width: 100%">
+                                                            <f:selectItem itemLabel="--- Select ---" itemValue=""/>
+                                                            <f:selectItems value="#{evaluationCriteriaController.criteriaNameList}"/>
+                                                            <f:selectItem itemLabel="Load all" itemValue="Load all"/>
+                                                            <p:ajax event="change" process="@this" update=":frmSearch:tblEvalCriteria"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <div class="col-md-12"> 
+                                        <div class="col-md-12"> 
+                                            <div class="form-group">
+                                                <p:dataTable id="tblEvalCriteria" value="#{evaluationCriteriaController.criteriaListDataModel}"
+                                                             var="criteria" selectionMode="single" rowIndexVar="num" class="dataTable" widgetVar="crtName"
+                                                             rows="10" rowsPerPageTemplate="5,10,15"  paginator="true" paginatorPosition="bottom"
+                                                             selection="#{evaluationCriteriaController.hrEvaluationCriteria}" rowKey="#{criteria.id}">
+                                                    <p:ajax event="rowSelect" process="@this,tblEvalCriteria" listener="#{evaluationCriteriaController.evalCriteria_vcl}"
+                                                            update=":frmToolBar,:frmSearch,:frmEvaluationCriteria"/>
+                                                    <p:column headerText="No." style="width: 60px;">
+                                                        <h:outputText value="#{num + 1}"/>
+                                                    </p:column>
+                                                    <p:column headerText="Criteria Name">
+                                                        <h:outputText value="#{criteria.criteriaName}"/>
+                                                    </p:column>
+                                                    <p:column filterBy="#{criteria.categoryId.categoryName}" headerText="Category" filterMatchMode="contains">
+                                                        <f:facet name="filter">
+                                                            <p:selectOneMenu onchange="PF('crtName').filter()">
+                                                                <f:selectItems value="#{evaluationCriteriaController.category}"/>
+                                                            </p:selectOneMenu> 
+                                                        </f:facet>
+                                                        <h:outputText value="#{criteria.categoryId.categoryName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Weight"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{criteria.weight}%"/>
+                                                    </p:column> 
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                                
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form> <!-- Evaluation Criteria -->
+        <h:form id="frmEvaluationCriteria"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainpage" rendered="#{evaluationCriteriaController.chooseCreatePage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Evaluation Criteria</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <h:panelGroup id="pnl1" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="txtCategory" class="control-label col-sm-4" value="Category: "/>
+                                                                    <div class="col-sm-8">                                                       
+                                                                        <p:selectOneMenu id="txtCategory" style="width:100%" converter="entConverter"
+                                                                                         value="#{evaluationCriteriaController.hrEvaluationCriteria.categoryId}"
+                                                                                         required="true" requiredMessage="Select category">
+                                                                            <f:selectItems value="#{evaluationCriteriaController.listOfCategory}"/>   
+                                                                            <p:ajax event="change" process="@this" update="frmEvaluationCriteria"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="txtCategory" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>   
+                                                            <br></br>
+                                                            <br></br>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtCriteriaName" class="control-label col-sm-4" value="Criteria name: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtCriteriaName" value="#{evaluationCriteriaController.hrEvaluationCriteria.criteriaName}" 
+                                                                                     title="Criteria Name" class="form-control" required="true" requiredMessage="Enter criteria name"
+                                                                                     validator="#{validatorManagedBean.Text}" validatorMessage="Criteria name should be string"/>
+                                                                        <p:message for="txtCriteriaName" display="icon"/>
+                                                                    </div>                                                               
+                                                                </div>                                                                                          
+                                                            </div>  
+                                                            <br></br>
+                                                            <br></br>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="txtWeight" class="control-label col-sm-4" value="Weight: " title="Weight from 100%"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtWeight" value="#{evaluationCriteriaController.hrEvaluationCriteria.weight}" 
+                                                                                     placeholder="in %" title="Weight" class="form-control" required="true"
+                                                                                     validator="#{validatorManagedBean.Percent}" requiredMessage="Enter the weight"
+                                                                                     converterMessage="Weight should be between 1 and 100"/>
+                                                                        <p:message for="txtWeight" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <center>
+                                                                        <p:commandButton id="btnAdd" value="#{evaluationCriteriaController.addorUpdate}" 
+                                                                                         action="#{evaluationCriteriaController.add()}" class="btn  btn-block btn-primary col-lg-4"
+                                                                                         process="@this,pnl1" update="@this,tblCriteria,pnl1" style="margin-top: 10px"/>
+                                                                    </center>
+                                                                </div>
+                                                            </div>
+                                                        </div> 
+                                                        <div class="col-md-6"> 
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="rbnStatus" value="Status: " class="control-label col-sm-4"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneRadio id="rbnStatus" value="#{evaluationCriteriaController.hrEvaluationCriteria.status}"
+                                                                                          required="true" class="col-sm-6" requiredMessage="Select status">
+                                                                            <f:selectItem itemLabel="Active" itemValue="1"/>
+                                                                            <f:selectItem itemLabel="Inactive" itemValue="0"/>
+                                                                            <p:ajax process="@this" event="change"/>
+                                                                        </p:selectOneRadio>
+                                                                        <p:message for="rbnStatus" display="icon"/>
+                                                                    </div>
+                                                                </div>                                               
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtDescription" value="Description:" class="control-label col-sm-4"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtDescription" value="#{evaluationCriteriaController.hrEvaluationCriteria.description}" 
+                                                                                         rows="1" autoResize="false" title="Description"
+                                                                                         validator="#{validatorManagedBean.Remark}" class="form-control"/>
+                                                                        <p:message for="txtDescription" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup> 
+                                            <br></br><br></br><br></br><br></br>
+                                            <br></br><br></br><br></br><br></br>
+                                            <h:panelGroup id="pnl2">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-12 ">                                                                      
+                                                            <div class="form-group form-horizontal">  
+                                                                <p:dataTable  id="tblCriteria" value="#{evaluationCriteriaController.criterias}"
+                                                                              selection="#{evaluationCriteriaController.hrEvaluationCriteria}" styleClass="dataTable" selectionMode="single" 
+                                                                              var="currentRow" rowKey="#{currentRow.criteriaName}" rowIndexVar="rowIndex">                                                                 
+                                                                    <p:ajax  event="rowSelect" listener="#{evaluationCriteriaController.populate}" update="@this,:frmEvaluationCriteria"/>  
+                                                                    <p:column style="width:60px">
+                                                                        <f:facet name="header">No.</f:facet>
+                                                                        <p:outputLabel value="#{rowIndex+1}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Category">
+                                                                        <h:outputText value="#{currentRow.categoryId.categoryName}" />
+                                                                    </p:column>
+                                                                    <p:column headerText="Criteria Name">
+                                                                        <h:outputText value="#{currentRow.criteriaName}" />
+                                                                    </p:column>
+                                                                    <p:column headerText="Weight">
+                                                                        <h:outputText value="#{currentRow.weight}%" />
+                                                                    </p:column>
+                                                                    <p:column headerText="Description">
+                                                                        <h:outputText value="#{currentRow.description}" />
+                                                                    </p:column>
+                                                                </p:dataTable>
+                                                            </div>
+                                                        </div>  
+                                                    </div> 
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup id="pnlSave">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                     value="#{evaluationCriteriaController.saveorUpdateBundle}"
+                                                                                     action="#{evaluationCriteriaController.saveEvaluationCriteria()}"
+                                                                                     process="@this,pnl2" update=":frmEvaluationCriteria:pnl2"/>  
+                                                                </div>
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                                     action="#{evaluationCriteriaController.clearEvaluationCriteria()}"
+                                                                                     process="@this" update=":frmEvaluationCriteria"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

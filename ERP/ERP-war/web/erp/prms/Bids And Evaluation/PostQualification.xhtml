@@ -1,0 +1,564 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard "></i> <span> Dashboard</span></a></li>
+        <li><a href="BidCriteria.xhtml"><i class="fa fa-circle-o "></i> <span>Bid’s Criteria</span></a></li> 
+        <li><a href="BidRegistration.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Registration</span></a></li> 
+        <li><a href="BidRegistrationAmend.xhtml"><i class="fa fa-circle-o "></i> <span>Bid Amendment</span></a></li> 
+        <li><a href="PreminilaryEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Preliminary Evaluation</span></a></li> 
+        <li><a href="TechnicalEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Technical Evaluation</span></a></li> 
+        <li><a href="FinancialEvaluation.xhtml"><i class="fa fa-circle-o "></i> <span>Financial Evaluation</span></a></li> 
+        <li><a href="PRMSEvaluationResult.xhtml"><i class="fa fa-circle-o "></i><span>Evaluation Result</span></a></li>
+
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="postQualification"> 
+            <p:toolbar style="background-color: white">
+                <f:facet name="right">
+                    
+                    <h:panelGroup id="pngBackToSearch" rendered="#{PostQualificationController.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{PostQualificationController.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                           process="@this" update="@this, :frmMainUI, :frmpostQualificationUi, :postQualification"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnNew" action="#{PostQualificationController.createNewPostQualification()}" icon="#{PostQualificationController.icone}"  validateClient="true" 
+                                     process="@this" update="@this, :frmMainUI, :frmpostQualificationUi, :postQualification" rendered="#{PostQualificationController.isRendercreate}"
+                                     title="#{PostQualificationController.createOrSearchBundle}"  
+                                     style="background-color: white"/>
+                    <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{PostQualificationController.requestNotificationCounter}"  
+                                   rendered="#{PostQualificationController.isRenderNotify}" style="color: red;background-color: white;border-color: white "/>
+                    <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblReqNotf" value="Post for approve List"/>
+                        <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                            valueChangeListener="#{PostQualificationController.RequestListChange}" converter="entConverter">
+                            <f:selectItems id="selectOneMenuAppList" var="postReqlst"
+                                           value="#{PostQualificationController.postQualificationList}"
+                                           itemValue="#{postReqlst}" itemLabel="#{postReqlst.pqNo}"/>               
+                            <p:ajax event="valueChange" update=":frmpostQualificationUi, :frmMainUI, :postQualification"  />  
+                        </p:selectOneListbox>
+                    </p:overlayPanel>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblWorkflow" value="#{PostQualificationController.wfPrmsProcessedDModel}"
+                                                             var="currentRow" selectionMode="single" rowIndexVar="num"  rows="5" paginator="true"
+                                                             rowKey="#{currentRow}" paginatorPosition="bottom" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{currentRow.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                        <a href="../Bids And Evaluation/PostQualification.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                </f:facet>
+
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{PostQualificationController.renderPnlManPage}">
+
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="postQualificationsearchTbl"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal  col-sm-12">
+                                             <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="Searching By:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{PostQualificationController.prmsPostQualification.columnName}"
+                                                                         valueChangeListener="#{PostQualificationController.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{PostQualificationController.postQualificationSearchParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblPostQualNo,txtPostQualNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblPostQualNo" class="control-label col-sm-4" value="Search By #{PostQualificationController.prmsPostQualification.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtPostQualNo" value="#{PostQualificationController.prmsPostQualification.columnValue}"/>
+                                                    </div>
+                                                </div>
+                                            <div class="form-group"> 
+                                                <div class="col-lg-2"></div>
+                                                <div class="col-sm-4">
+                                                    <p:commandButton  id="btnFind" icon="ui-icon-search" action="#{PostQualificationController.searchByPostQ()}"
+                                                                      process="@this,postQualificationsearchTbl" update=":frmMainUI:frmpostQualificationMasterTbl"
+                                                                      value="Find" class="btn btn-primary col-lg-3"/>              
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmpostQualificationMasterTbl">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="postQualificationsearchTbl" rows="5"  value="#{PostQualificationController.prmsPostQualificationModel}"
+                                                                 var="postQualificationMstrInfoTbl" paginator="true" paginatorPosition="bottom"
+                                                                 selection="#{PostQualificationController.selectPrmsPostQualification}"
+                                                                 selectionMode="single"  rowKey="#{postQualificationMstrInfoTbl.postId}">
+                                                        <p:ajax event="rowSelect" listener="#{PostQualificationController.rowSelect}" 
+                                                                update=":frmpostQualificationUi, :frmMainUI, :postQualification" />    
+                                                        <p:column filterBy="#{postQualificationMstrInfoTbl.pqNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Post Qualification NO" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{postQualificationMstrInfoTbl.pqNo}"/>
+                                                        </p:column>
+                                                        <p:column filterBy="#{postQualificationMstrInfoTbl.financId.financialResultNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Financial No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{postQualificationMstrInfoTbl.financId.financialResultNo}"/>
+                                                        </p:column>
+                                                        <p:column filterBy="#{postQualificationMstrInfoTbl.bidId}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Bid No" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{postQualificationMstrInfoTbl.financId.bidId}"/>
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+
+
+        <h:form id="frmpostQualificationUi">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="postQpanel" rendered="#{PostQualificationController.renderPnlCreateParty}"  >
+                <p:growl id="growl"  severity="information" autoUpdate="true" />
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Post Qualification</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="col-sm-6">
+
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="postQGenPanel" >
+                                        <div class="form-horizontal col-sm-12">  
+                                            <div class="form-horizontal col-sm-12"> 
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel id="lblRegistrationNo" class="control-label col-sm-4" value="PQ No :"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtPQNo"   readonly="true"
+                                                                     value="#{PostQualificationController.generatePQNo()}"/>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                    </h:panelGroup>
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="postQMasterPanel1" >
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px required">
+                                                    <p:outputLabel value="Result No :" id="lblEvaluation"  class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtEvaluation" converter="entConverter" style="width: 100%"
+                                                                         value="#{PostQualificationController.prmsFinancialEvalResult}" 
+                                                                         valueChangeListener="#{PostQualificationController.getBidNo}" 
+                                                                         disabled="#{workFlow.readonly}"
+                                                                         required="true" requiredMessage="Result Number is required">
+                                                            <f:selectItem itemLabel="---Select One---" itemValue=""/> 
+                                                            <f:selectItems value="#{PostQualificationController.financialEvalResultList}" var="result" 
+                                                                           itemLabel="#{result.financialResultNo}" itemValue="#{result}"/>
+                                                            <p:ajax event="change" process="@this" update="txtBidNoPost,txtBidderName" />
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtEvaluation" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div> 
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Bid No :" id="lblBidNoPost"  class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtBidNoPost"  value="#{PostQualificationController.prmsFinancialEvalResult.bidId}" readonly="true" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                    <h:panelGroup style="border: 0px; background-color: transparent" id="postQMasterPanel1detail" >
+                                        <div class="form-horizontal col-sm-12">
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Bidder Name :" id="lblBidderNamePost"  class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtBidderName" converter="entConverter" style="width: 100%"
+                                                                         value="#{PostQualificationController.prmsFinancialEvlResultyDtl}" 
+                                                                         valueChangeListener="#{PostQualificationController.getChangedItemLot}"
+                                                                         disabled="#{workFlow.readonly}"
+                                                                         requiredMessage="Pls Select A Bidder Name" required="true">
+                                                            <f:selectItem itemLabel="---Select One---" itemValue=""/> 
+                                                            <f:selectItems value="#{PostQualificationController.bidderNameList}" var="bidder" 
+                                                                           itemLabel="#{bidder.supplierId}" itemValue="#{bidder}"/>
+                                                            <p:ajax event="change" process="@this" update="txtItemCode,txtLotNO,PGitemOrLot"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtBidderName" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <h:panelGroup id="PGitemOrLot">
+                                                <div class="form-horizontal col-sm-12">
+                                                    <div class="form-group textBoxMargin6px">
+                                                        <p:outputLabel value="Item Code :" id="lblItemCode"  class="control-label col-sm-4"
+                                                                       rendered="#{PostQualificationController.renderItem}"/> 
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtItemCode" converter="entConverter" style="width: 100%"
+                                                                             value="#{PostQualificationController.prmsFinancialEvlResultyDtl}" 
+                                                                             disabled="#{workFlow.readonly}"
+                                                                             rendered="#{PostQualificationController.renderItem}" >
+                                                                <f:selectItem itemLabel="--------Select One------"  itemValue=""/> 
+                                                                <f:selectItems value="#{PostQualificationController.itemCodeList}" var="item" 
+                                                                               />
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-horizontal col-sm-12">
+                                                    <div class="form-group textBoxMargin6px">
+                                                        <p:outputLabel value="Lot No :" id="lblLotNO"  class="control-label col-sm-4" 
+                                                                       rendered="#{PostQualificationController.renderLot}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtLotNO" converter="entConverter" style="width: 100%"
+                                                                             value="#{PostQualificationController.prmsFinancialEvlResultyDtl}" 
+                                                                             disabled="#{workFlow.readonly}"
+                                                                             rendered="#{PostQualificationController.renderLot}">
+                                                                <f:selectItem itemLabel="---Select One---" /> 
+                                                                <f:selectItems value="#{PostQualificationController.lotNumberList}" var="lot" 
+                                                                               itemLabel="#{lot.lotNo}" itemValue="#{lot}"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Technical capacity:" id="lblPQTechCap"  class="control-label col-sm-4">
+                                                    </p:outputLabel>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneRadio id="techCap" style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                          value="#{PostQualificationController.prmsPostDetail.technicalCapacity}">
+                                                            <f:selectItem itemLabel="Capable" itemValue="Capable" />
+                                                            <f:selectItem itemLabel="Not Capable" itemValue="Not Capable" />
+                                                        </p:selectOneRadio>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Financial capacity:" id="lblPQFinCap" class="control-label col-sm-4">
+                                                    </p:outputLabel>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneRadio id="FinCap" style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                          value="#{PostQualificationController.prmsPostDetail.financialCapacity}">
+                                                            <f:selectItem itemLabel="Capable" itemValue="Capable" />
+                                                            <f:selectItem itemLabel="Not Capable" itemValue="Not Capable" />
+                                                        </p:selectOneRadio>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Results:" id="lblTermofPayment"  class="control-label col-sm-4">
+                                                    </p:outputLabel>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneRadio id="planType" style="width: 235" disabled="#{workFlow.readonly}"
+                                                                          value="#{PostQualificationController.prmsPostDetail.results}">
+                                                            <f:selectItem itemLabel="Pass" itemValue="Pass" />
+                                                            <f:selectItem itemLabel="Fail" itemValue="Fail" />
+                                                        </p:selectOneRadio>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Final Descion :" id="lblFinDesc"  class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtFinDesc" converter="entConverter" style="width: 100%"
+                                                                         value="#{PostQualificationController.prmsPostDetail.finalDecision}" 
+                                                                         disabled="#{workFlow.readonly}"
+                                                                         valueChangeListener="#{PostQualificationController.callingNextSupp}">
+                                                            <f:selectItem itemLabel="---Select One---" itemValue=""/> 
+                                                            <f:selectItem itemLabel="Close Bid" itemValue="Close Bid"/>
+                                                            <f:selectItem itemLabel="Next Supplier" itemValue="Next Supplier"/>
+                                                            <p:ajax event="change" process="@this" update="txtNomBidderNamePost"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Nominated Bidder Name :" id="lblNomBidderNamePost"  class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtNomBidderNamePost" converter="entConverter" style="width: 100%"
+                                                                         value="#{PostQualificationController.prmsSupplyProfile}"
+                                                                         disabled="#{workFlow.readonly}">
+                                                            <f:selectItem itemLabel="---Select One---" itemValue="" /> 
+                                                            <f:selectItems value="#{PostQualificationController.supplierListSecond}" var="bidder" 
+                                                                           itemLabel="#{bidder.vendorName}" itemValue="#{bidder}"/>
+                                                            <p:ajax event="change" process="@this" update="txtItemCode,txtLotNO,PGitemOrLot"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px">
+                                                    <p:outputLabel value="Remark :" class="control-label col-sm-4" />
+                                                    <div class="col-sm-8">
+                                                        <p:inputTextarea readonly="#{workFlow.readonly}" class="form-control" value="#{PostQualificationController.prmsPostDetail.remark}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group textBoxMargin6px"> 
+
+                                                    <div class="col-lg-4"></div>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnAdd" action="#{PostQualificationController.addTable()}" process="@this,postQMasterPanel1detail"
+                                                                         update="@this,postQMasterPanel1detail,postsearchTbl,PGitemOrLot" 
+                                                                         class="btn btn-primary col-lg-4 "
+                                                                         value="Add" />            
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="postQMasterPanel2" >
+                                    <div class="form-horizontal col-sm-12">
+
+                                        <p:dataTable id="postsearchTbl" rowIndexVar="num"  rows="5" 
+                                                     value="#{PostQualificationController.prmsPostDetailModel}" 
+                                                     var="posttbl" paginator="true" paginatorPosition="bottom" rowKey="#{posttbl.postdId}">
+                                            <p:column>                                                                                                 
+                                                <f:facet name="header">
+                                                    <h:outputLabel id="lblBidderName" value="Bidder Name"/>
+                                                </f:facet>
+                                                <h:outputText id="txtiBidderName" value="#{posttbl.bidderId.vendorName}"/> 
+                                            </p:column> 
+                                            <p:column>                                                                                                 
+                                                <f:facet name="header">
+                                                    <h:outputLabel id="lblItemss" value="Item Code"/>
+                                                </f:facet>
+                                                <h:outputText id="txtItemss" value="#{posttbl.materialId.matName}"/> 
+                                            </p:column> 
+                                            <p:column>                                                                                                 
+                                                <f:facet name="header">
+                                                    <h:outputLabel id="lblLotss" value="Lot Name"/>
+                                                </f:facet>
+                                                <h:outputText id="txtLotss" value="#{posttbl.lotName}"/> 
+                                            </p:column> 
+                                            <p:column>                                                                                                 
+                                                <f:facet name="header">
+                                                    <h:outputLabel id="lblTechnical" value="Technical Capacity"/>
+                                                </f:facet>
+                                                <h:outputText id="txtTechnical" value="#{posttbl.technicalCapacity}"/> 
+                                            </p:column> 
+                                            <p:column  >                                                                                                 
+                                                <f:facet name="header">
+                                                    <h:outputLabel id="lblFinancial" value="Financial Capacity"/>
+                                                </f:facet>
+                                                <h:outputText id="txtFinancial" value="#{posttbl.financialCapacity}"/> 
+                                            </p:column> 
+
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputLabel id="lblResult" value="Result" />
+                                                </f:facet>
+                                                <h:outputText id="txtResult" value="#{posttbl.results}"/>
+                                            </p:column> 
+
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputLabel id="lblRemark" value="Remark" />
+                                                </f:facet>
+                                                <h:outputText id="txtRemark" value="#{posttbl.remark}"/>
+                                            </p:column> 
+                                            <p:column>  
+                                                <p:commandLink disabled="#{workFlow.readonly}" value="Edit" action="#{PostQualificationController.edit()}"
+                                                               process="@this,postsearchTbl"
+                                                               update=":frmpostQualificationUi:postQMasterPanel1detail,postsearchTbl">
+                                                </p:commandLink>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </h:panelGroup>
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <section class="panel panel-info">
+                        <section class="panel-body">  
+                            <h:panelGroup id="pnlworkflow" class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-md-12">                      
+                                        <div class="box-body"> 
+                                            <div class="col-md-6">
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group">
+                                                        <p:outputLabel  for="txtProcessedBy" class="control-label col-sm-4" value="Processed By:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText  id="txtProcessedBy" readonly="true" class="form-control"  value="#{PostQualificationController.loggerName}" title="descripition"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel  class="control-label col-sm-4" value="Decision: " rendered="#{PostQualificationController.renderDecision}"/> 
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="drddecision" value="#{PostQualificationController.wfPrmsProcessed.decision}" 
+                                                                             rendered="#{PostQualificationController.renderDecision}"
+                                                                             
+                                                                             required="true"    requiredMessage="Select Decision" style="width: 100%"
+                                                                             valueChangeListener="#{PostQualificationController.handleselectOptions}">                                                                                        
+                                                                <f:selectItem itemLabel="---Select---" itemValue=""/>
+                                                                <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                                <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="drddecision" display="icon"/>                                                                                    
+                                                        </div>  
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal required">
+                                                        <p:outputLabel class="control-label col-sm-4" value="Processed Date:" />
+                                                        <div class="col-sm-8">
+                                                            <p:calendar id="txtProcessedDate"   placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy"
+                                                                        value="#{PostQualificationController.wfPrmsProcessed.processedOn}"  
+                                                                        title="date" required="true" requiredMessage="Processed Date is required">
+                                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                            </p:calendar>
+                                                            <p:message for="txtProcessedDate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group">
+
+                                                        <p:outputLabel  for="txtComment" class="control-label col-sm-4"
+                                                                        value="Comment Given:" rendered="#{PostQualificationController.renderDecision}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputTextarea id="txtComment" class="form-control"  value="#{PostQualificationController.wfPrmsProcessed.commentGiven}" 
+                                                                             title="Remark"  required="false"  requiredMessage="Enter Plan" 
+                                                                             rendered="#{PostQualificationController.renderDecision}"
+                                                                             validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+
+                        </section>
+                    </section>
+                    <div class="form-group textBoxMarginTop6px "> 
+                        <div class="col-lg-2" />
+                        <div class="col-sm-3">
+
+                            <p:commandButton id="btnSave" action="#{PostQualificationController.savePost()}" icon="ui-icon-new" validateClient="true" 
+                                             process="@this,postQMasterPanel1,pnlworkflow"  
+                                             update="postQMasterPanel1,postQMasterPanel2,pnlworkflow" 
+                                             class="btn btn-primary col-lg-4 "
+                                             value="#{PostQualificationController.saveorUpdateBundle}"/> 
+<!--                            process="@this,frmpostQualificationUi,postQpanel,postQGenPanel,postQMasterPanel1,PGitemOrLot"  
+                                             update="frmpostQualificationUi,postQpanel,postQGenPanel,postQMasterPanel1,PGitemOrLot" -->
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li><a href="PortEntry.xhtml"><i class="fa fa-circle-o "></i> <span>Port Registration</span></a></li> 
+        <li><a href="serviceProvider.xhtml"><i class="fa fa-circle-o "></i> <span>Service Provider</span></a></li> 
+        <li><a href="ForeignExchange.xhtml"><i class="fa fa-circle-o "></i> <span>Foreign Currency Exchange</span></a></li>
+        <!--<li><a href="InsuranceNotificationToBank.xhtml"><i class="fa fa-circle-o "></i> <span>Insurance Notification To Bank</span></a></li>--> 
+        <li><a href="LCInformation.xhtml"><i class="fa fa-circle-o "></i> <span>Letter Of Credit Information</span></a></li> 
+        <li><a href="LCRegAmendment.xhtml"><i class="fa fa-circle-o "></i> <span>Letter Of Credit Amendment </span></a></li> 
+        <li><a href="BankClearanceRegistration.xhtml"><i class="fa fa-circle-o "></i> <span>Declaration Settlement(Bank Clearance) Registration</span></a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmtoolbars">
+            <p:toolbar style="background-color: white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackToSearch" rendered="#{InsuranceRegisteration.renderpnlToSearchPage}">
+                        <p:commandButton id="cmdBackToSearch" icon="ui-icon-search" style="background-color: white;border-color: white"
+                                         action="#{InsuranceRegisteration.goBackSearchPageBtnAction()}" 
+                                         title="Back to Search"
+                                         process="@this" update=":frmSearchingPages,:frmRegistaringPage,:frmtoolbars"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PgCreate" rendered="#{InsuranceRegisteration.isRenderCreate}">
+                        <p:commandButton id="btnNew" action="#{InsuranceRegisteration.SwitchedToNewButton()}" 
+                                         style="background-color: white;border-color: white"
+                                         icon="#{InsuranceRegisteration.icone}" validateClient="true"
+                                         process="@this" update="@this,:frmSearchingPages,:frmRegistaringPage,:frmtoolbars"
+                                         title="#{InsuranceRegisteration.newOrSearchBundle}"
+                                         rendered="#{InsuranceRegisteration.isRenderCreate}"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PGNotification" rendered="#{purchaseReqController.renderDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell-o" value="#{InsuranceRegisteration.requestNotificationCounter}"
+                                       title="Notification" style="color: red;background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Insurance Requests"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{InsuranceRegisteration.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="insuReqlst"
+                                               value="#{InsuranceRegisteration.prmsInsuranceregistrationList}"
+                                               itemValue="#{insuReqlst}" itemLabel="#{insuReqlst.insuranceNo}"/>               
+                                <p:ajax event="valueChange" update=":frmRegistaringPage,:frmRegistaringPage:PGTwo,:frmtoolbars,:frmSearchingPages" process="@this,"/>                            
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                   title="Work Flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                    class="col-md-4" style="height: 200px">
+                        <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                        <!--put work flow list here-->
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmWf"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="dtWorkflow" paginator="true" paginatorPosition="bottom" var="num" rows="5" rowIndexVar="rowName" value="#{InsuranceRegisteration.wfPrmsProcessedDModel}"
+                                                             rowKey="#{num.processedId}" resizableColumns="true" >
+                                                    <p:column headerText="S/N" width="60">
+                                                        <h:outputText value="#{sn+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Processed By">
+                                                        <h:outputText value="#{num.processedBy}" /> 
+                                                    </p:column>
+                                                    <p:column headerText="Processed On">
+                                                        <h:outputText value="#{num.processedOn}">
+                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                        </h:outputText>
+                                                    </p:column>
+                                                    <p:column headerText="Comment Given">
+                                                        <h:outputText value="#{num.commentGiven}" /> 
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+
+                    <a href="InsuranceRegistrationForm.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearchingPages">
+            <h:panelGroup id="PGOne" rendered="#{InsuranceRegisteration.renderSearchingPage}" style="background-color: #2795e9">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><span>Search By Insurance No:</span></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h:form id="frmSearching">
+                                    <div class="panel-body">
+                                        <div class="form-horizontal">
+                                            <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblSearchingBy" class="control-label col-sm-4" value="Searching By:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchingBy" style="width: 100%" value="#{InsuranceRegisteration.insuranceregistration.columnName}"
+                                                                         valueChangeListener="#{InsuranceRegisteration.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{InsuranceRegisteration.insuranceSearchParameterLst}"
+                                                                           var="colNameLists" itemLabel="#{colNameLists}"/>
+                                                            <p:ajax event="change" process="@this," update="lblCriteriaNo,txtCriteriaNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                    <h:outputLabel id="lblCriteriaNo" class="control-label col-sm-4" value="Search By #{InsuranceRegisteration.insuranceregistration.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCriteriaNo" value="#{InsuranceRegisteration.insuranceregistration.columnValue}"/>
+                                                    </div>
+                                                </div>
+
+                                            <div class="form-group textBoxMargin6px">
+                                                <div class="col-sm-4 col-sm-push-2">
+                                                    <p:commandButton id="btnSearch" value="Find" icon="ui-icon-search" 
+                                                                     action="#{InsuranceRegisteration.searchInsuranceInformation()}" class="btn btn-primary"
+                                                                     process="@this frmSearching" update=":frmSearchingPages:frmInsuranceModel"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </h:form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h:form id="frmInsuranceModel">
+                                    <div class="panel-body">
+                                        <div class="form-horizontal">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="dtInsuReg" var="Insurer" value="#{InsuranceRegisteration.prmsInsuranceregistrationModel}"
+                                                                 rows="10" paginator="true" paginatorPosition="bottom"
+                                                                 selection="#{InsuranceRegisteration.insuranceDMSelection}" selectionMode="single" rowKey="#{Insurer.insuranceRegId}" 
+                                                                 rowIndexVar="Num" editable="true"
+                                                                 rowsPerPageTemplate="5,10,15"
+                                                                 paginatorTemplate="{CurrentPageReport} {PreviousPageLink} {FirstPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                                                        <p:ajax event="rowSelect" listener="#{InsuranceRegisteration.onRowSelect}"
+                                                                update=":frmRegistaringPage,:frmRegistaringPage:PGTwo,:frmtoolbars,:frmSearchingPages"/>
+                                                        <p:column headerText="S.No">
+                                                            #{Num+1}
+                                                        </p:column>
+                                                        <p:column sortBy="#{Insurer.insuranceNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputLabel value="Insurance No"/>
+                                                            </f:facet>
+                                                            <h:outputLabel value="#{Insurer.insuranceNo}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{Insurer.nameOfInsured}">
+                                                            <f:facet name="header">
+                                                                <h:outputLabel value="Name of Insured"/>
+                                                            </f:facet>
+                                                            <h:outputLabel value="#{Insurer.nameOfInsured}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputLabel value="Amount of Insurance"/>
+                                                            </f:facet>
+                                                            <h:outputLabel value="#{Insurer.amountOfInsuranceFc}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{Insurer.referenceNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputLabel value="Reference No"/>
+                                                            </f:facet>
+                                                            <h:outputLabel value="#{Insurer.referenceNo}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{Insurer.dateIssued}">
+                                                            <f:facet name="header">
+                                                                <h:outputLabel value="Issued Date"/>
+                                                            </f:facet>
+                                                            <h:outputLabel value="#{Insurer.dateIssued}">
+                                                                <f:convertDateTime pattern="yyyy/MMM/dd"/>
+                                                            </h:outputLabel>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <div class="row">
+            <div class="col-md-12">
+                <h:form id="frmRegistaringPage">
+                    <p:growl id="growlOne" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+                    <h:panelGroup id="PGTwo" rendered="#{InsuranceRegisteration.renderRegisterationPage}">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title">Insurance Registration Form</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-horizontal">
+                                            <div class="form-group textBoxMargin6px required">
+                                                <h:outputLabel id="lblInsNo" class="control-label col-sm-2" value="Insurance No:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtInsNo" readonly="true"
+                                                                 value="#{InsuranceRegisteration.generateInsuranceNo()}"/>
+
+                                                </div>
+                                                <p:outputLabel id="lblDate" class="control-label col-sm-2" value="Date Issued:"/>
+                                                <div class="col-sm-3">
+                                                    <p:calendar id="txtDate" required="true" requiredMessage="Please Select Issuid Date" 
+                                                                placeholder="dd/mm/yyyy" pattern="dd/MM/yyyy" tabindex="4"  disabled="#{workFlow.readonly}"                     
+                                                                value="#{InsuranceRegisteration.insuranceregistration.dateIssued}" maxdate="today"
+                                                                mindate="today" autocomplete="off" readonlyInput="true">                   
+                                                        <f:convertDateTime  pattern="dd/MM/yyyy"/>
+                                                    </p:calendar>
+                                                    <p:message for="txtDate" display="icon"/>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel id="lblServiceProFrom" class="control-label col-sm-2" value="From:"/>
+                                                <div class="col-sm-2">
+                                                    <p:inputText id="txtDepFrom" class="form-control" placeholder="Use Only From + Button"
+                                                                 value="#{InsuranceRegisteration.hrDepartments.depName}" onmousedown="return false;"
+                                                                 required="true" requiredMessage="Please Select From Department" />
+
+                                                    <p:message for="txtDepFrom" display="icon"/>
+                                                </div>
+
+                                               
+
+                                                <div class="col-sm-1">
+                                                    <p:commandButton id="cmdDepartment" type="button"  onclick="PF('dlg1').show()" value="+" partialSubmit="true" 
+                                                                     disabled="#{workFlow.readonly}" title="Choose Department" style="background: transparent"/>
+                                                </div>
+                                                <p:outputLabel id="lblRefNo" class="control-label col-sm-2" value="Reference No:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtRefNo" class="form-control col-sm-2" required="true" requiredMessage="Please Enter Reference Number"
+                                                                 value="#{InsuranceRegisteration.insuranceregistration.referenceNo}" readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="txtRefNo" display="icon"/>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel id="lblToBank" class="control-label col-sm-2"  value="To:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="selectToBank" required="true" requiredMessage="Please Select Bank Name To" style="width: 100%"
+                                                                     value="#{InsuranceRegisteration.prmsServiceProviderTo.serviceProId}"
+                                                                     converter="entConverter" disabled="#{workFlow.readonly}"
+                                                                     valueChangeListener="#{InsuranceRegisteration.updateTo}"> 
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{InsuranceRegisteration.serviceProviderListT}"
+                                                                       var="to" itemLabel="#{to.name}" itemValue="#{to.serviceProId}"/>
+                                                        <p:ajax update="selectBankBranch" process="@this" event="change"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="selectToBank" display="icon"/>
+
+                                                </div>
+                                                <p:outputLabel id="lblCover" class="control-label col-sm-2" value="Cover Required:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtCover" value="#{InsuranceRegisteration.insuranceregistration.coverRequired}"
+                                                                 class="form-control col-sm-2" required="true" requiredMessage="Please Enter Cover Required" readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="txtCover" display="icon"/>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel id="lblBranch" class="col-sm-2" style="text-align: right"  value="Branch:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="selectBankBranch" requiredMessage="Please Select Bank's Branch" style="width: 100%"
+                                                                     value="#{InsuranceRegisteration.prmsServiceProviderBranch.serviceDtId}"
+                                                                     converter="entConverter" disabled="#{workFlow.readonly}"
+                                                                     valueChangeListener="#{InsuranceRegisteration.updateBranch}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{InsuranceRegisteration.bankBranch}"
+                                                                       var="branch" itemLabel="#{branch.branchName}" itemValue="#{branch.serviceDtId}"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="selectBankBranch" display="icon"/>
+                                                </div>
+
+                                                <p:outputLabel id="lblpolicyNo" class="control-label col-sm-2"  value="Policy No:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtpolicyNo" value="#{InsuranceRegisteration.insuranceregistration.policyNo}" 
+                                                                 required="true" requiredMessage="Please Enter Policy Number"
+                                                                 validatorMessage="Please Enter only Numbers and Letters" readonly="#{workFlow.readonly}">
+                                                        <f:validateRegex pattern="^[a-zA-Z0-9]+$"/>
+                                                    </p:inputText>
+                                                    <p:message for="txtpolicyNo" display="icon"/>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+
+                                                <p:outputLabel id="lblNameOfInsured" class="control-label col-sm-2" value="Name Of Insured:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputTextarea id="txtnameOfInsured" value="#{InsuranceRegisteration.insuranceregistration.nameOfInsured}"
+                                                                     required="true" requiredMessage="Please Enter Name of Insured" autoResize="false" maxlength="200" class="form-control col-sm-2"
+                                                                     style="height: 8%; overflow: scroll " validator="#{validatorManagedBean.Text}" validatorMessage="Please Use only Letters"
+                                                                     counter="display" counterTemplate="{0} characters remaining." readonly="#{workFlow.readonly}"/>
+
+                                                    <h:outputText id="display"/>
+                                                    <p:message for="txtnameOfInsured" display="icon"/>
+
+                                                </div>
+                                                <p:outputLabel id="lblPerSS" class="control-label col-sm-2" value="Per S.S:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="txtPerSS" style="width: 100%" required="true" requiredMessage="Please select one service Provider"
+                                                                     value="#{InsuranceRegisteration.prmsServiceProvider.serviceProId}" converter="entConverter" disabled="#{workFlow.readonly}">
+                                                        <f:selectItem itemLabel="---- Select one ---" itemValue=""/>
+                                                        <f:selectItems value="#{InsuranceRegisteration.serviceProviderListF}"
+                                                                       var="names" itemLabel="#{names.name}" itemValue="#{names.serviceProId}"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtPerSS" display="icon"/>
+                                                    
+
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+
+                                                <p:outputLabel id="lblAmountOfInsurance" class="control-label col-sm-2" value="Amount of Insur.Fc:"/>
+                                                <div class="col-sm-2">
+
+                                                    <p:inputText id="txtAmountOfInsurance" class="form-control" placeholder="0.00" required="true" requiredMessage="Please Enter Amount of Insurance in Foreign Currency"
+                                                                 converterMessage="Please enter digits only." readonly="#{workFlow.readonly}"
+                                                                 value="#{InsuranceRegisteration.insuranceregistration.amountOfInsuranceFc}">
+                                                        <p:ajax event="keyup" update="lblOutput" listener="#{InsuranceRegisteration.percentage()}"/>
+                                                        <p:ajax event="mouseout" update="lblOutput" listener="#{InsuranceRegisteration.percentage()}"/> 
+                                                    </p:inputText>
+
+                                                    <p:message for="txtAmountOfInsurance" display="icon"/>
+
+                                                </div>
+                                                <div><p:outputLabel value="+ 10%"/></div>
+                                                <div class="col-sm-1">
+                                                    <h:outputLabel id="lblOutput" value="#{InsuranceRegisteration.insuranceregistration.getAmountOfInsuranceFc() + ((InsuranceRegisteration.insuranceregistration.getAmountOfInsuranceFc()) * 0.1)}" 
+                                                                   title="Amount in USD" converter="#{InsuranceRegisteration.numberConverter}">
+                                                        <f:convertNumber type="currency" currencySymbol="$" locale="en"/>
+                                                        <p:ajax event="mouseout"/>
+                                                    </h:outputLabel>
+                                                </div>
+
+                                                <p:outputLabel id="lblContractNo" class="control-label col-sm-2" value="Contract No:"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="txtContractNo" style="width: 100%" disabled="#{workFlow.readonly}"
+                                                                     value="#{InsuranceRegisteration.prmsContract}"
+                                                                     converter="entConverter" required="true" requiredMessage="Please Select Contract Number"
+                                                                     valueChangeListener="#{InsuranceRegisteration.updateConNum}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{InsuranceRegisteration.contractNum}"
+                                                                       var="contractNum" itemLabel="#{contractNum.contractNo}" itemValue="#{contractNum}"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message for="txtContractNo" display="icon"/>
+                                                </div> 
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px required">
+                                                <p:outputLabel id="lblSelectCurrency" value="Select Currency:" class="control-label col-sm-2"/>
+                                                <div class="col-sm-3">
+                                                    <p:selectOneMenu id="SelectCurrencyName" required="true" requiredMessage="Please Select Currency Name" style="width: 100%"
+                                                                     value="#{InsuranceRegisteration.insuranceregistration.currencyName}"
+                                                                     converter="entConverter" disabled="#{workFlow.readonly}"
+                                                                     valueChangeListener="#{InsuranceRegisteration.getXRate}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItems value="#{InsuranceRegisteration.luCurrencysLists}"  
+                                                                       var="CurrencyList" itemLabel="#{CurrencyList}" itemValue="#{CurrencyList}"/>
+                                                        <!--<f:selectItems value="{InsuranceRegisteration.fromLuCurrency()}" />-->
+                                                        <p:ajax event="change" process="@this" update="txtExchangeRate,lblLc,txtLocalCurrency"/>
+                                                    </p:selectOneMenu>
+                                                    <p:message  for="SelectCurrencyName" display="icon"/> 
+                                                </div>
+                                                <p:outputLabel id="lblPremium" value="Premium Due:" class="control-label col-sm-2"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtPremium" class="form-control" required="true" requiredMessage="Please Enter Premium due" 
+                                                                 validator="#{validatorManagedBean.Double}"  converterMessage="Please Enter only Numbers"
+                                                                 value="#{InsuranceRegisteration.insuranceregistration.premiumDue}" readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="txtPremium" display="icon"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+                                                <p:outputLabel id="lblExchangeRate" class="control-label col-sm-2" value="Exchange Rate:"/>
+                                                <div class="col-sm-2">
+                                                    <p:inputText id="txtExchangeRate" placeholder="0.00" readonly="true"
+                                                                 value="#{InsuranceRegisteration.insuranceregistration.exchangeRate}">
+                                                        <p:ajax event="change" update="lblLc" listener="#{InsuranceRegisteration.intoLc()}"/>
+                                                        <p:ajax event="change" update="txtLocalCurrency" listener="#{InsuranceRegisteration.toWords()}"/>
+                                                    </p:inputText>
+                                                </div>
+                                                <div class="col-sm-1">
+                                                    <h:outputLabel id="lblLc" value="#{InsuranceRegisteration.insuranceregistration.lcAmount}" title="Amount in Birr">
+                                                        <f:convertNumber type="currency" currencySymbol="ETB" locale="en"/>
+                                                    </h:outputLabel>
+
+
+                                                </div>
+                                                <h:outputLabel id="lblStartFrom" class="control-label col-sm-2"  for="txtStartFrom" value="Start From:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtStartFrom" value="#{InsuranceRegisteration.insuranceregistration.startFrom}" class="form-control" readonly="#{workFlow.readonly}"/>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group  textBoxMargin6px">
+                                                <h:outputLabel id="lblLocalCurrency" class="control-label col-sm-2"  for="txtLocalCurrency" value="Local Currency in word:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputTextarea id="txtLocalCurrency" readonly="true" placeholder="you can't type from keyboard!"
+                                                                     value="#{InsuranceRegisteration.insuranceregistration.localCurrencyInword}"
+                                                                     autoResize="false" style="height: 12%; overflow: scroll"/>
+                                                </div>
+                                                <p:message for="txtLocalCurrency" display="icon"/>
+
+                                                <h:outputLabel id="lblArriveTo" class="control-label col-sm-2" value="Arrive To:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtArriveTo" class="form-control" value="#{InsuranceRegisteration.insuranceregistration.arriveTo}" readonly="#{workFlow.readonly}"/>
+                                                    <p:message for="txtArriveTo" display="icon"/>
+                                                </div>
+
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px required">
+
+                                                <p:outputLabel id="lblQuantity" class="control-label col-sm-2" value="Quantity: "/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtQuantity" value="#{InsuranceRegisteration.insuranceregistration.quantity}" placeholder="000"
+                                                                 class="form-control col-sm-2" required="true" requiredMessage="Please Enter Quantity" 
+                                                                 validator="#{validatorManagedBean.Number}" converterMessage="Please Enter Only Digits" readonly="#{workFlow.readonly}"/>
+
+                                                    <p:message for="txtQuantity" display="icon"/>
+                                                    <p:clientValidator event="keyup"/>
+
+                                                </div>
+                                                <h:outputLabel id="lblPackaging" class=" col-sm-2" style="text-align: right" value="Packaging:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtPackaging" class="form-control col-sm-2" readonly="#{workFlow.readonly}"
+                                                                 value="#{InsuranceRegisteration.insuranceregistration.packaging}"/>
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+
+                                                <h:outputLabel id="lblDescription"  for="txtDescription" class="control-label col-sm-2" value="Description of Goods:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputTextarea id="txtDescription" class="form-control col-sm-2" placeholder="type your description here!"
+                                                                     value="#{InsuranceRegisteration.insuranceregistration.descriptionOfGood}"
+                                                                     autoResize="false" style="height: 7%; overflow: scroll"
+                                                                     validator="#{validatorManagedBean.Text}" readonly="#{workFlow.readonly}"/>
+
+                                                </div>
+                                                <h:outputLabel id="lblMark"  for="txtMark" class="control-label col-sm-2" value="Mark and Notification:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputTextarea id="txtMark" value="#{InsuranceRegisteration.insuranceregistration.marksAndNos}"
+                                                                     autoResize="false" style="height: 7%; overflow: scroll" 
+                                                                     class="form-control col-sm-2" readonly="#{workFlow.readonly}"
+                                                                     validator="#{validatorManagedBean.Text}"/>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+                                               
+                                                <h:outputLabel id="lblPosition"  for="txtPosition" class="control-label col-sm-2" value="Preparer Position:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputText id="txtPosition" class="form-control col-sm-2"
+                                                                 value="#{InsuranceRegisteration.insuranceregistration.preparerPosition}"
+                                                                 validator="#{validatorManagedBean.Text}" readonly="#{workFlow.readonly}"
+                                                                 validatorMessage="Please Enter Texts Only"/>
+                                                    <p:message for="txtPosition" display="icon"/>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <h:outputLabel id="lblAttachment" class="control-label col-sm-2" value="Attachment:"/>
+                                                <div class="col-sm-3">
+                                                    <p:fileUpload id="fileUpload" allowTypes="/(\.|\/)(gif|jpe?g|png|pdf|doc|docx|xls|xl|xlsx)$/" invalidFileMessage="Invalid File Type" 
+                                                                  sizeLimit="100000" invalidSizeMessage="File Size is Exceeded" auto="true" fileLimit="1" fileLimitMessage="Is impossible to upload more than one file"
+                                                                  mode="advanced" dragDropSupport="false"  value="#{InsuranceRegisteration.insuranceregistration.fileRefNumber}"
+                                                                  process="@this" update="dtFileUpload" fileUploadListener="#{InsuranceRegisteration.fileUploadListener}" disabled="#{workFlow.readonly}">
+                                                    </p:fileUpload>
+                                                    <p:dataTable id="dtFileUpload" paginator="true" paginatorPosition="bottom" var="currentRow"
+                                                                 rowKey="#{currentRow.documentId}" value="#{InsuranceRegisteration.prmsLuDmArchivesDModel}"
+                                                                 selection="#{InsuranceRegisteration.prmsLuDmArchiveSelection}" selectionMode="single">
+                                                        <p:ajax event="rowSelect" listener="#{InsuranceRegisteration.whenRowSelect}" update="dtFileUpload"/>
+                                                        <f:facet name="header">
+                                                            <p:outputLabel value="Files From Database"/>
+                                                        </f:facet>
+                                                        <p:column  headerText="File Name">
+                                                            <h:outputLabel id="lblFileName" value="#{currentRow.fileName}"/>
+                                                        </p:column>
+                                                        <p:column headerText="Download">
+                                                            <h:panelGroup id="PGFileDown">
+                                                                <p:commandButton id="cmdDownload" icon="ui-icon-arrowthickstop-1-s" ajax="false" title="Download" 
+                                                                                 process="@this,dtFileUpload" update="dtFileUpload" immediate="true">
+                                                                    <p:fileDownload id="fileUp" value="#{InsuranceRegisteration.downloads}"/>
+                                                                </p:commandButton>
+                                                            </h:panelGroup>
+
+                                                            
+                                                        </p:column>
+
+
+                                                    </p:dataTable>
+                                                </div>
+                                                <h:outputLabel id="lblRemark" class="control-label col-sm-2" for="txtRemark" value="Remark:"/>
+                                                <div class="col-sm-3">
+                                                    <p:inputTextarea id="txtRemark" value="#{InsuranceRegisteration.insuranceregistration.remark}"
+                                                                     validator="#{validatorManagedBean.Remark}" class="form-control col-sm-2"
+                                                                     autoResize="false" style="height: 8%; overflow: auto" readonly="#{workFlow.readonly}"/>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group textBoxMargin6px">
+                                                <section class="panel panel-info col-sm-12" >
+                                                    <section class="panel panel-info  col-sm-12">
+                                                        <h:panelGroup id="PGworkFlow"  >
+                                                            <div class="form-group  form-horizontal" >
+                                                                <div class="form-group textBoxMargin6px required">
+                                                                    <p:outputLabel id="lblApproverName" class="col-sm-2" style="text-align: right" value="Processed By:"/>
+                                                                    <div class="col-sm-3">
+                                                                        <p:inputText id="txtApproverName" value="#{InsuranceRegisteration.userName}" readonly="true"/>
+                                                                    </div>
+                                                                    <p:outputLabel id="lblApprovedDate" value="Processed On:" class="control-label col-sm-2"/>
+                                                                    <div class="col-sm-3">
+                                                                        <p:calendar id="calApprovedDate" placeholder="dd/mm/yyyy"  pattern="dd/MM/yyyy" mindate="today" maxdate="today" value="#{InsuranceRegisteration.wfPrmsProcessed.processedOn}"
+                                                                                    required="true" requiredMessage="Please Enter Processed On">
+                                                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                        </p:calendar>
+                                                                        <p:message for="calApprovedDate" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group textBoxMargin6px">
+                                                                    <p:outputLabel id="lblDecision" for="drdDecision" value="Decision:" class="control-label col-sm-2" rendered="#{InsuranceRegisteration.renderDecision}"/>
+                                                                    <div class="col-sm-3">
+                                                                        <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{InsuranceRegisteration.wfPrmsProcessed.decision}"
+                                                                                         valueChangeListener="#{InsuranceRegisteration.handleDecisionOptions}" rendered="#{InsuranceRegisteration.renderDecision}"
+                                                                                         required="true" requiredMessage="Please Give a Decision">
+                                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                            <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                                            <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                                        </p:selectOneMenu>
+                                                                        <p:message for="drdDecision" display="icon"/>
+                                                                    </div>
+                                                                    <p:outputLabel id="lblApproverRemark" class="control-label col-sm-2" value="Comment Given:" rendered="#{InsuranceRegisteration.renderDecision}"/>
+                                                                    <div class="col-sm-3">
+                                                                        <p:inputTextarea id="txtApproverRemark" class="form-control" value="#{InsuranceRegisteration.wfPrmsProcessed.commentGiven}" rendered="#{InsuranceRegisteration.renderDecision}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+
+                                                    </section>
+                                                </section> 
+                                            </div>
+
+                                            <div class="form-group textBoxMargin6px">
+
+                                                <div class="col-sm-3 col-sm-push-2">
+                                                    <p:commandButton id="btnSave" class="btn btn-primary col-lg-4" 
+                                                                     validateClient="true"
+                                                                     value="#{InsuranceRegisteration.createorUpdateBundle}" 
+                                                                     action="#{InsuranceRegisteration.createInsuranceInformation()}"
+                                                                     process="@this,PGTwo" update=":frmRegistaringPage:PGTwo,:frmtoolbars,PGworkFlow"/>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </h:panelGroup>
+                    <p:dialog id="dlg1" header="Departments" widgetVar="dlg1" draggable="true" width="520" height="400"
+                              showEffect="fade" hideEffect="fade">
+                        <h:panelGrid id="PGrid1" columns="3" cellpadding="5" style="border-color: #ffffff;">
+                            <p:tree value="#{InsuranceRegisteration.departmentsRoot}" var="nodes" dynamic="true"
+                                    style="border: transparent;width: 100%;height: 100%;overflow: auto;display: block"
+                                    selectionMode="single" selection="#{InsuranceRegisteration.selectedNode}" class="col-lg-12">
+                                <p:ajax event="select" listener="#{InsuranceRegisteration.onNodeSelection}" 
+                                        process="@this," 
+                                        update=":frmRegistaringPage:txtDepFrom" />
+                                <p:treeNode id="tNode1"> 
+                                    <h:outputText id="txtNode" value="#{nodes}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </h:panelGrid>
+                    </p:dialog>
+                </h:form>
+            </div>
+
+        </div>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,484 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="retirementRequest.xhtml" title="Retirement Request"><i class="fa fa-circle-o "></i> <span>Retirement Request</span></a></li>
+        <li><a href="terminationRequest.xhtml" title="Termination Request"><i class="fa fa-circle-o "></i> <span>Termination Request</span></a></li>
+        <li><a href="terminationApprove.xhtml" title="Termination Approve"><i class="fa fa-circle-o "></i><span>Termination Approve</span></a></li>
+        <li><a href="clearanceSetting.xhtml" title="Clearance Setting"><i class="fa fa-circle-o "></i><span>Clearance Setting</span></a></li>
+        <li><a href="clearance.xhtml" title="Clearance"><i class="fa fa-circle-o "></i><span>Clearance</span></a></li> 
+        <li><a href="exitInterview.xhtml" title="Exit Interview"><i class="fa fa-circle-o "></i><span>Exit Interview</span></a></li> 
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" action="#{retirementApproveConrtroller.searchRetirementApp()}" validateClient="true" 
+                                     icon="ui-icon-search" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmRetirement,:frmSearch,:frmToolBar" title="Search"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <span class="NotificationText"> #{retirementApproveConrtroller.retirementList.size()} </span>
+                    <p:commandLink id="cmdLNotification" class="fa fa-fw fa-bell" title="Notification"/>
+                    <p:overlayPanel widgetVar="widNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLNotification"
+                                    class="col-md-4" style="height: 400px">
+                        <div class="col-md-12 textBoxMargin6px">     
+                            <div class="form-group">  
+                                <div class="col-sm-8">                                                               
+                                    <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="startsWith" filter="true"
+                                                        converter="entConverter" valueChangeListener="#{retirementApproveConrtroller.populateNotification}" scrollHeight="400">
+                                        <f:selectItems value="#{retirementApproveConrtroller.retirementList}" var="reqList"
+                                                       itemValue="#{reqList}" itemLabel="#{reqList.empId.firstName} #{reqList.empId.middleName} => (#{reqList.empId.empId})"/> 
+                                        <p:ajax event="valueChange"  process="@this"  update="@this,:frmRetirement,:frmSearch"/>
+                                    </p:selectOneListbox>
+                                </div>                               
+                            </div> 
+                        </div> 
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-gear" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWorkflow" value="#{retirementApproveConrtroller.workflowDataModel}"
+                                                                 var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                 rowKey="#{currentRow.workflowId}" paginatorPosition="bottom">
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Decision"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.decision}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Comment Given"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Processed Date"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                        </p:column> 
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                    </h:panelGroup> 
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/termination/retirementApprove.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span> 
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlSearch" rendered="#{retirementApproveConrtroller.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchEvaLevel">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{retirementApproveConrtroller.filiterByStatus_Vcl}">
+                                                                <f:selectItems value="#{retirementApproveConrtroller.filterByStatus}"/>   
+                                                                <p:ajax event="change" process="@this" update=":frmSearch:tblRetirement"/>
+                                                            </p:selectOneMenu> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblRetirement" value="#{retirementApproveConrtroller.retirementDataModel}" selectionMode="single"
+                                                         var="termination" rows="10" paginator="true" rowKey="#{termination.id}" class="dataTable" rowIndexVar="num"
+                                                         selection="#{retirementApproveConrtroller.hrRetirementRequest}" rowsPerPageTemplate="5,10,15" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" listener="#{retirementApproveConrtroller.populateDatatable}" 
+                                                        process="@this,tblRetirement" update=":frmSearch,:frmToolBar,:frmRetirement"/>
+                                                <p:column headerText="No." style="width: 50px">                
+                                                    <h:outputText value="#{num+1}"/>
+                                                </p:column>
+                                                <p:column headerText="Employee Name" filterMatchMode="contains" filterBy="#{termination.empId.firstName}">
+                                                    <h:outputText value="#{termination.empId.firstName} #{termination.empId.middleName} #{termination.empId.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Employee ID">
+                                                    <h:outputText value="#{termination.empId.empId}"/>
+                                                </p:column> 
+                                                <p:column headerText="Termination Type">
+                                                    <h:outputText value="#{termination.retirementType}"/>
+                                                </p:column> 
+                                                <p:column headerText="Request Date">                
+                                                    <h:outputText value="#{termination.requestDate}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmRetirement">
+            <h:panelGroup id="pnlMainPage" rendered="#{retirementApproveConrtroller.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Retirement Approve</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <div class="nav-tabs-custom">
+                                        <ul class="nav nav-tabs" id="myTab">
+                                            <li class="active"><a href="#tabRetirementInfo" data-toggle="tab">Retirement Approve Detail</a></li>
+                                            <li><a href="#tabAttachFile" data-toggle="tab">Supportive Information</a></li>
+                                        </ul>
+                                        <div class="tab-content" id="maintab">
+                                            <div class="tab-pane active" id="tabRetirementInfo">
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <h:panelGroup id="pnl1" class="col-sm-12">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-md-6"> 
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtEmployeeName" value="Employee Name:" class="control-label col-sm-4"/>   
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtEmployeeName" value="#{retirementApproveConrtroller.hrEmployees.firstName}" 
+                                                                                                 title="Employee Name" readonly="true"/>
+                                                                                    <p:message for="txtEmployeeName" display="icon"/>
+                                                                                </div> 
+                                                                            </div>                                                                                          
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtDepartment" value="Department:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtDepartment" value="#{retirementApproveConrtroller.hrDepartments.depName}" 
+                                                                                                 title="Department" readonly="true"/>
+                                                                                    <p:message for="txtDepartment" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtDateofBirth" value="Date of Birth:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtDateofBirth" value="#{retirementApproveConrtroller.hrEmployees.dob}" 
+                                                                                                 title="Date of Birth" readonly="true"/>
+                                                                                    <p:message for="txtDateofBirth" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtPensionRegNo" value="Pension Reg. No.:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtPensionRegNo" value="#{retirementApproveConrtroller.hrEmployees.pensionRegNo}" 
+                                                                                                 title="Pension Reg. No." readonly="true"/>
+                                                                                    <p:message for="txtPensionRegNo" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                    </div>    
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtEmployeeID" value="Employee ID:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtEmployeeID" value="#{retirementApproveConrtroller.hrEmployees.empId}"
+                                                                                                 readonly="true" title="Employee ID" />
+                                                                                    <p:message for="txtEmployeeID" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                               
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtPosition" value="Job Title:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtPosition" value="#{retirementApproveConrtroller.hrJobTypes.jobTitle}" 
+                                                                                                 title="Job Position" readonly="true"/>
+                                                                                    <p:message for="txtPosition" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtHireDate" value="Hire Date:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtHireDate" value="#{retirementApproveConrtroller.hrEmployees.hireDate}" 
+                                                                                                 title="Hire Date" readonly="true"/>
+                                                                                    <p:message for="txtHireDate" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <h:panelGroup id="pnl2" class="col-sm-12">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel  for="txtRetirementType" value="Retirement Type:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtRetirementType" value="#{retirementApproveConrtroller.hrRetirementRequest.retirementType}" 
+                                                                                                 title="Retirement Type" readonly="true"/>
+                                                                                    <p:message for="txtRetirementType" display="icon"/>
+                                                                                </div>  
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtDescription" value="Description:" class="control-label col-sm-4"/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputTextarea id="txtDescription" value="#{retirementApproveConrtroller.hrRetirementRequest.description}" rows="1"
+                                                                                                     validator="#{validatorManagedBean.Remark}" autoResize="false" title="Description" readonly="true"/>
+                                                                                    <p:message for="txtDescription" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtRequestdate" value="Request Date:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtRequestdate" value="#{retirementApproveConrtroller.hrRetirementRequest.requestDate}"
+                                                                                                 title="Request Date" readonly="true"/>
+                                                                                    <p:message for="txtRequestdate" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtRetirementDate" value="Retirement Date:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtRetirementDate" value="#{retirementApproveConrtroller.hrRetirementRequest.retirementDate}"
+                                                                                                 title="Retirement Date" readonly="true"/>
+                                                                                    <p:message for="txtRetirementDate" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <h:panelGroup id="pnl3" class="col-sm-12">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel for="drdDecsion" class="control-label col-sm-4" value="Decision: "/> 
+                                                                                <div class="col-sm-8">  
+                                                                                    <p:selectOneMenu id="drdDecsion" value="#{retirementApproveConrtroller.hrRetirementRequest.status}"
+                                                                                                     valueChangeListener="#{retirementApproveConrtroller.handleselectOptions}"
+                                                                                                     required="true" requiredMessage="Select decision type" style="width:100%">        
+                                                                                        <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                                        <f:selectItem itemLabel="Approve" itemValue="1"/>
+                                                                                        <f:selectItem itemLabel="Reject" itemValue="2"/>
+                                                                                        <p:ajax process="@this" event="change"/>
+                                                                                    </p:selectOneMenu>
+                                                                                    <p:message for="drdDecsion" display="icon"/>
+                                                                                </div>  
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtReason" class="control-label col-sm-4" value="Comment Given"/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputTextarea id="txtReason" value="#{retirementApproveConrtroller.wfHrProcessed.commentGiven}" rows="1"
+                                                                                                     title="Comment" validator="#{validatorManagedBean.Remark}" class="form-control" autoResize="false"/> 
+                                                                                    <p:message for="txtReason" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel for="txtProcessedBy" value="Processed By: " class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtProcessedBy" value="#{workFlow.userName}"
+                                                                                                 title="Processed Date" readonly="true"/>
+                                                                                    <p:message for="txtProcessedBy" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel for="txtProcessedDate" value="Processed Date: " class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtProcessedDate" value="#{retirementApproveConrtroller.wfHrProcessed.processedOn}"
+                                                                                                 converter="dateConverter" class="form-control" 
+                                                                                                 onclick="displayCalendar('frmRetirement:txtProcessedDate', 'frmRetirement:txtProcessedDate');"
+                                                                                                 required="true" requiredMessage="Enter processed date" title="processed On"
+                                                                                                 validator="#{validatorManagedBean.Date}" validatorMessage="processed date should be in date format"/>
+                                                                                    <p:message for="txtProcessedDate" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <p:dialog id="dlgWorkflow" header="Workflow" widgetVar="dlgWorkflow" height="400"
+                                                                      width="1300" modal="true" resizable="false" showEffect="explode">
+                                                                <p:dataTable id="tblWorkflow" value="#{retirementApproveConrtroller.workflowDataModel}" 
+                                                                             var="currentRow" selectionMode="single" class="dataTable" scrollable="true"
+                                                                             rowIndexVar="num" rowKey="#{currentRow.workflowId}" paginatorPosition="bottom" scrollHeight="160">
+                                                                    <p:column headerText="No." style="width: 50px">                
+                                                                        <h:outputText value="#{num+1}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Processed By">
+                                                                        <h:outputText value="#{currentRow.processedBy}"/> 
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Decision"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{currentRow.decision}"/> 
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Processed Date"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{currentRow.processedOn}"/> 
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Comment Given"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                                    </p:column> 
+                                                                </p:dataTable>
+                                                            </p:dialog>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                            </div>
+                                            <div class="tab-pane" id="tabAttachFile">
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">  
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  value="Download File:" class="control-label col-sm-2"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:panelGrid columns="1" style="float: left;"> 
+                                                                        <p:dataTable id="tblSavedDoc"  var="currentRow" rowIndexVar="num" value="#{retirementApproveConrtroller.retirementUploadDataModel}"
+                                                                                     paginator="true" selectionMode="single" rowKey="#{currentRow.id}"
+                                                                                     selection="#{retirementApproveConrtroller.hrRetirementRequestUpload}" paginatorPosition="bottom"
+                                                                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                                     rows="3" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:1000px">
+                                                                            <p:ajax event="rowSelect" listener="#{retirementApproveConrtroller.onRowSelected}" process="@this,tblSavedDoc" update="tblSavedDoc"/>
+                                                                            <p:column headerText="No." width="50">
+                                                                                <h:outputText value="#{num+1}"/>
+                                                                            </p:column>
+                                                                            <p:column id="docNames" headerText="File Name"> 
+                                                                                <h:outputText id="txtcoScale" value="#{currentRow.documentId.fileName}" style="text-align: left;"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Download">
+                                                                                <p:commandButton process="@this,tblSavedDoc" update="tblSavedDoc" icon="ui-icon-arrowthickstop-1-s" ajax="false" immediate="true">
+                                                                                    <p:fileDownload value="#{retirementApproveConrtroller.file}"/>
+                                                                                </p:commandButton>
+                                                                            </p:column> 
+                                                                        </p:dataTable>
+                                                                    </p:panelGrid>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </section>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h:panelGroup id="pnl4" class="col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4"></div>                                           
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="Save" class="btn  btn-block btn-primary col-lg-4" 
+                                                                             action="#{retirementApproveConrtroller.saveRetirementApprove()}"
+                                                                             disabled="#{retirementApproveConrtroller.disableBtn}" title="Approve"
+                                                                             process="@this,pnlMainPage" update=":frmRetirement,:frmToolBar"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

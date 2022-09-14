@@ -1,0 +1,738 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="payLocationPayGroupSetup.xhtml"><i class="fa fa-fw"></i>Pay Location &amp; Pay Group Setup</a></li>
+        <li><a href="payLocationPayGroup.xhtml"><i class="fa fa-fw"></i>Pay Location Pay Group Mapping with Department</a></li>
+        <li><a href="payrollTaxRateRegistration.xhtml"><i class="fa fa-fw"></i> Tax Rate Entry</a></li>
+        <li><a href="pensionRateEntry.xhtml"><i class="fa fa-fw"></i>Pension Rate Entry</a></li>
+        <li><a href="earningDeductionSetupTabTest.xhtml"><i class="fa fa-fw"></i>Earnings/Deductions</a></li>
+        <li><a href="payrollPeriod.xhtml"><i class="fa fa-fw"></i>Payroll Period</a> </li>
+        <li><a href="EmpEarningDeductionTabTest.xhtml"><i class="fa fa-fw"></i>Employees Earning Deduction</a></li>
+        <li><a href="EmpEarningDeductionUsingGroup.xhtml"><i class="fa fa-fw"></i>All Employees Earning Deduction</a></li>        
+        <li><a href="ThirdPartiesInfo.xhtml"><i class="fa fa-fw"></i>Maintain Third party Info</a></li>
+        <li><a href="generateMonthlyPayroll.xhtml"><i class="fa fa-fw"></i>Generate Monthly Payroll</a> </li>      
+        <li><a href="generatePayrollReports.xhtml"><i class="fa fa-fw"></i>Payroll Report</a> </li>
+        <li><a href="backPaymentGroup.xhtml"><i class="fa fa-fw"></i>Create Payroll Group</a></li>
+        <li><a href="backPaymentForGroupOfEmployees.xhtml"><i class="fa fa-fw"></i>Back Payment using Group</a> </li>        
+        <li><a href="leaveAdvancePayment.xhtml"><i class="fa fa-fw"></i>Leave Advance</a> </li>
+    </ui:define>
+    <ui:define name="contents">
+        <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+        <h:form id="frmHeader"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton validateClient="true" action="#{employeesEarningDeductioinController.btnNewOrSearch()}"
+                                     icon="#{employeesEarningDeductioinController.icone}" style="background-color: white" 
+                                     process="@this" update="@this,:frmSearch,:fmrEmpRarnDedu" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/payroll/EmpEarningDeductionTabTest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form> 
+        <h:form class="" id="frmSearch">
+            <h:panelGroup id="pnlMainPage" rendered="#{employeesEarningDeductioinController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">  
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search ...</h3>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="form-group form-horizontal required">
+                                        
+                                        <h:outputLabel value="Search Id:"  class="control-label col-sm-4" />
+                                        <div class="col-sm-6"> 
+                                            <p:autoComplete id="searchAutocompletea" value="#{employeesEarningDeductioinController.hrEmployees.empId}" requiredMessage=" Please insert Employee Id"
+                                                            completeMethod="#{employeesEarningDeductioinController.SearchByFname}" 
+                                                            var="empList" label="State" dropdown="false"
+                                                            itemValue="#{empList.empId}" itemLabel="#{empList}" forceSelection="true" 
+                                                            size="20" emptyMessage="no data" style="width:100%" >  
+                                                <p:column headerText="Employee ID">
+                                                    <h:outputText value="#{empList.empId}"/>
+                                                </p:column>
+                                                <p:column headerText="Full Name">
+                                                    <h:outputText value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                </p:column>
+                                                <p:ajax event="itemSelect"  
+                                                        listener="#{employeesEarningDeductioinController.getByFirstName}" update="@(form)" />  
+                                            </p:autoComplete> 
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br></br>
+                            <br></br>
+                            <div class="nav-tabs-custom">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#tabEarnings" data-toggle="tab">Earnings</a></li>
+                                    <li><a href="#tabDeductions" data-toggle="tab">Deduction</a></li>    
+                                </ul>
+                                <div class="tab-content" id="maintab">                                
+                                    <div class="active tab-pane" id="tabEarnings">  
+                                        <p:dataTable id="tblearnDed" value="#{employeesEarningDeductioinController.listOfEarnigs}"
+                                                     var="earningDed"  paginator="true" paginatorPosition="bottom" class="dataTable"
+                                                     rowIndexVar="num" rows="10" selectionMode="single" rowKey="#{earningDed}" 
+                                                     selection="#{employeesEarningDeductioinController.checkForUpdate}">
+                                            <p:ajax event="rowSelect" process="@this,tblearnDed" listener="#{employeesEarningDeductioinController.populateEaring}"
+                                                    update="@this,:frmHeader,:frmSearch,:fmrEmpRarnDedu"/>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="S.NO" />
+                                                </f:facet>
+                                                <h:outputText value="#{num+1}"/>
+                                            </p:column>  
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Earning"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.earningDeductionCode.description}"/>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Starting Date"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.startDate}">
+                                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Number of Month"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.numberOfMonth}"/>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Total" style="float: right"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.total}" style="float:right">
+                                                    <f:convertNumber pattern="#,##0.00" type="currency"/>
+                                                </h:outputText>
+                                            </p:column>   
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Monthly Amount" />
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.monthlyAmount}" style="float:right">
+                                                    <f:convertNumber pattern="#,##0.00" type="currency"/>
+                                                </h:outputText>
+                                            </p:column>  
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Payment Type"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.paymentIn}">
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Respective Value"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.respectivePaymentTypeAmt}">
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Remaining Months"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.remainingMonth}">
+                                                </h:outputText>
+                                            </p:column>
+                                        </p:dataTable> 
+                                    </div>
+                                    <!--begining of morgate-->
+                                    <div class="tab-pane" id="tabDeductions">
+                                        <p:dataTable id="tblDeductions" value="#{employeesEarningDeductioinController.listOfDeductions}"  
+                                                     rowIndexVar="num"  rows="10"  var="earningDed"  paginator="true"  paginatorPosition="bottom"
+                                                     selectionMode="single" rowKey="#{earningDed}" class="dataTable"
+                                                     selection="#{employeesEarningDeductioinController.hrPayrollEarningDeductions}">
+                                            <p:ajax event="rowSelect" process="@this,tblDeductions" listener="#{employeesEarningDeductioinController.populateDeduction}"
+                                                    update="@this,:frmHeader,:frmSearch,:fmrEmpRarnDedu"/>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="S.NO" />
+                                                </f:facet>
+                                                <h:outputText value="#{num+1}"/>
+                                            </p:column>
+
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Deduction"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.earningDeductionCode.description}"/>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Starting Date"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.startDate}">
+                                                    <f:convertDateTime pattern="yyyy-MM-dd" />
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Number of Month"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.numberOfMonth}"/>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Total"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.total}" style="float:right">
+                                                    <f:convertNumber pattern="#0.00"/>
+                                                </h:outputText>
+                                            </p:column>   
+                                            <p:column >
+                                                <f:facet name="header" >
+                                                    <h:outputText value="Monthly Amount"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.monthlyAmount}" style="float:right">
+                                                    <f:convertNumber pattern="#0.00"/>
+                                                </h:outputText>
+                                            </p:column>  
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Payment Type"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.paymentIn}">
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Respective Value"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.respectivePaymentTypeAmt}">
+                                                </h:outputText>
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Remaining Months"/>
+                                                </f:facet>
+                                                <h:outputText value="#{earningDed.remainingMonth}">
+                                                </h:outputText>
+                                            </p:column>
+                                        </p:dataTable> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="fmrEmpRarnDedu">
+            <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup id="pnlSearch" rendered="#{employeesEarningDeductioinController.newPage}">
+                <div class="row">
+                    <div class="col-md-12"> 
+                        <div class="box box-primary">                  
+                            <div class="box-body ">                     
+                                <div class="box-body ">
+                                    <div class="box-header">
+                                        <h4 class="box-title">Employees Earning Deductions</h4>                                       
+                                    </div>
+                                    <section class="panel panel-info">
+                                        <div class="box-header">
+                                            <h1 class="box-title"><p:outputLabel value="#{employeesEarningDeductioinController.activePayrollDate}" >
+                                                </p:outputLabel>
+                                            </h1>    
+                                            <h1 class="box-title"></h1>                       
+                                        </div>
+                                        <section class="panel-body">
+                                            <div class="form-group" >
+                                                <div class="col-sm-12" >
+                                                    <div class="col-md-6 ">  
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel value="Search Id:"  class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:autoComplete id="searchAutocomplete" value="#{employeesEarningDeductioinController.hrEmployees.empId}"
+                                                                                    completeMethod="#{employeesEarningDeductioinController.SearchByFname}" 
+                                                                                    var="empList" label="State" dropdown="false"
+                                                                                    itemValue="#{empList.empId}" itemLabel="#{empList}" forceSelection="true" 
+                                                                                    size="20" emptyMessage="no data" style="width:100%">  
+                                                                        <p:column headerText="Employee ID">
+                                                                            <h:outputText value="#{empList.empId}"/>
+                                                                        </p:column>
+                                                                        <p:column headerText="Full Name">
+                                                                            <h:outputText value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                                        </p:column>
+                                                                        <p:ajax event="itemSelect"  
+                                                                                listener="#{employeesEarningDeductioinController.getByFirstName}" update="@(form)" />  
+                                                                    </p:autoComplete> 
+                                                                </div>
+                                                            </div>  
+                                                        </div>    
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Full Name:"  class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:outputLabel value="#{employeesEarningDeductioinController.hrEmployees.firstName} #{employeesEarningDeductioinController.hrEmployees.middleName} #{employeesEarningDeductioinController.hrEmployees.lastName}"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Basic Salary:"  class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:outputLabel value="#{employeesEarningDeductioinController.hrEmployees.basicSalary}">                                                             
+                                                                    </p:outputLabel>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Earning:"  class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:selectBooleanCheckbox id="chkEarning" value="#{employeesEarningDeductioinController.isEarning}">
+                                                                        <p:ajax update="drpEarningDed,chkDeduction,:fmrEmpRarnDedu" 
+                                                                                listener="#{employeesEarningDeductioinController.loadEarnings()}" />
+                                                                    </p:selectBooleanCheckbox>
+                                                                </div>
+                                                            </div> 
+                                                        </div> 
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Deduction:"  class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:selectBooleanCheckbox id="chkDeduction" value="#{employeesEarningDeductioinController.isDeduction}">
+                                                                        <p:ajax update="drpEarningDed,chkEarning,:fmrEmpRarnDedu" 
+                                                                                listener="#{employeesEarningDeductioinController.loadDeductions()}" />
+                                                                    </p:selectBooleanCheckbox>
+                                                                </div>
+                                                            </div> 
+                                                        </div>     
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel value="Earning Deductions:" class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:tooltip id="tooltipEaringDed" for="drpEarningDed" value="List of all earning/deductions except allowances" />
+                                                                    <p:selectOneMenu id="drpEarningDed"  style="width:100%" 
+                                                                                     valueChangeListener="#{employeesEarningDeductioinController.handleChange}" required="false" 
+                                                                                     value="#{employeesEarningDeductioinController.code}" >
+                                                                        <f:selectItem itemLabel="--- Select ---" itemValue="#{null}"/>
+                                                                        <f:selectItems itemLabel="#{ed.itemCode}===> #{ed.description}"
+                                                                                       itemValue="#{ed.code}" var="ed" value="#{employeesEarningDeductioinController.listOfEarningDeductions}"/>
+                                                                        <p:ajax listener="#{employeesEarningDeductioinController.handleChanges}" event="change" update="@this"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div> 
+                                                        </div>     
+                                                    </div>  
+                                                </div> 
+                                            </div>  
+                                            <div class="box-info">
+                                            </div>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info" id="pnl3">
+                                        <div class="box-header">
+                                            <h1 class="box-title"></h1>                       
+                                        </div>
+                                        <section class="panel-body">
+                                            <div class="form-group" >
+                                                <div class="col-sm-12" >
+                                                    <div class="col-sm-6" > 
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Applied From:"/> 
+                                                                <div class="col-sm-8">                                                             
+                                                                    <p:selectOneMenu id="drpPayrollFrom" style="width:60%" 
+                                                                                     valueChangeListener="#{employeesEarningDeductioinController.handleValueChangeFrom1}" 
+                                                                                     value="#{employeesEarningDeductioinController.appliedFrom}"  >
+                                                                        <p:ajax listener="#{employeesEarningDeductioinController.handleChangeFrom}" 
+                                                                                update="txtTotal,txtMonthlyPayment" />
+                                                                        <f:selectItem itemLabel="-Select Payroll Date-" itemValue="#{null}"/>
+                                                                        <f:selectItems itemLabel="#{ employeesEarningDeductioinController.getReturnYM(payroll.paymentMadeForTheMonthOf)}"
+                                                                                       itemValue="#{payroll.paymentMadeForTheMonthOf}" var="payroll" 
+                                                                                       value="#{employeesEarningDeductioinController.payrollFrom}" />
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Number of Month:"/> 
+                                                                <div class="col-sm-8">                                                             
+                                                                    <p:selectOneMenu id="drpPayrolddsslFrom" style="width:60%" 
+                                                                                     valueChangeListener="#{employeesEarningDeductioinController.handleNoMonthChange}"
+                                                                                     value="#{employeesEarningDeductioinController.hrPayrollMaintainEds.numberOfMonth}"  >
+                                                                        <p:ajax listener="#{employeesEarningDeductioinController.handlePaymentMonth}" 
+                                                                                update="txtTotal,txtMonthlyPayment" />
+                                                                        <f:selectItem itemLabel="Unknown" itemValue="Unknown"/>
+                                                                        <f:selectItem itemLabel="1" itemValue="1"/>
+                                                                        <f:selectItem itemLabel="2" itemValue="2"/>
+                                                                        <f:selectItem itemLabel="3" itemValue="3"/>
+                                                                        <f:selectItem itemLabel="4" itemValue="4"/>
+                                                                        <f:selectItem itemLabel="5" itemValue="5"/>
+                                                                        <f:selectItem itemLabel="6" itemValue="6"/>
+                                                                        <f:selectItem itemLabel="7" itemValue="7"/>
+                                                                        <f:selectItem itemLabel="8" itemValue="8"/>
+                                                                        <f:selectItem itemLabel="9" itemValue="9"/>
+                                                                        <f:selectItem itemLabel="10" itemValue="10"/>
+                                                                        <f:selectItem itemLabel="11" itemValue="11"/>
+                                                                        <f:selectItem itemLabel="12" itemValue="12"/>
+                                                                        <f:selectItem itemLabel="13" itemValue="13"/>
+                                                                        <f:selectItem itemLabel="14" itemValue="14"/>
+                                                                        <f:selectItem itemLabel="15" itemValue="15"/>
+                                                                        <f:selectItem itemLabel="16" itemValue="16"/>
+                                                                        <f:selectItem itemLabel="17" itemValue="17"/>
+                                                                        <f:selectItem itemLabel="18" itemValue="18"/>
+                                                                        <f:selectItem itemLabel="19" itemValue="19"/>
+                                                                        <f:selectItem itemLabel="20" itemValue="20"/>
+                                                                        <f:selectItem itemLabel="21" itemValue="21"/>
+                                                                        <f:selectItem itemLabel="22" itemValue="22"/>
+                                                                        <f:selectItem itemLabel="23" itemValue="23"/>
+                                                                        <f:selectItem itemLabel="24" itemValue="24"/>
+                                                                        <f:selectItem itemLabel="25" itemValue="25"/>
+                                                                        <f:selectItem itemLabel="26" itemValue="26"/>
+                                                                        <f:selectItem itemLabel="27" itemValue="27"/>
+                                                                        <f:selectItem itemLabel="28" itemValue="28"/>
+                                                                        <f:selectItem itemLabel="29" itemValue="29"/>
+                                                                        <f:selectItem itemLabel="30" itemValue="30"/>
+                                                                        <f:selectItem itemLabel="31" itemValue="31"/>
+                                                                        <f:selectItem itemLabel="32" itemValue="32"/>
+                                                                        <f:selectItem itemLabel="33" itemValue="33"/>
+                                                                        <f:selectItem itemLabel="34" itemValue="34"/>
+                                                                        <f:selectItem itemLabel="35" itemValue="35"/>
+                                                                        <f:selectItem itemLabel="36" itemValue="36"/>
+                                                                        <f:selectItem itemLabel="37" itemValue="37"/>
+                                                                        <f:selectItem itemLabel="38" itemValue="38"/>
+                                                                        <f:selectItem itemLabel="39" itemValue="39"/>
+                                                                        <f:selectItem itemLabel="40" itemValue="40"/>
+                                                                        <f:selectItem itemLabel="41" itemValue="41"/>
+                                                                        <f:selectItem itemLabel="42" itemValue="42"/>
+                                                                        <f:selectItem itemLabel="43" itemValue="43"/>
+                                                                        <f:selectItem itemLabel="44" itemValue="44"/>
+                                                                        <f:selectItem itemLabel="45" itemValue="45"/>
+                                                                        <f:selectItem itemLabel="46" itemValue="46"/>
+                                                                        <f:selectItem itemLabel="46" itemValue="46"/>
+                                                                        <f:selectItem itemLabel="47" itemValue="47"/>
+                                                                        <f:selectItem itemLabel="48" itemValue="48"/>
+                                                                        <f:selectItem itemLabel="49" itemValue="49"/>
+                                                                        <f:selectItem itemLabel="50" itemValue="50"/>
+                                                                        <f:selectItem itemLabel="51" itemValue="51"/>
+                                                                        <f:selectItem itemLabel="52" itemValue="52"/>
+                                                                        <f:selectItem itemLabel="53" itemValue="53"/>
+                                                                        <f:selectItem itemLabel="54" itemValue="54"/>
+                                                                        <f:selectItem itemLabel="55" itemValue="55"/>
+                                                                        <f:selectItem itemLabel="56" itemValue="56"/>
+                                                                        <f:selectItem itemLabel="57" itemValue="57"/>
+                                                                        <f:selectItem itemLabel="58" itemValue="58"/>
+                                                                        <f:selectItem itemLabel="59" itemValue="59"/>
+                                                                        <f:selectItem itemLabel="60" itemValue="60"/>
+                                                                        <f:selectItem itemLabel="61" itemValue="61"/>
+                                                                        <f:selectItem itemLabel="62" itemValue="62"/>
+                                                                        <f:selectItem itemLabel="63" itemValue="63"/>
+                                                                        <f:selectItem itemLabel="64" itemValue="64"/>
+                                                                        <f:selectItem itemLabel="65" itemValue="65"/>
+                                                                        <f:selectItem itemLabel="66" itemValue="66"/>
+                                                                        <f:selectItem itemLabel="67" itemValue="67"/>
+                                                                        <f:selectItem itemLabel="68" itemValue="68"/>
+                                                                        <f:selectItem itemLabel="69" itemValue="69"/>
+                                                                        <f:selectItem itemLabel="70" itemValue="70"/>
+                                                                        <f:selectItem itemLabel="71" itemValue="71"/>
+                                                                        <f:selectItem itemLabel="72" itemValue="72"/>
+                                                                        <f:selectItem itemLabel="73" itemValue="73"/>
+                                                                        <f:selectItem itemLabel="74" itemValue="74"/>
+                                                                        <f:selectItem itemLabel="75" itemValue="75"/>
+                                                                        <f:selectItem itemLabel="76" itemValue="76"/>
+                                                                        <f:selectItem itemLabel="77" itemValue="77"/>
+                                                                        <f:selectItem itemLabel="78" itemValue="78"/>
+                                                                        <f:selectItem itemLabel="79" itemValue="79"/>
+                                                                        <f:selectItem itemLabel="80" itemValue="80"/>
+                                                                        <f:selectItem itemLabel="81" itemValue="81"/>
+                                                                        <f:selectItem itemLabel="82" itemValue="82"/>
+                                                                        <f:selectItem itemLabel="83" itemValue="83"/>
+                                                                        <f:selectItem itemLabel="84" itemValue="84"/>
+                                                                        <f:selectItem itemLabel="85" itemValue="85"/>
+                                                                        <f:selectItem itemLabel="86" itemValue="86"/>
+                                                                        <f:selectItem itemLabel="87" itemValue="87"/>
+                                                                        <f:selectItem itemLabel="88" itemValue="88"/>
+                                                                        <f:selectItem itemLabel="89" itemValue="89"/>
+                                                                        <f:selectItem itemLabel="90" itemValue="90"/>
+                                                                        <f:selectItem itemLabel="91" itemValue="91"/>
+                                                                        <f:selectItem itemLabel="92" itemValue="92"/>
+                                                                        <f:selectItem itemLabel="93" itemValue="93"/>
+                                                                        <f:selectItem itemLabel="94" itemValue="94"/>
+                                                                        <f:selectItem itemLabel="95" itemValue="95"/>
+                                                                        <f:selectItem itemLabel="96" itemValue="96"/>
+                                                                        <f:selectItem itemLabel="97" itemValue="97"/>
+                                                                        <f:selectItem itemLabel="98" itemValue="98"/>
+                                                                        <f:selectItem itemLabel="99" itemValue="99"/>
+                                                                        <f:selectItem itemLabel="100" itemValue="100"/>
+                                                                        <f:selectItem itemLabel="101" itemValue="101"/>
+                                                                        <f:selectItem itemLabel="102" itemValue="102"/>
+                                                                        <f:selectItem itemLabel="103" itemValue="103"/>
+                                                                        <f:selectItem itemLabel="104" itemValue="104"/>
+                                                                        <f:selectItem itemLabel="105" itemValue="105"/>
+                                                                        <f:selectItem itemLabel="106" itemValue="106"/>
+                                                                        <f:selectItem itemLabel="107" itemValue="107"/>
+                                                                        <f:selectItem itemLabel="108" itemValue="108"/>
+                                                                        <f:selectItem itemLabel="110" itemValue="110"/>
+                                                                        <f:selectItem itemLabel="110" itemValue="110"/>
+                                                                        <f:selectItem itemLabel="111" itemValue="111"/>
+                                                                        <f:selectItem itemLabel="112" itemValue="112"/>
+                                                                        <f:selectItem itemLabel="113" itemValue="113"/>
+                                                                        <f:selectItem itemLabel="114" itemValue="114"/>
+                                                                        <f:selectItem itemLabel="115" itemValue="115"/>
+                                                                        <f:selectItem itemLabel="116" itemValue="116"/>
+                                                                        <f:selectItem itemLabel="117" itemValue="117"/>
+                                                                        <f:selectItem itemLabel="118" itemValue="118"/>
+                                                                        <f:selectItem itemLabel="119" itemValue="119"/>
+                                                                        <f:selectItem itemLabel="120" itemValue="120"/>
+                                                                        <f:selectItem itemLabel="121" itemValue="121"/>
+                                                                        <f:selectItem itemLabel="122" itemValue="122"/>
+                                                                        <f:selectItem itemLabel="123" itemValue="123"/>
+                                                                        <f:selectItem itemLabel="123" itemValue="123"/>
+                                                                        <f:selectItem itemLabel="124" itemValue="124"/>
+                                                                        <f:selectItem itemLabel="125" itemValue="125"/>
+                                                                        <f:selectItem itemLabel="126" itemValue="126"/>
+                                                                        <f:selectItem itemLabel="127" itemValue="127"/>
+                                                                        <f:selectItem itemLabel="128" itemValue="128"/>
+                                                                        <f:selectItem itemLabel="129" itemValue="129"/>
+                                                                        <f:selectItem itemLabel="130" itemValue="130"/>
+                                                                        <f:selectItem itemLabel="131" itemValue="131"/>
+                                                                        <f:selectItem itemLabel="132" itemValue="132"/>
+                                                                        <f:selectItem itemLabel="133" itemValue="133"/>
+                                                                        <f:selectItem itemLabel="134" itemValue="134"/>
+                                                                        <f:selectItem itemLabel="135" itemValue="135"/>
+                                                                        <f:selectItem itemLabel="136" itemValue="136"/>
+                                                                        <f:selectItem itemLabel="137" itemValue="137"/>
+                                                                        <f:selectItem itemLabel="138" itemValue="138"/>
+                                                                        <f:selectItem itemLabel="139" itemValue="139"/>
+                                                                        <f:selectItem itemLabel="140" itemValue="140"/>
+                                                                        <f:selectItem itemLabel="141" itemValue="141"/>
+                                                                        <f:selectItem itemLabel="142" itemValue="130"/>
+                                                                        <f:selectItem itemLabel="143" itemValue="143"/>
+                                                                        <f:selectItem itemLabel="144" itemValue="144"/>
+                                                                        <f:selectItem itemLabel="145" itemValue="145"/>
+                                                                        <f:selectItem itemLabel="146" itemValue="146"/>                                                                    
+                                                                        <f:selectItem itemLabel="147" itemValue="147"/>
+                                                                        <f:selectItem itemLabel="148" itemValue="148"/>
+                                                                        <f:selectItem itemLabel="149" itemValue="149"/>
+                                                                        <f:selectItem itemLabel="150" itemValue="150"/>
+                                                                        <f:selectItem itemLabel="151" itemValue="151"/>
+                                                                        <f:selectItem itemLabel="152" itemValue="152"/>
+                                                                        <f:selectItem itemLabel="153" itemValue="153"/>
+                                                                        <f:selectItem itemLabel="154" itemValue="154"/>
+                                                                        <f:selectItem itemLabel="155" itemValue="155"/>
+                                                                        <f:selectItem itemLabel="156" itemValue="156"/>
+                                                                        <f:selectItem itemLabel="157" itemValue="157"/>
+                                                                        <f:selectItem itemLabel="158" itemValue="158"/>
+                                                                        <f:selectItem itemLabel="159" itemValue="159"/>
+                                                                        <f:selectItem itemLabel="160" itemValue="160"/>
+                                                                        <f:selectItem itemLabel="161" itemValue="161"/>
+                                                                        <f:selectItem itemLabel="162" itemValue="162"/>                                                                    
+                                                                        <f:selectItem itemLabel="163" itemValue="163"/>
+                                                                        <f:selectItem itemLabel="164" itemValue="164"/>
+                                                                        <f:selectItem itemLabel="165" itemValue="165"/>
+                                                                        <f:selectItem itemLabel="166" itemValue="166"/>
+                                                                        <f:selectItem itemLabel="167" itemValue="167"/>
+                                                                        <f:selectItem itemLabel="168" itemValue="168"/>
+                                                                        <f:selectItem itemLabel="169" itemValue="169"/>
+                                                                        <f:selectItem itemLabel="170" itemValue="170"/>
+                                                                        <f:selectItem itemLabel="171" itemValue="171"/>
+                                                                        <f:selectItem itemLabel="172" itemValue="172"/>
+                                                                        <f:selectItem itemLabel="173" itemValue="173"/>
+                                                                        <f:selectItem itemLabel="174" itemValue="174"/>
+                                                                        <f:selectItem itemLabel="175" itemValue="175"/>
+                                                                        <f:selectItem itemLabel="176" itemValue="176"/>
+                                                                        <f:selectItem itemLabel="177" itemValue="177"/>
+                                                                        <f:selectItem itemLabel="178" itemValue="178"/>                                                                    
+                                                                        <f:selectItem itemLabel="179" itemValue="179"/>
+                                                                        <f:selectItem itemLabel="180" itemValue="180"/>
+                                                                        <f:selectItem itemLabel="181" itemValue="181"/>
+                                                                        <f:selectItem itemLabel="182" itemValue="182"/>
+                                                                        <f:selectItem itemLabel="183" itemValue="183"/>
+                                                                        <f:selectItem itemLabel="184" itemValue="184"/>
+                                                                        <f:selectItem itemLabel="185" itemValue="185"/>
+                                                                        <f:selectItem itemLabel="186" itemValue="186"/>
+                                                                        <f:selectItem itemLabel="187" itemValue="187"/>
+                                                                        <f:selectItem itemLabel="188" itemValue="188"/>
+                                                                        <f:selectItem itemLabel="189" itemValue="189"/>
+                                                                        <f:selectItem itemLabel="190" itemValue="190"/>
+                                                                        <f:selectItem itemLabel="191" itemValue="191"/>
+                                                                        <f:selectItem itemLabel="192" itemValue="192"/>
+                                                                        <f:selectItem itemLabel="193" itemValue="193"/>
+                                                                        <f:selectItem itemLabel="194" itemValue="194"/>                                                                    
+                                                                        <f:selectItem itemLabel="195" itemValue="195"/>
+                                                                        <f:selectItem itemLabel="196" itemValue="196"/>
+                                                                        <f:selectItem itemLabel="197" itemValue="197"/>
+                                                                        <f:selectItem itemLabel="198" itemValue="198"/>
+                                                                        <f:selectItem itemLabel="199" itemValue="199"/>
+                                                                        <f:selectItem itemLabel="200" itemValue="200"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Payment Type:"/> 
+                                                                <div class="col-sm-8">                                                             
+                                                                    <p:selectOneMenu id="selecttype"  
+                                                                                     value="#{employeesEarningDeductioinController.hrPayrollMaintainEds.paymentIn}" 
+                                                                                     valueChangeListener="#{employeesEarningDeductioinController.setPaymentLabel}"  
+                                                                                     style="width:60%"  required="false" label="Type"  >
+                                                                        <p:ajax update="lblRespectiveAmt,txtTotal,txtMonthlyPayment,txtRespectiveValue" 
+                                                                                listener="#{employeesEarningDeductioinController.handlePaymentTypeChange}"/>
+                                                                        <f:selectItem itemLabel="Birr" itemValue="Birr" />
+                                                                        <f:selectItem itemLabel="Percent" itemValue="Percent" />
+                                                                        <f:selectItem itemLabel="Percent+unlimited" itemValue="Percent+unlimited" />
+                                                                        <f:selectItem itemLabel="Hour" itemValue="Hour" />
+                                                                        <f:selectItem itemLabel="Day" itemValue="Day" />                                                                     
+                                                                        <p:ajax /> 
+                                                                        <p:message display="icon" for="selecttype"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel id="lblRespectiveAmt" class="control-label col-sm-4" 
+                                                                               value="#{employeesEarningDeductioinController.lableValue}"/> 
+                                                                <div class="col-sm-8">                                                             
+                                                                    <p:inputText id="txtRespectiveValue" requiredMessage="Fill the amount either in birr/percent!"
+                                                                                 value="#{employeesEarningDeductioinController.respectiveAmount}"  style="width: 200px" 
+                                                                                 validator="#{validatorManagedBean.Number}" required="true"></p:inputText>
+                                                                    <p:message display="icon" for="txtRespectiveValue"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal required">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Total:"/> 
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText   id="txtTotal" requiredMessage="Fill the total amount!" 
+                                                                                   value="#{employeesEarningDeductioinController.total}" required="true" 
+                                                                                   validator="#{validatorManagedBean.Double}" style="width: 200px">
+                                                                        <p:ajax event="keyup" update="txtMonthlyPayment" process=""
+                                                                                listener="#{employeesEarningDeductioinController.calculateED}" /> 
+                                                                    </p:inputText>
+                                                                    <p:message display="icon" for="txtTotal"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br><br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Monthly Amount:"/> 
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtMonthlyPayment" requiredMessage="Fill the monthly payment!"
+                                                                                 style="width: 200px" value="#{employeesEarningDeductioinController.hrPayrollMaintainEds.monthlyAmount}" 
+                                                                                 validator="#{validatorManagedBean.Double}" required="true">
+                                                                        <f:convertNumber pattern="#0.00" />
+                                                                    </p:inputText>
+                                                                    <p:message display="icon" for="txtMonthlyPayment"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Remark:"/> 
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea  id="txtDescription" style="width: 200px" 
+                                                                                      value="#{employeesEarningDeductioinController.hrPayrollMaintainEds.remark}"  
+                                                                                      validator="#{validatorManagedBean.Remark}"/> 
+                                                                    <p:message display="icon" for="txtDescription"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Status:"/> 
+                                                                <div class="col-sm-8">                                                             
+                                                                    <p:selectOneMenu id="status" style="width:60%"  
+                                                                                     value="#{employeesEarningDeductioinController.hrPayrollMaintainEds.status}">
+                                                                        <f:selectItem itemLabel="Active" itemValue="Active"/>
+                                                                        <f:selectItem itemLabel="Inactive" itemValue="Inactive"/>
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Carry Forward To:"/> 
+                                                                <div class="col-sm-8">                                                             
+                                                                    <p:selectOneMenu id="drCarryForward" style="width:60%"  
+                                                                                     valueChangeListener="#{employeesEarningDeductioinController.handleValueChangeFromCarryForward}" 
+                                                                                     value="#{employeesEarningDeductioinController.carryForward}"  >
+                                                                        <p:ajax listener="#{backPayment.handleChangeFrom}" update="" />
+                                                                        <f:selectItem itemLabel="No" itemValue="#{null}"/>
+                                                                        <f:selectItems itemLabel="#{ employeesEarningDeductioinController.getReturnYM(payroll.paymentMadeForTheMonthOf)}" 
+                                                                                       itemValue="#{payroll.paymentMadeForTheMonthOf}" var="payroll" 
+                                                                                       value="#{employeesEarningDeductioinController.payrollFrom}" />
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div> 
+                                                        <br></br>
+                                                        <br></br>
+                                                        <div class="col-md-12 ">
+                                                            <div class="col-md-4">
+                                                            </div>
+                                                            <div class="form-group form-horizontal textBoxMargin6px">
+                                                                <div class="col-sm-8"> 
+                                                                    <p:commandButton id="btnSave" action="#{employeesEarningDeductioinController.saveEmpEarningDeductions}" 
+                                                                                     update="@this:fmrEmpRarnDedu"  process=":fmrEmpRarnDedu"  class="btn  btn-primary col-sm-4"  
+                                                                                     value="#{employeesEarningDeductioinController.saveOrUpdate}"/>
+                                                                </div>
+                                                            </div> 
+                                                        </div>   
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../resources/templates/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="navigaion_content"> 
+        <h:form id="searchPaydEntryForm">
+            <ul class="nav" id="side-menu">
+                <li><a href="../hrms/hrmsDashboard.xhtml"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+            </ul>
+
+            <div class="form-group" >
+                <div class="form-horizontal  col-sm-12">
+                    <div class="form-group">  
+                        <div class="col-sm-12">  
+                            <p:selectOneMenu id="selectSystem" converter="entConverter"  
+                                             value="#{lookUpControl.selectedSystem}" valueChangeListener="#{lookUpControl.selectedSystemEvent}">
+                                <f:selectItems id="recentSystemList" value="#{lookUpControl.systemList}"/>   
+                                <p:ajax event="change" process="@this" update="tblLookUpList"/>
+                            </p:selectOneMenu>
+                        </div>                               
+                    </div> 
+
+                    <div class="form-group">  
+                        <div class="col-sm-12">  
+                            <p:dataTable id="tblLookUpList" value="#{lookUpControl.tableList}" paginatorPosition="bottom" var="Lkutable" selectionMode="single" scrollHeight="600" scrollable="true"
+                                         rowKey="#{Lkutable.name}">
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="LookUp Tables"/>
+                                    </f:facet>
+                                    <h:outputText value="#{Lkutable.name}"/>                          
+                                </p:column>   
+                                <p:ajax event="rowSelect" listener="#{lookUpControl.onRowSelect}" update=":frmLookUp" />
+                            </p:dataTable>
+                        </div>                               
+                    </div> 
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+
+    <ui:define name="contents">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info ">
+                    <div class="box-header">
+                        <h3 class="box-title"> Lookup Tables</h3>                                       
+                    </div>
+                    <div class="box-body ">
+                        <div class="box-body ">
+                            <h:form id="frmLookUp"> 
+                                <p:growl id="growl" showDetail="false" autoUpdate="true" severity="information,error"/>
+                                <section class="panel panel-info">
+                                    <section class="panel-body">
+                                        <h:panelGroup  id="pnlManPage" class="panel-info">
+                                            <p:dataTable id="tblLookUpDetail" rows="#{lookUpControl.rows}" value="#{lookUpControl.rowDataModel}" var="LkutableDet" rowIndexVar="rowDet" 
+                                                         selectionMode="single" rowKey="#{LkutableDet}" paginator="true" paginatorPosition="bottom" rowsPerPageLabel="Rows" rowsPerPageTemplate="5,10,15,20">
+                                                <f:facet name="header" >
+                                                    <p:outputLabel style="font-size: 16px;" value="#{lookUpControl.lblTableName}" />
+                                                </f:facet> 
+                                                <f:facet name="header">
+                                                    <p:commandButton id="btnAddNew" style="font-size: 10px; left: 200px; width: 60px"
+                                                                     type="button" ajax="true" value="Add" image="add" onclick="PF('digLookUp').show()"  />
+                                                </f:facet>                   
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="S/N"/>
+                                                    </f:facet>
+                                                    <h:outputText id="otxtsn" value="#{rowDet+1}"/>
+                                                </p:column>
+                                                <p:columns id="tdTableNames" value="#{lookUpControl.columnDataModel}" var="column">
+                                                    <f:facet name="header">
+                                                        <h:outputText id="rowData" value="#{lookUpControl.columnDataModel.rowData}"/>
+                                                    </f:facet>
+                                                    <!-- display the table cell values-->
+                                                    <h:outputText id="cellValue" value="#{lookUpControl.cellValue}"/>
+                                                </p:columns>
+                                                <p:ajax event="rowSelect" listener="#{lookUpControl.onRowSelectForUpdate}" update=":frmLookUp:digLookUp" oncomplete="PF('digLookUp').show();"/>  
+                                            </p:dataTable>
+                                            <p:dialog id="digLookUp" header="#{lookUpControl.lblTableName}" widgetVar="digLookUp" height="300" width="600" showEffect="explode">
+                                                <p:outputLabel value="#{lookUpControl.message}" style="color: red; font-size: medium"/>
+                                                <h:panelGrid columns="2" styleClass="noBorders col-sm-7" binding="#{lookUpControl.pnlContainer}">
+
+                                                </h:panelGrid>
+                                                <p:commandButton id="btnAdd" value="Add" process="digLookUp" action="#{lookUpControl.btnAdd()}"
+                                                                 update="frmLookUp:tblLookUpDetail, frmLookUp:digLookUp" oncomplete="PF('digLookUp').show();"
+                                                                 style="font-family: 'Lucida Sans'; font-style: normal; font-weight: lighter; 
+                                                                 left: 90px; top: 200px; position: absolute; width: 100px; visibility: #{lookUpControl.saveRender};"/>
+
+                                                <p:commandButton id="btnUpdate"  value="Update" process="digLookUp" action="#{lookUpControl.btnUpdate()}"
+                                                                 update="frmLookUp:tblLookUpDetail, frmLookUp:digLookUp" oncomplete="PF('digLookUp').show();"
+                                                                 style="font-family: 'Lucida Sans'; font-style: normal; font-weight: lighter; 
+                                                                 left: 250px; top: 200px; position: absolute; width: 100px; visibility: #{lookUpControl.updateRender};"/>
+                                            </p:dialog>
+                                        </h:panelGroup>
+                                    </section>
+                                </section>
+
+                            </h:form>     
+                        </div>                   
+                    </div>                   
+                </div>
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

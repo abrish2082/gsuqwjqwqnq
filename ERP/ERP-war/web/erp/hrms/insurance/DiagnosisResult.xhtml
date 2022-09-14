@@ -1,0 +1,525 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="insuranceCompany.xhtml"><i class="fa fa-fw"></i> <span> insurance Company</span></a></li>
+        <li><a href="maintianInjuredEmployee.xhtml"><i class="fa fa-fw"></i> <span> Maintain Injured Employee</span></a></li>
+        <li><a href="DiagnosisResult.xhtml"><i class="fa fa-fw"></i>Diagnosis Result</a></li>
+        <li><a href="insurancePayment.xhtml"><i class="fa fa-fw"></i> <span>Insurance Payment </span></a></li>
+        <li><a href="insurancePaymentApprove.xhtml"><i class="fa fa-fw"></i> <span> Insurance Payment Approve</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmTop"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlGNotifica">
+                        <span  class="NotificationText"> #{diagnosisResultController.insuranceInjuedList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" title="Notification" />
+                        <p:overlayPanel widgetVar="widNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 500px">
+                            <p:outputLabel id="lblReqNotf" value="Evaluated List"/>
+                            <div class="col-md-12 textBoxMargin6px">  
+                                <div class="form-group">
+                                    <p:dataTable id="tblnotification" value="#{diagnosisResultController.insuranceInjuedList}"
+                                                 var="res" selectionMode="single" rowIndexVar="num" rows="10" paginator="true" paginatorPosition="bottom"
+                                                 selection="#{diagnosisResultController.hrInsuranceInjuredEmployee}" rowKey="#{res.id}" class="dataTable">
+                                        <p:ajax event="rowSelect" listener="#{diagnosisResultController.populateNotify}"
+                                                process="@this,tblnotification" update=":frmSuccessionplan,:frmTop"/>
+                                        <p:column headerText="No.">
+                                            <h:outputText value="#{num + 1}"/>
+                                        </p:column>
+                                        <p:column headerText="Employee Name" filterMatchMode="startsWith" filterBy="#{res.empId.firstName}">
+                                            <h:outputText value="#{res.empId.firstName} 
+                                                          #{res.empId.middleName} #{res.empId.lastName}"/>
+                                        </p:column>
+                                        <p:column >
+                                            <f:facet name="header">
+                                                <h:outputText value="Insurance Provider"/>
+                                            </f:facet>
+                                            <h:outputText value="#{res.insuranceId.insuranceId.insuranceName}"/> 
+                                        </p:column>
+                                        <p:column >
+                                            <f:facet name="header">
+                                                <h:outputText value="Insurance Branch"/>
+                                            </f:facet>
+                                            <h:outputText value="#{res.insuranceId.branchId.branchName}"/> 
+                                        </p:column>
+                                    </p:dataTable>
+                                </div>
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnSearch0" validateClient="true" action="#{diagnosisResultController.searchPage()}"
+                                     icon="ui-icon-search" title="Search" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmSuccessionplan,:frmTop"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/insurance/DiagnosisResult.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>  
+        <h:form id="frmSuccessionplan"> 
+            <p:growl id="growlq" showDetail="true" autoUpdate="true" severity="information,fatal"/> 
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlDtSearch" rendered="#{diagnosisResultController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">                      
+                            <div class="box-body">    
+                                <div class="box-header with-border"> 
+                                    <h4 class="box-title"><h:outputLabel id="frmsuccosion" value="#{diagnosisResultController.headerTitle}" /></h4> 
+                                </div>
+                                <div class="col-md-12" style="margin-top:30px;">
+                                    <div class="form-group">
+                                        <p:dataTable id="tblKmpList" value="#{diagnosisResultController.insuranceInjuedList}"
+                                                     var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                     selection="#{diagnosisResultController.hrInsuranceInjuredEmployee}" rowKey="#{currentRow}" paginatorPosition="bottom">
+                                            <p:ajax event="rowSelect" listener="#{diagnosisResultController.populate}"
+                                                    process="@this,tblKmpList" update=":frmSuccessionplan,:frmTop"/>
+                                            <p:column>
+                                                <f:facet name="header">
+                                                    <h:outputText value="Employee Name"/>
+                                                </f:facet>
+                                                <h:outputText value="#{currentRow.empId.firstName} #{currentRow.fullName}"/> 
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Insurance Provider"/>
+                                                </f:facet>
+                                                <h:outputText value="#{currentRow.insuranceId.insuranceId.insuranceName}"/> 
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Insurance Branch"/>
+                                                </f:facet>
+                                                <h:outputText value="#{currentRow.insuranceId.branchId.branchName}"/> 
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Employee Type" />
+                                                </f:facet>
+                                                <h:outputText value="#{currentRow.type}"/> 
+                                            </p:column>
+                                            <p:column >
+                                                <f:facet name="header">
+                                                    <h:outputText value="Job Title" />
+                                                </f:facet>
+                                                <h:outputText value="#{currentRow.empId.jobId.jobTitle}"/> 
+                                            </p:column> 
+                                        </p:dataTable>
+                                    </div>
+                                </div>                   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlFindAll" rendered="#{diagnosisResultController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">                                
+                                <h2 class="box-title"><h:outputLabel id="frmsuccosion1" value="#{diagnosisResultController.headerTitle1}"/></h2>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body ">
+                                    <div class="col-md-12" >                                        
+                                        <div class="col-sm-12">
+                                            <p:dataTable id="tblSearch" value="#{diagnosisResultController.diagnoasisList}"
+                                                         var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                         selection="#{diagnosisResultController.hrInsuranceDiagnosisResult}" rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" listener="#{diagnosisResultController.populateAll}"
+                                                        process="@this,tblSearch" update=":frmSuccessionplan,:frmTop"/>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Employee Name"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.hrInsuranceInjuredEmployee.empId.firstName} #{currentRow.hrInsuranceInjuredEmployee.fullName}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Insurance Provider"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.hrInsuranceInjuredEmployee.insuranceId.insuranceId.insuranceName}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Insurance Branch"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.hrInsuranceInjuredEmployee.insuranceId.branchId.branchName}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Employee Type" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.hrInsuranceInjuredEmployee.type}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Job Title" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.hrInsuranceInjuredEmployee.empId.jobId.jobTitle}"/> 
+                                                </p:column> 
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Job Title" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.treatmentDate}"/> 
+                                                </p:column> 
+                                            </p:dataTable>
+                                        </div> 
+                                    </div>   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+            </h:panelGroup>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlSucceassorAll" rendered="#{diagnosisResultController.renderPnlCreateGatePass}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary "> 
+                            <!-- /.box-header --> 
+                            <h4 class="box-title" style="margin-left: 5px;">Diagnosis Result </h4>
+                            <div class="box-body ">
+                                <div class="box-body ">        
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">  
+                                            <h:panelGroup id="panelpermanent" rendered="#{diagnosisResultController.choosePermanet}">
+                                                <div class="row">
+                                                    <div class="col-md-12">                      
+                                                        <div class="box-body"> 
+                                                            <div class="col-md-6">
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtInjure" class="col-md-4 control-label" value=" Employee Name:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtInjure" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.empId.firstName} 
+                                                                                         #{diagnosisResultController.hrInsuranceInjuredEmployee.fullName}"
+                                                                                         title="Employee Name" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel  for="txtInsur" class="col-md-4 control-label" value="Insurance Provider:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtInsur" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.insuranceId.insuranceId.insuranceName}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtbranch" class="col-md-4 control-label" value="Insurance Branch:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtbranch" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.insuranceId.branchId.branchName}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtdep" class="col-md-4 control-label" value="Department:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtdep" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.empId.deptId}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>   
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtpsh" class="col-md-4 control-label" value="Job Title:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtpsh" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.empId.jobId.jobTitle}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>  
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtEmptype" class="col-md-4 control-label" value="Employee Type:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtEmptype" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.type}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div> 
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtDesc1" class="col-md-4 control-label" value="Discription of accident:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtDesc1" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.accidentDescription}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>  
+                                            <h:panelGroup id="paneldailyLabour" rendered="#{diagnosisResultController.chooseDailyLabour}">
+                                                <div class="row">
+                                                    <div class="col-md-12">                      
+                                                        <div class="box-body"> 
+                                                            <div class="col-md-6">
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtInjure1" class="col-md-4 control-label" value=" Employee Name:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtInjure1" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.fullName}" title="Employee Name" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel  for="txtInsur1" class="col-md-4 control-label" value="Insurance Provider:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtInsur1" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.insuranceId.insuranceId.insuranceName}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtbranch1" class="col-md-4 control-label" value="Insurance Branch:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtbranch1" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.insuranceId.branchId.branchName}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="Daily1" class="col-md-4 control-label" value="Daily Wage"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="Daily1" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.dailyWage}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div> 
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtEmptype1" class="col-md-4 control-label" value="Employee Type:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtEmptype1" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.type}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <h:outputLabel for="txtDesc" class="col-md-4 control-label" value="Discription of accident:"/>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txtDesc" value="#{diagnosisResultController.hrInsuranceInjuredEmployee.accidentDescription}" readonly="true"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>     
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">  
+                                            <div class="col-md-6">
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group required">
+                                                        <h:outputLabel  for="txtHospital" class="col-md-4 control-label" value="Hospital Name: "/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtHospital" value="#{diagnosisResultController.hrInsuranceDiagnosisResult.hospital}"
+                                                                         title="Hospital Name" required="true" requiredMessage="Enter Hospital Name"
+                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only" onchange="this.value = this.value.trim()"/>
+                                                            <p:message for="txtHospital" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group required">
+                                                        <h:outputLabel  for="txtDate" class="col-md-4 control-label" value="Date: "/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtDate" value="#{diagnosisResultController.hrInsuranceDiagnosisResult.treatmentDate}"
+                                                                         onclick="displayCalendar('frmSuccessionplan:txtDate', 'frmSuccessionplan:txtDate');"
+                                                                         title="Date" required="true" requiredMessage="selct Date"
+                                                                         validator="#{validatorManagedBean.Date}" validatorMessage="Please Enter Date Only"/>
+                                                            <p:message for="txtDate" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group required">
+                                                        <h:outputLabel for="txtaInjury" class="col-md-4 control-label" value="Name Of Injury/Disease: " />
+                                                        <div class="col-sm-8"> 
+                                                            <p:inputTextarea id="txtaInjury" class="form-control"  value="#{diagnosisResultController.hrInsuranceDiagnosisResult.injuryDisease}" 
+                                                                             title="Name Of Injured" required="true" requiredMessage="Enter Name of Injury"
+                                                                             validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only" onchange="this.value = this.value.trim()"/>
+                                                            <p:message for="txtaInjury" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal">
+                                                        <h:outputLabel for="txtaTreatment" class="col-md-4 control-label" value="Treatment Prescribed:" />
+                                                        <div class="col-sm-8"> 
+                                                            <p:inputTextarea id="txtaTreatment" class="form-control"  title="Treatment" onchange="this.value = this.value.trim()"
+                                                                             value="#{diagnosisResultController.hrInsuranceDiagnosisResult.treatmentPrescribed}"/>
+                                                            <p:message for="txtaTreatment" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">  
+                                                <div class="col-md-12 textBoxMargin6px">
+                                                    <div class="form-group form-horizontal form-group required">
+                                                        <h:outputLabel for="txtPhysician" class="col-md-4 control-label" value="Physician Name: " />
+                                                        <div class="col-sm-8"> 
+                                                            <p:inputText id="txtPhysician" value="#{diagnosisResultController.hrInsuranceDiagnosisResult.physician}"
+                                                                         title="Physician Name" required="true" requiredMessage="Enter Doctor Name" onchange="this.value = this.value.trim()"
+                                                                         validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                            <p:message for="txtPhysician" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                                <div class="col-md-12 textBoxMargin6px form-group required"> 
+                                                    <div class="form-group form-horizontal">
+                                                        <h:outputLabel for="txtTime" class="col-md-4 control-label" value="Time: " />
+                                                        <div class="col-sm-8">        
+                                                            <p:calendar id="txtTime" value="#{diagnosisResultController.hrInsuranceDiagnosisResult.time}" pattern="HH:mm:ss" 
+                                                                        title="Time"  timeOnly="true" required="true" requiredMessage="Enter Time"
+                                                                        validatorMessage="Please Enter Time Only" onchange="this.value = this.value.trim()"/>
+                                                            <p:message for="txtTime" display="icon"/>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px form-group required">
+                                                    <div class="form-group form-horizontal ">
+                                                        <h:outputLabel  for="txtSick" class="col-md-4 control-label" value="Sick Leave: "/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtSick" value="#{diagnosisResultController.hrInsuranceDiagnosisResult.sickLeave}"
+                                                                         required="true" requiredMessage="Please Enter Minimum Of Zero Sick Leave"
+                                                                         title="Sick Leave" class="form-control" onchange="this.value = this.value.trim()"/>
+                                                            <p:message for="txtSick" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 textBoxMargin6px form-group required">
+                                                    <div class="form-group form-horizontal">
+                                                        <h:outputLabel  for="txtPresent" class="col-md-4 control-label" value="Precentage Of Damage: "/>
+                                                        <div class="col-sm-8">
+                                                            <p:inputText id="txtPresent" value="#{diagnosisResultController.hrInsuranceDiagnosisResult.isDisease}"
+                                                                         required="true" requiredMessage="Please Enter Minimum Of Zero Damage"
+                                                                         title="Precentage" onchange="this.value = this.value.trim()"/>
+                                                            <p:message for="txtPresent" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </section>
+                                    </section>
+<!--
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">  
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel  class="col-md-2 control-label" value="Attach Medical File Or Others:"/>
+                                                    <div class="col-sm-2"> 
+                                                        <p:panelGrid columns="1" style="float: left;"> 
+                                                            <p:fileUpload  id="fileUplod" cancelLabel="{contenu.annuler}"
+                                                                           fileUploadListener="{diagnosisResultController.uploadListener}"
+                                                                           value="{diagnosisResultController.file}" 
+                                                                           allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                           invalidFileMessage="This type of file is not valid"
+                                                                           invalidSizeMessage="The size is not Allowed"
+                                                                           multiple="false" mode="advanced" sizeLimit="52428800" auto="true" process="tblSavedDoc" update="tblSavedDoc"/>
+                                                            <p:dataTable id="tblSavedDoc"  var="currentRow" sortBy="{currentRow.name}"  rowIndexVar="current" value="{diagnosisResultController.docValueModel}"
+                                                                         paginator="true" selectionMode="single" rowKey="{currentRow.id}"
+                                                                         selection="{diagnosisResultController.documentModel}"
+                                                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                         rowsPerPageTemplate="5,10,15" style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:1000px">
+                                                                <p:ajax event="rowSelect" listener="{diagnosisResultController.onRowSelect}" update="tblSavedDoc"/>
+                                                                <p:column id="docNames"   style="border: none; font-size: 10px; text-align: left;"> 
+                                                                    <h:outputText id="txtcoScale" value="{currentRow.name}"/>
+                                                                </p:column>
+                                                                <p:column  style="border: none; font-size: 10px; text-align: left;">
+                                                                    <h:panelGrid style="border: none " columns="2" 
+                                                                                 id="pnlGridtblDoccolOptions" >
+                                                                        <p:commandButton process="tblSavedDoc"                                               
+                                                                                         icon="ui-icon-arrowthickstop-1-s"  ajax="false">
+                                                                            <p:fileDownload value="{diagnosisResultController.file}"/>
+                                                                        </p:commandButton>
+                                                                        <p:outputPanel id="buttonDetail">
+                                                                            <p:commandButton  process="tblSavedDoc" title="{dmsBundle.delete}" id="docRemove" 
+                                                                                              update="tblSavedDoc" immediate="true" ajax="true" 
+                                                                                              icon="ui-icon-trash" style="border: none; color: #0B70F9">
+                                                                                <p:confirm header="Confirmation" message="Are you sure?"  icon="ui-icon-alert"/>
+                                                                            </p:commandButton>
+                                                                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                                                <p:commandButton value="Yes" action="{diagnosisResultController.remove(rowselect)}" immediate="true" process="@this" update="tblSavedDoc" 
+                                                                                                 styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                                                                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                                                                            </p:confirmDialog>
+                                                                        </p:outputPanel>
+                                                                    </h:panelGrid>
+                                                                </p:column>  
+                                                            </p:dataTable>
+                                                        </p:panelGrid>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                    -->
+                                    <h:panelGroup id="pnlSave">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-3">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                             value="#{diagnosisResultController.saveorUpdateBundle}"
+                                                                             action="#{diagnosisResultController.saveDiagnosisResult()}"
+                                                                             process="@this,pnlSucceassorAll"                                       
+                                                                             update=":frmSuccessionplan"/>
+                                                        </div>
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                             action="#{diagnosisResultController.resetDiagnosisResult()}"
+                                                                             process="@this" 
+                                                                             update=":frmSuccessionplan"/> 
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>                                                      
+                                </div>  
+                            </div>
+                        </div>                           
+                    </div>  
+                </div>
+            </h:panelGroup>                           
+        </h:form>
+    </ui:define>
+</ui:composition>
+

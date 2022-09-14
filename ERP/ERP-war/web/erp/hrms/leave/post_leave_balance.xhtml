@@ -1,0 +1,280 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+
+
+    </ui:define>
+
+    <ui:define name="contents">
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-info ">
+
+                    <h:form id="frmSrch">
+                        <br></br>
+                        <section class="panel panel-default">
+
+                            <div class="panel-heading"><strong> Search Leave </strong></div>
+                            <div class="panel-body">
+
+                                <div class="form-group">
+                                    <div class="col-sm-3">
+
+
+
+
+
+                                        <p:autoComplete   id="themeCustom" placeholder="Enter Your ID Here" value="#{leaveReturn.employee.firstName}" 
+                                                          style="width: 100%"  completeMethod="#{ leaveReturn.searchEmployeeById}" required="true"
+                                                          var="emp" itemLabel="#{emp}" itemValue="#{emp.firstName}"  >
+                                            <p:column headerText="ID"  >
+                                                <h:outputText value="#{emp.empId}" />
+                                            </p:column>
+                                            <p:column headerText="First Name" >
+                                                <h:outputText  value="#{emp.firstName}" />
+                                            </p:column>
+                                            <p:column  headerText="Last Name">
+                                                <h:outputText value="#{emp.lastName}" />
+                                            </p:column>
+
+
+                                            <p:ajax  event="itemSelect" listener="#{leaveReturn.findEmployee}"   process="@this" update=":frmOffense" />   
+                                        </p:autoComplete>     
+                                    </div>
+                                    <div class="col-sm-6">
+                                    </div>
+                                    <div class="col-sm-3">
+
+                                        <p:autoComplete id="themeCustom2" placeholder="Search by First Name"  value="#{leaveReturn.employee.empId}" style="width: 100%"  
+                                                        completeMethod="#{leaveReturn.searchEmployeeById}"
+                                                        var="emp" itemLabel="#{emp}" itemValue="#{emp.empId}"  >
+                                            <p:column headerText="ID"  >
+                                                <h:outputText value="#{emp.empId}" />
+                                            </p:column>
+                                            <p:column headerText="First Name" >
+                                                <h:outputText  value="#{emp.firstName}" />
+                                            </p:column>
+                                            <p:column  headerText="Last Name">
+                                                <h:outputText value="#{emp.lastName}" />
+                                            </p:column>
+                                            <p:ajax  event="itemSelect" listener="#{leaveReturn.getEmployeeInfoById}" process="@this" update=":frmOffense" />   
+                                        </p:autoComplete>  
+                                    </div> 
+                                </div>
+                            </div>
+                        </section>
+                    </h:form>  
+                    <h:form id="frmOffense">
+                        <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,error"/>
+
+                        <p:panel id="panel">
+                            <p:panel id="panelLeaveHistory" >
+                                <section class="panel panel-info">
+                                    <section class="panel-heading"><strong><span></span>
+                                            <h:outputLabel  value="Leave History" /></strong></section>
+                                    <section class="panel-body">                                 
+                                        <p:toolbar>
+                                            <f:facet name="left">
+                                                <span class="ui-separator">
+                                                    <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                                                </span>
+
+                                                <p:commandButton type="button" title="Requests" icon="ui-icon-prnt" value="#{leaveReturn.reqSize}"/>
+                                            </f:facet>
+
+                                        </p:toolbar>
+                                        <p:dataTable id="tblleaveStat" var="requestDetail" rows="5" paginator="true"
+                                                     rowIndexVar="Det" value="#{leaveReturn.leaveRequestDataModel}" >
+                                                <p:column  headerText="NO" width="70">
+                                                        <h:outputText  value="#{Det+1}"/>
+                                            </p:column> 
+                                            <p:column headerText="Employee">
+                                                          <h:outputText value="#{requestDetail.empId.empId}"/>
+                                            </p:column>
+                                                <p:column headerText="Year"  sortBy="#{requestDetail.leaveYear.luBudgetYearId.budgetYear}">
+                                                        <h:outputText value="#{requestDetail.leaveYear.luBudgetYearId.budgetYear}"/>
+                                            </p:column>
+                                            <p:column headerText="Leave Type">
+                                                        <h:outputText value="#{requestDetail.leaveTypesId.leaveName}"/>
+                                                    </p:column>
+                                                <p:column headerText="Leave Start">
+                                                        <h:outputText value="#{requestDetail.leaveStart}"/>
+                                                    </p:column>
+                                                <p:column headerText="Return Day">
+                                                       <h:outputText value="#{requestDetail.leaveEnd}"/>
+                                            </p:column>                                 
+
+                                            <p:column headerText="Action">  
+                                                <p:commandLink action="#{leaveReturn.updateReqestDialog}"
+                                                               value="Edit/View" 
+                                                               process="@this"                                                       
+                                                               oncomplete= "PF('dlgAproval').show();" 
+                                                               update=":frmOffense:pnlApproval">                                                               
+                                                </p:commandLink>
+                                            </p:column>
+                                              
+                                        </p:dataTable>
+                                        <p:panel id="pnlApproval">
+                                            <p:dialog id="dlgAproval" width="60%" class="panel panel-info" modal="true" hideEffect="drop"  position="center"  widgetVar="dlgAproval" >   
+                                                <p:growl severity="information"/>
+
+                                                <section class="panel panel-info">
+                                                    <section class="panel-heading"><strong><h:outputLabel  value="Leave Approve" /></strong></section>
+                                                    <section class="panel-body">
+                                                        <section class="form-horizontal  col-sm-12">
+
+                                                            <div class="form-group" >
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group">
+                                                                        <label for="ddlGender" class="col-sm-2 control-label" >Employee:</label>
+                                                                        <div class="col-sm-4">
+                                                                            <p:autoComplete   id="themeCustom" placeholder="Enter Your ID Here" value="#{leaveReturn.employee.firstName}" 
+                                                                                              style="width: 100%"  completeMethod="#{ leaveReturn.searchEmployee}"
+                                                                                              var="emp" itemLabel="#{emp}" itemValue="#{emp.firstName}"  >
+                                                                                <p:column headerText="ID"  >
+                                                                                    <h:outputText value="#{emp.empId}" />
+                                                                                </p:column>
+                                                                                <p:column headerText="First Name" >
+                                                                                    <h:outputText  value="#{emp.firstName}" />
+                                                                                </p:column>
+                                                                                <p:column  headerText="Last Name">
+                                                                                    <h:outputText value="#{emp.lastName}" />
+                                                                                </p:column>
+                                                                                <p:ajax  event="itemSelect" listener="#{leaveReturn.getEmployeeInfo}" process="@this" update="menuLeaveType" />   
+                                                                            </p:autoComplete> 
+
+                                                                        </div>
+                                                                        <label for="menuLeaveType" class="col-sm-2 control-label" >Leave Type</label>
+                                                                        <div class="col-sm-4">
+                                                                            <p:selectOneMenu id="menuLeaveType"  value="#{leaveReturn.hrLuLeaveTypes.leaveName}" 
+                                                                                             valueChangeListener="#{leaveReturn.leaveTyp}" required="true">
+                                                                                <p:ajax event="change" process="@this"
+                                                                                        update="panelLeaveHistory,drlNoOfDays" />
+                                                                                <f:selectItems value="#{leaveReturn.leavetypeList}"/>
+                                                                            </p:selectOneMenu>                        
+                                                                            <p:message for="menuLeaveType" display="icon"/>  
+                                                                        </div>    
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+
+
+
+                                                            <div class="form-group" >
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group">
+                                                                        <label for="drlNoOfDays" class="col-sm-2 control-label" >No of Days:</label>
+                                                                        <div class="col-sm-4"> 
+                                                                            <p:inputText id="drlNoOfDays" value="#{leaveReturn.leaveRequest.approvedDays}"  > 
+                                                                                <p:ajax></p:ajax>
+                                                                            </p:inputText>
+                                                                            <p:message for="drlNoOfDays" display="icon"/>
+                                                                        </div>
+                                                                        <label for="cldStart" class="col-sm-2 control-label" >Leave Start:</label>
+                                                                        <div class="col-sm-4"> 
+                                                                            <p:calendar id="cldStart"  value="#{leaveReturn.leave_start}" pattern="yyyy/MM/dd" >
+                                                                                <p:ajax event="dateSelect" listener="#{leaveReturn.startDateSelected}"/> 
+                                                                            </p:calendar>
+                                                                            <p:message for="cldStart" display="icon"/>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div class="form-group" >
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group">
+                                                                        <label for="drlDayss" class="col-sm-2 control-label" >Days:</label>
+                                                                        <div class="col-sm-4"> 
+                                                                            <p:selectOneMenu id="drlDayss" value="#{leaveReturn.leaveRequest.halfOrFull}" required="true" 
+                                                                                             valueChangeListener="#{leaveReturn.halfOrfullSelected}">
+
+                                                                                <f:selectItem itemLabel="Select One"  itemValue="" />
+                                                                                <f:selectItem itemLabel="Half Day" itemValue="Half Day" />
+                                                                                <f:selectItem itemLabel="Full Day" itemValue="Full Day" />
+                                                                                <p:ajax event="change" process="@this" update="endStart" />
+                                                                            </p:selectOneMenu>
+                                                                        </div>
+                                                                        <label for="endStart" class="col-sm-2 control-label" >Return Date:</label>
+                                                                        <div class="col-sm-4"> 
+                                                                            <p:calendar id="endStart"   value="#{leaveReturn.leave_end}"  pattern="yyyy/MM/dd" readonly="true">
+                                                                                <p:ajax event="dateSelect" listener="#{leaveReturn.endDateSelected}"/> 
+                                                                            </p:calendar>  
+                                                                            <p:message for="endStart" display="icon"/>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>  
+                                                            <div class="form-group" >
+                                                                <h:outputLabel for="txtStatus" value="Decision "  class="control-label col-sm-2"/>
+                                                                <div class="col-sm-4">
+                                                                    <p:selectOneMenu id="txtStatus"  required="true"                                     
+                                                                                     value="#{leaveReturn.leaveRequest.status2}" 
+                                                                                     valueChangeListener="#{leaveReturn.changedStatus}">
+                                                                        <f:selectItems value="#{leaveReturn.allState}"  />                                                            
+
+                                                                        <p:ajax    event="change" process="@this" />
+                                                                    </p:selectOneMenu>                        
+                                                                    <p:message for="txtStatus" display="icon"/>  
+
+                                                                </div>
+                                                                <h:outputLabel for="txtused" value="Unused Days "  class="control-label col-sm-2"/>
+                                                                <div class="col-sm-4">
+                                                                    <p:spinner id="txtused" value="#{leaveReturn.leaveRequest.usedDays}" required="true"
+                                                                               valueChangeListener="#{leaveReturn.changedSpineer}"
+                                                                               min="0"  max="#{leaveReturn.usedMax}" >
+
+                                                                        <p:ajax event="change" process="@this"  />
+                                                                    </p:spinner>                          
+                                                                    <p:message for="txtused" display="icon"/>  
+
+                                                                </div>
+                                                            </div>
+
+
+                                                        </section>
+                                                    </section>                   
+
+                                                </section>
+
+                                                <p:panel id="btnSave" >
+                                                    <div class="panel panel-info col-sm-12">
+                                                        <p:commandButton id="btnSave" class="btn btn-success col-sm-push-4" 
+                                                                         value="Save" action="#{leaveReturn.save}" 
+                                                                         process="@this" update="frmOffense"/> 
+
+                                                    </div>
+                                                </p:panel>
+
+                                            </p:dialog>
+
+                                        </p:panel>
+                                    </section>
+                                </section> 
+
+                            </p:panel>
+
+                        </p:panel>
+
+                    </h:form>
+
+                </div>                   
+            </div>
+        </div>
+
+
+    </ui:define>
+</ui:composition>
+

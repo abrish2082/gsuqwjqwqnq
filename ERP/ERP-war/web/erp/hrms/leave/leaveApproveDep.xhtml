@@ -1,0 +1,342 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="leaveSetting.xhtml"><i class="fa fa-fw"></i> <span>Leave Setting </span></a></li>
+        <li>      <a href="leaveRequest.xhtml"><i class="fa fa-fw"></i>  <span>Leave Request</span></a> </li>
+        <li>    <a href="leaveApproveHr.xhtml"><i class="fa fa-fw"></i>  <span>Leave Approve HR </span></a></li>
+        <li>   <a href="leaveReturn.xhtml"><i class="fa fa-fw"></i>  <span>Employees On Leave </span></a></li>
+        <li>    <a href="leaveBalance.xhtml"><i class="fa fa-fw"></i> <span>Generate Leave Balance </span></a> </li>
+        <li>    <a href="leaveSchedule.xhtml"><i class="fa fa-fw"></i> <span>Leave Schedule </span></a> </li>
+        <li> <a href="holiday.xhtml"><i class="fa fa-fw"></i>  <span>Manage Holiday  </span>  </a></li>
+
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar  style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pnlGNotifica">
+                        <span  class="NotificationText"> #{leaveAppDp.reqSize} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Request List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                         <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{leaveAppDp.populateLeaveRequestForDept}" scrollHeight="300">
+                                            <f:selectItems  var="leaveRequests" value="#{leaveAppDp.requestsList}"
+                                                            itemValue="#{leaveRequests}"  itemLabel="#{leaveRequests.empId.firstName} #{leaveRequests.empId.middleName} #{leaveRequests.empId.lastName}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update="@this,:frmDeptApproval"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-gear" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWorkflow" value="#{leaveAppDp.workflowDataModel}" 
+                                                                 var="currentRow" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                 rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Decision"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.decision}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Comment Given"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Processed Date"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                        </p:column> 
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="leaveApproveDep.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+
+            </p:toolbar>
+        </h:form>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary ">
+                    <div class="box-header">
+                        <h3 class="box-title">Department Leave Approval... </h3>  
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body ">
+                        <div class="box-body ">
+                            <h:form id="frmDeptApproval">
+                                <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>                               
+                                <h:panelGroup id="pnlMain">
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <section class="form-horizontal">
+                                                <div class="row">
+                                                    <div class="col-md-12">                      
+                                                        <div class="box-body"> 
+                                                            <div class="col-md-6">
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <p:outputLabel   value="Emp ID:" class="control-label col-sm-4"/>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText  id="txtRequesterName" value="#{leaveAppDp.employee.empId}"  readonly="true" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal ">
+                                                                        <label for="txtEmpID" class="control-label col-sm-4" >Full Name:</label>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText  id="txtEmpID" value="#{leaveAppDp.employee.firstName} #{leaveAppDp.employee.middleName} #{leaveAppDp.employee.lastName}" readonly="true"  />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <label class="control-label col-sm-4" >Leave Type:</label>
+                                                                        <div class="col-sm-8">
+                                                                            <p:inputText  id="txtLeaveType" value="#{leaveAppDp.hrLuLeaveTypes.leaveName}" readonly="true"  />                                                                                
+                                                                        </div>  
+                                                                    </div>    
+                                                                </div>
+
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <label class="control-label col-sm-4" >Full/Half Days:</label>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText  id="txtFullHalf" value="#{leaveAppDp.leaveRequest.halfOrFull}"  readonly="true" />  
+
+                                                                        </div>  
+                                                                    </div>    
+                                                                </div>
+                                                            </div>
+                                                            <!--right side-->
+                                                            <div class="col-md-6">
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <label for="drlNoOfDays" class="control-label col-sm-4" >Requested Days:</label>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="drlNoOfDays" value="#{leaveAppDp.leaveRequest.requestedDays}"  readonly="true" > 
+                                                                              
+                                                                            </p:inputText>
+                                                                            <p:message for="drlNoOfDays" display="icon"/>
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <label for="txLeaveStart" class="control-label col-sm-4" >Leave Start:</label>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txLeaveStart" value="#{leaveAppDp.leaveRequest.leaveStart}" readonly="true"  />                                                                                
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <label for="txLeaveEnd" class="control-label col-sm-4" >Return Date:</label>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputText id="txLeaveEnd" value="#{leaveAppDp.leaveRequest.leaveEnd}"  readonly="true" />      
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <label class="control-label col-sm-4" >Description:</label>
+                                                                        <div class="col-sm-8"> 
+                                                                            <p:inputTextarea id="txtDesciption" value="#{leaveAppDp.leaveRequest.description}" readonly="true" 
+                                                                                             class="form-control" rows="1" cols="5" autoResize="false"/> 
+                                                                        </div>
+                                                                    </div>    
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </section>
+                                        </section>
+                                    </section> 
+                                </h:panelGroup>
+
+                                
+                                
+                                
+                                <h:panelGroup id="panelAlBalance" rendered="#{leaveAppDp.renderAlBalance}">
+                                    <div class="col-sm-12" >
+                                        <div class="col-md-12 ">                                                                      
+                                            <div class="form-group form-horizontal"> 
+                                                <h:outputLabel  value="Total Leave days: " class="control-label col-sm-4" />
+                                                  <h:outputLabel id="totallvdays"   value="#{leaveAppDp.totalLeaveDays}" />
+                                                  <p:dataTable id="tblleaveBalance" var="balanceInfo" rows="3" paginator="true" paginatorPosition="bottom" class="dataTable" 
+                                                               rowIndexVar="Det" value="#{leaveAppDp.balanceDataModel}" >
+                                                    <p:column  headerText="NO">
+                                                        <h:outputText  value="#{Det+1}"/>
+                                                    </p:column> 
+                                                        
+                                                    <p:column headerText="Leave Year">
+                                                        <h:outputText value="#{balanceInfo.leaveYearId.budgetYear}"/>
+                                                    </p:column>
+
+                                                    <p:column headerText="Total Days">
+                                                               <h:outputText value="#{balanceInfo.totalDays}"/>
+                                                    </p:column>                                 
+                                                    <p:column headerText="Remaining Days">
+                                                                  <h:outputText value="#{balanceInfo.remainingDays}"/>
+                                                    </p:column>
+                                                    <p:column headerText="Status">
+                                                                  <h:outputText value="Active"/>
+                                                    </p:column>       
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                </h:panelGroup>
+
+                                <h:panelGroup id="panelWorkFlow" >
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <section class="form-horizontal">
+                                                <div class="row">
+                                                    <div class="col-md-12">                      
+                                                        <!--<div class="box-body">--> 
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtStatus" value="Decision:"  class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneMenu id="txtStatus"  required="true"      style="width: 100%"                                
+                                                                                         value="#{leaveAppDp.leaveRequest.status1}" valueChangeListener="#{leaveAppDp.decisin}">
+                                                                            <f:selectItem itemLabel="--- Select ---" />
+                                                                            <f:selectItem itemLabel="Approve" itemValue="1" />
+                                                                            <f:selectItem itemLabel="Reject" itemValue="2"/>                                                          
+                                                                            <p:ajax    event="change" process="@this" update="@this,txtdateApproved"/>
+                                                                        </p:selectOneMenu>                        
+                                                                        <p:message for="txtStatus" display="icon"/>  
+                                                                    </div>
+                                                                </div>
+                                                            </div>                                                                    
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtdateApproved" value="Approved Days:"  class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+
+                                                                        <p:inputText id="txtdateApproved" value="#{leaveAppDp.leaveRequest.approvedDays}" readonly="true" validator="#{validatorManagedBean.Number}"/>
+                                                                        <p:message for="txtdateApproved" display="icon"/>  
+                                                                    </div>
+                                                                </div>
+                                                            </div>                                                                    
+                                                        </div>
+                                                    </div>
+                                                      <div class="col-md-12"> 
+                                                        <div class="col-md-6">
+                                                            
+                                                            <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtAppDesc" value="Approver Comment:"  class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtAppDesc" value="#{leaveAppDp.hrWfProcessed.commentGiven}"  class="form-control" rows="1" cols="5" autoResize="false" />
+                                                                        <p:message for="txtAppDesc" display="icon"/>  
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                </div>                                                    
+                                            </section>
+                                        </section>   
+                                    </section>
+                                </h:panelGroup>                            
+
+
+                                <h:panelGroup id="pnlSaveEmp"  >
+                                    <section class="panel panel-info"  >
+                                        <section class="panel-body" > 
+                                            <div class="col-sm-6">
+                                                <div class="col-sm-12 form-horizontal">
+                                                    <div class="col-sm-4">                                                              
+                                                    </div>                                                                    
+                                                    <div class="col-sm-4">
+                                                        <p:commandButton id="btnSavea" action="#{leaveAppDp.saveLeaveApproveDep}"  oncomplete="PF('dlgAproval').show();"
+                                                                         value="Submit" class="btn  btn-block btn-primary col-lg-4"
+                                                                         process="@this,:frmDeptApproval:panelWorkFlow" 
+                                                                         update="@this,:frmDeptApproval,:frmSample"/>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                </h:panelGroup>
+                            </h:form>
+                        </div>
+
+                    </div>
+                    <div class="box-footer ">                       
+                    </div>
+                </div>                   
+            </div>
+        </div>
+
+    </ui:define>
+</ui:composition>

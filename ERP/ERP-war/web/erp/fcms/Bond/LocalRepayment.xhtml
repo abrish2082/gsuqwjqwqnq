@@ -1,0 +1,496 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li>
+            <a href="BondLibor.xhtml"><i class="fa fa-circle-o"></i>Bond Libor </a>
+        </li>
+        <li>
+            <a href="BondForeign.xhtml"><i class="fa fa-circle-o"></i>Bond Foreign </a>
+        </li>      
+        <li>
+            <a href="BondLocal.xhtml"><i class="fa fa-circle-o"></i>Bond Local </a>
+        </li>
+        <li>
+            <a href="BondCoupon.xhtml"><i class="fa fa-circle-o"></i>Bond Coupon </a>
+        </li>
+        <li>
+            <a href="BondCouponSchedule.xhtml"><i class="fa fa-circle-o"></i>Bond Coupon Schedule </a>
+        </li>
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <a href="LocalRepayment.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>  
+            <h:panelGroup style="border: white; background-color: transparent" id="mainUI" rendered="#{bondLocalScheduleController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Bond_Local_Repayment_Search}</h3>
+                    </div> 
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel for="searchId" class="control-label col-sm-4" value="#{FCMS.Serial_Number}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:inputText id="searchId"   value="#{bondLocalScheduleController.bondLocal.serialNo}"
+                                                         class="form-control"  style="width: 100%" >
+                                                <p:ajax event="select" process="@this" update="@this"/>
+                                            </p:inputText>
+                                            <p:message for="searchId" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel for="searchName" class="control-label col-sm-4" value="#{FCMS.Name}: "></h:outputLabel> 
+                                        <div class="col-sm-8">
+                                            <p:autoComplete id="searchName"  emptyMessage="no data found"   style="width: 100%"                                              
+                                                            value="#{bondLocalScheduleController.bondLocal.buyerFullName}"
+                                                            completeMethod="#{bondLocalScheduleController.searchName}"  
+                                                            var="nameinfo" itemValue="#{nameinfo.buyerFullName}" itemLabel="#{nameinfo}"  >
+                                                <p:ajax  event="itemSelect" listener="#{bondLocalScheduleController.getBuyersName}" 
+                                                         process="searchName" update="@this"></p:ajax>  
+                                                <p:column headerText="#{FCMS.Buyer_Name}"  >
+                                                    <h:outputText value="#{nameinfo.buyerFullName}" />
+                                                </p:column>
+                                                <p:column  headerText="#{FCMS.Serial_Number}">
+                                                    <h:outputText value="#{nameinfo.serialNo}" />
+                                                </p:column>
+                                            </p:autoComplete> 
+                                            <p:message for="searchName" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                        <div class="col-sm-8">
+                                            <p:commandButton id="btnSearch" value="Find" class="btn btn-primary" 
+                                                             process="@this" 
+                                                             action="#{bondLocalScheduleController.searchLocalRepayment()}" 
+                                                             update="tblLocInfoDetail"  />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class = "col-md-6">
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel for="txtAmount" class="control-label col-sm-4" value=" #{FCMS.Principal_Amount}: "/>   
+                                        <div class="col-sm-8">
+                                            <p:inputText id="txtAmount" value="#{bondLocalScheduleController.bondLocal.valueBirr}"  
+                                                         converter="#{bondLocalScheduleController.numberConverter}" class="form-control"  
+                                                         style="width: 100%" >
+                                                <p:ajax event="select" process="@this" update="@this"/>
+                                            </p:inputText>  
+                                            <p:message for="txtAmount" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+
+                                <p:panel id="pnldtabel" style="border: white;"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <p:dataTable id="tblLocInfoDetail" 
+                                                         value="#{bondLocalScheduleController.bondLocalAddDataModel}"
+                                                         style="font-size: 11px;"  
+                                                         rows="10"             
+                                                         paginator="true" 
+                                                         paginatorPosition="bottom"
+                                                         rowsPerPageTemplate="5,10,15"
+                                                         resizableColumns="true"
+                                                         rowIndexVar="numbers"  
+                                                         var="addInfo"
+                                                         selection="#{bondLocalScheduleController.bondLocalselect}"
+                                                         selectionMode="single"
+                                                         rowKey="#{addInfo.serialNo}"
+                                                         > 
+                                                <p:ajax event="rowSelect" listener="#{bondLocalScheduleController.getBySchedule}" 
+                                                        process="@this" update=":frmRegisterUI,:frmMainUI,:frmToolbar"/>
+
+                                                <p:column  style="width:60px">
+                                                    <f:facet name="header"  >
+                                                        <h:outputText value="#{FCMS.No}" />
+                                                    </f:facet>      
+                                                    <h:outputText value="#{numbers+1}"/>          
+                                                </p:column>                                       
+                                                <p:column sortBy="#{addInfo.serialNo}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Bond_Serial_Number}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.serialNo}" />
+                                                </p:column>  
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Bond_Type}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.bondType}" />
+                                                </p:column> 
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Amount}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.valueBirr}" converter="#{bondLocalScheduleController.numberConverter}"/>
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Full_Name}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.buyerFullName}" />
+                                                </p:column>
+                                                <p:column rendered="false" >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Repaid}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.rePaid}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Interest_Margin}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.interestBearing}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Grace_Period}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.gracePeriod}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Bond_Maturity}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.rePaid}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Issued_Date}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{addInfo.applicationDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"></f:convertDateTime>
+                                                    </h:outputText>
+                                                </p:column>
+                                            </p:dataTable>  
+                                        </div>
+                                    </div>    
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <h:panelGroup style="border: white; background-color: transparent" id="registerUI" rendered="#{bondLocalScheduleController.renderPnlCreateAdditional}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"> #{FCMS.Bond_local_Repayment_Followup}</h3>
+                    </div>
+                    <div class="box-body">
+                        <p:dialog id="digImpDet" 
+                                  header="Local Bond Repayment Schedule Detail" 
+                                  widgetVar="digImp"                                              
+                                  showEffect="bounce"
+                                  position="center"
+                                  modal="true"
+                                  width="50%"
+                                  >   
+                            <h:panelGroup id="pnldialog" class="col-md-12">
+                                <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <div class="col-md-12 textBoxMargin6px" >
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel for="txtcountryBondIssued" class="control-label col-sm-4" value="Interest: "></h:outputLabel> 
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtcountryBondIssued"   value="#{bondLocalScheduleController.localSchedule.interest}"
+                                                                 class="form-control"  readonly="true" converter="#{bondLocalScheduleController.numberConverter}"/>
+                                                    <p:message for="txtcountryBondIssued" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br></br>
+                                        <br></br>
+                                        <div class="col-md-12 textBoxMargin6px" >
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel for="txtbuyerFullName" class="control-label col-sm-4" value="#{FCMS.Principal}: "></h:outputLabel>   
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtbuyerFullName" value="#{bondLocalScheduleController.localSchedule.principal}"  
+                                                                 class="form-control"  readonly="true" converter="#{bondLocalScheduleController.numberConverter}"
+                                                                 />
+                                                    <p:message for="txtbuyerFullName" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br></br>
+                                        <br></br>
+                                        <div class="col-md-12 textBoxMargin6px" >
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel for="txtgracePeriod" class="control-label col-sm-4" value="#{FCMS.Amount_to_be_Paid}: "></h:outputLabel>   
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtgracePeriod" value="#{bondLocalScheduleController.localSchedule.paidAmount}"  readonly="true"
+                                                                 class="form-control" converter="#{bondLocalScheduleController.numberConverter}"
+                                                                 >
+                                                    </p:inputText>
+                                                    <p:message for="txtgracePeriod" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br></br>
+                                        <br></br>
+                                        <div class="col-md-12 textBoxMargin6px" >
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel for="txtPaymentDate" class="control-label col-sm-4" value="#{FCMS.payment_Document_Date}: "/> 
+                                                <div class="col-sm-8">
+                                                    <p:calendar id="txtPaymentDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                                value="#{bondLocalScheduleController.localSchedule.paymentDocumentDate}"
+                                                                required="true" requiredMessage=" field is required Date format e.g 2017/06/24"
+                                                                converterMessage="Issued Date must be in Date format"  >
+                                                    </p:calendar>
+                                                    <p:message for="txtPaymentDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br></br>   
+                                        <br></br>
+                                        <div class="col-md-12 textBoxMargin6px">
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel for="txtDocRef"  class="control-label col-sm-4" value=" #{FCMS.Document_Reference_Number}: "></h:outputLabel> 
+                                                <div class="col-sm-8">
+                                                    <p:inputText id="txtDocRef"  value="#{bondLocalScheduleController.localSchedule.paymentDocumentReference}" 
+                                                                 required="true" requiredMessage="Document Reference No is required please insert"
+                                                                 validator="#{validatorManagedBean.AlphaNumericText}" converterMessage="Vaue must be Alpha Numeric Text"
+                                                                 >
+                                                    </p:inputText>
+                                                    <p:message for="txtDocRef" display="icon" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br></br>   
+                                        <br></br>
+                                        <div class="col-md-12 textBoxMargin6px" >
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel  class="control-label col-sm-4" value="#{FCMS.Remark}: " />
+                                                <div class="col-sm-8">
+                                                    <p:column headerText="Remark" >
+                                                        <h:inputTextarea id="txtRemark" value="#{bondLocalScheduleController.localSchedule.remark}"
+                                                                         class="form-control" 
+                                                                         validator="#{validatorManagedBean.AlphaNumericText}" converterMessage="Vaue must be Alpha Numeric Text" >
+                                                        </h:inputTextarea> 
+                                                        <p:message for="txtRemark" display="icon" />
+                                                    </p:column> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br></br>   
+                                        <br></br>
+                                        <div class="col-md-12 textBoxMargin6px">
+                                            <div class="form-group form-horizontal">
+                                                <div class="col-sm-8" style="left: 100px">
+                                                    <br></br>
+                                                    <p:commandButton id="btnPayment" value="save"
+                                                                     process="@this,pnldialog,digImpDet,tblLocRpDetail:txtStatus" 
+                                                                     action="#{bondLocalScheduleController.localPayment1()}" 
+                                                                     update="tblLocRpDetail,pnldialog" >
+                                                        <p:confirm header="Confirmation" message="Make Payment?" />
+                                                    </p:commandButton>
+                                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" >
+                                                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" process="@this," update="tblLocRpDetail:txtStatus"/>
+                                                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                                    </p:confirmDialog> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:panelGroup>
+                        </p:dialog> 
+                        <div class="row"> 
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="col-md-12 textBoxMargin6px">
+                                        <div class="form-group form-horizontal">
+                                            <h:outputLabel for="StartDate"  class="control-label col-sm-4" value="#{FCMS.Start_Date}: "></h:outputLabel>   
+                                            <div class="col-sm-8">
+                                                <p:calendar id="StartDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                            value="#{bondLocalScheduleController.fromStartDate}" 
+                                                            required="true" requiredMessage="The  field is required date must look like e.g 2017/02/18"
+                                                            converterMessage="Issued Date must be in Date format"/>
+                                                <p:message for="StartDate" display="icon"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 textBoxMargin6px">
+                                        <div class="form-group form-horizontal">
+                                            <h:outputLabel for="EndDate"  class="control-label col-sm-4" value="#{FCMS.End_Date}: "></h:outputLabel>   
+                                            <div class="col-sm-8">
+                                                <p:calendar id="EndDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                            value="#{bondLocalScheduleController.toEndDate}" 
+                                                            converterMessage="Issued Date must be in Date format"
+                                                            required="true" requiredMessage="The  field is required date must look like e.g 2017/02/18"/>
+                                                <p:message for="EndDate" display="icon"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 textBoxMargin6px">
+                                        <div class="form-group form-horizontal">
+                                            <h:outputLabel id="Find" class="control-label col-sm-4"/>
+                                            <div class="col-sm-8">
+                                                <p:commandButton value="Find" class="btn btn-primary" 
+                                                                 process="@this,StartDate,EndDate" icon="ui-icon-search" 
+                                                                 action="#{bondLocalScheduleController.searchStartEndDate()}" 
+                                                                 update=":frmRegisterUI,tblLocRpDetail"  />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <p:panel id="pnlRptabel" style="border: white;"> 
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <p:dataTable id="tblLocRpDetail" 
+                                                         value="#{bondLocalScheduleController.repaymentScheduleDatamodel}"
+                                                         style="font-size: 11px;"  
+                                                         rows="5"             
+                                                         paginator="true" 
+                                                         paginatorPosition="bottom"
+                                                         rowsPerPageTemplate="5,10,15"
+                                                         resizableColumns="true"
+                                                         rowIndexVar="numbers"  
+                                                         var="BondInfo"
+                                                         sortBy="#{BondInfo.noOfInstallmen}"
+                                                         > 
+                                                <p:column  style="width:60px">
+                                                    <f:facet name="header"  >
+                                                        <h:outputText value="#{FCMS.No}" />
+                                                    </f:facet>      
+                                                    <h:outputText value="#{numbers+1}"/>          
+                                                </p:column>                                       
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Schedule_Id}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.LRepaymentSchId}" />
+                                                </p:column>  
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Serial_Number}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.serialNo}" />
+                                                </p:column>  
+                                                <p:column sortBy="#{BondInfo.noOfInstallmen}">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Number_Of_Installment}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.noOfInstallmen}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.interest}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.interest}" converter="#{bondLocalScheduleController.numberConverter}" />
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Principal}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.principal}" converter="#{bondLocalScheduleController.numberConverter}" />
+                                                </p:column>
+                                                <p:column rendered="true" >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Paid_Amount} "/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.paidAmount}" converter="#{bondLocalScheduleController.numberConverter}"/>
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Remaining_Amount}" />
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.remain}" converter="#{bondLocalScheduleController.numberConverter}" />
+                                                </p:column>
+                                                <p:column rendered="true">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Due_Date}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.installmentDueDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column >
+                                                <p:column rendered="true" >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Status}"/>
+                                                    </f:facet>
+                                                    <h:outputText id="txtStatus" value="#{BondInfo.changeStatus}" />
+                                                </p:column>
+                                                <p:column rendered="true" >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Payment_Document_Reference}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.paymentDocumentReference}" />
+                                                </p:column>
+                                                <p:column rendered="true" >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.payment_Document_Date}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.paymentDocumentDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column>
+                                                <p:column rendered="true" >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="#{FCMS.Remark}"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{BondInfo.remark}" />
+                                                </p:column>
+                                                <p:column headerText="Activity" sortBy="#{BondInfo.status}">
+                                                    <p:commandLink id="cmdLnkPay" action="#{bondLocalScheduleController.updatelocalSchedule()}"                                       
+                                                                   disabled="#{BondInfo.status eq bondLocalScheduleController.paidStatus}"
+                                                                   update=":frmRegisterUI:digImpDet,"
+                                                                   oncomplete="PF('digImp').show();" 
+                                                                   process="@this">
+                                                        <h:outputText  value="Pay" class="fa fa-paypal"/>
+                                                    </p:commandLink>                    
+                                                </p:column>
+                                            </p:dataTable>  
+                                        </div>
+                                    </div>    
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

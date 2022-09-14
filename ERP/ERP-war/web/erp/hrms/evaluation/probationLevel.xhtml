@@ -1,0 +1,228 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li> 
+        <li><a href="probationCriteria.xhtml"><i class="fa fa-circle-o "></i> <span>Probation Criteria</span></a></li>  
+        <li><a href="probationLevel.xhtml"><i class="fa fa-fw fa-refresh"></i> <span>Refresh Page</span></a></li>  
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{evaluationLevelProbationController.probationLevelInfo()}"
+                                     icon="#{evaluationLevelProbationController.icone}" style="background-color: white" 
+                                     process="@this" update="@this,:frmEvaluationLevelProbation,:frmSample" 
+                                     title="#{evaluationLevelProbationController.createorSaveBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{evaluationLevelProbationController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{evaluationLevelProbationController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmEvaluationLevelProbation,:frmSample" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <p:commandButton id="btnOpen" value="Open"  icon="ui-icon-folder-open" style="background-color: white"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <p:commandButton id="btnDisk" type="button" style="background-color: white" title="Save" icon="ui-icon-disk"/>
+                    <p:commandButton id="btnTrash" type="button" style="background-color: white"  title="Delete" icon="ui-icon-trash"/>
+                    <p:commandButton id="btnPrint" type="button" style="background-color: white"  title="Print" icon="ui-icon-print"/>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmEvaluationLevelProbation"> 
+            <p:growl id="growl" autoUpdate="true" severity="information,error"/>
+            <div class="box-header">
+                <h4 class="box-title">
+                    <h:outputLabel id="lblheadeTitle" />
+                </h4>
+            </div>
+            <h:panelGroup id="pnlSearch" rendered="#{evaluationLevelProbationController.renderOne}" style="border: 0px; background-color: transparent">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title"> Search Level</h3>                       
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="row">
+                                            <div class="col-md-12" >  
+                                                <h:panelGroup id="pnlSearchEvaLevel">
+                                                    <div class="form-horizontal  col-sm-12">
+                                                        <div class="form-group">
+                                                            <h:outputLabel class="control-label col-sm-2" value="Filter Level:"/>
+                                                            <div class="col-sm-3">
+                                                                <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                                 value="#{evaluationLevelProbationController.hrEvalLevelProbations.evaluationLevel}"
+                                                                                 valueChangeListener="#{evaluationLevelProbationController.vcl_filiterByStatus}">
+                                                                    <f:selectItems value="#{evaluationLevelProbationController.filterByStatus}" var="inst" itemLabel="#{inst}" itemValue="#{inst.id}"/>   
+                                                                    <p:ajax event="change" process="@this" update=":frmEvaluationLevelProbation:tblLevelList"/>
+                                                                </p:selectOneMenu> 
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </h:panelGroup>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                   
+
+                                <div class="box-body">
+                                    <div class="col-md-12">                                       
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <p:dataTable id="tblLevelList" value="#{evaluationLevelProbationController.hrEvalevelProbationsDataModel}"
+                                                             var="level" selectionMode="single" rowIndexVar="num" class="dataTable" 
+                                                             rows="10" rowsPerPageTemplate="5,10,15" paginator="true" paginatorPosition="bottom"
+                                                             rowKey="#{level.id}" selection="#{evaluationLevelProbationController.hrEvalLevelProbations}">
+                                                    <p:ajax event="rowSelect" process="@this,tblLevelList" listener="#{evaluationLevelProbationController.levelList}"
+                                                            update=":frmEvaluationLevelProbation,:frmSample"/>
+                                                    <p:column headerText="No.">
+                                                        <h:outputText value="#{num + 1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Evaluation Level"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{level.evaluationLevel}"/>
+                                                    </p:column> 
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Description"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{level.description}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="Status"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{level.status}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+
+            <h:panelGroup id="pnlMainpage" style="border: 0px; background-color: transparent" rendered="#{evaluationLevelProbationController.renderTwo}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title"> Evaluation Level Probation Registration</h3>                       
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl1" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEvaluationLevel" class="control-label col-sm-4" value="Evaluation Level:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEvaluationLevel" value="#{evaluationLevelProbationController.hrEvalLevelProbations.evaluationLevel}" 
+                                                                                             title="Evaluation Level" class="form-control" required="true" requiredMessage="Enter Evaluation Level"/>
+                                                                                <p:message for="txtEvaluationLevel" display="icon"/>
+                                                                            </div>                                                               
+                                                                        </div>                                                                                          
+                                                                    </div>    
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtDescription" class="control-label col-sm-4" value="Description:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="txtDescription" value="#{evaluationLevelProbationController.hrEvalLevelProbations.description}" 
+                                                                                                 rows="1" cols="5" autoResize="false" title="Description" required="true"
+                                                                                                 requiredMessage="Enter your Reason" validator="#{validatorManagedBean.Remark}" class="form-control"/>
+                                                                                <p:message for="txtDescription" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="rdoStatus" class="control-label col-sm-4" value="Status:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneRadio id="rdoStatus" value="#{evaluationLevelProbationController.hrEvalLevelProbations.status}"
+                                                                                                  required="true" class="col-sm-6" requiredMessage="Select Status type">
+                                                                                    <f:selectItem itemLabel="Active" itemValue="1"/>
+                                                                                    <f:selectItem itemLabel="Inactive" itemValue="0"/>
+                                                                                    <p:ajax process="@this" event="change"/>
+                                                                                    <p:message for="rdoStatus" display="icon"/>
+                                                                                </p:selectOneRadio>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>  
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <h:panelGroup id="pnlSave">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-4">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                     value="#{evaluationLevelProbationController.saveorUpdateBundle}"
+                                                                                     action="#{evaluationLevelProbationController.create}"
+                                                                                     process="@this,pnl1" update="pnl1,rdoStatus,:frmEvaluationLevelProbation" />  
+                                                                </div>
+                                                                <div class="col-sm-4">
+                                                                    <p:commandButton id="btnReset" value="Reset" class="btn btn-block btn-primary col-lg-4"
+                                                                                     action="#{evaluationLevelProbationController.clear}" 
+                                                                                     process="@this" update="pnl1, :frmEvaluationLevelProbation"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                            <div class="box-footer ">
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

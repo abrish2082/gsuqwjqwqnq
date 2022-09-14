@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="costSharingSummery" language="groovy" pageWidth="1000" pageHeight="1100" whenNoDataType="BlankPage" columnWidth="960" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="68c2d4bc-227f-4f67-ae31-9c2c357c6c26">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="month" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT T1.ID,T1.EMP_ID, T1.HIRE_DATE, T1.BASIC_SALARY, T1.TIN_NO, SUBSTR(T1.payment_made_for_the_month_of,4,2)paymentMonth,SUBSTR(T1.payment_made_for_the_month_of,7)paymentYear,t1.FULL_NAME,nvl(T1.AMOUNT,0) Tax,nvl(T2.AMOUNT,0) costSharing,nvl(T1.AMOUNT,0)+nvl(T2.AMOUNT,0) TOTAL_AMOUNT
+FROM (
+( SELECT  EMP.ID,EMP.TIN_NO, EMP.HIRE_DATE, EMP.BASIC_SALARY, pp.payment_made_for_the_month_of, EMP.EMP_ID, EMP.FIRST_NAME||' '||EMP.MIDDLE_NAME||' '||EMP.LAST_NAME FULL_NAME,PT.AMOUNT,ED.DESCRIPTION,
+ '3'DISP_ORDER FROM hr_payroll_periods PP INNER JOIN  HR_PAYROLL_MON_TRANSACTIONS PT ON pp.id=pt.payroll_period_id INNER JOIN HR_PAYROLL_EARNING_DEDUCTIONS ED
+ON ED.CODE=PT.EARNING_DED_CODE INNER JOIN HR_EMPLOYEES EMP ON EMP.ID=PT.EMP_ID WHERE
+ ED.CRITERIAS='Tax' )t1
+ left join
+ (
+ SELECT  EMP.ID,EMP.TIN_NO, EMP.HIRE_DATE, EMP.BASIC_SALARY, PP.payment_made_for_the_month_of, EMP.EMP_ID, EMP.FIRST_NAME||' '||EMP.MIDDLE_NAME||' '||EMP.LAST_NAME FULL_NAME,PT.AMOUNT,ED.DESCRIPTION,
+ '3'DISP_ORDER FROM  hr_payroll_periods PP INNER JOIN  HR_PAYROLL_MON_TRANSACTIONS PT ON pp.id=pt.payroll_period_id INNER JOIN HR_PAYROLL_EARNING_DEDUCTIONS ED
+ON ED.CODE=PT.EARNING_DED_CODE INNER JOIN HR_EMPLOYEES EMP ON EMP.ID=PT.EMP_ID WHERE
+ ED.CRITERIAS='costSharing')t2  on T1.EMP_ID=T2.EMP_ID
+ )]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="EMP_ID" class="java.lang.String"/>
+	<field name="HIRE_DATE" class="java.lang.String"/>
+	<field name="BASIC_SALARY" class="java.math.BigDecimal"/>
+	<field name="TIN_NO" class="java.lang.String"/>
+	<field name="PAYMENTMONTH" class="java.lang.String"/>
+	<field name="PAYMENTYEAR" class="java.lang.String"/>
+	<field name="FULL_NAME" class="java.lang.String"/>
+	<field name="TAX" class="java.math.BigDecimal"/>
+	<field name="COSTSHARING" class="java.math.BigDecimal"/>
+	<field name="TOTAL_AMOUNT" class="java.math.BigDecimal"/>
+	<variable name="year" class="java.lang.String"/>
+	<variable name="totalSalaryCurrentMonth" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{BASIC_SALARY}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<variable name="monthlyTotalTax" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{TAX}]]></variableExpression>
+		<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+	</variable>
+	<variable name="totalCastSharing" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{COSTSHARING}]]></variableExpression>
+	</variable>
+	<variable name="totalNumberOfEmployee" class="java.lang.Number" calculation="Count">
+		<variableExpression><![CDATA[$F{EMP_ID}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<title>
+		<band height="71" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="904cb523-d511-4f6a-94e3-74eacdd78273" x="78" y="0" width="239" height="71"/>
+				<textElement/>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="19be07cf-6e71-4b53-ad5b-014d0c4b52f9" x="385" y="48" width="148" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cost Sharing Summary]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="277" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ca5f021e-5a47-4388-84b3-1bb709e16582" x="238" y="217" width="293" height="41"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[7) Fax.No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8348d88a-91d0-45e4-90e2-23a2a1ce2b76" x="0" y="217" width="238" height="41"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[6) Tel.No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1fbc3804-54e0-4ab7-932d-f588188e2b57" x="643" y="94" width="78" height="38"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Month]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0b9f4ed9-3a15-4fc3-a2ce-d3a0276c31f8" x="802" y="94" width="57" height="38"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Year]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e2f65d23-cd1f-4946-ba37-a56ad993949c" x="740" y="131" width="219" height="126"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Document No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4bbd178e-1b3f-43ae-a7ad-78db1b8020d4" x="531" y="131" width="209" height="45"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[4) Tax Payer Account No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a0dbc7b6-09a7-45d0-8203-e27e4611df38" x="0" y="132" width="166" height="44"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2A) Region]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2acd7521-101b-4912-a267-0cdaa108d429" x="347" y="176" width="184" height="41"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2E) HouseNo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1fbacbc9-83ef-4c53-a048-8cce4a07ee2a" x="166" y="176" width="181" height="41"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2D) kebele]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3fcb0d2c-f320-4490-bf4a-a7ae9b441a00" x="643" y="60" width="316" height="34"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[vacancy time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="7394c054-df53-4f06-84f6-517a9eea2869" x="0" y="60" width="406" height="72"/>
+				<box>
+					<pen lineWidth="1.25"/>
+					<topPen lineWidth="1.25"/>
+					<leftPen lineWidth="1.25"/>
+					<bottomPen lineWidth="1.25"/>
+					<rightPen lineWidth="1.25"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[1)tax payer Organization Name or person full name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4546abb3-2e34-4d9b-a467-64c91ab417de" x="166" y="132" width="365" height="44"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2B) Zone]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9c279f56-91e0-4121-a4f5-d836bd73b96b" x="0" y="176" width="166" height="41"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[2C) Woreda]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="32d2fca4-7c0c-4887-8e75-4365cae460a3" x="406" y="60" width="237" height="72"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TIN No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4cbca515-9431-499b-b808-2852170991b9" x="189" y="18" width="300" height="42"/>
+				<textElement>
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[A) Tax payer list information]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3d575096-d914-4611-8e86-c38c1aa34c2d" x="531" y="176" width="209" height="82"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="44effc56-9a04-4cca-9ae8-47d6fe8d26c0" x="721" y="94" width="70" height="38"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENTMONTH}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="56b83e5d-0da1-4def-9575-27f9f96fcdfb" x="859" y="94" width="100" height="38"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PAYMENTYEAR}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="0f3a3322-4886-42f5-8123-ba89eb2fc94f" x="801" y="94" width="1" height="38"/>
+			</line>
+			<line>
+				<reportElement uuid="94bc276e-938c-4b28-a4e5-7c3ef769453e" x="959" y="94" width="1" height="38"/>
+			</line>
+		</band>
+	</pageHeader>
+	<summary>
+		<band height="593">
+			<staticText>
+				<reportElement uuid="3627e8b7-a022-4bab-a4bb-121d73a9744c" x="189" y="10" width="408" height="40"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[B) Income vacancy]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="461f9f1f-cebf-47f2-91c7-5164b81a696c" x="0" y="151" width="114" height="34"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[30]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8a01a12a-7336-4263-84e8-4cbeaaef59bf" x="114" y="116" width="519" height="35"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[monthly total tax]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="535b4926-15f9-429d-92ba-26a547f56a88" x="0" y="116" width="114" height="35"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[20]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e2099986-ad5e-4421-8605-3193d7cf3658" x="114" y="151" width="519" height="35"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[cast sharing payment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6fbb9c6f-415f-4671-b43f-562df2438377" x="0" y="73" width="114" height="43"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="98a0a527-532a-4edd-a05b-4366a340e588" x="114" y="73" width="519" height="43"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[total number of employee salary payed in current month]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3627e8b7-a022-4bab-a4bb-121d73a9744c" x="189" y="199" width="408" height="40"/>
+				<box>
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement>
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[D) Correrctness checking]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="98a0a527-532a-4edd-a05b-4366a340e588" x="0" y="259" width="597" height="67"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[all the above evideces are fully correct .....................]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f65a2987-7750-4710-8bbe-a4b93853b1fa" x="597" y="259" width="362" height="23"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[For office use only]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4f933c78-e4e7-43bf-a4ff-69c84b4af932" x="597" y="282" width="170" height="44"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[payment date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4f933c78-e4e7-43bf-a4ff-69c84b4af932" x="767" y="282" width="192" height="44"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Rreciept No]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement uuid="2c928f12-12f9-4874-a10d-dca9eea73c78" x="0" y="326" width="268" height="142"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="dfc077fe-6c49-421b-bdb8-3817984f07d2" x="0" y="361" width="78" height="39"/>
+				<textElement/>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="8f4e8eb8-d8eb-4faa-a00e-ba8031afe985" x="83" y="377" width="155" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="9d631bb4-6873-4528-a42a-8092532fb526" x="0" y="434" width="78" height="34"/>
+				<textElement/>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d0ffad77-cdc3-4248-a72a-839193bc64a6" x="0" y="400" width="78" height="34"/>
+				<textElement/>
+				<text><![CDATA[Signature ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6b62709c-ac55-4fc7-ae61-b8a838ed1064" x="0" y="326" width="268" height="35"/>
+				<textElement/>
+				<text><![CDATA[tax payer Legal representative]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="f1514c8f-2bbe-4dc2-8135-2d5014d884ca" x="83" y="412" width="155" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="fdc554b4-784f-49e8-b139-f5bb1e211395" x="83" y="446" width="155" height="1"/>
+			</line>
+			<rectangle>
+				<reportElement uuid="def3db52-6a9f-4f51-8758-5485aa975426" x="450" y="326" width="238" height="142"/>
+			</rectangle>
+			<staticText>
+				<reportElement uuid="cea6d692-41f9-4d8c-ab69-eab3baa42495" x="688" y="326" width="134" height="52"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Total Amount Money]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5af117d3-b49c-433e-9fdf-627fc331be63" x="822" y="325" width="137" height="52"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Cheque No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5e10dab3-229f-4fdc-b519-53e8deb8be9a" x="688" y="378" width="271" height="90"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[casher signature]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="74a13045-9c4d-4b4e-9926-172e96c5c944" x="450" y="326" width="238" height="35"/>
+				<textElement/>
+				<text><![CDATA[tax authority office manager]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9d631bb4-6873-4528-a42a-8092532fb526" x="450" y="434" width="78" height="34"/>
+				<textElement/>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="f1514c8f-2bbe-4dc2-8135-2d5014d884ca" x="530" y="406" width="155" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="d0ffad77-cdc3-4248-a72a-839193bc64a6" x="450" y="400" width="78" height="34"/>
+				<textElement/>
+				<text><![CDATA[Signature ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dfc077fe-6c49-421b-bdb8-3817984f07d2" x="450" y="361" width="78" height="39"/>
+				<textElement/>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="fdc554b4-784f-49e8-b139-f5bb1e211395" x="533" y="369" width="155" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="fdc554b4-784f-49e8-b139-f5bb1e211395" x="530" y="441" width="155" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="602b57d1-10eb-4864-a9c2-5e690fa3937e" x="268" y="325" width="182" height="143"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement/>
+				<text><![CDATA[Static text]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="0e62a39b-aa95-4fb8-ab65-3542a3054758" x="633" y="116" width="326" height="35"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{monthlyTotalTax}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="d3b39966-6c0c-4b1d-bdbf-967b946ff51b" x="633" y="151" width="326" height="34"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{totalCastSharing}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="1494d93f-d733-43cc-810e-ef48d3059146" x="633" y="73" width="326" height="43"/>
+				<box>
+					<pen lineWidth="1.5"/>
+					<topPen lineWidth="1.5"/>
+					<leftPen lineWidth="1.5"/>
+					<bottomPen lineWidth="1.5"/>
+					<rightPen lineWidth="1.5"/>
+				</box>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{totalNumberOfEmployee}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

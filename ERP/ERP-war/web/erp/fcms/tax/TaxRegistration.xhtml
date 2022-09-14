@@ -1,0 +1,339 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li> 
+            <a href="../../fcms/tax/TaxSummery.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>  Tax Summery</a>
+        </li> 
+         <li> 
+            <a href="../../fcms/tax/taxRateReg.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>Tax Rate Registration</a>
+        </li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone" action="#{fmsTaxRegistrationContoller.createNewTax()}" 
+                                     icon="#{fmsTaxRegistrationContoller.icone}" validateClient="true" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{fmsTaxRegistrationContoller.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/tax/TaxRegistration.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>  
+                </f:facet>
+            </p:toolbar>
+        </h:form> 
+        <!-- Search Tax-->
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="pnlSearch" rendered="#{fmsTaxRegistrationContoller.renderPnlManPage}">
+                <div class="box box-primary">                     
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search Tax <small>...</small></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="pnlSearchTax" class="col-sm-12"> 
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="lblSearchYear"  class="control-label col-sm-4" value="Year:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtSearchYear" style="width: 100%"
+                                                                         valueChangeListener="#{fmsTaxRegistrationContoller.yearValueChange}"                                                                                                
+                                                                         converter="entConverter" >   
+                                                            <f:selectItems id="txtselectOneSSearchYear"  
+                                                                           value="#{fmsTaxRegistrationContoller.allBudgetYearList}" />  
+                                                            <p:ajax   event="change"  update="txtSearchMonth,btnFind,frmTaxSearch:tblTaxDetail"  process="@this" />
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="lblSearchMonth" class="control-label col-sm-4" value="Month:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtSearchMonth"  style="width: 100%"
+                                                                         valueChangeListener="#{fmsTaxRegistrationContoller.monthValueChange}"                                                                                                
+                                                                         requiredMessage="Select One Value"  >   
+                                                            <f:selectItems id="txtselectOneSSearchMonthr" 
+                                                                           value="#{fmsTaxRegistrationContoller.monthList}" />  
+                                                            <p:ajax   event="change"  update="frmTaxSearch:tblTaxDetail"  process="@this" />
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnFind" class="btn btn-primary" action="#{fmsTaxRegistrationContoller.findAllTaxes()}" 
+                                                                         disabled="#{fmsTaxRegistrationContoller.renderBtnFind}" title="Find all" icon="ui-icon-search" 
+                                                                         update=":frmMainUI:frmTaxSearch:tblTaxDetail" process="@this,pnlSearchTax"
+                                                                         value="Find" />            
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmTaxSearch"> 
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblTaxDetail" 
+                                                             value="#{fmsTaxRegistrationContoller.taxRegisterDataModel}" 
+                                                             rowIndexVar="num"  
+                                                             rows="10"  
+                                                             var="taxDetail" 
+                                                             selectionMode="single" 
+                                                             rowKey="#{taxDetail.taxId}" 
+                                                             selection="#{fmsTaxRegistrationContoller.selectedTax}"
+                                                             paginator="true" 
+                                                             paginatorPosition="bottom"  >
+                                                    <p:ajax event="rowSelect" listener="#{fmsTaxRegistrationContoller.populate}" process="@this" update=":frmRegisterUI,:frmMainUI,:frmToolbar"/>
+                                                    <p:column headerText="No." width="60">
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column> 
+                                                    <p:column headerText="Year">
+                                                        <h:outputText value="#{taxDetail.yearId.budgetYear}" />
+                                                    </p:column>
+                                                    <p:column headerText="Month">
+                                                        <h:outputText value="#{taxDetail.month}"  />
+                                                    </p:column>
+                                                    <p:column headerText="Tax Type">
+                                                        <h:outputText value="#{taxDetail.taxType}" />
+                                                    </p:column>
+                                                    <p:column headerText="Tax Center">
+                                                        <h:outputText value="#{taxDetail.taxCenter}" />
+                                                    </p:column>
+                                                    <p:column headerText="CPO Number">
+                                                        <h:outputText value="#{taxDetail.cpoNo}" />
+                                                    </p:column>
+                                                    <p:column headerText="CPO Date">
+                                                        <h:outputText value="#{taxDetail.cpoDate}" ><f:convertDateTime  pattern="yyyy/MM/dd" /></h:outputText>
+                                                    </p:column>
+                                                    <p:column headerText="Payed Amount">
+                                                        <h:outputText value="#{taxDetail.amount}" />
+                                                    </p:column>
+                                                    <p:column headerText="Receipt Number">
+                                                        <h:outputText value="#{taxDetail.receiptNo}" />
+                                                    </p:column>
+                                                    <p:column headerText="Payment Date">
+                                                        <h:outputText value="#{taxDetail.paymentDate}" ><f:convertDateTime  pattern="yyyy/MM/dd" /></h:outputText>
+                                                    </p:column>
+                                                    <p:column headerText="Receiver Name">
+                                                        <h:outputText value="#{taxDetail.casherId.firstName}" />
+                                                    </p:column>
+                                                </p:dataTable> 
+                                            </div>
+                                        </div>
+                                    </div>    
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+        <!--Tax Register-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{fmsTaxRegistrationContoller.renderPnlCreateAcc}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Tax registration </h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="pnlGrpTaxRegister" class="col-sm-12">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblTax" class="control-label col-sm-4" value="Tax Type:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="selectTaxType" value="#{fmsTaxRegistrationContoller.taxRgistration.taxType}" 
+                                                                         style="width: 100%" required="true" requiredMessage="Select Tax Type"> 
+                                                            <f:selectItem itemLabel="--- Select One ---"  />
+                                                            <f:selectItem itemLabel="VAT" itemValue="VAT" />
+                                                            <f:selectItem itemLabel="WITH HOLD TAX " itemValue="WITH HOLD TAX" />      
+                                                            <f:selectItem itemLabel="PENSION" itemValue="PENSION" />
+                                                            <f:selectItem itemLabel="COST SHARING " itemValue="COST SHARING " />  
+                                                            <f:selectItem itemLabel="INCAME TAX " itemValue="INCAME TAX" />                                  
+                                                        </p:selectOneMenu>
+                                                        <p:message for="selectTaxType" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblYear" class="control-label col-sm-4" value="Year:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtBudgetYear" style="width: 100%" value="#{fmsTaxRegistrationContoller.taxRgistration.yearId}"
+                                                                         converter="entConverter" required="true" requiredMessage="Select Year" > 
+
+                                                            <f:selectItems id="txtselectOneBudgetYear" 
+                                                                           value="#{fmsTaxRegistrationContoller.allBudgetYearList}"  />                              
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtBudgetYear" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblMonth" class="control-label col-sm-4" value="Month:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtMonth" style="width: 100%" value="#{fmsTaxRegistrationContoller.taxRgistration.month}" required="true" requiredMessage="Select Month" >
+                                                            <f:selectItem itemLabel="--- Select One ---"  />
+                                                            <f:selectItem itemLabel="September" itemValue="September" />
+                                                            <f:selectItem itemLabel="October " itemValue="October" />      
+                                                            <f:selectItem itemLabel="November" itemValue="November" />
+                                                            <f:selectItem itemLabel="December " itemValue="December " />  
+                                                            <f:selectItem itemLabel="January " itemValue="January " />
+                                                            <f:selectItem itemLabel="February" itemValue="February" />  
+                                                            <f:selectItem itemLabel="March " itemValue="March" />
+                                                            <f:selectItem itemLabel="April " itemValue="April" />
+                                                            <f:selectItem itemLabel="May " itemValue="May" />
+                                                            <f:selectItem itemLabel="June " itemValue="June" />
+                                                            <f:selectItem itemLabel="July " itemValue="July" />
+                                                            <f:selectItem itemLabel="August  " itemValue="August" />
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtMonth" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblTaxCenter" class="control-label col-sm-4" value="Tax Center:"/>                                                    
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtTaxCenter" validator="#{validatorManagedBean.Text}" placeholder="Tax Center" class="form-control" 
+                                                                       value="#{fmsTaxRegistrationContoller.taxRgistration.taxCenter}" required="true" requiredMessage="Tax Center: Value is required"/>
+                                                        <p:message for="txtTaxCenter" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblCPO" class="control-label col-sm-4" value="CPO Number:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtCPO" value="#{fmsTaxRegistrationContoller.taxRgistration.cpoNo}" placeholder="CPO No" 
+                                                                     class="form-control" required="true" requiredMessage="CPO Number: Value is required"/>
+                                                        <p:message for="txtCPO" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">                                                                
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="lblbuttonaSave" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnSave" class="btn btn-primary"  validateClient="true"                                                  
+                                                                         value="#{fmsTaxRegistrationContoller.saveUpdate}"
+                                                                         action="#{fmsTaxRegistrationContoller.registerTax()}" 
+                                                                         process="@this,pnlGrpTaxRegister" 
+                                                                         update="@this,pnlGrpTaxRegister" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="col-sm-6">
+                                            <div class="col-md-12 textBoxMargin6px">                                                                
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblCPODate" class="control-label col-sm-4" value="CPO Date:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtCPODate" placeholder="CPO date" pattern="yyyy/MM/dd" value="#{fmsTaxRegistrationContoller.taxRgistration.cpoDate}" required="true" 
+                                                                    requiredMessage="CPO Date: Value is required" converterMessage="Value must be Date"/>
+                                                        <p:message for="txtCPODate" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblAmount" class="control-label col-sm-4" value="Amount:"/>  
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtAmount" validator="#{validatorManagedBean.Double}" placeholder="Amount" required="true" class="form-control" 
+                                                                     value="#{fmsTaxRegistrationContoller.taxRgistration.amount}" converterMessage="Value must be a number" requiredMessage="Amount: Value is required"/>
+                                                        <p:message for="txtAmount" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblReceiptNo" class="control-label col-sm-4" value="Receipt Number:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtReceiptNo" value="#{fmsTaxRegistrationContoller.taxRgistration.receiptNo}" placeholder="Receipt Number" class="form-control" 
+                                                                     validator="#{validatorManagedBean.Number}" converterMessage="Value must be a number"  required="true" requiredMessage="Receipt Number: Value is required"/>
+                                                        <p:message for="txtReceiptNo" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblPaymentDate" class="control-label col-sm-4" value="Payment Date:" />
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtPaymentDate" value="#{fmsTaxRegistrationContoller.taxRgistration.paymentDate}" placeholder="Payment Date" 
+                                                                    required="true" requiredMessage="Payment Date: Value is required" pattern="yyyy/MM/dd" converterMessage="Value must be Date"/>
+                                                        <p:message for="txtPaymentDate" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel id="lblReceiverName" class="control-label col-sm-4" value="Receiver Name:" />
+                                                    <div class="col-sm-8">
+                                                        <p:autoComplete id="txtReceiverName" value="#{fmsTaxRegistrationContoller.employee.firstName}" validator="#{validatorManagedBean.FullName}" converterMessage="Value must be a Full Name"
+                                                                        completeMethod="#{hrEmployeeController.searchByEmpId(empId)}" placeholder="Search By Cashier Name" 
+                                                                        required="true" requiredMessage="Receiver Name: Value is required" var="empList" itemValue="#{empList.firstName}" 
+                                                                        itemLabel="#{empList}" forceSelection="true" size="20" emptyMessage="no data" style="width: 100%"> 
+                                                            <f:facet name="itemtip" >
+                                                                <h:panelGrid columns="2" cellpadding="" >                        
+                                                                    <h:outputText value="First Name " />
+                                                                    <h:outputText value="#{empList.firstName}" />                      
+                                                                    <h:outputText value="Middle Name: " />
+                                                                    <h:outputText value="#{empList.middleName}" />
+                                                                    <h:outputText value="Last Name: " />
+                                                                    <h:outputText value="#{empList.lastName}" />
+                                                                    <h:outputText value="Employee Picture: " />                                                                                
+                                                                </h:panelGrid>
+                                                            </f:facet>
+                                                            <p:ajax event="itemSelect"  process="txtReceiverName" listener="#{fmsTaxRegistrationContoller.getByFirstName}" update="@this" />  
+                                                        </p:autoComplete>
+                                                        <p:message for="txtReceiverName" display="icon"/> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

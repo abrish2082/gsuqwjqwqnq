@@ -1,0 +1,579 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li>
+            <a href="BondLibor.xhtml"><i class="fa fa-circle-o"></i>Bond Libor </a>
+        </li>
+        <li>
+            <a href="BondForeign.xhtml"><i class="fa fa-circle-o"></i>Bond Foreign </a>
+        </li>      
+        <li>
+            <a href="BondLocal.xhtml"><i class="fa fa-circle-o"></i>Bond Local </a>
+        </li>
+        <li>
+            <a href="LocalRepayment.xhtml"><i class="fa fa-circle-o"></i>Bond Local Repayment </a>
+        </li>
+        <li>
+            <a href="BondCoupon.xhtml"><i class="fa fa-circle-o"></i>Bond Coupon </a>
+        </li>
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone"  action="#{bondCouponScheduleController.createAdditional()}" 
+                                     icon="#{bondCouponScheduleController.icone}" validateClient="true" style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar" title="#{bondCouponScheduleController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    <a href="BondCouponSchedule.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>  
+            <h:panelGroup style="border: white; background-color: transparent" id="mainUI" rendered="#{bondCouponScheduleController.renderPnlMainPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Bond_Coupon_Schedule_Search}</h3>
+                    </div> 
+                    <div class="box-body">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtFromDate" class="control-label col-sm-4" value="#{FCMS.From_Date}: "/> 
+                                        <div class="col-sm-8">
+                                            <p:calendar id="txtFromDate" pattern="dd/mm/yyyy" placeholder="dd/mm/yyyy"
+                                                        value="#{bondCouponScheduleController.fromStartDate}" converterMessage="Value must be in Date Format"
+                                                        required="true" requiredMessage=" This field is required please select date"/>
+                                            <p:message for="txtFromDate" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group required form-horizontal">
+                                        <h:outputLabel for="txtToDate" class="control-label col-sm-4" value="#{FCMS.To_Date}: "/> 
+                                        <div class="col-sm-8">
+                                            <p:calendar id="txtToDate" pattern="dd/mm/yyyy" placeholder="dd/mm/yyyy"
+                                                        value="#{bondCouponScheduleController.toEndDate}" converterMessage="Value must be in Date Format"
+                                                        required="true" requiredMessage="This field is required please select date"/>
+                                            <p:message for="txtToDate" display="icon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 textBoxMargin6px">
+                                    <div class="form-group form-horizontal">
+                                        <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                        <div class="col-sm-8">
+                                            <p:commandButton  id="btnSearch" value="Find" class="btn btn-primary" 
+                                                              process="@this,txtFromDate,txtToDate" icon="ui-icon-search" 
+                                                              action="#{bondCouponScheduleController.searchBondCouponSchedule()}" 
+                                                              update=":frmMainUI:tblCoupon"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <p:panel id="pnldtabel" style="border: white;"> 
+                                    <div class="panel-body">
+                                        <div class="col-md-12 " style="padding-top: 20px">
+                                            <p:dataTable id="tblCoupon"
+                                                         value="#{bondCouponScheduleController.bondCouponAddDatamodel}"
+                                                         style="font-size: 11px"
+                                                         rows="10"
+                                                         resizableColumns="true"
+                                                         paginator="true"
+                                                         paginatorPosition="bottom"
+                                                         rowsPerPageTemplate="5,10,15"
+                                                         rowIndexVar="numbers"
+                                                         var="addinfo"
+                                                         selectionMode="single"
+                                                         selection="#{bondCouponScheduleController.bondCouponselect}"
+                                                         rowKey="#{addinfo.bondNo}">
+                                                <p:ajax event="rowSelect" listener="#{bondCouponScheduleController.getByBondCouponNo}"
+                                                        update=":frmRegisterUI,:frmMainUI,:frmToolbar" process="@this">
+                                                </p:ajax>
+                                                <p:column style="width: 60px" headerText ="#{FCMS.No}" >
+                                                    <h:outputText value="#{numbers+1}"/>  
+                                                </p:column>
+                                                <p:column  headerText ="Bond Number" resizable="true" filterMatchMode="startsWith" filterBy="#{addinfo.bondNo}">
+                                                    <h:outputText value="#{addinfo.bondNo}" />
+                                                </p:column> 
+                                                <p:column headerText ="#{FCMS.Bond_Issued_Date}">
+                                                    <h:outputText value="#{addinfo.bondIssuedDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column> 
+                                                <p:column headerText ="#{FCMS.int}">
+                                                    <h:outputText value="#{addinfo.interestRepaymentStartDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column> 
+                                                <p:column headerText ="Principal Repayment Start Date">
+                                                    <h:outputText value="#{addinfo.principalRepaymentStartDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column> 
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Paid Interest "/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{bondCouponScheduleController.totalPaidInterest}" 
+                                                                  converter="#{bondCouponScheduleController.numberConverter}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Paid Principal "/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{bondCouponScheduleController.totalPaidPrincipal}"
+                                                                  converter="#{bondCouponScheduleController.numberConverter}"/>
+
+                                                </p:column>
+                                                <p:column headerText ="#{FCMS.Principal_Repayment_End_Date}">
+                                                    <h:outputText value="#{addinfo.principalRepaymentEndDate}" >
+                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                    </h:outputText>
+                                                </p:column> 
+                                                <p:column headerText ="#{FCMS.number_of_bond}">
+                                                    <h:outputText value="#{addinfo.numberOfBond}" />
+                                                </p:column>  
+                                                <p:column headerText ="#{FCMS.Total_Bond_Value}">
+                                                    <h:outputText value="#{addinfo.totalBondValue}" />
+                                                </p:column> 
+                                            </p:dataTable>
+                                        </div>
+                                    </div>    
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmRegisterUI">
+            <h:panelGroup style="border: white; background-color: transparent" id="pnlregisterUI" rendered="#{bondCouponScheduleController.renderPnlCreateAdditional}">
+                <section class="panel panel-info"  >
+                    <section class="panel-body" >  
+                        <h:panelGroup id="pnlPrincipalFollowup" class="col-sm-12">
+                            <h:form id="frmPrincipalSchedule">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Bond Coupon Principal Repayment Followup </h3>
+                                    </div>
+                                    <div class="box-body">
+                                        <p:dialog id="digPayment" 
+                                                  header="Coupon Repayment Schedule Detail" 
+                                                  widgetVar="digImp"                                              
+                                                  showEffect="bounce"
+                                                  position="center"
+                                                  modal="true"
+                                                  width="50%">
+                                            <h:panelGroup id="pnldialog" class="col-md-12">
+                                                <div class="col-md-12">
+                                                    <div class="col-md-6">
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group required form-horizontal">
+                                                                <h:outputLabel for="txtPaymentDate" class="control-label col-sm-4" value="#{FCMS.Payment_Date}: "></h:outputLabel> 
+                                                                <div class="col-sm-8">
+                                                                    <p:calendar id="txtPaymentDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                                                value="#{bondCouponScheduleController.couponSchedule.paymentDate}"
+                                                                                required="true" requiredMessage=" field is required Date format e.g 2017/06/24"
+                                                                                valueChangeListener="#{bondCouponScheduleController.handleInterestForPaymentDate}" 
+                                                                                converterMessage="Issued Date must be a Date"  >
+                                                                        <p:ajax process="@this" update="@this,txtpaidInterest" event="dateSelect" />
+                                                                    </p:calendar>
+                                                                    <p:message for="txtPaymentDate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtprincipalAmount"  class="control-label col-sm-4" value="Principal To Be Paid: "></h:outputLabel> 
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtprincipalAmount"  value="#{bondCouponScheduleController.principalToBePaid}" 
+                                                                                 converter="#{bondCouponScheduleController.numberConverter}" readonly="true" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtpaidInterest"  class="control-label col-sm-4" value="Paid Interest:"></h:outputLabel> 
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtpaidInterest"  value="#{bondCouponScheduleController.totalPaidInterest}" 
+                                                                                 converter="#{bondCouponScheduleController.numberConverter}" readonly="true" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group required form-horizontal">
+                                                                <h:outputLabel for="txtPaymentDocDate" class="control-label col-sm-4" value="payment Document Date: "></h:outputLabel> 
+                                                                <div class="col-sm-8">
+                                                                    <p:calendar id="txtPaymentDocDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                                                value="#{bondCouponScheduleController.couponSchedule.paymentDocumentDate}"
+                                                                                required="true" requiredMessage=" field is required Date format e.g 2017/06/24"
+                                                                                converterMessage="Issued Date must be a Date"  >
+                                                                    </p:calendar>
+                                                                    <p:message for="txtPaymentDocDate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group required form-horizontal">
+                                                                <h:outputLabel for="txtDocRef"  class="control-label col-sm-4" value=" #{FCMS.Document_Reference_Number}: "></h:outputLabel> 
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtDocRef"  value="#{bondCouponScheduleController.couponSchedule.paymentDocumentReference}" 
+                                                                                 required="true" requiredMessage="value ie required" validator="#{validatorManagedBean.AlphaNumericText}"
+                                                                                 converterMessage="Value must be Alpha Numeric Text"/>
+                                                                    <p:message for="txtDocRef" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12 textBoxMargin6px ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Remark}:" />
+                                                                <div class="col-sm-8">
+                                                                    <p:column headerText="Remark" >
+                                                                        <h:inputTextarea id="txtRemark" value="#{bondCouponScheduleController.couponSchedule.remark}"
+                                                                                         class="form-control"  style="width: 100%" 
+                                                                                         validator="#{validatorManagedBean.AlphaNumericText}"
+                                                                                         converterMessage="Value must be Alpha Numeric Text"> 
+                                                                        </h:inputTextarea> 
+                                                                        <p:message for="txtRemark" display="icon"/>
+                                                                    </p:column> 
+                                                                </div>
+                                                            </div>
+                                                        </div> 
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <div class="col-sm-8" style="left: 100px">
+                                                                    <br></br>
+                                                                    <p:commandButton id="btnsavedialog" value="#{FCMS.save}" action="#{bondCouponScheduleController.couponPayment()}" 
+                                                                                     process="@this,pnldialog"  update="pnldialog,tblLocRpDetail">
+                                                                        <p:confirm header="Confirmation" message="Make Payment?" />
+                                                                    </p:commandButton>
+
+                                                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                                        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                                                                        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+                                                                    </p:confirmDialog>  
+                                                                </div>
+                                                            </div>    
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </p:dialog>          
+                                        <div class="row"> 
+                                            <div class="col-md-12">
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group required form-horizontal">
+                                                            <h:outputLabel for="txtFromDate" class="control-label col-sm-4" value="#{FCMS.From_Date}: "/> 
+                                                            <div class="col-sm-8">
+                                                                <p:calendar id="txtFromDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                                            value="#{bondCouponScheduleController.fromStartDate}" required="true" 
+                                                                            requiredMessage=" date must be like 19/04/2019" converterMessage="Value must be Date"/>
+                                                                <p:message for="txtFromDate" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group required form-horizontal">
+                                                            <h:outputLabel for="txtToDate" class="control-label col-sm-4" value="#{FCMS.To_Date}: "/> 
+                                                            <div class="col-sm-8">
+                                                                <p:calendar id="txtToDate" pattern="dd/MM/yyyy" placeholder="dd/mm/yyyy"
+                                                                            value="#{bondCouponScheduleController.toEndDate}" required="true"
+                                                                            requiredMessage=" date must be like 19/04/2019" converterMessage="Value must be Date"/>
+                                                                <p:message for="txtToDate" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal">
+                                                            <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                                            <div class="col-sm-8">
+                                                                <p:commandButton id="btnSearch" value="Find principal schedule" class="btn btn-primary" 
+                                                                                 process="@this,txtFromDate,txtToDate" update=":frmRegisterUI:frmPrincipalSchedule:tblLocRpDetail"
+                                                                                 action="#{bondCouponScheduleController.searchStartEndDate()}"/>
+                                                            </div>
+                                                        </div> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row"> 
+                                            <div class="col-md-12" > 
+                                                <p:panel id="pnlRptabel" style="border: white;"> 
+                                                    <div class="panel-body">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:dataTable id="tblLocRpDetail" 
+                                                                         value="#{bondCouponScheduleController.couponScheduleAddDatamodel}"
+                                                                         style="font-size: 11px;"  
+                                                                         rows="5"
+                                                                         resizableColumns="true"
+                                                                         paginator="true" 
+                                                                         paginatorPosition="bottom" 
+                                                                         rowIndexVar="numbers"  
+                                                                         sortBy="#{addInfo.installmentNo}"
+                                                                         var="addInfo">  
+                                                                <p:column  style="width:60px">
+                                                                    <f:facet name="header"  >
+                                                                        <h:outputText value="#{FCMS.No}" />
+                                                                    </f:facet>      
+                                                                    <h:outputText value="#{numbers+1}"/>          
+                                                                </p:column>
+                                                                <p:column >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Bond Number"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.bondNo}" />
+                                                                </p:column>
+                                                                <p:column >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Installment Number"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.installmentNo}"/>
+                                                                </p:column>
+                                                                <p:column rendered="true" >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Principal to be paid"/>
+                                                                    </f:facet>
+                                                                    <f:facet name="footer">
+                                                                        <h:outputText value="#{bondCouponScheduleController.totalPrincipalToBePaid}" converter="#{bondCouponScheduleController.numberConverter}"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{bondCouponScheduleController.principalToBePaid}" converter="#{bondCouponScheduleController.numberConverter}" />
+                                                                </p:column>
+                                                                <p:column rendered="true" >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Paid Principal "/>
+                                                                    </f:facet>
+                                                                    <f:facet name="footer">
+                                                                        <h:outputText value="#{bondCouponScheduleController.totalPaidPrincipal}" converter="#{bondCouponScheduleController.numberConverter}"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.paidAmount}" converter="#{bondCouponScheduleController.numberConverter}"/>
+
+                                                                </p:column>
+                                                                <p:column rendered="true" >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Remain Principal"/>
+                                                                    </f:facet>
+                                                                    <f:facet name="footer">
+                                                                        <h:outputText value="#{bondCouponScheduleController.totalRemainPrincipal}" converter="#{bondCouponScheduleController.numberConverter}"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.remainPrincipal}" converter="#{bondCouponScheduleController.numberConverter}"/>
+
+                                                                </p:column>
+                                                                <p:column rendered="true">
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Installment Due Date"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.installmentDueDate}" >
+                                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                                    </h:outputText>
+                                                                </p:column>
+                                                                <p:column rendered="true" >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Payment Status "/>
+                                                                    </f:facet>
+                                                                    <h:outputText id="txtStatuses" value="#{addInfo.changeStatus}" />
+                                                                </p:column>
+                                                                <p:column rendered="true">
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Payment Date"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.paymentDate}" >
+                                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                                    </h:outputText>
+                                                                </p:column>
+                                                                <p:column rendered="true" >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Payment Document Reference"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.paymentDocumentReference}" />
+                                                                </p:column>
+                                                                <p:column rendered="true" >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="payment Document Date"/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.paymentDocumentDate}">
+                                                                        <f:convertDateTime pattern="dd/MMM/yyyy"/> 
+                                                                    </h:outputText>
+                                                                </p:column>
+                                                                <p:column rendered="true" >
+                                                                    <f:facet name="header">
+                                                                        <h:outputText value="Remark "/>
+                                                                    </f:facet>
+                                                                    <h:outputText value="#{addInfo.remark}" />
+                                                                </p:column>
+                                                                <p:column headerText="Option" >
+                                                                    <p:commandLink action="#{bondCouponScheduleController.updateCouponSchedulePayment()}"                                       
+                                                                                   disabled="#{addInfo.status eq bondCouponScheduleController.paidStatus}" 
+                                                                                   update=":frmRegisterUI:frmPrincipalSchedule:digPayment"
+                                                                                   oncomplete="PF('digImp').show();" 
+                                                                                   process="@this">
+                                                                        <h:outputText value="Pay" class="fa fa-paypal"/>
+                                                                    </p:commandLink>
+                                                                </p:column>
+                                                            </p:dataTable>  
+                                                        </div>
+                                                    </div>    
+                                                </p:panel>
+                                            </div>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </h:form>
+                        </h:panelGroup>
+                    </section>
+                </section>                     
+                <h:panelGroup  id="pnlInterestFollowup" class="col-sm-12">
+                    <h:form id="frmInterestRepay">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Bond Coupon Interest Repayment Followup </h3>
+                            </div>
+                            <h:panelGroup id="pnlInterestPay" class="col-sm-12">
+                                <section class="panel panel-info"  >
+                                    <section class="panel-body" >  
+                                        <p:growl id="growl2" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="txtSerial" class="control-label col-sm-4" value="Bond Number: "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtSerial" value="#{bondCouponScheduleController.bondCoupon.bondNo}" class="form-control"  style="width: 100%" 
+                                                                 validator="#{validatorManagedBean.AlphaNumericText}" converterMessage="Value must be Alpha numeric text"
+                                                                 title="TypeId" required="true" requiredMessage="Serial Number is required." />
+                                                    <p:message for="txtSerial" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="txtPaymDate" class="control-label col-sm-4" value="payment Date : "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="txtPaymDate" pattern="yyyy/MM/dd" placeholder="dd/mm/yyyy" maxdate="today"
+                                                                value="#{bondCouponScheduleController.couponInterestRePayment.paymentDate}"
+                                                                required="true" requiredMessage=" field is required Date format e.g 2017/06/24"
+                                                                converterMessage="Issued Date must be a Date"  >
+                                                        <p:ajax process="@this" update="txtPaymDate,txtnoofDays,txtprincipalAmount,txtInterest" 
+                                                                listener="#{bondCouponScheduleController.handleInterestPayment}" 
+                                                                event="dateSelect" />
+                                                    </p:calendar>
+                                                    <p:message for="txtPaymDate" display="icon"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="txtnoofDays" class="control-label col-sm-4" value="Number of Days : "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtnoofDays"   value="#{bondCouponScheduleController.numberOfDays}" 
+                                                                 class="form-control" readonly="true" >                                                
+                                                    </p:inputText>
+                                                    <p:message for="txtnoofDays" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="txtprincipalAmount"  class="control-label col-sm-4" value="Remain Principal"></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtprincipalAmount"  value="#{bondCouponScheduleController.remainPrincipal}" 
+                                                                 style="width: 100%" readonly="true" converter="#{bondCouponScheduleController.numberConverter}" 
+                                                                 />
+                                                </div>
+                                            </div>
+                                            <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="txtInterest" class="control-label col-sm-4" value="Interest "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtInterest"   value="#{bondCouponScheduleController.interestToBePaid}"
+                                                                 class="form-control"  style="width: 100%" readonly="true"
+                                                                 converter="#{bondCouponScheduleController.numberConverter}"
+                                                                 title="TypeId" />
+                                                </div>
+                                            </div>  
+                                        </div>
+                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                            <div class="form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="txtInterestRate" class="control-label col-sm-4" value="Interest Rate: "></h:outputLabel>   
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtInterestRate" value="#{bondCouponScheduleController.bondCoupon.interestRate}"  
+                                                                 class="form-control"  style="width: 100%" required="true" requiredMessage="value ie required"
+                                                                 validator="#{validatorManagedBean.Double}" converterMessage="Interest must be Number"
+                                                                 >
+                                                    </p:inputText>  
+                                                    <p:message for="txtInterestRate" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="txtDocRef"  class="control-label col-sm-4" value=" payment Document Reference: "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:inputText id="txtDocRef"  value="#{bondCouponScheduleController.couponInterestRePayment.paymentDocumentReference}" 
+                                                                 required="true" requiredMessage="value ie required"
+                                                                 validator="#{validatorManagedBean.AlphaNumericText}" converterMessage="Interest must be Alpha Numeric Text"/>
+                                                    <p:message for="txtDocRef" display="icon"/>
+                                                </div>
+                                            </div>
+                                            <div class="form-group required form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for ="txtRemark"  class="control-label col-sm-4" value="Remark :" />
+                                                <div class="col-sm-6">
+                                                    <p:column headerText="Remark" >
+                                                        <h:inputTextarea id="txtRemark" value="#{bondCouponScheduleController.couponInterestRePayment.remark}"
+                                                                         class="form-control"  style="width: 100%" required="true" requiredMessage="value ie required"
+                                                                         validator="#{validatorManagedBean.AlphaNumericText}" converterMessage="Interest must be Alpha Numeric Text"> 
+                                                        </h:inputTextarea> 
+                                                        <p:message for="txtRemark" display="icon"/>
+                                                    </p:column> 
+                                                </div>
+                                            </div> 
+                                            <div class="form-group required form-horizontal col-sm-6" style="padding-bottom: 10px;" >
+                                                <h:outputLabel for="txtPaymDocDate" class="control-label col-sm-4" value="payment Document Date : "></h:outputLabel> 
+                                                <div class="col-sm-6">
+                                                    <p:calendar id="txtPaymDocDate" pattern="yyyy/MM/dd" placeholder="dd/mm/yyyy"
+                                                                value="#{bondCouponScheduleController.couponInterestRePayment.paymentDocumentDate}"
+                                                                required="true" requiredMessage=" field is required Date format e.g 2017/06/24" 
+                                                                converterMessage="Issued Date must be a Date"  >
+                                                    </p:calendar>
+                                                    <p:message for="txtPaymDocDate" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group required col-sm-12 textBoxMargin6px">
+                                            <div class="form-horizontal col-sm-12" style="padding-bottom: 10px;" >
+                                                <div class="col-sm-2"></div>
+                                                <div class="col-sm-2">
+                                                    <p:commandButton id="btnAdd" value="make payment" class="btn btn-primary"
+                                                                     action="#{bondCouponScheduleController.saveCouponInterestPaymet()}"  
+                                                                     process=":frmRegisterUI:frmInterestRepay,txtSerial,txtPaymDate,txtnoofDays,txtprincipalAmount,txtInterest,txtInterestRate,txtDocRef,txtRemark,txtPaymDocDate"
+                                                                     update=":frmRegisterUI:frmInterestRepay"/>
+                                                </div>                                                                
+                                            </div>
+                                        </div>
+                                    </section>
+                                </section>
+                            </h:panelGroup>
+                        </div>
+                    </h:form>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

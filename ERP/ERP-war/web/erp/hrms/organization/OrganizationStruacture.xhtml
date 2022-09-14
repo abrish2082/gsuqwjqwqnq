@@ -1,0 +1,661 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">               
+        <li><a href="jobRegistration.xhtml">Job Registration</a></li>
+        <li><a href="payGrade.xhtml">Pay Grade</a></li>
+        <script name="jquery/jquery.js" library="primefaces"></script>
+    </ui:define> 
+    <ui:define name="contents">
+        <h:form id="frmTop"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="OrganizationStruacture.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>                        
+                    <a href="Region:../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>  
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">Organization Information</h3>                                       
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body ">
+                        <div class="box-body ">
+                            <h:form id="frmOrganizationStructure"> 
+                                <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>         
+                                <div class="nav-tabs-custom">
+                                    <ul class="nav nav-tabs" id="ulTab">
+                                        <li class="#{organizationStructureController.preTab}"><a href="#tabOrgStr" data-toggle="tab">Organization Structure</a></li>
+                                        <li class="#{organizationStructureController.secTab}"><a href="#tabWorkUnit"  data-toggle="#{organizationStructureController.secTabToggle}">Department/Process</a></li>
+                                        <li class="#{organizationStructureController.adrsJobTab}"><a href="#tabDeptAdd" data-toggle="#{organizationStructureController.adrsJobTabToggle}">Address</a></li>
+                                        <li class="#{organizationStructureController.adrsJobTab}"><a href="#tabStaffPlan" data-toggle="#{organizationStructureController.adrsJobTabToggle}">Staff Plan</a></li>
+                                    </ul>
+                                    <div class="tab-content" id="maintab">
+                                        <div class="active tab-pane" id="tabOrgStr">                                         
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlgTree">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12">
+                                                               <p:tree value="#{organizationStructureController.roots}" var="node" dynamic="true"   id="treeDept"
+                                                                        selectionMode="single" animate="true" selection="#{organizationStructureController.selectedNodes}"
+                                                                        draggable="true" style="border: transparent; width: 100%" droppable="true">
+                                                                    <p:ajax event="select" listener="#{organizationStructureController.onNodeSelect}" process="@this" 
+                                                                            update=":frmOrganizationStructure" />
+                                                                    <p:ajax event="dragdrop" listener="#{organizationStructureController.onDragDrop}" update=":frmOrganizationStructure"/>
+                                                                    <p:treeNode id="treeNode" expandedIcon="ui-icon ui-icon-folder-open" 
+                                                                                collapsedIcon="ui-icon ui-icon-folder-collapsed">
+                                                                         <h:outputText value="#{node}"/>
+                                                                    </p:treeNode>                                             
+                                                                </p:tree>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section> 
+                                        </div>
+                                        <div class="tab-pane" id="tabWorkUnit" >                                          
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlgWorkUnit">
+                                                        <div class="form-group" >
+                                                            <div class="form-group form-horizontal" align="left">
+                                                                <p:outputLabel class="panel-title fa fa-arrow-circle-o-down" value ="  #{organizationStructureController.selectedDepartments.depName}" style="width: 600px;" ></p:outputLabel>
+                                                            </div>                                                           
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-md-6 ">  
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-group required form-horizontal">
+                                                                            <h:outputLabel for="txtWorkUnitName" value="Department: " class="control-label col-sm-3"/>
+                                                                            <div class="col-sm-9">
+                                                                                <p:inputText id="txtWorkUnitName" required="true" 
+                                                                                             value="#{organizationStructureController.hrDepartments.depName}" 
+                                                                                             title="Work Unit Name" validator="#{validatorManagedBean.Text}"  
+                                                                                             validatorMessage="Please Insert Work Unit Name" 
+                                                                                             requiredMessage="Please Insert Work Unit Name"/>
+                                                                                <p:message for="txtWorkUnitName" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                                                                          
+                                                                    </div>
+
+                                                                    <div class="col-md-12 textBoxMargin6px">                                                                
+                                                                        <div class="form-group form-group required form-horizontal">
+                                                                            <h:outputLabel for="txtType" value="Type: "   class="control-label col-sm-3" /> 
+                                                                            <div class="col-sm-9">
+                                                                                <p:selectOneRadio id="txtType"  value="#{organizationStructureController.hrDepartments.type}"
+                                                                                                  class="col-sm-8" >
+                                                                                    <f:selectItem itemLabel="non project" itemValue="0" />
+                                                                                    <f:selectItem itemLabel="project" itemValue="1" />      
+                                                                                    <p:ajax event="change"  process="@this" />
+                                                                                </p:selectOneRadio>
+                                                                                <p:message for="txtType" display="icon" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+
+
+
+
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel for="txtBranch" class="control-label col-sm-3" value="Region:"/>
+                                                                            <div class="col-sm-9">                                                       
+                                                                                <p:selectOneMenu id="txtBranch" value="#{organizationStructureController.hrLuRegions}"
+                                                                                                 converter="entConverter"  valueChangeListener="#{organizationStructureController.vcl_region}" 
+                                                                                                 style="width:100%" effect="fade" filter="true" filterMatchMode="startsWith">
+                                                                                    <f:selectItem itemLabel="--- Select ---" itemValue="#{null}"/>
+                                                                                    <f:selectItems value="#{organizationStructureController.hrLuRegionsList}" var="varRegion"
+                                                                                                   itemValue="#{varRegion}" itemLabel="#{varRegion.region}"/> 
+                                                                                </p:selectOneMenu>
+                                                                            </div>                                                                 
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEstablishedOn" class="control-label col-sm-3" value="Established on:"/>
+                                                                            <div class="col-sm-9">
+                                                                                <p:inputText id="txtEstablishedOn" title="Established On"   validator="#{validatorManagedBean.Date}" 
+                                                                                             value="#{organizationStructureController.hrDepartments.estDate}" 
+                                                                                             onclick="displayCalendar('frmOrganizationStructure:txtEstablishedOn', 'frmOrganizationStructure:txtEstablishedOn');"
+                                                                                             validatorMessage="Please Insert Work Unit Established Date"/>
+
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtMission" value="Mission:" class="control-label col-sm-3"/>
+                                                                            <div class="col-sm-9">
+                                                                                <p:inputTextarea id="txtMission" validator="#{validatorManagedBean.Remark}" class="form-control"
+                                                                                                 value="#{organizationStructureController.hrDepartments.mission}" title="Mission"
+                                                                                                 validatorMessage="Please Insert Departments Mission" />
+
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtVision" class="control-label col-sm-3" value="Vision:"/>
+                                                                            <div class="col-sm-9">
+                                                                                <p:inputTextarea id="txtVision" value="#{organizationStructureController.hrDepartments.vision}"
+                                                                                                 title="Vision"   validator="#{validatorManagedBean.Remark}" class="form-control"
+                                                                                                 validatorMessage="Please Insert Departments Vision"/>
+
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>     
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtValues" class="control-label col-sm-3" value="Values:"/>
+                                                                            <div class="col-sm-9">
+                                                                                <p:inputTextarea id="txtValues" title="Values" class="form-control"
+                                                                                                 value="#{organizationStructureController.hrDepartments.depValue}"
+                                                                                                 validator="#{validatorManagedBean.Remark}" 
+                                                                                                 validatorMessage="Please Insert Departments Values"  />
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>   
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup> 
+                                                </section>
+                                            </section>   
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">  
+                                                    <h:panelGroup id="pnlgDepPrepare" class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-md-12">  
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <p:outputLabel  for="txtPreparedBy" value="Prepared By: " class="control-label col-sm-3"/>
+                                                                            <div class="col-sm-9">
+                                                                                <p:inputText id="txtPreparedBy" value="#{organizationStructureController.hrDepartments.preparedBy}"  />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <p:outputLabel value="Prepared On:" class="control-label col-sm-3"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPreparedOn" value="#{organizationStructureController.hrDepartments.preparedOn}" 
+                                                                                             converter="dateConverter" placeholder="dd/mm/yyyy" onclick="displayCalendar('frmOrganizationStructure:txtPreparedOn', 'frmOrganizationStructure:txtPreparedOn');"
+                                                                                             validator="#{validatorManagedBean.Date}"/>
+
+                                                                                <p:message for="txtPreparedOn" display="icon"/> 
+                                                                            </div> 
+                                                                        </div>    
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlCrude" class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <div class="col-sm-12 textBoxMargin6px">
+                                                                    <div class="form-group form-horizontal">
+                                                                        <div class="col-sm-3"><h:outputLabel class="control-label col-sm-3" value=""/></div>
+
+                                                                        <div class="col-sm-3">
+                                                                            <p:commandButton id="btnNew" class="btn  btn-block btn-primary col-sm-3 " value="New" 
+                                                                                             action="#{organizationStructureController.newWorkUnit}" 
+                                                                                             process="@this,pnlgTree,pnlgDepPrepare"
+                                                                                             update="@this,pnlgWorkUnit,:frmOrganizationStructure:pnlDebJob,
+                                                                                             :frmOrganizationStructure:tblDebJob,:frmOrganizationStructure:pnlCrude
+                                                                                             :frmOrganizationStructure:pnlDepAddress,pnlgDepPrepare,pnlgAddressPrepared,pnlgStaffPrepared"/>                                                                                
+                                                                        </div>
+                                                                        <div class="col-sm-3 textBoxMarginTop6px">
+                                                                            <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-sm-3 " value="#{organizationStructureController.saveOrUpdateButton}"
+                                                                                             action="#{organizationStructureController.saveWorkUnit}" 
+                                                                                             process="@this,:frmOrganizationStructure:pnlgWorkUnit,:frmOrganizationStructure:pnlgDepPrepare"
+                                                                                             update="@this,:frmOrganizationStructure:pnlgWorkUnit"/>
+                                                                        </div> 
+                                                                        <div class="col-sm-3 textBoxMarginTop6px">
+                                                                            <p:commandButton id="btndelete" class="btn  btn-block btn-primary col-sm-3 " value="Delete"
+                                                                                             action="#{organizationStructureController.deleteDepartmentInfo}" 
+                                                                                             process="@this,:frmOrganizationStructure:pnlgWorkUnit"
+                                                                                             update="@this,frmOrganizationStructure,frmOrganizationStructure:growl,:frmOrganizationStructure:pnlCrude,pnlgDepPrepare"/>
+                                                                        </div> 
+                                                                    </div>                                                                            
+                                                                </div>
+                                                            </div>
+                                                        </div>  
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                        </div>
+
+                                        <div class="tab-pane" id="tabDeptAdd">                                          
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlDepAddress">
+                                                        <div class="form-group" >
+                                                            <div class="form-group textBoxMargin6px" align="left">
+                                                                <p:outputLabel id="lblDebAddress" class="panel-title fa fa-arrow-circle-right" value ="#{organizationStructureController.hrDepartments.depName}"/>
+                                                            </div>
+                                                            <div class="col-sm-12" ></div>
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-md-6 textBoxMargin6px">  
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-group required form-horizontal">
+                                                                            <h:outputLabel for="txtDepLocation" value="Location: " class="control-label col-sm-4"/>                                                                                                                
+                                                                            <div class="col-sm-6">
+                                                                                <p:inputText id="txtDepLocation" value="#{organizationStructureController.allAddressUnitAsOne}"
+                                                                                             class="form-control col-sm-4" required="true" requiredMessage="Insert Department Location">                                                                                     
+                                                                                </p:inputText>
+                                                                                <p:message for="txtDepLocation" display="icon"/>
+                                                                            </div>
+                                                                            <div class="col-sm-2">                                                                            
+                                                                                <p:commandButton id="btnDepAddress" onclick="PF('dlgDepAddress').show();" partialSubmit="false" style="background: transparent" value="+"/> 
+                                                                            </div>
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtBlockNo" value="Block No:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtBlockNo"
+                                                                                             value="#{organizationStructureController.hrDepAddresses.blockNumber}" title="Block No"
+                                                                                             validatorMessage="Please Insert Block No. Correctly"
+                                                                                             validator="#{validatorManagedBean.Remark}" />
+                                                                                <p:message for="txtBlockNo" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-group required form-horizontal">
+                                                                            <h:outputLabel for="txtTellOffice" class="control-label col-sm-4" value="Tel. Office: "/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputMask id="txtTellOffice" required="true" title="Telephone Office" mask="(+999) 999-999999"
+                                                                                             value="#{organizationStructureController.hrDepAddresses.telOffice}"
+                                                                                             validatorMessage="Please Insert Work Unit Tel.Office"  requiredMessage="Please Insert Work Unit Tel.Office"  />
+                                                                                <p:message for="txtTellOffice" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtTellExtension" class="control-label col-sm-4" value="Tel. Extension:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtTellExtension" title="Tell Extension"   
+                                                                                             value="#{organizationStructureController.hrDepAddresses.telExtension}"
+                                                                                             validatorMessage="Please Insert Work Unit Tel.Extension"
+                                                                                             validator="#{validatorManagedBean.Remark}"/>
+                                                                                <p:message for="txtTellExtension" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtMobile" class="control-label col-sm-4" value="Mobile:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputMask id="txtMobile" value="#{organizationStructureController.hrDepAddresses.mobile}"  title="Mobile" mask="(+999) 999-999999"
+                                                                                             validatorMessage="Please Insert Work Unit Mobile" requiredMessage="Please Insert Work Unit Mobile" />
+                                                                                <p:message for="txtMobile" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div> 
+                                                                </div> 
+                                                                <div class="col-md-6 ">  
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtHouseNumber" value="House Number:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtHouseNumber"
+                                                                                             value="#{organizationStructureController.hrDepAddresses.houseNumber}" title="House Number"
+                                                                                             validatorMessage="Please Insert Work Unit House Number"
+                                                                                             validator="#{validatorManagedBean.Number}" />
+                                                                                <p:message for="txtHouseNumber" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtFloor" value="Floor:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtFloor" 
+                                                                                             value="#{organizationStructureController.hrDepAddresses.floor}" title="Floor"
+                                                                                             validatorMessage="Please Insert Work Unit Building Floor" 
+                                                                                             validator="#{validatorManagedBean.Remark}"/>
+                                                                                <p:message for="txtFloor" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtOfficeNumber" class="control-label col-sm-4" value="Office Number:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtOfficeNumber" title="Office Number" 
+                                                                                             value="#{organizationStructureController.hrDepAddresses.officeNumber}" 
+                                                                                             validatorMessage="Please Insert Work Unit Office Number"/>
+                                                                                <p:message for="txtOfficeNumber" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmail" class="control-label col-sm-4" value="Email:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmail"  title="Email"
+                                                                                             value="#{organizationStructureController.hrDepAddresses.EMail}"
+                                                                                             validatorMessage="Please insert correct email format"  placeholder="info@eep.gov.et"
+                                                                                             validator="#{validatorManagedBean.Email}" />
+                                                                                <p:message for="txtEmail" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtWebsite" class="control-label col-sm-4" value="Website:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtWebsite" value="#{organizationStructureController.hrDepAddresses.website}" 
+                                                                                             placeholder="http://www.eep.gov.et" 
+                                                                                             title="Website"  validatorMessage="Please insert correctly website format" 
+                                                                                             validator="#{validatorManagedBean.Website}"/>
+                                                                                <p:message for="txtWebsite" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>                                                                     
+                                                                </div>                                                                                                                              
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup> 
+                                                </section>
+                                            </section>  
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">  
+                                                    <h:panelGroup id="pnlgAddressPrepared" class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-md-12">  
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <p:outputLabel  for="txtAddressPreparedBy" value="Prepared By: " class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtAddressPreparedBy" value="#{organizationStructureController.hrDepAddresses.preparedBy}"  />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <p:outputLabel value="Prepared On:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPreparedOnadrs" value="#{organizationStructureController.hrDepAddresses.preparedOn}" 
+                                                                                             converter="dateConverter" placeholder="dd/mm/yyyy" onclick="displayCalendar('frmOrganizationStructure:txtPreparedOnadrs', 'frmOrganizationStructure:txtPreparedOnadrs');"
+                                                                                             validator="#{validatorManagedBean.Date}"/>
+
+                                                                                <p:message for="txtPreparedOnadrs" display="icon"/> 
+                                                                            </div> 
+                                                                        </div>    
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <section class="panel panel-info">
+                                                <section class="panel-body"> 
+                                                    <div class="col-sm-12" >
+                                                        <div class="col-md-6 ">  
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel class="control-label col-sm-4" value=""/>
+                                                                    <div class="col-sm-3 textBoxMarginTop6px">
+                                                                        <p:commandButton id="btnDebAddress" class="btn  btn-block btn-primary col-sm-2 " value="#{organizationStructureController.saveOrUpdateAddress}"
+                                                                                         action="#{organizationStructureController.checkSaveDeptAddress}" disabled="#{organizationStructureController.disableAddressBtn}"
+                                                                                         process="@this,pnlgAddressPrepared,pnlDepAddress" update="@this,pnlgAddressPrepared,pnlDepAddress"/>
+                                                                    </div>                                                                             
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </section>
+
+                                        </div>
+
+                                        <div class="tab-pane" id="tabStaffPlan">                                           
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlDebJob" >
+                                                        <div class="form-group" >
+                                                            <div class="form-group form-horizontal" align="left">
+                                                                <p:outputLabel id="lblDebJobTab" class="panel-title fa fa-arrow-circle-right" value ="  #{organizationStructureController.hrDepartments.depName}"  />
+                                                            </div>
+                                                            <div class="col-sm-12" > </div>
+                                                            <div class="col-md-6 ">  
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-group form-horizontal form-group required">
+                                                                        <h:outputLabel for="somJobTitle" value="Job Title: " class="control-label col-sm-4"/>                                                                                                                
+                                                                        <div class="col-sm-8 textBoxMargin6px">
+                                                                            <p:selectOneMenu  id="somJobTitle" required="true"  value="#{organizationStructureController.hrJobTypes.id}"
+                                                                                              converter="entConverter" style="width:100%" 
+                                                                                              valueChangeListener="#{organizationStructureController.vlcJobTitle}" 
+                                                                                              requiredMessage="Please Select Job Title">
+                                                                                <f:selectItem itemLabel="-- select --" itemValue="" />
+                                                                                <f:selectItems value="#{organizationStructureController.allJobTypes}" var="jobs" itemLabel="#{jobs}"
+                                                                                               itemValue="#{jobs.id}" />
+                                                                                <p:ajax   event="change"  process="@this"  update="txtJobCode,txtJobGrade"/>
+                                                                            </p:selectOneMenu>
+                                                                            <p:message for="somJobTitle" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                                                                          
+                                                                </div>    
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-horizontal form-group form-group required">
+                                                                        <h:outputLabel for="txtNoEmpNeeded" class="control-label col-sm-4" value="Quantity: "/>
+                                                                        <div class="col-sm-8 textBoxMargin6px">
+                                                                            <p:inputText id="txtNoEmpNeeded" required="true"  
+                                                                                         value="#{organizationStructureController.hrDeptJobs.noEmpNeeded}"                                                                                             
+                                                                                         requiredMessage="Please Insert No of Employee Needed"       
+                                                                                         validator="#{validatorManagedBean.Number}" converterMessage="Please Insert only Number"
+                                                                                         validatorMessage="Please Insert only Number"/>
+                                                                            <p:message for="txtNoEmpNeeded" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                            
+                                                                </div>
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-horizontal form-group form-group required">
+                                                                        <h:outputLabel for="txtReason" rendered="#{organizationStructureController.reasonLblRendered}" 
+                                                                                       class="control-label col-sm-4" value="Reason/Remark: "/>
+                                                                        <div class="col-sm-8 textBoxMargin6px">
+                                                                            <p:inputTextarea id="txtReason" rendered="#{organizationStructureController.reasonTxtRendered}" 
+                                                                                             value="#{organizationStructureController.hrDeptJobs.remark}"
+                                                                                             required="true" requiredMessage="Enter the reason for changing the staff plan"
+                                                                                             placeholder="Reason for Changing the Staff Plan Number"/>
+                                                                            <p:message for="txtReason" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                            
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6 ">
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-horizontal form-group ">
+                                                                        <h:outputLabel for="txtJobCode" class="control-label col-sm-4" value="Job Code:"/>
+                                                                        <div class="col-sm-8 textBoxMargin6px">
+                                                                            <p:inputText id="txtJobCode" readonly="true" 
+                                                                                         value="#{organizationStructureController.hrJobTypes.jobCode}"/>
+                                                                            <p:message for="txtJobCode" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                            
+                                                                </div>
+                                                                <div class="col-md-12 ">
+                                                                    <div class="form-horizontal form-group ">
+                                                                        <h:outputLabel for="txtJobGrade" class="control-label col-sm-4" value="Job Grade:"/>
+                                                                        <div class="col-sm-8 textBoxMargin6px">
+                                                                            <p:inputText id="txtJobGrade" readonly="true"  
+                                                                                         value="#{organizationStructureController.hrJobTypes.jobGradeId.gradeId.grade}"/>
+                                                                            <p:message for="txtJobGrade" display="icon"/>
+                                                                        </div>
+                                                                    </div>                                            
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>                                                
+                                            </section>
+
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <div class="col-sm-12 ">
+                                                        <div class="col--md-6">    
+                                                            <div class="col-md-12 ">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-3 textBoxMarginTop6px">
+                                                                        <p:commandButton id="btnDebJabSave" class="btn  btn-block btn-primary col-sm-2 " value="#{organizationStructureController.saveOrUpdateJob}"
+                                                                                         action="#{organizationStructureController.saveDepJobs}" disabled="#{organizationStructureController.disableDebJobBtn}"
+                                                                                         process="@this,pnlDebJob,pnlgStaffPrepared" update="@this,pnlDebJob,:frmOrganizationStructure:tblDebJob"/>
+                                                                    </div>   
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </section>
+                                            </section>
+
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnlgDepJobTbl">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12" >
+                                                                <p:dataTable id="tblDebJob" value="#{organizationStructureController.hrDeptJobsDataModel}"
+                                                                             var="depJob" selectionMode="single" rowIndexVar="num"  class="dataTable"  rowKey="#{depJob.jobId.jobTitle}" >
+                                                                    <p:ajax event="rowSelect" process="@this,:frmOrganizationStructure:tblDebJob" 
+                                                                            listener="#{organizationStructureController.selectedDeptJob}"
+                                                                            update=":frmOrganizationStructure:pnlDebJob" />
+                                                                    <p:column headerText="Job Title" filterMatchMode="startsWith" filterBy="#{depJob.jobId.jobTitle}">                                                       
+                                                                        <h:outputText  value="#{depJob.jobId.jobTitle}" />
+                                                                    </p:column>
+                                                                    <p:column headerText="Job Code" filterMatchMode="startsWith" filterBy="#{depJob.jobId.jobCode}">                                                       
+                                                                        <h:outputText  value="#{depJob.jobId.jobCode}" />
+                                                                    </p:column>
+                                                                    <p:column>
+                                                                        <f:facet name="header">
+                                                                            <h:outputText value="Quantity"/>
+                                                                        </f:facet>
+                                                                        <h:outputText value="#{depJob.noEmpNeeded}" />
+                                                                    </p:column>                                                                   
+                                                                </p:dataTable>
+                                                            </div></div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">  
+                                                    <h:panelGroup id="pnlgStaffPrepared" class="col-sm-12">
+                                                        <div class="row">
+                                                            <div class="col-md-12">  
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <p:outputLabel for="txtStaffPreparedBy" value="Prepared By: " class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtStaffPreparedBy" value="#{organizationStructureController.hrDeptJobs.preparedBy}"  />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <p:outputLabel value="Prepared On:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPreparedOnstaff" value="#{organizationStructureController.hrDeptJobs.preparedOn}" 
+                                                                                             converter="dateConverter" placeholder="dd/mm/yyyy" onclick="displayCalendar('frmOrganizationStructure:txtPreparedOnstaff', 'frmOrganizationStructure:txtPreparedOnstaff');"
+                                                                                             validator="#{validatorManagedBean.Date}"/>
+                                                                                <p:message for="txtPreparedOnadrs" display="icon"/> 
+                                                                            </div> 
+                                                                        </div>    
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>     
+                                <p:dialog id="dlgDepAddress" header="Department Address" widgetVar="dlgDepAddress" height="300" width="500"  showEffect="explode">
+                                    <h:panelGrid columns="2" >
+                                        <f:facet name="header">
+                                            <h:panelGrid columns="2" styleClass="noBorders">
+                                                <p:selectBooleanCheckbox id="ckbAllCountry" value="#{organizationStructureController.isAllCountry}"
+                                                                         valueChangeListener="#{organizationStructureController.ckbAllCountry}">
+                                                    <p:ajax process="@this,:frmOrganizationStructure" update=":frmOrganizationStructure:addressTree"/>
+                                                </p:selectBooleanCheckbox>
+                                                <p:outputLabel class="control-label col-sm-12" value="All Countries"/>
+                                            </h:panelGrid>
+                                        </f:facet>
+                                        <p:tree id="addressTree" value="#{organizationStructureController.addressRoot}" var="node" dynamic="true" 
+                                                selectionMode="single" animate="true" selection="#{organizationStructureController.addressSelectedNode}"  
+                                                style="width: 100%; height: 100%; overflow: auto; display: block; border: transparent; border-style: inset" class="col-lg-12">
+                                            <p:treeNode id="treeNode" expandedIcon="ui-icon ui-icon-folder-open" 
+                                                        collapsedIcon="ui-icon ui-icon-folder-collapsed">
+                                                <h:outputText value="#{node}" id="nodetxt"/>                                                                
+                                            </p:treeNode>
+                                            <p:ajax event="select" listener="#{organizationStructureController.onAddressNodeSelect}" 
+                                                    process="@this,:frmOrganizationStructure:pnlDepAddress,:frmOrganizationStructure:txtDepLocation" 
+                                                    update=":frmOrganizationStructure:txtDepLocation" />
+                                        </p:tree>
+                                    </h:panelGrid>
+                                </p:dialog> 
+                            </h:form>      
+                        </div>   
+                    </div>                   
+                </div>                   
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+

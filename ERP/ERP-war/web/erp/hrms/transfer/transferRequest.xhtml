@@ -1,0 +1,488 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">        
+        <li><a href="../hrmsDashboard.xhtml" title="Go to Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>  
+        <li><a href="transferApprove.xhtml"><span>Transfer Approve</span></a></li> 
+        <li><a href="internalMovement.xhtml" title="Internal Movement"><span>Direct Assignment</span></a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{transferRequestController.transferRequestInfo()}"
+                                     icon="#{transferRequestController.icone}" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmTransfer" 
+                                     title="#{transferRequestController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <p:commandLink id="cmlWorkflow" class="fa fa-fw fa-wordpress" onclick="PF('dlgWorkflow').show();" title="Workflow"/> 
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/transfer/transferRequest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{transferRequestController.chooseMainPage}" style="border: 0px; background-color: transparent">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title" title="Search transfer on request">Search <small>Transfer</small> ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchList">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{transferRequestController.loadByStatus}">
+                                                                <f:selectItems value="#{transferRequestController.statusList}"/>   
+                                                                <p:ajax event="change" process="@this" update=":frmSearch:tblRequestList"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblRequestList" value="#{transferRequestController.transferRequestsDataModel}" paginator="true"
+                                                         var="rqst" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" rowsPerPageTemplate="10,20,30"
+                                                         selection="#{transferRequestController.hrTransferRequests}" rowKey="#{rqst.id}" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" process="@this,tblRequestList" listener="#{transferRequestController.populateTransfer}"
+                                                        update=":frmToolBar,:frmSearch,:frmTransfer"/>
+                                                <p:column headerText="No." style="width:60px;">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Employee Name" filterMatchMode="contains" filterBy="#{rqst.requesterId.firstName}">
+                                                    <h:outputText value="#{rqst.requesterId.firstName} #{rqst.requesterId.middleName} #{rqst.requesterId.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Employee Id" filterMatchMode="contains" filterBy="#{rqst.requesterId.empId}">
+                                                    <h:outputText value="#{rqst.requesterId.empId}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Request Date"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{rqst.requestDate}"/>
+                                                </p:column>
+                                                <p:column headerText="Transfer Type" filterMatchMode="contains" filterBy="#{rqst.transferTypeId.transferType}">
+                                                    <h:outputText value="#{rqst.transferTypeId.transferType}"/>
+                                                </p:column> 
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>          
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmTransfer"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/> 
+            <h:panelGroup id="pnlMainpage" style="border: 0px; background-color: transparent" rendered="#{transferRequestController.chooseCreatePage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Transfer Request</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl1" class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-6"> 
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal form-group required">
+                                                                            <h:outputLabel for="srchAutocomplete" value="Employee Name: " class="control-label col-sm-4"/>  
+                                                                            <div class="col-sm-8">
+                                                                                <p:autoComplete id="srchAutocomplete" value="#{transferRequestController.emp}" scrollHeight="300" 
+                                                                                                completeMethod="#{transferRequestController.SearchByFname}" placeholder="Enter name to search"
+                                                                                                var="empList" required="true" requiredMessage="Enter name to search"
+                                                                                                itemValue="#{empList.firstName}" itemLabel="#{empList}" forceSelection="true" 
+                                                                                                size="20" emptyMessage="no data" style="width:100%">  
+                                                                                    <p:ajax event="itemSelect" process="@this" 
+                                                                                            listener="#{transferRequestController.getByEmpName}" 
+                                                                                            update="pnl1"/>     
+                                                                                    <p:column headerText="Full Name">
+                                                                                        <h:outputText  value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="Employee ID" >
+                                                                                        <h:outputText  value="#{empList.empId}"/>
+                                                                                    </p:column>
+                                                                                </p:autoComplete> 
+                                                                                <p:message for="srchAutocomplete" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <div class="col-md-12 textBoxMargin6px">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmpType" class="control-label col-sm-4" value="Employee Type:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmpType" value="#{transferRequestController.hrEmployees.employmentType}" title="Employee Type" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtEmpType" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                                       
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">                                                                
+                                                                            <h:outputLabel for="txtdepartments" class="control-label col-sm-4" value="Department:"/>                                                               
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtdepartments" value="#{transferRequestController.hrDepartments.depName}" 
+                                                                                             required="true" readonly="true" title="Department"/>
+                                                                                <p:message for="txtdepartments" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>                                                                                
+                                                                </div>
+                                                                <div class="col-md-6">                                                         
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmployeeId"  class="control-label col-sm-4" value="Employee ID:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmployeeId" value="#{transferRequestController.hrEmployees.empId}" title="Employee Id" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtEmployeeId" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtHiredDate"  class="control-label col-sm-4" value="Hired Date:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtHiredDate" value="#{transferRequestController.hrEmployees.hireDate}" title="Hire Date" 
+                                                                                             required="true" readonly="true"/>
+                                                                                <p:message for="txtHiredDate" display="icon"/>
+                                                                            </div>                                                                                                          
+                                                                        </div> 
+                                                                    </div>                                                                                
+                                                                    <br></br>
+                                                                    <br></br>  
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtJobPosition"  class="control-label col-sm-4" value="Job Title:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtJobPosition" value="#{transferRequestController.hrJobTypes.jobTitle}"  
+                                                                                             readonly="true" title="Job Position"/>
+                                                                                <p:message for="txtJobPosition" display="icon"/>
+                                                                            </div>                                                              
+                                                                        </div>
+                                                                    </div>                                                                                                                                                                                                                                               
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section> 
+                                            <div class="nav-tabs-custom">
+                                                <div class="tab-content" id="maintab">
+                                                    <div class="active tab-pane" id="tabEmp">
+                                                        <section class="panel panel-info">
+                                                            <section class="panel-body">
+                                                                <h:panelGroup id="pnl3"  class="col-sm-12">
+                                                                    <div class="form-group">
+                                                                        <div class="col-sm-12">
+                                                                            <div class="col-md-6">
+                                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                                    <div class="form-group form-horizontal form-group required">
+                                                                                        <h:outputLabel for="txtwork" class="control-label col-sm-4" value="Department: "/>   
+                                                                                        <div class="col-sm-7">
+                                                                                            <p:inputText id="txtwork" value="#{transferRequestController.transferTo.depName}" readonly="true"
+                                                                                                         title="Transfer Work Unit" placeholder="Transfer department"/>
+                                                                                            <p:message for="txtwork" display="icon"/>
+                                                                                        </div>
+                                                                                        <div class="col-sm-1">
+                                                                                            <p:commandButton onclick="PF('dlg1').show();" id="btnTree" value="+" type="button"
+                                                                                                             partialSubmit="true" style="background: transparent;"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>  
+                                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                                    <div class="form-group form-horizontal form-group required"> 
+                                                                                        <h:outputLabel for="txttransfertype" class="control-label col-sm-4" value="Transfer Type: "/> 
+                                                                                        <div class="col-sm-8">                                                       
+                                                                                            <p:selectOneMenu id="txttransfertype" value="#{transferRequestController.hrLuTransferTypes.transferType}" 
+                                                                                                             valueChangeListener="#{transferRequestController.getTransfer}" 
+                                                                                                             required="true" requiredMessage="Select transfer type" style="width:100%">
+                                                                                                <f:selectItems value="#{transferRequestController.listOfTransferinfo}"/>   
+                                                                                                <p:ajax event="change" process="@this" update="@this,pnl3"/>
+                                                                                            </p:selectOneMenu>
+                                                                                            <p:message for="txttransfertype" display="icon"/>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>                                                                   
+                                                                                <div class="col-md-12 textBoxMargin6px"><div class="form-group form-horizontal form-group required">
+                                                                                        <h:outputLabel for="calRequsetdate" value="Request Date: " class="control-label col-sm-4"/>
+                                                                                        <div class="col-sm-8">
+                                                                                            <p:inputText id="calRequsetdate" value="#{transferRequestController.hrTransferRequests.requestDate}"
+                                                                                                         readonly="true" converter="dateConverter"/>      
+                                                                                            <p:message for="calRequsetdate" display="icon"/>
+                                                                                        </div>
+                                                                                    </div>                                                                                                       
+                                                                                </div>
+                                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                                    <div class="form-group form-horizontal form-group required">
+                                                                                        <h:outputLabel for="txtReason" class="control-label col-sm-4" value="Reason: "/> 
+                                                                                        <div class="col-sm-8">
+                                                                                            <p:inputTextarea id="txtReason" value="#{transferRequestController.hrTransferRequests.reason}"
+                                                                                                             required="true" requiredMessage="Enter transfer reason" rows="1" autoResize="false" 
+                                                                                                             validator="#{validatorManagedBean.Text}" validatorMessage="Reason should be in text format"
+                                                                                                             title="Reason" class="form-control" placeholder="Reason for transfer ....."/>  
+                                                                                            <p:message for="txtReason" display="icon"/>
+                                                                                        </div>
+                                                                                    </div>                                       
+                                                                                </div>
+                                                                                <div class="col-md-12 textBoxMargin6px"><div class="form-group form-horizontal form-group required">
+                                                                                        <h:outputLabel value="Start Date: " for="calStartDate" class="control-label col-sm-4" rendered="#{transferRequestController.chooseTemporary}"/>
+                                                                                        <div class="col-sm-8">
+                                                                                            <p:inputText id="calStartDate" value="#{transferRequestController.hrTransferRequests.startDate}"
+                                                                                                         onclick="displayCalendar('frmTransfer:calStartDate', 'frmTransfer:calStartDate');"
+                                                                                                         required="true" class="form-control" requiredMessage="Enter start date" rendered="#{transferRequestController.chooseTemporary}"/> 
+                                                                                            <p:message for="calStartDate" display="icon"/>
+                                                                                        </div>
+                                                                                    </div>                                                                                                       
+                                                                                </div>
+                                                                            </div> 
+                                                                            <div class="col-md-6">
+                                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                                    <div class="form-group form-horizontal">
+                                                                                        <h:outputLabel for="txtSystem" class="control-label col-sm-4" value="System:"/> 
+                                                                                        <div class="col-sm-8">
+                                                                                            <p:inputText id="txtSystem" value="#{transferRequestController.system}" title="System" readonly="true"/>
+                                                                                        </div>
+                                                                                    </div>                                            
+                                                                                </div> 
+                                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                                    <div class="form-group form-horizontal">
+                                                                                        <h:outputLabel for="txtCostCenter" class="control-label col-sm-4" value="Cost Center:"/> 
+                                                                                        <div class="col-sm-8">
+                                                                                            <p:inputText id="txtCostCenter" value="#{transferRequestController.costCenter}" title="Cost Center" readonly="true"/>
+                                                                                        </div>
+                                                                                    </div>                                            
+                                                                                </div>
+                                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                                    <div class="form-group form-horizontal">
+                                                                                        <h:outputLabel for="txtPayLocation" class="control-label col-sm-4" value="Pay Location:"/> 
+                                                                                        <div class="col-sm-8">
+                                                                                            <p:inputText id="txtPayLocation" value="#{transferRequestController.payLocation}" title="Pay Location" readonly="true"/>
+                                                                                        </div>
+                                                                                    </div>                                            
+                                                                                </div>
+                                                                                <div class="col-md-12 textBoxMargin6px">
+                                                                                    <div class="form-group form-horizontal">
+                                                                                        <h:outputLabel for="txtPayGroup" class="control-label col-sm-4" value="Pay Group:"/> 
+                                                                                        <div class="col-sm-8">
+                                                                                            <p:inputText id="txtPayGroup" value="#{transferRequestController.payGroup}" title="Pay Group" readonly="true"/>
+                                                                                        </div>
+                                                                                    </div>                                            
+                                                                                </div> 
+                                                                                <div class="col-md-12 textBoxMargin6px"><div class="form-group form-horizontal form-group required">
+                                                                                        <h:outputLabel value="End Date: " for="calEndDate" class="control-label col-sm-4" rendered="#{transferRequestController.chooseTemporary}"/>
+                                                                                        <div class="col-sm-8">
+                                                                                            <p:inputText id="calEndDate" value="#{transferRequestController.hrTransferRequests.endDate}"
+                                                                                                         onclick="displayCalendar('frmTransfer:calEndDate', 'frmTransfer:calEndDate');"
+                                                                                                         required="true" class="form-control" requiredMessage="Enter end date" rendered="#{transferRequestController.chooseTemporary}"/>
+                                                                                            <p:message for="calEndDate" display="icon"/>
+                                                                                        </div>
+                                                                                    </div>                                                                                                       
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </h:panelGroup>
+                                                            </section> 
+                                                        </section> 
+                                                    </div>
+                                                    <div class="tab-pane" id="tabOvertime">                                           
+                                                        <section class="panel panel-info" id="pnl3">
+                                                            <section class="panel-body">
+                                                                <h:panelGroup id="pnl5">                                                                                                                    
+                                                                    <p:dataTable id="tblOvertime" 
+                                                                                 rowIndexVar="num" var="Overtime" lazy="true"
+                                                                                 editable="true" editMode="cell" widgetVar="Overtime"  
+                                                                                 rows="20" paginatorPosition="bottom"
+                                                                                 paginator="true" 
+                                                                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">                                                           
+                                                                        <p:ajax event="cellEdit" listener="#{overtimeReqCon.onCellEdit}" update=":frmTransfer:growl" />
+
+                                                                        <f:facet name="header">
+                                                                            <p:outputLabel value="Attach Supportive Information"/>                                                                                         
+                                                                            <p:fileUpload id="flUpload" mode="advanced" fileUploadListener="#{hrSalaryDelegationRequestController.handleFileUpload}"                                                                   
+                                                                                          multiple="true"  
+                                                                                          update="flUpload"  
+                                                                                          sizeLimit="1000000"
+                                                                                          auto="false"
+                                                                                          process="@this"
+                                                                                          label="Browse ..."
+                                                                                          allowTypes="/(\.|\/)(doc|docx|pdf)$/"/>                                                                              
+                                                                        </f:facet>
+                                                                    </p:dataTable>                                               
+                                                                </h:panelGroup>
+                                                            </section>
+                                                        </section>                                           
+                                                    </div>
+                                                    <p:dialog id="dig1" header="Department List" widgetVar="dlg1" height="300" width="500" showEffect="explode" modal="true">
+                                                        <h:panelGrid columns="3">
+                                                            <p:tree value="#{transferRequestController.root2}" var="nodes" style="border: transparent; width: 100%"
+                                                                    selectionMode="single" selection="#{transferRequestController.selectedNode}">
+                                                                <p:ajax event="select" listener="#{transferRequestController.onNodeSelect}" process="@this" 
+                                                                        update=":frmTransfer:txtwork,:frmTransfer:txtSystem,:frmTransfer:txtCostCenter,
+                                                                        :frmTransfer:txtPayLocation,:frmTransfer:txtPayGroup"/>
+                                                                <p:treeNode>
+                                                                    <h:outputText value="#{nodes}"/>
+                                                                </p:treeNode>
+                                                            </p:tree>                                       
+                                                        </h:panelGrid>
+                                                    </p:dialog>
+                                                    <section class="panel panel-info">
+                                                        <section class="panel-body">
+                                                            <h:panelGroup id="pnlWorkflow" class="col-sm-12">
+                                                                <div class="form-group">
+                                                                    <div class="col-sm-12">
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group required form-horizontal">
+                                                                                    <h:outputLabel for="txtProcessedBy" value="Processed By: " class="control-label col-sm-4"/>
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:inputText id="txtProcessedBy" value="#{workFlow.userName}"
+                                                                                                     title="Processed By" readonly="true"/>
+                                                                                        <p:message for="txtProcessedBy" display="icon"/>
+                                                                                    </div>
+                                                                                </div>                                                                                                       
+                                                                            </div>
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group required form-horizontal">
+                                                                                    <h:outputLabel for="txtProcessedDate" value="Processed Date: " class="control-label col-sm-4"/>
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:inputText id="txtProcessedDate" value="#{transferRequestController.wfHrProcessed.processedOn}"
+                                                                                                     converter="dateConverter" readonly="true" title="processed On"
+                                                                                                     validator="#{validatorManagedBean.Date}" validatorMessage="processed date should be in date format"/>
+                                                                                        <p:message for="txtProcessedDate" display="icon"/>
+                                                                                    </div>
+                                                                                </div>                                                                                                       
+                                                                            </div> 
+                                                                        </div>
+                                                                        <div class="col-md-6">
+                                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                                <div class="form-group form-horizontal">
+                                                                                    <h:outputLabel for="txtCommentGiven" class="control-label col-sm-4" value="Comment Given:"/> 
+                                                                                    <div class="col-sm-8">
+                                                                                        <p:inputTextarea id="txtCommentGiven" value="#{transferRequestController.wfHrProcessed.commentGiven}"
+                                                                                                         rows="1" autoResize="false" title="Comment"
+                                                                                                         validator="#{validatorManagedBean.Remark}" class="form-control"/>
+                                                                                        <p:message for="txtCommentGiven" display="icon"/>
+                                                                                    </div>
+                                                                                </div>                                            
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <p:dialog id="dlgWorkflow" header="Workflow" widgetVar="dlgWorkflow" height="400"
+                                                                          width="1280" modal="true" resizable="false" showEffect="explode">
+                                                                    <p:dataTable id="tblWorkflow" value="#{transferRequestController.workflowDataModel}" 
+                                                                                 var="currentRow" selectionMode="single" class="dataTable" scrollable="true"
+                                                                                 rowIndexVar="num" rowKey="#{currentRow}" paginatorPosition="bottom" scrollHeight="160">
+                                                                        <p:column headerText="No." style="width: 50px">                
+                                                                            <h:outputText value="#{num+1}"/>
+                                                                        </p:column>
+                                                                        <p:column headerText="Processed By">
+                                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Decision"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{currentRow.decision}"/> 
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Processed Date"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                                        </p:column>
+                                                                        <p:column>
+                                                                            <f:facet name="header">
+                                                                                <h:outputText value="Comment Given"/>
+                                                                            </f:facet>
+                                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                                        </p:column> 
+                                                                    </p:dataTable>
+                                                                </p:dialog>
+                                                            </h:panelGroup>
+                                                        </section>
+                                                    </section>
+                                                    <h:panelGroup id="pnl6" class="col-sm-12">
+                                                        <div class="panel-body col-sm-12">
+                                                            <div class="form-group col-sm-12">
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-sm-12 form-horizontal">
+                                                                        <div class="col-sm-4">                                                              
+                                                                        </div>                                                                    
+                                                                        <div class="col-sm-3">
+                                                                            <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                             value="#{transferRequestController.saveorUpdateBundle}"
+                                                                                             action="#{transferRequestController.saveTransferRqst()}"
+                                                                                             disabled="#{transferRequestController.disableBtn}"
+                                                                                             process="@this,pnlMainpage" update=":frmTransfer"/>
+                                                                        </div>
+                                                                        <div class="col-sm-3">
+                                                                            <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                                             action="#{transferRequestController.resetTransferRqst()}" 
+                                                                                             process="@this" update=":frmTransfer"/> 
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </div>
+                                            </div>
+                                        </div>   
+                                    </div>
+                                </div>                   
+                            </div>
+                        </div>
+                    </div>
+                </div>              
+            </h:panelGroup>
+        </h:form> 
+    </ui:define>
+</ui:composition>
+

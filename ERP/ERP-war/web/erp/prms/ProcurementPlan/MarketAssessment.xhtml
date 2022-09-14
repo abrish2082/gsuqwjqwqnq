@@ -1,0 +1,1371 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li><a href="../prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a></li>
+        <li>
+            <a href="ServiceAndWorkRegistration.xhtml"><i class="fa fa-circle-o"></i>Service And Work Registration</a>
+        </li>
+        <li>
+            <a href="ProcurementAnnualPlan.xhtml"><i class="fa  fa-circle-o"></i>Annual Procurement Plan</a>
+        </li>
+        <li>
+            <a href="PurchaseRequistionInfo.xhtml"><i class="fa  fa-circle-o"></i>Purchase Request</a>
+        </li>
+        <li>
+            <a href="ProjectProcurementPlan.xhtml"><i class="fa  fa-circle-o"></i>Project Procurement Plan</a>
+        </li>
+
+    </ui:define>
+    <ui:define name="contents">
+
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right" id="tb">
+                    <h:panelGroup id="pnlGoBackSearchButton" rendered="#{marketAssessmentController.renderPnlToSearchPage}">
+                        <p:commandButton id="searchButton" icon="ui-icon-search" style="background-color: white;border-color: white" 
+                                         action="#{marketAssessmentController.goBackSearchButtonAction()}"
+                                         title="Back to Search"
+                                         process="@this" update=":frmRegisterUI,:frmMainUI,:frmSample" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PgCreate" rendered="#{marketAssessmentController.isCreateButton}">
+                        <p:commandButton id="btnNew" action="#{marketAssessmentController.createNewParty()}" icon="#{marketAssessmentController.icone}" style="background-color: white;border-color: white"
+                                         validateClient="true" title="#{marketAssessmentController.createOrSearchBundle}"
+                                         process="@this" update=":frmMainUI, :frmRegisterUI, :frmSample" rendered="#{marketAssessmentController.isCreateButton}"/>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="PGNotification" rendered="#{marketAssessmentController.isDecision}">
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-bell-o" title="Notifications" value="#{marketAssessmentController.requestNotificationCounter}" 
+                                       style="color: red;background-color: white; border-color: white"/>
+                        <p:overlayPanel widgetVar="ovrNotification" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 200px">
+                            <p:outputLabel id="lblReqNotf" value="#{PRMS.MarketAssessment}"/>
+                            <p:selectOneListbox id="lstNotf" class="col-md-2" scrollHeight="400" filter="true" filterMatchMode="contains"                                            
+                                                valueChangeListener="#{marketAssessmentController.RequestListChange}" converter="entConverter">
+                                <f:selectItems id="selectOneMenuAppList" var="purchaseReqlst"
+                                               value="#{marketAssessmentController.prmsMarketAssessmentLst}"
+                                               itemValue="#{marketNo}" itemLabel="#{marketNo}"/>               
+                                <p:ajax event="valueChange"  update=":frmRegisterUI, :frmMainUI, :frmSample" />                            
+                            </p:selectOneListbox>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <h:panelGroup id="pnlWorkflow" rendered="#{marketAssessmentController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 200px">
+                            <p:outputLabel id="lblFaWf" value="#{PRMS.Workflow}"/>
+                            <!--put work flow list here-->
+
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{marketAssessmentController.wfPrmsProcessedDModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="#{PRMS.No}" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="#{PRMS.ProcessedBy}">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="#{PRMS.ProcessedDate}">
+                                                            <h:outputText value="#{wfVar.processedOn}" >
+                                                                <f:convertDateTime pattern="dd/MMM/yyyy"/>
+                                                            </h:outputText> 
+                                                        </p:column>
+                                                        <p:column headerText="#{PRMS.Decision}">
+                                                            <h:outputText value="#{wfVar.decision}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="#{PRMS.Comment}">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../prms/ProcurementPlan/MarketAssessment.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../prms/prmsDashboardNew.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{marketAssessmentController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Search ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchmarket"> 
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="col-sm-6" >
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12 "> 
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{PRMS.searchingby}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="drdSearchBy" style="width: 100%" value="#{marketAssessmentController.eepPmsMarketAssessmentInfo.columnName}"
+                                                                         valueChangeListener="#{marketAssessmentController.selectedParamChangeEvent}" converter="entConverter">
+                                                            <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                            <f:selectItems value="#{marketAssessmentController.marketAssessmentSearchParameterLst}"
+                                                                           var="paramLists" itemLabel="#{paramLists}"/>
+                                                            <p:ajax event="change" process="@this" update="lblMarketAssmntNo,marketAssmntNo"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12 "> 
+                                                    <h:outputLabel id="lblMarketAssmntNo" class="control-label col-sm-4" value="#{PRMS.SearchBy} #{marketAssessmentController.eepPmsMarketAssessmentInfo.columnName}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="marketAssmntNo" class="form-control" value="#{marketAssessmentController.eepPmsMarketAssessmentInfo.columnValue}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12 "> 
+                                                    <h:outputLabel class="control-label col-sm-4" />
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnFind" icon="ui-icon-search" action="#{marketAssessmentController.search_MarketAssessment()}"
+                                                                         process="@this,frmSearchmarket" update=":frmMainUI:frmmarket" class="btn btn-primary"
+                                                                         value="#{PRMS.Find}" />     
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmmarket">   
+                                    <div class="panel-body">
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblmrktNo"  var="marketAssmnt" rows="10" rowIndexVar="num"   
+                                                                 selection="#{marketAssessmentController.marketAssessmentSelect}"
+                                                                 rowKey="#{marketAssmnt.id}"  selectionMode="single" 
+                                                                 value="#{marketAssessmentController.marketAssessmentModel}"
+                                                                 class="dataTable" paginator="true" paginatorPosition="bottom"
+                                                                 rowsPerPageTemplate="5,10,15" 
+                                                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                                                        <p:ajax event="rowSelect" listener="#{marketAssessmentController.rowSelect}" 
+                                                                update=":frmRegisterUI, :frmMainUI, :frmSample" />     
+                                                        <p:column style="width: 70px">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.No}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{marketAssmnt.marketAssNo}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.MarketAssessNo}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{marketAssmnt.marketAssNo}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.SupplierName}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{marketAssmnt.luSupplierNameId}"/>
+                                                        </p:column>
+                                                        <p:column headerText="#{PRMS.ProcurementType}" sortBy="#{marketAssmnt.purchaseType}">
+                                                            <h:outputText value="#{marketAssmnt.purchaseType}"/>
+                                                        </p:column>
+                                                        <p:column sortBy="#{marketAssmnt.registrationDate}">
+                                                            <f:facet name="header">
+                                                                <h:outputText value="#{PRMS.ProcessedDate}" />
+                                                            </f:facet>
+                                                            <h:outputText value="#{marketAssmnt.registrationDate}" >
+                                                                <f:convertDateTime  pattern="dd/MMM/yyyy" />
+                                                            </h:outputText>
+                                                        </p:column>
+
+                                                    </p:dataTable>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+        <h:form id="frmRegisterUI"  enctype="multipart/form-data">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{marketAssessmentController.renderPnlCreateParty}">
+                <p:growl id="growl" showDetail="true" severity="information,fatal" autoUpdate="true" />
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Market Assessment</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup style="border: 0px; background-color: transparent" id="marketInfoId">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class=" col-sm-6">
+                                            <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                <div class="form-horizontal col-sm-12 ">
+                                                    <p:outputLabel class="control-label col-sm-4" value="#{PRMS.ProcurementType}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneRadio id="txtPrTypes" style="width: 100%" required="true" requiredMessage="Please Select Procurement Type" value="#{marketAssessmentController.procurementType}"
+                                                                          valueChangeListener="#{marketAssessmentController.changePrRqType}" disabled="#{marketAssessmentController.disableWhenUpdate}">
+                                                            <f:selectItem itemLabel="Goods" itemValue="Goods" />
+                                                            <f:selectItem itemLabel="Service" itemValue="Service" />
+                                                            <f:selectItem itemLabel="Work" itemValue="Work" />
+                                                            <p:ajax  event="change"  update="frmRegisterUI:marketDetail,frmRegisterUI:itemAndServiceTbl,marketInfoId,txtmarketAssid" process="@this"/>
+                                                        </p:selectOneRadio>
+                                                        <p:message for="txtPrTypes" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-sm-12 textBoxMargin6px">
+                                                <div class="form-horizontal col-sm-12 ">
+                                                    <h:outputLabel id="lblmarketAssid" class="control-label col-sm-4"  value="#{PRMS.MarketAssessNo}"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText required="true" id="txtmarketAssid" readonly="true"
+                                                                     value="#{marketAssessmentController.generateMarketNo()}"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <h:panelGroup style="border: 0px; background-color: transparent" id="supplierName" rendered="#{marketAssessmentController.supplierName}">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <p:outputLabel id="lblSuppName" class="control-label col-sm-4"  value="#{PRMS.SupplierName}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="txtSuppName" style="width: 100%" disabled="#{workFlow.readonly}"  converter="entConverter" required="true" requiredMessage="Please Select Supplier Name"
+                                                                             value="#{marketAssessmentController.eepPmsMarketAssessmentInfo.luSupplierNameId}">
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItems value="#{marketAssessmentController.getSuppName()}" var="supplier" itemLabel="#{supplier}"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="txtSuppName" display="icon" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent" id="contractorAndConsultancyName" rendered="#{marketAssessmentController.consultancyAndContrtName}">
+                                                <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                    <div class="form-horizontal col-sm-12 ">
+                                                        <p:outputLabel id="ss" class="control-label col-sm-4"   value="#{PRMS.Contractorandconsultancy}"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="ContrCconsultancy" style="width: 100%" disabled="#{workFlow.readonly}"  converter="entConverter" required="true"
+                                                                             value="#{marketAssessmentController.eepPmsMarketAssessmentInfo.luSupplierNameId}" requiredMessage="Please Select Consultancy and Contractor">
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                <f:selectItems value="#{marketAssessmentController.getContAndConsultancy()}" var="supplier" itemLabel="#{supplier}"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="ContrCconsultancy" display="icon" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>         
+
+
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class=" col-sm-6">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Market Assessment Detail</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <div class="panel-body">
+                                    <h:panelGroup style="border: 0px; background-color: transparent"   id="marketDetail">
+
+                                        <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{marketAssessmentController.renderitem}" id="itemdetailPanel">
+                                            <div class="form-horizontal  col-sm-12">
+                                                <div class=" col-sm-6">
+                                                    <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblQuantity" class="control-label col-sm-4"  value="#{PRMS.GoodSourceOfAssessment}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdSourceOfassessmnt" style="width: 100%" required="true" 
+                                                                                 valueChangeListener="#{marketAssessmentController.changeSourceOfAssessment}"
+                                                                                 value="#{marketAssessmentController.eepPmsMrktAsssmtInfoDetil.sourceOfAssessment}" requiredMessage="Please Select Source Of Assessment for Goods" 
+                                                                                 disabled="#{workFlow.readonly}">
+                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                    <f:selectItem itemLabel="Evaluation" itemValue="Evaluation" />
+                                                                    <f:selectItem itemLabel="Purchase Agency" itemValue="Purchase Agency" />
+                                                                    <f:selectItem itemLabel="Assessment" itemValue="Assessment" />
+                                                                    <p:ajax event="change" update="itemdetailPanel,tblItem" process="@this"/>
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon" for="drdSourceOfassessmnt"/>
+                                                            </div>
+                                                        </div>
+                                                    </div> 
+                                                </div>
+                                            </div>
+
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{marketAssessmentController.assessment}" id="assessmentpnl">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblCategory" class="control-label col-sm-4"  value="#{PRMS.Category}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdCategory" required="true" requiredMessage="Please Select Category" valueChangeListener="#{marketAssessmentController.changeEventSubCat}" 
+                                                                                     style="width: 100%"   value="#{marketAssessmentController.mmsCategory.catId}" converter="entConverter"  >   
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.getcatName()}" var="subCategory" itemLabel="#{subCategory.catName}" 
+                                                                                       itemValue="#{subCategory.catId}" />
+                                                                        <p:ajax event="change" update="drdSubCategory" process="@this" />
+                                                                    </p:selectOneMenu> 
+                                                                    <p:message for="drdCategory" display="icon"/>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lbldrdSubCategory" class="control-label col-sm-4" value="#{PRMS.SubCategory}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdSubCategory" required="true" requiredMessage="Please Select Sub Category" converter="entConverter"
+                                                                                     valueChangeListener="#{marketAssessmentController.changeEventItemNam}" 
+                                                                                     style="width: 100%" value="#{marketAssessmentController.mmsSubCat.subCatId}"  >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.mmsSubCatList}" var="subCat"
+                                                                                       itemLabel="#{subCat.subCatName}" itemValue="#{subCat.subCatId}"/>
+
+                                                                        <p:ajax event="change" process="@this" update="drdItemNames"/>
+                                                                    </p:selectOneMenu>
+
+                                                                    <p:message display="icon" for="drdSubCategory"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblitemserviceCode"  class="control-label col-sm-4" value="#{PRMS.ItemName}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdItemNames" required="true" requiredMessage="Please Select Item Name for Assesment" value="#{marketAssessmentController.mmsItemRegistration.materialId}"
+                                                                                     valueChangeListener="#{marketAssessmentController.changeEvent}" 
+                                                                                     style="width: 100%"  converter="entConverter">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.itemRegistrationList}" var="itemName"
+                                                                                       itemLabel="#{itemName.matName}" itemValue="#{itemName.materialId}"/>
+
+                                                                        <p:ajax event="valueChange" process="@this" update="txtunitmeasure"/>
+                                                                    </p:selectOneMenu>
+
+
+                                                                    <p:message display="icon" for="drdItemNames"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblunitmeasure" class="control-label col-sm-4"  value="#{PRMS.UnitMeasure}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtunitmeasure" value="#{marketAssessmentController.mmsItemRegistration.unitMeasure1}" readonly="true" >
+
+                                                                    </p:inputText>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel class="control-label col-sm-4" id="lblUnitPrice" value="#{PRMS.EstimatedCurrent}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtUnitPrice" class="form-control" required="true" requiredMessage="Please Enter Estimated Current Price for Good's Assesment"
+                                                                                 value="#{marketAssessmentController.eepPmsMrktAsssmtInfoDetil.unitPrice}">
+
+                                                                    </p:inputText>
+                                                                    <p:message display="icon" for="txtUnitPrice"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblCountryOfOrigin" class="control-label col-sm-4" value="#{PRMS.CountryOfOrigin}"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdCountryOfOrigin" style="width: 100%" required="true" requiredMessage="Please Select Country Of Origin" converter="entConverter"
+                                                                                     value="#{marketAssessmentController.comLuCountry}" filterMatchMode="contains" filter="true" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.getCoutry()}" var="country" itemLabel="#{country}"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drdCountryOfOrigin"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <div class="col-lg-4"></div>
+                                                                <div class="col-sm-8">
+                                                                    <p:commandButton id="btnAdd" action="#{marketAssessmentController.addToItemTable()}" class="btn btn-primary col-lg-4 " 
+                                                                                     update="tblItem,itemdetailPanel" process="@this,tblItem,itemdetailPanel" disabled="#{workFlow.readonly}"
+                                                                                     value="#{marketAssessmentController.addOrModifyBundle} #{PRMS.save}" /> 
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblForAssmntCurrency" class="control-label col-sm-4"  value="#{PRMS.Currency}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdForAssmntCurrency" style="width: 100%"  converter="entConverter" required="true" requiredMessage="Please Select Currency"
+                                                                                     value="#{marketAssessmentController.fmsLuCurrency}" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.getCurrency()}" var="currency" itemLabel="#{currency}"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drdForAssmntCurrency"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblavaialbityForAssmnt" class="control-label col-sm-4" value="#{PRMS.Availablity}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdAvaliabiltyForAssmnt"  style="width: 100%"
+                                                                                     value="#{marketAssessmentController.eepPmsMrktAsssmtInfoDetil.availabilty}" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Local" itemValue="Local" />
+                                                                        <f:selectItem itemLabel="Foreign" itemValue="Foreign" />
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel class="control-label col-sm-4"  id="lblRemarkForAssmnt" value="#{PRMS.Remark}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtRemarkForAssmnt" class="form-control" value="#{marketAssessmentController.eepPmsMrktAsssmtInfoDetil.remark}" autoResize="false"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{marketAssessmentController.purchaseAgency}" id="purchaseAgencyPnl">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <p:outputLabel id="lblUpload" class="control-label col-sm-4" value="#{PRMS.UploadFile}"/>
+                                                            <div class="col-sm-8">  
+                                                                <p:fileUpload  update="tblItem" sizeLimit="1000000" multiple="true"
+                                                                               fileUploadListener="#{marketAssessmentController.handleFileUpload}" mode="advanced" 
+                                                                               allowTypes="/(\.|\/)(xls|xlsx)$/"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{marketAssessmentController.evaluation}" id="evaluationPnl">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblFromYear" class="control-label col-sm-4" value="#{PRMS.FromYear}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:calendar id="calFromDate" placeholder="dd/mm/yyyy" 
+                                                                                value="#{marketAssessmentController.eepPmsMrktAsssmtInfoDetil.fromYear}"
+                                                                                pattern="dd/MM/yyyy" maxdate="today" disabled="#{marketAssessmentController.disableDetailWhenUpdate}"
+                                                                                required="true" requiredMessage="Enter From Year for Goods Evaluation">
+                                                                        <p:ajax event="dateSelect" listener="#{marketAssessmentController.handleFromYearEvents}" 
+                                                                                process="@this" update="drdItemNameFrmEvResult,calToDate" />           
+                                                                    </p:calendar>
+                                                                    <p:message for="calFromDate" display="icon"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblToYear" class="control-label col-sm-4" value="#{PRMS.ToYear}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:calendar id="calToDate" placeholder="dd/mm/yyyy"
+                                                                                value="#{marketAssessmentController.eepPmsMrktAsssmtInfoDetil.toYear}"
+                                                                                pattern="dd/MM/yyyy" mindate="#{marketAssessmentController.getMinDate()}"
+                                                                                disabled="#{marketAssessmentController.disableDetailWhenUpdate}"
+                                                                                required="true" requiredMessage="Enter To Year for Goods Evaluation">
+                                                                        <p:ajax event="dateSelect" listener="#{marketAssessmentController.handleToYearEvents}"
+                                                                                process="@this" update="drdItemNameFrmEvResult" />
+                                                                    </p:calendar>
+                                                                    <p:message display="icon" for="calToDate"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblItemNameFrmEvResult" class="control-label col-sm-4" value="#{PRMS.ItemName}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdItemNameFrmEvResult" required="true" requiredMessage="Please Select Item Name for Evaluation"
+                                                                                     value="#{marketAssessmentController.mmsItemRegistration}"
+                                                                                     valueChangeListener="#{marketAssessmentController.changeAveragePrice}" 
+                                                                                     style="width: 100%"  converter="entConverter" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.itemRegistrationList}" var="itemNameEv"
+                                                                                       itemLabel="#{itemNameEv.matName}" itemValue="#{itemNameEv}"/>
+
+                                                                        <p:ajax event="change" process="@this" update="evaluationPnl,txtUnitPriceAverage,drdAvaliabilty"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drdItemNameFrmEvResult"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblCategorys" 
+                                                                               class="control-label col-sm-4"  value="#{PRMS.Category}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtCategory" readonly="true"
+                                                                                 style="width: 100%" value="#{marketAssessmentController.mmsCategory.catName}" >   
+                                                                    </p:inputText>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblSubcategory" 
+                                                                               class="control-label col-sm-4" value="#{PRMS.SubCategory}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtSubcategory" readonly="true" value="#{marketAssessmentController.mmsSubCat.subCatName}" /> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <div class="col-lg-4"></div>
+                                                                <div class="col-sm-8">
+                                                                    <p:commandButton id="btnAdd11" action="#{marketAssessmentController.addToItemTable()}" class="btn btn-primary col-lg-4 " 
+                                                                                     update="itemdetailPanel,evaluationPnl,tblItem" process="@this,evaluationPnl" disabled="#{workFlow.readonly}"
+                                                                                     value="#{marketAssessmentController.addOrModifyBundle} #{PRMS.Add}" /> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblUnitPriceAverage" class="control-label col-sm-4"  value="#{PRMS.UnitPriceAverage}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtUnitPriceAverage" style="width: 100%" readonly="true"
+                                                                                 value="#{marketAssessmentController.eepPmsMrktAsssmtInfoDetil.unitPrice}" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblCurrency" class="control-label col-sm-4"  value="#{PRMS.Currency}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="drdCurrency" style="width: 100%"  readonly="true"
+                                                                                 value="#{marketAssessmentController.fmsLuCurrency.currency}" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblavaialbity" class="control-label col-sm-4"  value="#{PRMS.Availablity}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="drdAvaliabilty" style="width: 100%" readonly="true"
+                                                                                 value="#{marketAssessmentController.prmsBid.bidType}" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel class="control-label col-sm-4"  id="lblRemark" value="#{PRMS.Remark}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtRemark" class="form-control" value="#{marketAssessmentController.eepPmsMrktAsssmtInfoDetil.remark}" autoResize="false"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{marketAssessmentController.renderService}" id="serviceDtlPanel">
+                                            <div class="form-horizontal  col-sm-12">
+                                                <div class=" col-sm-6">
+                                                    <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblSourceAssessmentFfService" class="control-label col-sm-4"  value="#{PRMS.ServiceSourceOfAssessment}"/>
+
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdSourceOfassessmnts" style="width: 100%" required="true" requiredMessage="Please Select Source Of Assessment for Service" 
+                                                                                 valueChangeListener="#{marketAssessmentController.changeSourceOfAssessment}"
+                                                                                 value="#{marketAssessmentController.prmsMarketAssmntService.sourceOfAssessment}" disabled="#{workFlow.readonly}">
+                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                    <f:selectItem itemLabel="Evaluation" itemValue="Evaluation" />
+                                                                    <f:selectItem itemLabel="Purchase Agency" itemValue="Purchase Agency" />
+                                                                    <f:selectItem itemLabel="Assessment" itemValue="Assessment" />
+                                                                    <p:ajax event="change" update="serviceDtlPanel,serviceTbl" />
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon" for="drdSourceOfassessmnts"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{marketAssessmentController.assessment}" id="assementFrmServicepnl">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblConsultancyservice" class="control-label col-sm-4" value="#{PRMS.ServiceName}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdConsultancyservice" required="true" requiredMessage="Please Select Service Name for Assesment" value="#{marketAssessmentController.prmsMarketAssmntService.serviceId}"
+                                                                                     valueChangeListener="#{marketAssessmentController.changeEventServiceNo}"
+                                                                                     style="width: 100%"  converter="entConverter">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.service()}" var="servNameAss" 
+                                                                                       itemLabel="#{servNameAss.serviceName}" itemValue="#{servNameAss}"/>
+                                                                        <p:ajax event="change" process="@this" update="txtSerunitmeasure,txtserviceType"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drdConsultancyservice"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblserviceType" class="control-label col-sm-4"  value="#{PRMS.ServiceType}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtserviceType" value="#{marketAssessmentController.prmsServiceAndWorkReg.serviceType}" readonly="true"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblServunitmeasure" class="control-label col-sm-4"  value="#{PRMS.UnitMeasure}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtSerunitmeasure" value="#{marketAssessmentController.prmsServiceAndWorkReg.unitMeasures}" readonly="true"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel class="control-label col-sm-4" id="lblServUnitPrice" value="#{PRMS.EstimatedCurrent}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtServUnitPrice"  class="form-control" required="true" requiredMessage="Please Enter Estimated Current for Service Assesment" 
+                                                                                 value="#{marketAssessmentController.prmsMarketAssmntService.unitPrice}">
+                                                                        <p:clientValidator event="keyup"/>
+                                                                    </p:inputText>
+                                                                    <p:message display="icon" for="txtServUnitPrice"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <div class="col-lg-4"></div>
+                                                                <div class="col-sm-8">
+                                                                    <p:commandButton id="btnAdd2" action="#{marketAssessmentController.addTable()}" class="btn btn-primary col-lg-4 " 
+                                                                                     update="serviceDtlPanel,serviceTbl" process="@this,serviceDtlPanel,serviceTbl" disabled="#{workFlow.readonly}"
+                                                                                     value="#{marketAssessmentController.addOrModifyBundle} #{PRMS.Add}"/> 
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" col-sm-6">
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblServavaialbity" class="control-label col-sm-4"  value="#{PRMS.Availablity}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="txtServavaialbity"   style="width: 100%"
+                                                                                     value="#{marketAssessmentController.prmsMarketAssmntService.availabilty}" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItem itemLabel="Local" itemValue="Local" />
+                                                                        <f:selectItem itemLabel="Foreign" itemValue="Foreign" />
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel class="control-label col-sm-4"  id="lblServRemark" value="#{PRMS.Remark}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtServRemark" class="form-control" value="#{marketAssessmentController.prmsMarketAssmntService.remark}" autoResize="false"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{marketAssessmentController.evaluation}" id="EvaluationFrmServicepnl">
+
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblFromYearFrService" class="control-label col-sm-4" value="#{PRMS.FromYear}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:calendar id="calFromDateFrService" placeholder="dd/mm/yyyy"
+                                                                                value="#{marketAssessmentController.prmsMarketAssmntService.fromYear}"
+                                                                                maxdate="today" pattern="dd/MM/yyyy"
+                                                                                disabled="#{marketAssessmentController.disableDetailWhenUpdate}"
+                                                                                required="true" requiredMessage="Enter From Year for Service Evalution">
+                                                                        <p:ajax event="dateSelect" listener="#{marketAssessmentController.handleFromYearEvents}"
+                                                                                process="@this," update="drdServiceNameFrmEvResult,calToDateFrService"/>           
+                                                                    </p:calendar>
+                                                                    <p:message for="calFromDateFrService" display="icon"/>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblToYearFrService" class="control-label col-sm-4" value="#{PRMS.ToYear}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:calendar id="calToDateFrService" placeholder="dd/mm/yyyy"  
+                                                                                value="#{marketAssessmentController.prmsMarketAssmntService.toYear}"
+                                                                                maxdate="today" pattern="dd/MM/yyyy"
+                                                                                disabled="#{marketAssessmentController.disableDetailWhenUpdate}"
+                                                                                mindate="#{marketAssessmentController.getMinDate()}" 
+                                                                                required="true" requiredMessage="Enter To Year for Service Evalution">
+                                                                        <p:ajax event="dateSelect" listener="#{marketAssessmentController.handleToYearEvents}"
+                                                                                process="@this" update="drdServiceNameFrmEvResult" />
+                                                                    </p:calendar>
+                                                                    <p:message display="icon" for="calToDateFrService"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblServiceNameFrmEvResult" class="control-label col-sm-4" value="#{PRMS.ServiceName}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdServiceNameFrmEvResult" required="true" requiredMessage="Please Select Service Name for Evaluation" 
+                                                                                     value="#{marketAssessmentController.prmsServiceAndWorkReg}"
+                                                                                     valueChangeListener="#{marketAssessmentController.changeAveragePrice}"
+                                                                                     style="width: 100%"  converter="entConverter">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.prmsServiceRegLists}" var="servNameEva" 
+                                                                                       itemLabel="#{servNameEva.serviceName}" itemValue="#{servNameEva}"/>
+                                                                        <p:ajax event="change" process="@this" update="txtService,drdAvaliabiltyFrService,txtUnitPriceAverageFrService,txtCurrencyFrService"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drdServiceNameFrmEvResult"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblServiceTypes" class="control-label col-sm-4"  value="#{PRMS.ServiceType}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtService" style="width: 100%" readonly="true" value="#{marketAssessmentController.prmsMarketAssmntService.serviceType}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <div class="col-lg-4"></div>
+                                                                <div class="col-sm-8">
+                                                                    <p:commandButton id="btnAdd7" action="#{marketAssessmentController.addTable()}" class="btn btn-primary col-lg-4 " 
+                                                                                     update="EvaluationFrmServicepnl,serviceTbl,drdSourceOfassessmnts" process="@this,EvaluationFrmServicepnl,serviceTbl"
+                                                                                     value="#{marketAssessmentController.addOrModifyBundle} #{PRMS.Add}"/> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblUnitPriceAverageFrService" class="control-label col-sm-4"  value="#{PRMS.UnitPrice}"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtUnitPriceAverageFrService" style="width: 100%" readonly="true"
+                                                                                 value="#{marketAssessmentController.prmsMarketAssmntService.unitPrice}" />
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblCurrencyFrService" class="control-label col-sm-4"  value="#{PRMS.Currency}"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtCurrencyFrService" style="width: 100%"  readonly="true"
+                                                                                 value="#{marketAssessmentController.fmsLuCurrency}" />
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblavaialbityFrService" class="control-label col-sm-4"  value="#{PRMS.Availablity}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="drdAvaliabiltyFrService" readonly="true" style="width: 100%"
+                                                                                 value="#{marketAssessmentController.prmsMarketAssmntService.availabilty}"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel class="control-label col-sm-4"  id="lblRemarkFrService" value="#{PRMS.Remark}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtRemarkFrService" class="form-control" value="#{marketAssessmentController.prmsMarketAssmntService.remark}" autoResize="false"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{marketAssessmentController.purchaseAgency}" id="purchaseAgencyFrmServicepnl">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <p:outputLabel id="lblFileUplodFrService" class="control-label col-sm-4" value="#{PRMS.UploadFile}"/>
+                                                            <div class="col-sm-8">  
+                                                                <p:fileUpload  update="tblService" sizeLimit="1000000" multiple="true"
+                                                                               fileUploadListener="#{marketAssessmentController.handleFileUpload}" mode="advanced" 
+                                                                               allowTypes="/(\.|\/)(xls|xlsx)$/"/>
+                                                                <p:growl id="fileUpForServiceGrl" showDetail="true"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{marketAssessmentController.workName}" id="workNamePnl">
+                                            <div class="form-horizontal  col-sm-12">
+                                                <div class=" col-sm-6">
+                                                    <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel id="lblsourceOfAssessmentFrWrk" class="control-label col-sm-4" value="#{PRMS.WorksSourceOfAssessment}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drdSourceOfassessmntFrwork" style="width: 100%" required="true" requiredMessage="Please Select Source Of Assessment For Work" 
+                                                                                 valueChangeListener="#{marketAssessmentController.changeSourceOfAssessment}"
+                                                                                 value="#{marketAssessmentController.prmsMarketAssmntService.sourceOfAssessment}" disabled="#{workFlow.readonly}">
+                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                    <f:selectItem itemLabel="Evaluation" itemValue="Evaluation" />
+                                                                    <f:selectItem itemLabel="Purchase Agency" itemValue="Purchase Agency" />
+                                                                    <f:selectItem itemLabel="Assessment" itemValue="Assessment" />
+                                                                    <p:ajax event="change" update="workNamePnl,serviceTbl" />
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon" for="drdSourceOfassessmntFrwork"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{marketAssessmentController.evaluation}" id="EvaluationFrmWorkpnl">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblFromDateFrWork" class="control-label col-sm-4" value="#{PRMS.FromYear}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:calendar id="calFromDateFrWork" placeholder="dd/mm/yyyy" 
+                                                                                value="#{marketAssessmentController.prmsMarketAssmntService.fromYear}"
+                                                                                maxdate="today" pattern="dd/MM/yyyy"
+                                                                                disabled="#{marketAssessmentController.disableDetailWhenUpdate}"
+                                                                                required="true" requiredMessage="Enter From Year for Work Evaluation">
+                                                                        <p:ajax event="dateSelect" listener="#{marketAssessmentController.handleFromYearEvents}"
+                                                                                process="@this" update="drdWorkNameFrmEvResult,calToDateFrWork"/>           
+                                                                    </p:calendar>
+                                                                    <p:message for="calFromDateFrWork" display="icon"/>
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblToDateFrWork" class="control-label col-sm-4" value="#{PRMS.ToYear}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:calendar id="calToDateFrWork" placeholder="dd/mm/yyyy" 
+                                                                                value="#{marketAssessmentController.prmsMarketAssmntService.toYear}"
+                                                                                mindate="#{marketAssessmentController.getMinDate()}" pattern="dd/MM/yyyy"
+                                                                                disabled="#{marketAssessmentController.disableDetailWhenUpdate}"
+                                                                                required="true" requiredMessage="Enter To Year for Work Evaluation">
+                                                                        <p:ajax event="dateSelect" listener="#{marketAssessmentController.handleToYearEvents}"
+                                                                                process="@this" update="drdWorkNameFrmEvResult" />
+                                                                    </p:calendar>
+                                                                    <p:message display="icon" for="calToDateFrWork"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblWorkNameFrmEvResult" class="control-label col-sm-4" value="#{PRMS.WorkName}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdWorkNameFrmEvResult" required="true" requiredMessage="Please Select Work Name for Evaluation" 
+                                                                                     value="#{marketAssessmentController.prmsServiceAndWorkReg}"
+                                                                                     valueChangeListener="#{marketAssessmentController.changeAveragePrice}"
+                                                                                     style="width: 100%"  converter="entConverter" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.prmsWorkRegLists}" var="workNameEv"
+                                                                                       itemLabel="#{workNameEv.workName}" itemValue="#{workNameEv}"/>
+                                                                        <p:ajax event="change" process="@this" update="EvaluationFrmWorkpnl,txtAvaialbityFrWork,txtCurrencyFrWork"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drdWorkNameFrmEvResult"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <div class="col-lg-4"></div>
+                                                                <div class="col-sm-8">
+                                                                    <p:commandButton id="btnAdd8" action="#{marketAssessmentController.addTable()}" class="btn btn-primary col-lg-4 " 
+                                                                                     update="EvaluationFrmWorkpnl,serviceTbl,drdSourceOfassessmntFrwork" process="@this,EvaluationFrmWorkpnl,serviceTbl,drdSourceOfassessmntFrwork"
+                                                                                     value="#{marketAssessmentController.addOrModifyBundle} #{PRMS.Add}"/> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblUnitPriceAverageFrWork" class="control-label col-sm-4"  value="#{PRMS.UnitPriceAverage}"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtUnitPriceAverageFrWork" style="width: 100%" readonly="true"
+                                                                                 value="#{marketAssessmentController.prmsMarketAssmntService.unitPrice}" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblCurrencyFrWork" class="control-label col-sm-4"  value="#{PRMS.Currency}"/>
+
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtCurrencyFrWork" style="width: 100%" readonly="true"
+                                                                                 value="#{marketAssessmentController.fmsLuCurrency}" />
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblAvaialbityFrWork" class="control-label col-sm-4"  value="#{PRMS.Availablity}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtAvaialbityFrWork"  style="width: 100%" readonly="true"
+                                                                                 value="#{marketAssessmentController.prmsMarketAssmntService.availabilty}" />
+
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel class="control-label col-sm-4"  id="lblRemarkFrWork" value="#{PRMS.Remark}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtRemarkFrWork" class="form-control" value="#{marketAssessmentController.prmsMarketAssmntService.remark}" autoResize="false"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div> 
+
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{marketAssessmentController.assessment}" id="assessmentFrmWorkpnl">
+
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel id="lblWorkName" class="control-label col-sm-4"  value="#{PRMS.WorkName}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdWorkName" required="true" requiredMessage="Please Select Work Name for Assesment"
+                                                                                     valueChangeListener="#{marketAssessmentController.changeEventWorkName}"
+                                                                                     style="width: 100%"  converter="entConverter" 
+                                                                                     value="#{marketAssessmentController.prmsMarketAssmntService.serviceId}" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                        <f:selectItems value="#{marketAssessmentController.getWorkName()}" var="worksName"
+                                                                                       itemLabel="#{worksName.workName}" itemValue="#{worksName}"/>
+                                                                        <p:ajax event="change" process="@this" update="txtUnitMeasureFrWorkName"/>
+                                                                    </p:selectOneMenu>
+                                                                    <p:message display="icon" for="drdWorkName"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblUnitMeasureFrWorkName" class="control-label col-sm-4"  value="#{PRMS.UnitMeasure}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtUnitMeasureFrWorkName" value="#{marketAssessmentController.prmsServiceAndWorkReg.unitMeasures}" readonly="true"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px required">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <p:outputLabel class="control-label col-sm-4" id="lblEstimatedUnitPrice" value="#{PRMS.EstimatedCurrent}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtEstimatedUnitPrice"  class="form-control" required="true"  requiredMessage="Please Enter Estimated Current for Work Assesment"
+                                                                                 value="#{marketAssessmentController.prmsMarketAssmntService.unitPrice}"/>
+                                                                    <p:message display="icon" for="txtEstimatedUnitPrice"/>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <div class="col-lg-4"></div>
+                                                                <div class="col-sm-8">
+                                                                    <p:commandButton id="btnAdd3" action="#{marketAssessmentController.addTable()}" class="btn btn-primary col-lg-4 " 
+                                                                                     update="workNamePnl,serviceTbl" process="@this,workNamePnl,serviceTbl"
+                                                                                     value="#{marketAssessmentController.addOrModifyBundle} #{PRMS.Add}" /> 
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel id="lblAvailabiltyFrWrk" class="control-label col-sm-4"  value="#{PRMS.Availablity}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:selectOneMenu id="drdAvailabiltyFrWrk"  style="width: 100%"
+                                                                                     value="#{marketAssessmentController.prmsMarketAssmntService.availabilty}" >
+                                                                        <f:selectItem itemLabel="--- Select One ---" />
+                                                                        <f:selectItem itemLabel="Local" itemValue="Local" />
+                                                                        <f:selectItem itemLabel="Foreign" itemValue="Foreign" />
+                                                                    </p:selectOneMenu>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <div class="form-horizontal col-sm-12">
+                                                                <h:outputLabel class="control-label col-sm-4"  id="lblWorkRemark" value="#{PRMS.Remark}"/>
+                                                                <div class="col-sm-8">
+                                                                    <p:inputTextarea id="txtaWorkRemark" class="form-control" value="#{marketAssessmentController.prmsMarketAssmntService.remark}" autoResize="false" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                            <h:panelGroup style="border: 0px; background-color: transparent"  rendered="#{marketAssessmentController.purchaseAgency}" id="purchaseAgencyFrmWorkpnl">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class=" col-sm-6">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                            <p:outputLabel id="lblFileUplodFrWork" class="control-label col-sm-4" value="#{PRMS.UploadFile}"/>
+                                                            <div class="col-sm-8">  
+                                                                <p:fileUpload  update="tblService" sizeLimit="1000000" multiple="true"
+                                                                               fileUploadListener="#{marketAssessmentController.handleFileUpload}" mode="advanced" 
+                                                                               allowTypes="/(\.|\/)(xls|xlsx)$/"/>
+                                                                <p:growl id="fileUpForWorkGrl" showDetail="true"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+
+                                        </h:panelGroup>
+
+                                    </h:panelGroup>
+                                    <h:panelGroup style="border: 0px; background-color: transparent"   id="itemAndServiceTbl">
+                                        <h:panelGroup style="border: 0px; background-color: transparent" id="serviceTbl" rendered="#{marketAssessmentController.serviceTbale}">
+                                            <div class="form-horizontal  col-sm-12">   
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <p:dataTable  id="tblService" paginator="true" paginatorPosition="bottom"  rows="5" 
+                                                                      rowIndexVar="num" editable="true"  var="serviceTbl"
+                                                                      value="#{marketAssessmentController.marketAssmntServiceMdl}"
+                                                                      lazy="true"  scrollHeight="true">
+                                                            <p:ajax event="rowEditCancel" listener="#{marketAssessmentController.onContactRowCancel}" update="tblService" />
+
+                                                            <p:column  headerText="#{PRMS.No}" >                                                                                                                                                        
+                                                                #{num+1}
+                                                            </p:column> 
+                                                            <p:column>      
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.sourceOfAssessment}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{serviceTbl.sourceOfAssessment}" />
+                                                            </p:column>
+                                                            <p:column headerText="#{PRMS.FromYear}" rendered="#{marketAssessmentController.evaluation}">
+                                                                <p:outputLabel value="#{serviceTbl.fromYear}">
+                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                </p:outputLabel>
+                                                            </p:column>
+                                                            <p:column headerText="#{PRMS.ToYear}" rendered="#{marketAssessmentController.evaluation}">
+                                                                <p:outputLabel value="#{serviceTbl.toYear}">
+                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                </p:outputLabel>
+                                                            </p:column>
+                                                            <p:column rendered="#{marketAssessmentController.renderService}">                                                                                                                                                        
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.ServiceName}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{serviceTbl.serviceId.serviceName}"/>
+                                                            </p:column>
+                                                            <p:column  rendered="#{marketAssessmentController.renderService}">                                                                                                                                                        
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.ServiceType}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{serviceTbl.serviceId.serviceType}"/>
+                                                            </p:column> 
+                                                            <p:column rendered="#{marketAssessmentController.workName}">                                                                                                                                                        
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.WorkName}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{serviceTbl.serviceId.workName}"/>
+                                                            </p:column>
+                                                            <p:column id="column5">      
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.UnitMeasure}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{serviceTbl.serviceId.unitMeasures}" />
+                                                            </p:column>
+                                                            <p:column  headerText="#{PRMS.EstimatedCurrent}">                                                                                                                                                        
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{serviceTbl.unitPrice}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText  value="#{serviceTbl.unitPrice}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+
+                                                            <p:column  headerText="#{PRMS.Availablity}"  >                                                                                                                                                        
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{serviceTbl.availabilty}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText  value="#{serviceTbl.availabilty}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>  
+
+                                                            <p:column  headerText="#{PRMS.Remark}" >                                                                                                                                                        
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{serviceTbl.remark}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText  value="#{serviceTbl.remark}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column id="column12" headerText="#{PRMS.Action}" >                                                                                                 
+                                                                <p:commandLink value="Edit" action="#{marketAssessmentController.edit()}" disabled="#{workFlow.readonly}" process="@this" 
+                                                                               update=":frmRegisterUI:tblService,:frmRegisterUI:workNamePnl,:frmRegisterUI:serviceDtlPanel">
+                                                                </p:commandLink>
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" style="position: top;">
+                                                            <p:commandButton id="btnYes" value="#{PRMS.Yes}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                            <p:commandButton id="btnNo"  value="#{PRMS.No}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                        </p:confirmDialog>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" rendered="#{marketAssessmentController.renderitem}" id="marketTblPanel">
+                                            <div class="form-horizontal  col-sm-12">   
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <p:dataTable  id="tblItem" paginator="true" paginatorPosition="bottom"  rows="5" 
+                                                                      rowIndexVar="num" editable="true"  var="marketassDtbl" value="#{marketAssessmentController.dataModel}"
+                                                                      lazy="true"  scrollHeight="true">
+                                                            <p:column  headerText="#{PRMS.No}" >                                                                                                                                                        
+                                                                #{num+1}
+                                                            </p:column> 
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="#{PRMS.sourceOfAssessment}" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{marketassDtbl.sourceOfAssessment}"/>
+                                                            </p:column>
+                                                            <p:column >                                                                                                                                                        
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.Category}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{marketassDtbl.categoryId.catName}" />
+                                                            </p:column> 
+                                                            <p:column >                                                                                                                                                        
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.SubCategory}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{marketassDtbl.subCategoryId.subCatName}" />
+                                                            </p:column>
+                                                            <p:column headerText="#{PRMS.FromYear}" rendered="#{marketAssessmentController.evaluation}">
+                                                                <p:outputLabel value="#{marketassDtbl.fromYear}">
+                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                </p:outputLabel>
+                                                            </p:column>
+                                                            <p:column headerText="#{PRMS.ToYear}" rendered="#{marketAssessmentController.evaluation}">
+                                                                <p:outputLabel value="#{marketassDtbl.toYear}">
+                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                </p:outputLabel>
+                                                            </p:column>
+                                                            <p:column id="column3">                                                                                                                                                        
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.ItemName}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{marketassDtbl.itemId.matName}" />
+                                                            </p:column> 
+                                                            <p:column rendered="#{marketAssessmentController.assessment}">      
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.UnitMeasure}" />
+
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{marketassDtbl.itemId.unitMeasure1}" />
+                                                            </p:column>
+                                                            <p:column headerText="#{PRMS.EstimatedCurrent}"  >                                                                                                                                                        
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{marketassDtbl.unitPrice}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="unitprce" value="#{marketassDtbl.unitPrice}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column>      
+                                                                <f:facet name="header" >
+                                                                    <p:outputLabel value="#{PRMS.Currency}" />
+                                                                </f:facet>
+                                                                <p:outputLabel value="#{marketassDtbl.currencyId}"/>
+                                                            </p:column>
+                                                            <p:column rendered="#{marketAssessmentController.assessment}">
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="#{PRMS.CountryOfOrigin}" />
+                                                                </f:facet>
+                                                                <h:outputText value="#{marketassDtbl.countryId}"/>
+                                                            </p:column>
+                                                            <p:column  headerText="#{PRMS.Availablity}"  >                                                                                                                                                        
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{marketassDtbl.availabilty}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="availabilty" value="#{marketassDtbl.availabilty}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>  
+
+                                                            <p:column  headerText="#{PRMS.Remark}" >                                                                                                                                                        
+                                                                <p:cellEditor>
+                                                                    <f:facet name="output"><h:outputText value="#{marketassDtbl.remark}" /></f:facet>
+                                                                    <f:facet name="input"><p:inputText id="remark" value="#{marketassDtbl.remark}" style="width:100%"/></f:facet>
+                                                                </p:cellEditor>
+                                                            </p:column>
+                                                            <p:column  headerText="#{PRMS.Action}" >                                                                                                 
+                                                                <p:commandLink value="Edit" action="#{marketAssessmentController.editItem()}" disabled="#{workFlow.readonly}"
+                                                                               process="@this" update=":frmRegisterUI:tblItem,:frmRegisterUI:itemdetailPanel">
+                                                                </p:commandLink>
+                                                            </p:column>
+                                                        </p:dataTable>
+                                                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" style="position: top;">
+                                                            <p:commandButton id="btnYes1" value="#{PRMS.Yes}" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                                            <p:commandButton id="btnNo1" value="#{PRMS.No}" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                                                        </p:confirmDialog>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                        <h:panelGroup style="border: 0px; background-color: transparent" id="marketAssessmnetMasterPanel">
+                                            <div class="form-horizontal  col-sm-12">
+                                                <div class=" col-sm-6">
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel  for="txtProcessedBy" class="control-label col-sm-4" value="#{PRMS.ProcessedBy}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputText  id="txtProcessedBy" readonly="true" value="#{marketAssessmentController.userName}" title="descripition"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <h:outputLabel  class="control-label col-sm-4" value="#{PRMS.Decision}" rendered="#{marketAssessmentController.isDecision}"/> 
+                                                            <div class="col-sm-8">
+                                                                <p:selectOneMenu id="drddecision" value="#{marketAssessmentController.wfPrmsProcessed.decision}" valueChangeListener="#{marketAssessmentController.handleselectOptions}"
+                                                                                 required="true"  rendered="#{marketAssessmentController.isDecision}"  requiredMessage="Select Decision" style="width: 100%">                                                                                        
+                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                                    <f:selectItem itemLabel="Approved" itemValue="Approved"/>
+                                                                    <f:selectItem itemLabel="Rejected" itemValue="Rejected"/>
+                                                                </p:selectOneMenu>
+                                                                <p:message for="drddecision" display="icon"/>                                                                                    
+                                                            </div>  
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class=" col-sm-6">
+                                                    <div class="col-md-12 textBoxMargin6px">
+                                                        <div class="form-group form-horizontal required">
+                                                            <p:outputLabel  id="lblApproved" value="#{PRMS.ProcessedDate}"  class="control-label col-sm-4" />
+                                                            <div class="col-sm-8">
+                                                                <p:calendar id="calprocessed" autocomplete="off" value="#{marketAssessmentController.wfPrmsProcessed.processedOn}"
+                                                                            pattern="dd/MM/yyyy" required="true" requiredMessage="Please Enter Processed Date" mindate="today" maxdate="today">
+                                                                </p:calendar>
+                                                                <p:message for="calprocessed" display="icon"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-sm-12 textBoxMargin6px">
+                                                        <div class="form-horizontal col-sm-12">
+                                                            <p:outputLabel  for="txtComment" class="control-label col-sm-4"
+                                                                            value="#{PRMS.Comment}" rendered="#{marketAssessmentController.isCommentGiven}"/>
+                                                            <div class="col-sm-8">
+                                                                <p:inputTextarea id="txtComment" rendered="#{marketAssessmentController.isCommentGiven}" class="form-control"  value="#{marketAssessmentController.wfPrmsProcessed.commentGiven}" 
+                                                                                 title="Remark"  required="false"  requiredMessage="Enter Plan" 
+                                                                                 validator="#{validatorManagedBean.Text}" validatorMessage="Please Enter Text Only"/>
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </h:panelGroup>
+                                        <div class="form-horizontal  col-sm-12">
+                                            <div class=" col-sm-6">
+                                                <div class=" form-group col-sm-12 textBoxMargin6px">
+                                                    <div class="form-horizontal col-sm-12">
+                                                        <div class="col-lg-4"/>
+                                                        <div class="col-sm-8">
+                                                            <p:commandButton action="#{marketAssessmentController.save_marketAssessmnt()}" 
+                                                                             process="@this,frmRegisterUI:itemAndServiceTbl,frmRegisterUI:marketInfoId,frmRegisterUI:marketAssessmnetMasterPanel,frmRegisterUI:marketAssessmnetMasterPanel" 
+                                                                             update="frmRegisterUI:itemAndServiceTbl,frmRegisterUI:marketInfoId,frmRegisterUI:marketAssessmnetMasterPanel,frmRegisterUI:marketAssessmnetMasterPanel,:frmSample,
+                                                                             itemdetailPanel,serviceDtlPanel,EvaluationFrmServicepnl,EvaluationFrmWorkpnl,workNamePnl"
+                                                                             class="btn btn-primary col-lg-4" 
+                                                                             value="#{marketAssessmentController.saveorUpdateBundle} #{PRMS.save}"/> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

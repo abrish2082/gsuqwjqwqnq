@@ -1,0 +1,455 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li> 
+        <li><a href="recruitmentRequests.xhtml"><span>Recruitment Request</span></a></li>        
+        <li><a href="maintainAdvertisement.xhtml">Maintain Advertisement</a></li>
+        <li><a href="candidateRegistration.xhtml">Candidate Registration</a></li>
+        <li><a href="assessmentWeight.xhtml">Assessment Weight</a></li>
+        <li><a href="shortlistCandidates.xhtml">Shortlist Candidates</a></li>
+        <li><a href="filterCandidate.xhtml">Filter Candidate</a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" action="#{hrRecruitmentReqApproveController.btnSearch()}" title="Search"
+                                     icon="ui-icon-search" style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRecruitment" validateClient="true"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <span class="NotificationText"> #{hrRecruitmentReqApproveController.recruitmentRqstList.size()} </span>
+                    <p:commandLink id="cmdLNotification" class="fa fa-fw fa-bell" title="Notification"/>
+                    <p:overlayPanel widgetVar="widNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLNotification" class="col-md-4">
+                        <p:dataTable id="tblNotfication" value="#{hrRecruitmentReqApproveController.recruitmentRqstList}"
+                                     var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" 
+                                     rowKey="#{currentRow}" scrollable="true" scrollHeight="300">
+                            <p:ajax event="rowSelect" listener="#{hrRecruitmentReqApproveController.populateNotifcation}" 
+                                    process="@this" update="@this,:frmRecruitment"/>
+                            <p:column headerText="No." style="width: 50px">
+                                <h:outputText value="#{num + 1}"/>
+                            </p:column>
+                            <p:column headerText="Requester Name" filterMatchMode="contains" filterBy="#{currentRow.requesterId.firstName}">
+                                <h:outputText value="#{currentRow.requesterId.firstName} #{currentRow.requesterId.middleName} #{currentRow.requesterId.lastName}"/>
+                            </p:column>
+                            <p:column sortBy="#{currentRow.requestDate}">
+                                <f:facet name="header">
+                                    <h:outputText value="Request Date"/>
+                                </f:facet>
+                                <h:outputText value="#{currentRow.requestDate}" converter="dateConverter"/> 
+                            </p:column>
+                        </p:dataTable>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <p:commandLink id="cmdlWf" class="fa fa-fw fa-wordpress"
+                                   title="Work flow" style="background-color: white; border-color: white;"/>
+                    <p:overlayPanel showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdlWf" 
+                                    class="col-md-4" style="height: 400px">
+                        <p:outputLabel id="lblFaWf" value="Work flow"/>
+                        <p:dataTable id="tblWorkflow" value="#{hrRecruitmentReqApproveController.workflowDataModel}"
+                                     var="currentRow" selectionMode="single" class="dataTable" rows="10" paginator="true"
+                                     rowKey="#{currentRow}" paginatorPosition="bottom">
+                            <p:column headerText="Processed By">
+                                <h:outputText value="#{currentRow.processedBy}"/> 
+                            </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="Status"/>
+                                </f:facet>
+                                <h:outputText value="#{currentRow.changedStstus}"/> 
+                            </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="Processed Date"/>
+                                </f:facet>
+                                <h:outputText value="#{currentRow.processedOn}" converter="dateConverter"/> 
+                            </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="Comment Given"/>
+                                </f:facet>
+                                <h:outputText value="#{currentRow.commentGiven}"/> 
+                            </p:column>
+                        </p:dataTable>
+                    </p:overlayPanel>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="recruitmentApprove.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>                        
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form> 
+        <h:form id="frmRecruitment"> 
+            <h:panelGroup id="pnlSearch" rendered="#{hrRecruitmentReqApproveController.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">    
+                            <div class="box-header">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Search <small> Recruitment ...</small></h3>
+                                </div>                 
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">                                    
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchEvaLevel">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{hrRecruitmentReqApproveController.filiterByStatus_Vcl}">
+                                                                <f:selectItems value="#{hrRecruitmentReqApproveController.filterByStatus}"/>   
+                                                                <p:ajax event="change" process="@this" update="tblRequestList"/>
+                                                            </p:selectOneMenu> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblRequestList" value="#{hrRecruitmentReqApproveController.recruitmentRequestsListDataModel}"
+                                                         var="recRqst"  rowIndexVar="num" paginator="true" class="dataTable" rows="10" 
+                                                         selection="#{hrRecruitmentReqApproveController.selectedRequest}" selectionMode="single"
+                                                         paginatorPosition="bottom" rowsPerPageTemplate="10,20,30" rowKey="#{recRqst.id}">
+                                                <p:ajax event="rowSelect" listener="#{hrRecruitmentReqApproveController.populateDatatable}"
+                                                        process="@this,tblRequestList" update=":frmRecruitment,:frmSample"/>
+                                                <p:column headerText="No" style="width: 50px">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column sortBy="#{recRqst.deptId.depName}" filterBy="depName" filterMatchMode="startsWith" headerText="Department">                
+                                                    <h:outputText value="#{recRqst.deptId.depName}"/>
+                                                </p:column>                                         
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Job Title"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{recRqst.jobId}"/>
+                                                </p:column>
+                                                <p:column style="width: 120px">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Requester ID"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{recRqst.requesterId.empId}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Requester Name"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{recRqst.requesterId.firstName} #{recRqst.requesterId.lastName}"/>
+                                                </p:column>
+                                                <p:column style="width: 130px">
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Request Date"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{recRqst.requestDate}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </h:panelGroup> 
+            <h:panelGroup rendered="#{hrRecruitmentReqApproveController.renderPnlUpdate}">
+                <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/> 
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title">Recruitment Approve <small></small></h3>                       
+                            </div>
+                            <!-- /.box-header -->
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <div class="col-sm-12">
+                                                <div class="col-sm-12">
+                                                    <div class="col-sm-6">
+                                                        <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                            <h:outputLabel for="txtRequester" class="control-label col-sm-4" value="Requester:"/>
+                                                            <div class="col-sm-8">                                                    
+                                                                <p:inputText id="txtRequester" value="#{hrRecruitmentReqApproveController.recruitmentRequests.requesterId}"                                                                                              
+                                                                             readonly="true"/>
+                                                            </div>              
+                                                        </div>   
+                                                        <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                            <h:outputLabel for="txtPlaceWorking" class="control-label col-sm-4" value="Department:"/>                    
+                                                            <div class="col-sm-8">
+                                                                <p:inputText id="txtPlaceWorking" value="#{hrRecruitmentReqApproveController.hrDepartments.depName}"
+                                                                             readonly="true"/>
+                                                            </div>   
+                                                        </div> 
+                                                        <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                            <h:outputLabel for="txtGrade" value="Grade:" class="control-label col-sm-4"/>       
+                                                            <div class="col-sm-8">                                             
+                                                                <p:inputText id="txtGrade" value="#{hrRecruitmentReqApproveController.recruitmentRequests.jobId.jobGradeId.gradeId.grade}"                                                                                              
+                                                                             readonly="true"/>
+                                                            </div> 
+                                                        </div>
+                                                        <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                            <h:outputLabel for="txtReleventExpriance" class="control-label col-sm-4" value="Relevant Experience:"/>       
+                                                            <div class="col-sm-8">                                             
+                                                                <p:inputTextarea id="txtReleventExpriance"  value="#{hrRecruitmentReqApproveController.hrJobTypes.relevantExperiance}"                                                                                              
+                                                                                 readonly="true"/>
+                                                            </div> 
+                                                        </div>
+                                                    </div>    
+                                                    <div class="col-sm-6">
+                                                        <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                            <h:outputLabel class="control-label col-sm-4" value="Job Title :"/>  
+                                                            <div class="col-sm-8">                                                  
+                                                                <p:inputText id="txtJob" value="#{hrRecruitmentReqApproveController.hrJobTypes.jobTitle}"                                                                                               
+                                                                             readonly="true"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                            <h:outputLabel for="txtMinSalary" class="control-label col-sm-4" value="Initial Salary:"/>       
+                                                            <div class="col-sm-8">                                             
+                                                                <p:inputText id="txtMinSalary" value="#{hrRecruitmentReqApproveController.recruitmentRequests.jobId.jobGradeId.minSalary}"                                                                                              
+                                                                             readonly="true"/>
+                                                            </div> 
+                                                        </div>
+                                                        <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                            <h:outputLabel for="txtJobDescription" class="control-label col-sm-4" value="Job Description:"/>       
+                                                            <div class="col-sm-8">                                             
+                                                                <p:inputTextarea id="txtJobDescription" value="#{hrRecruitmentReqApproveController.hrJobTypes.jobDescription}"                                                                                              
+                                                                                 readonly="true" rows="2" autoResize="false"/>
+                                                            </div> 
+                                                        </div>
+                                                    </div>
+                                                </div> 
+                                            </div>   
+                                            <div class="col-md-12" style="margin-top: 20px;">
+                                                <div class="form-group">
+                                                    <p:dataTable id="tblqualification" value="#{hrRecruitmentReqApproveController.getHrJobQualificationModel()}"
+                                                                 var="qlf" rowIndexVar="num" class="dataTable">
+                                                        <f:facet name="header">
+                                                            Education Qualification and Experience
+                                                        </f:facet>
+                                                        <p:column headerText="No" style="width: 50px">
+                                                            <h:outputText value="#{num + 1}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Education Level"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{qlf.educLevelId.educLevel}"/>
+                                                        </p:column>                                           
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Minimum Experience"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{qlf.minExperiance}"/>
+                                                        </p:column>
+                                                        <p:column>
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Qualification"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{qlf.educQualId.educType}"/>
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <div class="form-group">
+                                                <div class="col-sm-12">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-sm-6">  
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                                <h:outputLabel for="txtNoRequiredEmployeeAllWorkUnit" class="control-label col-sm-4" value="Required Employee For All WorkUnit:"/>
+                                                                <div class="col-sm-8">                                                       
+                                                                    <p:inputText id="txtNoRequiredEmployeeAllWorkUnit" value="#{hrRecruitmentReqApproveController.countEmpInJob}"
+                                                                                 readonly="true"/> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px">                    
+                                                                <h:outputLabel for="txtOpenVacant" class="control-label col-sm-4" value="Open Vacant Place:"/>
+                                                                <div class="col-sm-8">                                                       
+                                                                    <p:inputText id="txtOpenVacant" value="#{hrRecruitmentReqApproveController.maxEmpValue}"
+                                                                                 readonly="true"/> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                                <h:outputLabel for="txtRecruitmentType" class="control-label col-sm-4" value="Recruitment Type:"/>
+                                                                <div class="col-sm-8">                                                       
+                                                                    <p:inputText id="txtRecruitmentType" value="#{hrRecruitmentReqApproveController.recruitmentRequests.recruitmentType}"
+                                                                                 readonly="true"/> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                                <h:outputLabel for="txtRemark" class="control-label col-sm-4" value="Remark :"/> 
+                                                                <div class="col-sm-8">                                                       
+                                                                    <p:inputTextarea id="txtRemark" value="#{hrRecruitmentReqApproveController.recruitmentRequests.remark}"
+                                                                                     readonly="true"/> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px form-group required">
+                                                                <h:outputLabel for="txtBatchofCode" class="control-label col-sm-4" value="Vacancy No: "/>       
+                                                                <div class="col-sm-8">                                             
+                                                                    <p:inputText id="txtBatchofCode" value="#{hrRecruitmentReqApproveController.recruitmentRequests.batchCode}"   
+                                                                                 required="true" requiredMessage="Vacancy number is required" class="form-control"
+                                                                                 validator="#{validatorManagedBean.Remark}" validatorMessage="Please Insert correctly"/>
+                                                                    <p:message for="txtBatchofCode" display="icon"/>
+                                                                </div> 
+                                                            </div>
+                                                        </div>     
+                                                        <div class="col-sm-6"> 
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                                <h:outputLabel for="txtNoAllowedEmployeesThisWorkUnit" class="control-label col-sm-4" value="Allowed Employees:"/>
+                                                                <div class="col-sm-8">                                                       
+                                                                    <p:inputText id="txtNoAllowedEmployeesThisWorkUnit" value="#{hrRecruitmentReqApproveController.totalNoAllowedJob}"
+                                                                                 readonly="true"/> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                                <h:outputLabel for="txtAvailableEmployees" class="control-label col-sm-4" value="Available Employees:"/>
+                                                                <div class="col-sm-8">                                                       
+                                                                    <p:inputText id="txtAvailableEmployees" value="#{hrRecruitmentReqApproveController.noCurrentEmployee}"
+                                                                                 readonly="true"/> 
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                                <h:outputLabel  class="control-label col-sm-4" value="Requested Employees:"/> 
+                                                                <div class="col-sm-8">
+                                                                    <p:inputText id="txtNoOfEmployee" value="#{hrRecruitmentReqApproveController.recruitmentRequests.numOfEmpsRequested}"  
+                                                                                 readonly="true"/>                                                  
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal col-md-12 form-group textBoxMargin6px">
+                                                                <h:outputLabel for="txtRequestedDate" class="control-label col-sm-4" value="Requested Date:"/>                                                          
+                                                                <div class="col-sm-8">                                 
+                                                                    <p:inputText id="txtRequestedDate" value="#{hrRecruitmentReqApproveController.recruitmentRequests.requestDate}" 
+                                                                                 readonly="true"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-horizontal col-md-12 form-group required textBoxMargin6px">
+                                                                <h:outputLabel for="txtApprovedEmployee" value="No. of Employees Approved: " class="control-label col-sm-4"/>
+                                                                <div class="col-sm-8">                                                       
+                                                                    <p:inputText id="txtApprovedEmployee" value="#{hrRecruitmentReqApproveController.recruitmentRequests.numOfEmpsApproved}"
+                                                                                 class="form-control" required="true" requiredMessage="Enter number of approved employee" placeholder="No. of employee approved"
+                                                                                 validator="#{validatorManagedBean.Number}" validatorMessage="Please Insert only Number"/> 
+                                                                    <p:message for="txtApprovedEmployee" display="icon"/>
+                                                                </div>
+                                                            </div>   
+                                                        </div>
+                                                    </div> 
+                                                </div> 
+                                            </div> 
+                                        </section>
+                                    </section>
+                                    <section class="panel panel-info">                                   
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl6" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-sm-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtDecsion" class="control-label col-sm-4" value="Decision: "/> 
+                                                                    <div class="col-sm-8">  
+                                                                        <p:selectOneMenu id="txtDecsion" value="#{hrRecruitmentReqApproveController.recruitmentRequests.status}" 
+                                                                                         valueChangeListener="#{hrRecruitmentReqApproveController.handleDecision}"
+                                                                                         required="true" requiredMessage="Select decision type" style="width:100%">        
+                                                                            <f:selectItem itemLabel="--- Select ---" noSelectionOption="true"/>
+                                                                            <f:selectItem itemLabel="Approve" itemValue="1"/>
+                                                                            <f:selectItem itemLabel="Reject" itemValue="2"/>
+                                                                        </p:selectOneMenu>  
+                                                                        <p:message for="txtDecsion" display="icon"/>
+                                                                    </div> 
+                                                                </div>                                            
+                                                            </div>   
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtCommentGiven" class="control-label col-sm-4" value="Comment Given:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtCommentGiven" value="#{hrRecruitmentReqApproveController.wfHrProcessed.commentGiven}"
+                                                                                         validator="#{validatorManagedBean.Text}" rows="1" autoResize="false"
+                                                                                         title="Remark" class="form-control" requiredMessage="Remark can not be empty"/> 
+                                                                        <p:message for="txtCommentGiven" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6"> 
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtApproveBy" class="control-label col-sm-4" value="Approved By: "/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtApproveBy" value="#{workFlow.userName}"
+                                                                                     title="Approve By" readonly="true"/>
+                                                                        <p:message for="txtApproveBy" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px"><div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="calApprovedate" value="Processed Date: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calApprovedate" value="#{hrRecruitmentReqApproveController.wfHrProcessed.processedOn}" converter="dateConverter"  
+                                                                                     title="Approved Date"/>
+                                                                        <p:message for="calApprovedate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                        </div>
+                                                    </div>                                                                                                       
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <h:panelGroup id="pnlSave" class="form-group col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="Save" class="btn  btn-block btn-primary col-lg-4" 
+                                                                             action="#{hrRecruitmentReqApproveController.saveRecruitmentApprove()}" 
+                                                                             disabled="#{hrRecruitmentReqApproveController.disableBtn}"
+                                                                             process="@all" update=":frmRecruitment,:frmSample" title="Approve"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>   
+    </ui:define>
+</ui:composition>
+

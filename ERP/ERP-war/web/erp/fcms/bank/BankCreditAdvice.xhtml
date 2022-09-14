@@ -1,0 +1,444 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li class="header">MAIN NAVIGATION</li>
+        <li>
+            <a href="../fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span><i class="fa fa-angle-double-left pull-right"></i></a>
+        </li>
+        <li>
+            <a href="../../fcms/bank/BankRegister.xhtml"><i class="fa fa-fw fa-circle-o-notch"></i>  Bank Register</a>
+        </li>                                          
+        <li>
+            <a href="../../fcms/bank/BankAccountRegister2.xhtml"><i class="fa fa-fw fa-cc-amex"></i>  Bank Account Register</a>
+        </li>
+        <li>
+            <a href="../../fcms/bank/BankCashDeposit.xhtml"><i class="fa fa-fw fa-money"></i>  Bank Cash Deposit</a>
+        </li>
+        <li>
+            <a href="../../fcms/bank/BankChequeDeposit.xhtml"><i class="fa fa-fw fa-cc-mastercard"></i>  Bank Cheque Deposit</a>
+        </li>
+        <li>
+            <a href="../../fcms/bank/BankDebitAdvice.xhtml"><i class="fa fa-fw fa-cc-discover"></i>  Bank Debit Advice</a>
+        </li>
+        <li>
+            <a href="../../fcms/bank/BankReconciliation.xhtml"><i class="fa fa-fw fa-adjust"></i>  Bank Reconciliation</a>
+        </li>
+
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone" action="#{bankCreditAdviceController.createNewCredit()}" 
+                                     icon="#{bankCreditAdviceController.icone}" validateClient="true" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmToolbar"
+                                     title="#{bankCreditAdviceController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                    <a href="../../fcms/bank/BankCreditAdvice.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../fcms/fcmsDashBoardnew.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <!-- Search -->
+        <h:form id="frmMainUI">
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="#{bankCreditAdviceController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Search_Credit_Advice} ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="pnlSearchCredit" class="col-sm-12"> 
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Account_No}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="selAcctNo1" value="#{bankCreditAdviceController.fmsBankCreditAdvice.accountNumber}" 
+                                                                         converter="entConverter" filterMatchMode="contains" filter="true" style="width: 100%"> 
+                                                            <f:selectItem itemLabel="--- Select Account Number. ---" itemValue="" />
+                                                            <f:selectItems value="#{bankCreditAdviceController.bankAccountNo}" 
+                                                                           var="acctNoList" itemLabel="#{acctNoList.accountNumber}" 
+                                                                           itemValue="#{acctNoList.accountNumber}"/>
+                                                            <p:ajax event="change"  process="@this" update="@this,selCredittDate,selTransaction1" 
+                                                                    listener="#{bankCreditAdviceController.getDateFromCreditAdvice(event)}"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel value="#{FCMS.Date}:" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu  id="selCredittDate" value="#{bankCreditAdviceController.fmsBankCreditAdvice.creditDate}"
+                                                                          converter="entConverter" filterMatchMode="contains" filter="true" style="width: 100%">
+                                                            <f:selectItem itemLabel="--- Select Date ---" itemValue="" />
+                                                            <f:selectItems value="#{bankCreditAdviceController.dates}" 
+                                                                           var="creditDateList" itemLabel="#{creditDateList.creditDate}" 
+                                                                           itemValue="#{creditDateList.creditDate}"/>
+                                                            <p:ajax event="change" process="@this" update="@this,selTransaction1" 
+                                                                    listener="#{bankCreditAdviceController.getTransactionFromCredit(event)}"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel value="#{FCMS.Transaction_Reference_Number}:" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="selTransaction1" value="#{bankCreditAdviceController.fmsBankCreditAdvice.tranRef}" 
+                                                                         converter="entConverter" filterMatchMode="contains" filter="true" style="width: 100%"> 
+                                                            <f:selectItem itemLabel="--- Select Transaction ---" itemValue="" />
+                                                            <f:selectItems value="#{bankCreditAdviceController.transactionList}" 
+                                                                           var="tranList1" itemLabel="#{tranList1.tranRef}" 
+                                                                           itemValue="#{tranList1.tranRef}"/>
+                                                            <p:ajax event="change" process="@this" update="@this"
+                                                                    listener="#{bankCreditAdviceController.getAllDataFromCredit(event)}"/>
+                                                        </p:selectOneMenu>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnSearch" class="btn btn-primary" action="#{bankCreditAdviceController.searchCredit}" icon="ui-icon-search" 
+                                                                         process="@this,pnlSearchCredit" update=":frmMainUI:pnlSearchCredit"
+                                                                         value="#{FCMS.Find}" />        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--search credit data table-->
+                                    <p:dataTable id="tblCashDatail" value="#{bankCreditAdviceController.creditDataModel}" 
+                                                 rows="10"
+                                                 paginator="true"
+                                                 paginatorPosition="bottom"
+                                                 rowsPerPageTemplate="5,10,15"
+                                                 rowIndexVar="num" selectionMode="single"
+                                                 var="creditInfo" selection="#{bankCreditAdviceController.selectedFmsCreditAdvice}" rowKey="#{creditInfo.creditAdviceId}">
+                                        <p:ajax event="rowSelect" listener="#{bankCreditAdviceController.populate}" update=":frmRegisterUI,:frmMainUI,:frmToolbar"/>
+                                        <p:column headerText="No." width="60">
+                                            <h:outputText value="#{num+1}"/>
+                                        </p:column> 
+                                        <p:column headerText="#{FCMS.Bank_Name}" width="220">
+                                            <h:outputText value="#{creditInfo.bankId.bankName}" />
+                                        </p:column>
+                                        <p:column headerText="#{FCMS.Branch_Name}">
+                                            <h:outputText value="#{creditInfo.branchName}" />
+                                            <f:facet name="input"><p:inputText id="brName" value="#{creditInfo.branchName}" style="width:100%"/></f:facet>
+                                        </p:column>
+                                        <p:column headerText="#{FCMS.Account_No}">
+                                            <h:outputText value="#{creditInfo.accountNumber}" />
+                                        </p:column>
+                                        <p:column headerText="#{FCMS.Amount}">
+                                            <h:outputText value="#{creditInfo.amount}" converter="#{bankCreditAdviceController.numberConverter}"/>
+                                        </p:column>
+                                        <p:column headerText="#{FCMS.Credit_Account_Code}">
+                                            <h:outputText value="#{creditInfo.subsidaryId}" /> 
+                                        </p:column>
+                                        <p:column headerText="#{FCMS.Transaction_Reference}">
+                                            <h:outputText value="#{creditInfo.tranRef}" />
+                                        </p:column>
+                                        <p:column headerText="#{FCMS.Date}">
+                                            <h:outputText value="#{creditInfo.creditDate}" ><f:convertDateTime  pattern="dd/MM/yyyy" /></h:outputText> 
+                                        </p:column>
+                                    </p:dataTable>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+
+        <!-- Create credit advice -->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growl1" life="2000" showDetail="true" autoUpdate="true" severity="information,fatal"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" 
+                          rendered="#{bankCreditAdviceController.renderPnlCreateCredit}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{FCMS.Bank_Credit_Advice}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" >
+                                <h:panelGroup id="pnlCredit" class="col-sm-12">
+                                    <div class="col-md-12">
+                                        <div class="col-md-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Bank_Name}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtBankName1" value="#{bankCreditAdviceController.fmsBankAccount.bankId}" required="true"
+                                                                         requiredMessage="Value is required please Bank Name" converter="entConverter" filterMatchMode="contains" filter="true" style="width: 100%"> 
+                                                            <f:selectItem itemLabel="--- Select Bank ---" itemValue="" />
+                                                            <f:selectItems value="#{bankCreditAdviceController.bankNameList}" 
+                                                                           var="bankNamelist1" itemLabel="#{bankNamelist1.bankName}" 
+                                                                           itemValue="#{bankNamelist1}"/>
+                                                            <p:ajax event="change" 
+                                                                    process="@this" 
+                                                                    update="@this,txtBranchName1,txtAccountNumber1" 
+                                                                    listener="#{bankCreditAdviceController.getBankBranchFromBankAccount(event)}"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtBankName1" display="icon"/>
+                                                    </div>  
+                                                </div>  
+                                            </div>  
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Branch_Name}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtBranchName1" value="#{bankCreditAdviceController.fmsBankAccount.bankAccountId}" 
+                                                                         filterMatchMode="contains" filter="true" style="width: 100%" required="true" 
+                                                                         requiredMessage="value is required please select Branch Name">
+                                                            <f:selectItem itemLabel="--- Select Branch ---" itemValue="" />
+                                                            <f:selectItems value="#{bankCreditAdviceController.branchNames}" 
+                                                                           var="branchList1" 
+                                                                           itemLabel="#{branchList1.branchName}" 
+                                                                           itemValue="#{branchList1.bankAccountId}"/>                                                   
+                                                            <p:ajax event="change" 
+                                                                    process="@this" 
+                                                                    update="@this,txtAccountNumber1" 
+                                                                    listener="#{bankCreditAdviceController.getAccountNumberFromBranchAccounts(event)}"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtBranchName1" display="icon"/> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Account_No}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:selectOneMenu id="txtAccountNumber1" value="#{bankCreditAdviceController.fmsBankBranchAccounts.accountNumber}" 
+                                                                         required="true" requiredMessage="value is required please select Account Code"
+                                                                         filterMatchMode="contains" filter="true" style="width: 100%"> 
+                                                            <f:selectItem itemLabel="--- Select account Number ---" itemValue="" />
+                                                            <f:selectItems  value="#{bankCreditAdviceController.accountNumbers}"   
+                                                                            var="AcctNoList" itemLabel="#{AcctNoList.accountNumber}" 
+                                                                            itemValue="#{AcctNoList.accountNumber}"/>
+                                                            <p:ajax event="change" process="@this" update="@this,txtCreditCode1"
+                                                                    listener="#{bankCreditAdviceController.getBalance(event)}"/>
+                                                        </p:selectOneMenu>
+                                                        <p:message for="txtAccountNumber1" display="icon"/>
+                                                    </div>  
+                                                </div>  
+                                            </div>  
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4"  value="##{FCMS.Debit_account_code}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText   id="txtCreditCode1" class="form-control"  value="#{bankCreditAdviceController.fmsBankBranchAccounts.subsidiaryId.subsidiaryCode}" 
+                                                                       readonly="true" />
+                                                    </div>  
+                                                </div>  
+                                            </div>  
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Transaction_Reference}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtTranRef1"  value="#{bankCreditAdviceController.fmsBankCreditAdvice.tranRef}" title="Transaction Reference No." 
+                                                                     class="form-control" placeholder="example: FT/16117/BLWGV"
+                                                                     required="true" requiredMessage="value is required please enter Transaction Reference"/>
+                                                        <p:message for="txtTranRef1" display="icon"/>
+                                                    </div>  
+                                                </div>  
+                                            </div> 
+
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel id="FindInfo" class="control-label col-sm-4"/>
+                                                    <div class="col-sm-8">
+                                                        <p:commandButton id="btnSaveCredit1" class="btn btn-primary"  validateClient="true" 
+                                                                         process="@this,pnlCredit" update="@this,pnlCredit" action="#{bankCreditAdviceController.saveCreditAdvice()}"
+                                                                         value="#{bankCreditAdviceController.saveorUpdateBundle}"/>
+                                                    </div>
+                                                </div>
+                                            </div>  
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Amount}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:inputText id="txtAmount2"  value="#{bankCreditAdviceController.fmsBankCreditAdvice.amount}" converter="#{bankCreditAdviceController.numberConverter}"
+                                                                     converterMessage="Value must be a number" validator="#{validatorManagedBean.Money}" title="Enter Ammount of Birr" 
+                                                                     class="form-control" required="true" requiredMessage="value is required please enter amount"/>
+                                                        <p:message for="txtAmount2" display="icon"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Credit_Account_Code}:"/>
+                                                    <div class="col-sm-6">
+                                                        <p:inputText   id="txtDebitCode1" class="form-control" value="#{bankCreditAdviceController.fmsBankCreditAdvice.display_conn}" 
+                                                                       required="true" requiredMessage="Value is required please select Credit Acc Code" />
+                                                        <p:message for="txtDebitCode1" display="icon"/>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        <p:commandButton id="btnAddDebitCode" partialSubmit="true" class="btn btn-primary" value="+" onclick="PF('dig1').show();" title="Add Credit Account Code"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group required form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Date}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:calendar id="txtDate1" value="#{bankCreditAdviceController.fmsBankCreditAdvice.creditDate}"  
+                                                                    pattern="dd/MM/yyyy" required="true" requiredMessage="Date is required please select one" tabindex="4"
+                                                                    converterMessage="Value must be a Date" placeholder="dd/mm/yyyy" >
+                                                        </p:calendar>
+                                                        <p:message for="txtDate1" display="icon"/> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 textBoxMargin6px">
+                                                <div class="form-group form-horizontal">
+                                                    <h:outputLabel class="control-label col-sm-4"  value="#{FCMS.Reason}:"/>
+                                                    <div class="col-sm-8">
+                                                        <p:column headerText="#{FCMS.Reason}">
+                                                            <h:inputTextarea id="txtAreaReason1" value="#{bankCreditAdviceController.fmsBankCreditAdvice.reason}" class="form-control"
+                                                                             validator="#{validatorManagedBean.Text}" converterMessage="Value must be in text form" style="width: 100%" > </h:inputTextarea> 
+                                                        </p:column> 
+                                                        <p:message for="txtAreaReason1" display="icon" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                                <p:dialog id="dig1" header="#{FCMS.Credit_Account_Code}"  widgetVar="dig1" height="210" width="650" showEffect="explode" resizable="false">
+                                    <h:panelGroup id="pnlCreditcode" class="col-sm-12">
+                                        <div class="col-md-12 textBoxMargin6px">                                                                
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel  for="sysSearch" class="control-label col-sm-4" value="#{FCMS.System}:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="sysSearch" value="#{bankCreditAdviceController.fmsLuSystem}"
+                                                                     filterMatchMode="contains" filter="true" converter="entConverter"
+                                                                     valueChangeListener="#{bankCreditAdviceController.onChangeSystem}" required="true" 
+                                                                     requiredMessage="System is required please select one" style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{bankCreditAdviceController.systemList}" var="sys" itemLabel="#{sys.systemCode}" itemValue="#{sys}" />
+                                                        <p:ajax event="change" process="@this" update="drdCostCenter,pnljob,glSearch"/>
+                                                    </p:selectOneMenu> 
+                                                    <p:message for="sysSearch" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 textBoxMargin6px">                                                                
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel  for="drdCostCenter"  class="control-label col-sm-4" value="#{FCMS.Cost_Center}"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="drdCostCenter"  value="#{bankCreditAdviceController.fmsCostcSystemJunction}" 
+                                                                     converter="entConverter"  filterMatchMode="contains" filter="true" required="true" requiredMessage="Cost Center is required please select one"
+                                                                     valueChangeListener="#{bankCreditAdviceController.onChangeCostCenter}" style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{bankCreditAdviceController.ssCcJunctionList}" var="costC"
+                                                                       itemLabel="#{costC.fmsCostCenter.systemName} " itemValue="#{costC}"/>
+                                                        <p:ajax event="change" process="@this" />
+                                                    </p:selectOneMenu>
+                                                    <p:message for="drdCostCenter" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 textBoxMargin6px">                                                                
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel  for="glSearch" class="control-label col-sm-4" value="#{FCMS.General_Ledger}:"/>
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="glSearch" value="#{bankCreditAdviceController.fmsGeneralLedger}"
+                                                                     converter="entConverter" filterMatchMode="contains" filter="true" 
+                                                                     valueChangeListener="#{bankCreditAdviceController.onChangeGeneralLedger}"  
+                                                                     required="true" requiredMessage="Value is required: Select General Ledger" style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{bankCreditAdviceController.glList}" var="glVarr"
+                                                                       itemLabel="#{glVarr.generalLedgerCode}" itemValue="#{glVarr}"/>
+                                                        <p:ajax event="change" process="@this" update="selectSubL" />
+                                                    </p:selectOneMenu>   
+                                                    <p:message for="glSearch" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h:panelGroup id="pnljob">
+                                            <h:panelGroup id="pnlJOBNO" rendered="#{bankCreditAdviceController.renderJobNo}">
+                                                <div class="col-md-12 textBoxMargin6px">                                                                
+                                                    <div class="form-group required form-horizontal">
+                                                        <h:outputLabel  for="jbSearch" class="control-label col-sm-4" value="#{FCMS.Job_No}:"/>
+                                                        <div class="col-sm-8">
+                                                            <p:selectOneMenu id="jbSearch"  value="#{bankCreditAdviceController.fmsSystemJobJunction}" 
+                                                                             converter="entConverter" filterMatchMode="contains" filter="true" 
+                                                                             valueChangeListener="#{bankCreditAdviceController.onChangeJobNo}" 
+                                                                             required="true" requiredMessage="Value is required: Select General Ledger" style="width: 100%" >
+                                                                <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                                <f:selectItems value="#{bankCreditAdviceController.sysJobNOList}" var="sysJobVar"
+                                                                               itemLabel="#{sysJobVar.jobNo}" itemValue="#{sysJobVar}"/>
+                                                                <p:ajax event="change" process="@this"/>
+                                                            </p:selectOneMenu>
+                                                            <p:message for="jbSearch" display="icon"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                        <div class="col-md-12 textBoxMargin6px">                                                                
+                                            <div class="form-group required form-horizontal">
+                                                <h:outputLabel class="control-label col-sm-4" value="#{FCMS.Subsidiary_Ledger}:" />
+                                                <div class="col-sm-8">
+                                                    <p:selectOneMenu id="selectSubL" value="#{bankCreditAdviceController.fmsSubsidiaryLedger}"
+                                                                     converter="entConverter" filterMatchMode="contains" filter="true" 
+                                                                     valueChangeListener="#{bankCreditAdviceController.onChangeSubsidiaryLedger}"  
+                                                                     required="true" requiredMessage="Value is required: Select Subsidiary Ledger" style="width: 100%">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" /> 
+                                                        <f:selectItems value="#{bankCreditAdviceController.slList}" var="slVar"
+                                                                       itemLabel="#{slVar.subsidiaryCode}" itemValue="#{slVar}"/>
+                                                        <p:ajax event="change" process="@this" update="@this" />
+                                                    </p:selectOneMenu>  
+                                                    <p:message for="selectSubL" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 textBoxMargin6px">                                                                
+                                            <div class="form-group form-horizontal">
+                                                <h:outputLabel id="buttonaddDtl" class="control-label col-sm-4"/>
+                                                <div class="col-sm-8">
+                                                    <p:commandButton id="btnAdd" class="btn btn-primary" value="#{FCMS.Add}" validateClient="true" 
+                                                                     process="dig1" update="@this,dig1,:frmRegisterUI:txtDebitCode1"
+                                                                     action="#{bankCreditAdviceController.addAccountInfoDetail()}"/> 
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </p:dialog>
+                            </div>                   
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>
+
+
+

@@ -1,0 +1,513 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="terminationApprove.xhtml" title="Termination Approve"><i class="fa fa-circle-o "></i><span>Termination Approve</span></a></li>
+        <li><a href="retirementRequest.xhtml" title="Retirement Request"><i class="fa fa-circle-o "></i><span>Retirement Request</span></a></li>
+        <li><a href="retirementApprove.xhtml" title="Retirement Approve"><i class="fa fa-circle-o "></i><span>Retirement Approve</span></a></li>
+        <li><a href="clearanceSetting.xhtml" title="Clearance Setting"><i class="fa fa-circle-o "></i><span>Clearance Setting</span></a></li>
+        <li><a href="clearance.xhtml" title="Clearance"><i class="fa fa-circle-o "></i><span>Clearance</span></a></li> 
+        <li><a href="exitInterview.xhtml" title="Exit Interview"><i class="fa fa-circle-o "></i><span>Exit Interview</span></a></li>  
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{terminationRequestController.btnNewOrSearch()}"
+                                     title="#{terminationRequestController.newOrSearch}" 
+                                     process="@this" update="@this,:frmSearch,:frmToolBar,:frmTermination"
+                                     icon="#{terminationRequestController.icone}" style="background-color: white; border-color: white"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{terminationRequestController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{terminationRequestController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmSearch,:frmToolBar,:frmTermination" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup> 
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-gear" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWorkflow" value="#{terminationRequestController.workflowDataModel}"
+                                                                 var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                 rowKey="#{currentRow.workflowId}" paginatorPosition="bottom">
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Decision"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.decision}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Comment Given"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Processed Date"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                        </p:column> 
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/termination/terminationRequest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{terminationRequestController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h1 class="box-title" title="Search termination on request">Search...</h1>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchList">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{terminationRequestController.filiterByStatus}">
+                                                                <f:selectItems value="#{terminationRequestController.statusList}"/>   
+                                                                <p:ajax event="change" process="@this" update=":frmSearch:tblTerminationRequestList"/>
+                                                            </p:selectOneMenu> 
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblTerminationRequestList" value="#{terminationRequestController.terminationRequestDataModel}" rowIndexVar="num"
+                                                         var="termination" rows="10" paginator="true" rowKey="#{termination.id}" class="dataTable" selectionMode="single"
+                                                         selection="#{terminationRequestController.hrTerminationRequest}" rowsPerPageTemplate="5,10,15" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" listener="#{terminationRequestController.populateTerminationRqst}" 
+                                                        process="@this" update=":frmToolBar,:frmSearch,:frmTermination"/>
+                                                <f:facet name="header">
+                                                        <p:commandButton id="toggler" type="button" value="Columns" style="float:right"/>
+                                                        <p:columnToggler datasource="tblTerminationRequestList" trigger="toggler"/>
+                                                </f:facet>
+                                                <p:column headerText="No." style="width: 50px">                
+                                                    <h:outputText value="#{num+1}"/>
+                                                </p:column>
+                                                <p:column headerText="Employee Name" filterMatchMode="startsWith" filterBy="#{termination.empId.firstName}">
+                                                    <h:outputText value="#{termination.empId.firstName} #{termination.empId.middleName} #{termination.empId.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Employee ID">
+                                                    <h:outputText value="#{termination.empId.empId}"/>
+                                                </p:column> 
+                                                <p:column headerText="Termination Type" filterMatchMode="startsWith" filterBy="#{termination.terminationType.terminationName}">
+                                                    <h:outputText value="#{termination.terminationType}"/>
+                                                </p:column> 
+                                                <p:column headerText="Request Date">                
+                                                    <h:outputText value="#{termination.requestDate}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmTermination"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainPage" rendered="#{terminationRequestController.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title">Termination Request</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <div class="nav-tabs-custom">
+                                        <ul class="nav nav-tabs" id="myTab">
+                                            <li class="active"><a href="#tabTerminationInfo" data-toggle="tab">Termination Request Detail</a></li>
+                                            <li><a href="#tabAttachFile" data-toggle="tab">Supportive Information</a></li>
+                                        </ul>
+                                        <div class="tab-content" id="maintab">
+                                            <div class="tab-pane active" id="tabTerminationInfo">
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <h:panelGroup id="pnl1" class="col-sm-12">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-md-6"> 
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel for="srcEmployeeName" value="Employee Name: " class="control-label col-sm-4"/>   
+                                                                                <div class="col-sm-8">
+                                                                                    <p:autoComplete id="srcEmployeeName" value="#{terminationRequestController.hrEmployees.firstName}"
+                                                                                                    completeMethod="#{terminationRequestController.searchEmployeeName}" style="width:100%"  
+                                                                                                    var="empList" required="true" title="Employee Name" placeholder="Enter name to search"
+                                                                                                    requiredMessage="Enter name to search" size="20" forceSelection="true" scrollHeight="300"
+                                                                                                    itemValue="#{empList.firstName}" itemLabel="#{empList}" emptyMessage="no data">  
+                                                                                        <p:ajax event="itemSelect" listener="#{terminationRequestController.getEmployeeName}" process="@this" 
+                                                                                                update="txtEmployeeID,txtPosition,txtDepartment,txtDateofBirth,txtHireDate"/>     
+                                                                                        <p:column headerText="Full Name">
+                                                                                            <h:outputText  value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                                                        </p:column>
+                                                                                        <p:column headerText="Employee ID" >
+                                                                                            <h:outputText  value="#{empList.empId}"/>
+                                                                                        </p:column>
+                                                                                    </p:autoComplete> 
+                                                                                    <p:message for="srcEmployeeName" display="icon"/>
+                                                                                </div> 
+                                                                            </div>                                                                                          
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtDepartment" value="Department:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtDepartment" value="#{terminationRequestController.hrDepartments.depName}" 
+                                                                                                 title="Department" readonly="true"/>
+                                                                                    <p:message for="txtDepartment" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtDateofBirth" value="Date of Birth:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtDateofBirth" value="#{terminationRequestController.hrEmployees.dob}" 
+                                                                                                 title="Date of Birth" readonly="true"/>
+                                                                                    <p:message for="txtDateofBirth" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                    </div>    
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtEmployeeID" value="Employee ID:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtEmployeeID" value="#{terminationRequestController.hrEmployees.empId}"
+                                                                                                 readonly="true" title="Employee ID" />
+                                                                                    <p:message for="txtEmployeeID" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                               
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtPosition" value="Job Title:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtPosition" value="#{terminationRequestController.hrJobTypes.jobTitle}" 
+                                                                                                 title="Job Position" readonly="true"/>
+                                                                                    <p:message for="txtPosition" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtHireDate" value="Hire Date:" class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtHireDate" value="#{terminationRequestController.hrEmployees.hireDate}" 
+                                                                                                 title="Hire Date" readonly="true"/>
+                                                                                    <p:message for="txtHireDate" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <h:panelGroup id="pnl2" class="col-sm-12">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group col-sm-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel  for="somResignType" class="control-label col-sm-4" value="Termination Type: "/>
+                                                                                <div class="col-sm-7">
+                                                                                    <p:selectOneMenu id="somResignType" value="#{terminationRequestController.hrTerminationRequest.terminationType}"
+                                                                                                     required="true" requiredMessage="Select termination type" converter="entConverter" style="width:100%"> 
+                                                                                        <f:selectItem itemLabel="--- select ---" itemValue=""/> 
+                                                                                        <f:selectItems value="#{terminationRequestController.terminationTypeList}"/>
+                                                                                        <p:ajax event="change" process="@this" update="somResignType"/>
+                                                                                    </p:selectOneMenu>
+                                                                                    <p:message for="somResignType" display="icon"/>
+                                                                                </div>
+                                                                                <div class ="col-sm-1">
+                                                                                    <p:commandButton id="btnAdd" value="+" onclick="PF('resignTypeDlg').show();"
+                                                                                                     title="Click to register termination type"  type="button" style="background: transparent;"/>
+                                                                                </div>  
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel for="calResignDate" value="Termination Date: " class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="calResignDate" value="#{terminationRequestController.hrTerminationRequest.terminationDate}"
+                                                                                                 converter="dateConverter" class="form-control" placeholder="dd/mm/yyyy"
+                                                                                                 onclick="displayCalendar('frmTermination:calResignDate', 'frmTermination:calResignDate');"
+                                                                                                 required="true" requiredMessage="Enter termination date" title="Resign Date"
+                                                                                                 validator="#{validatorManagedBean.Date}" validatorMessage="Termination date should be in date format"/>
+                                                                                    <p:message for="calResignDate" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                                <h:panelGroup id="dlgpnl">
+                                                    <p:dialog id="resignTypeDlg" header="Register Termination Type" widgetVar="resignTypeDlg" 
+                                                              height="300" width="600" modal="true" resizable="tru" showEffect="explode">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="box-body">
+                                                                        <div class="form-horizontal col-md-12">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtResignName" class="control-label col-sm-4" value="Termination Name: "/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <h:inputText id="txtResignName" value="#{terminationRequestController.hrTerminationType.terminationName}" 
+                                                                                                 validator="#{validatorManagedBean.Text}" validatorMessage="Termination Name must be a character" 
+                                                                                                 requiredMessage="Enter termination name" required="true" title="Termination Name" class="form-control"/>
+                                                                                    <p:message for="txtResignName" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                               
+                                                                        </div> 
+                                                                        <div class="form-horizontal col-md-12">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtdlgDescription" class="control-label col-sm-4" value="Description:"/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <h:inputTextarea id="txtdlgDescription" value="#{terminationRequestController.hrTerminationType.description}"
+                                                                                                     validator="#{validatorManagedBean.Remark}"   
+                                                                                                     rows="1" cols="3" title="Description" class="form-control"/>
+                                                                                </div>
+                                                                            </div>                                               
+                                                                        </div>
+                                                                        <div class="form-horizontal col-md-12">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtUpdate" class="control-label col-sm-4"/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <p:autoComplete id="txtUpdate" completeMethod="#{terminationRequestController.searchByTerminationName}"
+                                                                                                    emptyMessage="no data found" placeholder="Search termination name to update"
+                                                                                                    title="Only for updating" style="width:100%" styleClass="forItxt"
+                                                                                                    var="termName" itemValue="#{termName.terminationName}" itemLabel="#{termName}">  
+                                                                                        <p:ajax event="itemSelect" listener="#{terminationRequestController.getByTerminationName}" 
+                                                                                                process="@this" update="dlgpnl" oncomplete="PF('resignTypeDlg').show();"/>  
+                                                                                        <p:column headerText="Termination Name">
+                                                                                            <h:outputText value="#{termName.terminationName}"/>
+                                                                                        </p:column>
+                                                                                        <p:column headerText="Description">
+                                                                                            <h:outputText value="#{termName.description}"/>
+                                                                                        </p:column>
+                                                                                    </p:autoComplete>
+                                                                                </div>
+                                                                            </div>                                               
+                                                                        </div> 
+                                                                        <div class="form-horizontal col-md-12">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <div class="col-md-4 "></div>
+                                                                                <div class="col-sm-3">
+                                                                                    <p:commandButton id="btnDlgSave" value="#{terminationRequestController.poupSaveOrUpdate}"                                              
+                                                                                                     action="#{terminationRequestController.saveTerminationType}"
+                                                                                                     title="Save/Update" process="@this,dlgpnl" update="dlgpnl"
+                                                                                                     oncomplete="PF('resignTypeDlg').show();" class="btn  btn-block btn-primary col-lg-4"/> 
+                                                                                </div>
+                                                                                <div class="col-sm-3">
+                                                                                    <p:commandButton id="btnCancel" value="Cancel" class="btn  btn-block btn-primary col-lg-4"                                           
+                                                                                                     action="#{terminationRequestController.cancel}"
+                                                                                                     title="Cancel" process="@this" update=":frmTermination:dlgpnl"
+                                                                                                     oncomplete="PF('resignTypeDlg').show();"/> 
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </p:dialog> 
+                                                </h:panelGroup>
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">
+                                                        <h:panelGroup id="pnlWorkflow" class="col-sm-12">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel for="txtProcessedBy" value="Processed By: " class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtProcessedBy" value="#{workFlow.userName}"
+                                                                                                 title="Processed Date" readonly="true"/>
+                                                                                    <p:message for="txtProcessedBy" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div>
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group required form-horizontal">
+                                                                                <h:outputLabel for="txtProcessedDate" value="Processed Date: " class="control-label col-sm-4"/>
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputText id="txtProcessedDate" value="#{terminationRequestController.wfHrProcessed.processedOn}"
+                                                                                                 converter="dateConverter" required="true" title="processed On" class="form-control"
+                                                                                                 onclick="displayCalendar('frmTermination:txtProcessedDate', 'frmTermination:txtProcessedDate');"
+                                                                                                 validatorMessage="processed date should be in date format"/>
+                                                                                    <p:message for="txtProcessedDate" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                                                                                       
+                                                                        </div> 
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="col-md-12 textBoxMargin6px">
+                                                                            <div class="form-group form-horizontal">
+                                                                                <h:outputLabel for="txtCommentGiven" class="control-label col-sm-4" value="Comment Given:"/> 
+                                                                                <div class="col-sm-8">
+                                                                                    <p:inputTextarea id="txtCommentGiven" value="#{terminationRequestController.wfHrProcessed.commentGiven}"
+                                                                                                     rows="1" autoResize="false" title="Comment"
+                                                                                                     validator="#{validatorManagedBean.Remark}" class="form-control"/>
+                                                                                    <p:message for="txtCommentGiven" display="icon"/>
+                                                                                </div>
+                                                                            </div>                                            
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </h:panelGroup>
+                                                    </section>
+                                                </section>
+                                            </div>
+                                            <div class="tab-pane" id="tabAttachFile">
+                                                <section class="panel panel-info">
+                                                    <section class="panel-body">  
+                                                        <div class="col-md-12 textBoxMargin6px">
+                                                            <div class="form-group form-horizontal">
+                                                                <p:outputLabel  value="Upload File:" class="control-label col-sm-2"/>
+                                                                <div class="col-sm-8"> 
+                                                                    <p:panelGrid columns="1" style="float: left;"> 
+                                                                        <p:fileUpload id="fileUplod" cancelLabel="#{contenu.annuler}" fileUploadListener="#{terminationRequestController.uploadListener}"
+                                                                                      value="#{terminationRequestController.hrLuDmArchive.documentId}" allowTypes="/(\.|\/)(doc|docx|xls|xlsx|pdf|jpg|mkv|JPG)$/"
+                                                                                      invalidFileMessage="This type of file is not valid" invalidSizeMessage="The size is not allowed"
+                                                                                      multiple="false" mode="advanced" sizeLimit="52428800" auto="true" process="@this,tblSavedDoc" update="tblSavedDoc"/>
+                                                                        <p:dataTable id="tblSavedDoc" var="currentRow" rowIndexVar="current" value="#{terminationRequestController.terminationReqUploadsDM}"
+                                                                                     paginator="true" selectionMode="single" rowKey="#{currentRow.id}" 
+                                                                                     selection="#{terminationRequestController.hrTerminationRequestUpload}" paginatorPosition="bottom" rows="3"
+                                                                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                                                     style="border: none; font-family: 'Lucida Sans'; font-size: 11px; font-style: normal; font-weight: lighter; width:1000px">
+                                                                            <p:ajax event="rowSelect" listener="#{terminationRequestController.onRowSelect}" process="@this,tblSavedDoc" update="tblSavedDoc"/>
+                                                                            <f:facet name="header">
+                                                                                <p:outputLabel value="Uploaded File List From DBMS"/>
+                                                                            </f:facet>
+                                                                            <p:column id="no" headerText="No" style="width: 50px"> 
+                                                                                <h:outputText value="#{current+1}"/>
+                                                                            </p:column> 
+                                                                            <p:column id="docNames" headerText="File Name"> 
+                                                                                <h:outputText id="txtcoScale" value="#{currentRow.documentId.fileName}"/>
+                                                                            </p:column> 
+                                                                            <p:column headerText="Delete"> 
+                                                                                <p:outputPanel id="buttonDetail">
+                                                                                    <p:commandButton id="docRemove" process="@this,tblSavedDoc" update="tblSavedDoc" immediate="true" ajax="true" 
+                                                                                                     title="Delete" icon="ui-icon-trash" style="border: none; color: #0B70F9">
+                                                                                        <p:confirm header="Confirmation" message="Are you sure you wante to delete?" icon="ui-icon-alert" />
+                                                                                    </p:commandButton>
+                                                                                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                                                                        <p:commandButton value="Yes" action="#{terminationRequestController.remove()}"  
+                                                                                                         immediate="true" process="@this,tblSavedDoc" update="tblSavedDoc"/>
+                                                                                        <p:commandButton value="No" type="button"/>
+                                                                                    </p:confirmDialog>
+                                                                                </p:outputPanel>
+                                                                            </p:column>  
+                                                                        </p:dataTable>
+                                                                    </p:panelGrid>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </section>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <h:panelGroup id="pnl4" class="col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4"></div>                                           
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="#{terminationRequestController.saveOrUpdate}" 
+                                                                             action="#{terminationRequestController.saveTerminationRequest()}" 
+                                                                             disabled="#{terminationRequestController.disableBtn}" class="btn  btn-block btn-primary col-lg-4" 
+                                                                             process="@this,pnl1,pnl2,pnlWorkflow" update=":frmTermination"/>
+                                                        </div>
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnReset" value="Reset" title="Clear"
+                                                                             action="#{terminationRequestController.resetTerminationRqst()}"
+                                                                             process="@this" class="btn  btn-block btn-primary col-lg-4"                                       
+                                                                             update=":frmTermination"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+

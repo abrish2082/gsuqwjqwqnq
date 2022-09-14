@@ -1,0 +1,555 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">        
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li> 
+        <li><a href="salaryDelegationRequest.xhtml"><i class="fa fa-fw fa-refresh"></i> <span>Refresh Page</span></a></li> 
+        <li><a href="salaryDelegationApprove.xhtml"><i class="fa fa-circle-o text-primary"></i> <span>Salary Delegation Approve</span></a></li>
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{hrSalaryDelegationRequestController.delegationRequestInfo()}"
+                                     icon="#{hrSalaryDelegationRequestController.icone}" style="background-color: white" 
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmSalary" 
+                                     value="#{hrSalaryDelegationRequestController.createOrSearchBundle}"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/salaryDelegation/salaryDelegationRequest.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{hrSalaryDelegationRequestController.chooseMainPage}" style="border: 0px; background-color: transparent">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">  
+                            <div class="box-header with-border">
+                                <h3 class="box-title" >Search ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <h:panelGroup id="pnlSearchList">
+                                                <div class="form-horizontal  col-sm-12">
+                                                    <div class="form-group">
+                                                        <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                        <div class="col-sm-5">
+                                                            <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                             valueChangeListener="#{hrSalaryDelegationRequestController.filiterByStatus_Vcl}">
+                                                                <f:selectItems value="#{hrSalaryDelegationRequestController.filterByStatus}"/>   
+                                                                <p:ajax event="change" process="@this" update=":frmSearch:tblRequestList"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div> 
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblRequestList" value="#{hrSalaryDelegationRequestController.requestsListDataModel}"
+                                                         var="rqst" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                         selection="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest}" rowKey="#{rqst.id}" paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" process="@this,tblRequestList" listener="#{hrSalaryDelegationRequestController.populate}"
+                                                        update=":frmToolBar,:frmSearch,:frmSalary"/>
+                                                <p:column headerText="No." style="width:100px;">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Employee Name" filterMatchMode="contains" filterBy="#{rqst.empId.firstName}">
+                                                    <h:outputText value="#{rqst.empId.firstName} #{rqst.empId.middleName} #{rqst.empId.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Employee Id" filterMatchMode="contains" filterBy="#{rqst.empId.empId}" style="width:200px;">
+                                                    <h:outputText value="#{rqst.empId.empId}"/>
+                                                </p:column>
+                                                <p:column>
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Delegate Type"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{rqst.delegateFrom}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>                                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmSalary"> 
+             <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainpage" style="border: 0px; background-color: transparent" rendered="#{hrSalaryDelegationRequestController.chooseCreatePage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Salary Delegation Request</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="box-body">
+                                        <div class="box-body">
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">
+                                                    <h:panelGroup id="pnl1" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-md-6 ">  
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="searchAutocomplete" value="Delegator Name:" class="control-label col-sm-4"/>  
+                                                                            <div class="col-sm-8">
+                                                                                <p:autoComplete id="searchAutocomplete" style="width:100%" placeholder="Search by Name" 
+                                                                                                value="#{hrSalaryDelegationRequestController.hrEmployees.firstName}"
+                                                                                                completeMethod="#{hrSalaryDelegationRequestController.SearchEmpByFname}" 
+                                                                                                var="empList" required="true" requiredMessage="Please Enter your Name and fill the remaing Info"
+                                                                                                itemValue="#{empList.firstName}" itemLabel="#{empList}" forceSelection="true" 
+                                                                                                size="20" emptyMessage="no data">  
+                                                                                    <p:ajax event="itemSelect"  process="@this" 
+                                                                                            listener="#{hrSalaryDelegationRequestController.getByEmpName}" 
+                                                                                            update="txtSalary,txtPosition,txtEmployeeID,txtDepartment"/>     
+                                                                                    <p:column headerText="Full Name">
+                                                                                        <h:outputText  value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                                                    </p:column>
+                                                                                    <p:column headerText="Employee ID" >
+                                                                                        <h:outputText  value="#{empList.empId}"/>
+                                                                                    </p:column>
+                                                                                </p:autoComplete> 
+                                                                                <p:message for="searchAutocomplete" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                                                                          
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtSalary" value="Salary:" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtSalary" required="true"
+                                                                                             value="#{hrSalaryDelegationRequestController.hrEmployees.basicSalary}" 
+                                                                                             title="Salary" readonly="true"/>
+                                                                                <p:message for="txtSalary" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtPosition" class="control-label col-sm-4" value="Job Titel:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtPosition"  value="#{hrSalaryDelegationRequestController.hrJobTypes.jobTitle}" title="Position"
+                                                                                             readonly="true" required="true"/>
+                                                                                <p:message for="txtPosition" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                </div>    
+
+                                                                <div class="col-md-6 ">
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtEmployeeID" class="control-label col-sm-4" value="Employee ID:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtEmployeeID" value="#{hrSalaryDelegationRequestController.hrEmployees.empId}"
+                                                                                             readonly="true" title="Employee ID" />
+                                                                                <p:message for="txtEmployeeID" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>  
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtDepartment" class="control-label col-sm-4" value="Department:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtDepartment" value="#{hrSalaryDelegationRequestController.hrDepartments.depName}" title="Department"
+                                                                                             readonly="true" required="true"/>  
+                                                                                <p:message for="txtDepartment" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div> 
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section> 
+                                            </section> 
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">                                                             
+                                                    <h:panelGroup id="pnl2" class="col-sm-12">                                                                   
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-sm-6" >   
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel  class="control-label col-sm-4" value="Delegate Type:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="paymenttype" style="width:100%" required="true" requiredMessage="Please Select one option"
+                                                                                                 value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.delegateFrom}"
+                                                                                                 valueChangeListener="#{hrSalaryDelegationRequestController.handleEmploee}"> 
+                                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                                                    <f:selectItem itemLabel=" EEP Employee" itemValue="EEP Employee"/>
+                                                                                    <f:selectItem itemLabel=" Family" itemValue="Family"/> 
+                                                                                    <f:selectItem itemLabel=" Other Government Employee" itemValue="Other Government Employee"/>                                                           
+                                                                                    <f:selectItem itemLabel=" Private Company Employee" itemValue="Private Company Employee"/>
+                                                                                    <p:ajax event="change" process="@this" update="frmSalary"/> 
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="paymenttype" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                        </div> 
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+
+                                            <div class="box-header">
+                                                <h1 class="box-title">Delegate Information</h1>                       
+                                            </div>
+                                            <section class="panel panel-info">                                   
+                                                <section class="panel-body">                                        
+                                                    <h:panelGroup id="pnl3" rendered="#{hrSalaryDelegationRequestController.chooseEEPemp}" class="col-sm-12">
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="empsearch" class="control-label col-sm-2" value="Employee Name:" style="left: 12px"/>
+                                                                <div class="col-sm-4">
+                                                                    <p:autoComplete id="empsearch" style="width:90%; left: 10px" placeholder="Search Employee Name"
+                                                                                    value="#{hrSalaryDelegationRequestController.empdelegator.firstName}"
+                                                                                    completeMethod="#{hrSalaryDelegationRequestController.SearchByFname}" 
+                                                                                    var="emp" required="true" requiredMessage="Search delegated employee"
+                                                                                    itemValue="#{emp.firstName}" itemLabel="#{emp}" forceSelection="true" 
+                                                                                    size="20" emptyMessage="no data"> 
+                                                                        <p:column headerText="Full Name">
+                                                                            <h:outputText  value="#{emp.firstName} #{emp.middleName} #{emp.lastName}"/>
+                                                                        </p:column>
+                                                                        <p:column headerText="Employee ID" >
+                                                                            <h:outputText  value="#{emp.empId}"/>
+                                                                        </p:column>
+                                                                        <p:ajax event="itemSelect" process="@this" 
+                                                                                listener="#{hrSalaryDelegationRequestController.getEmployeeName}" update="empsearch"/>     
+                                                                    </p:autoComplete>
+                                                                    <p:message for="empsearch" display="icon"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>                                                                                        
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup id="pnl4" rendered="#{hrSalaryDelegationRequestController.chooseFamily}" class="col-sm-12">
+                                                        <div class="col-md-12 ">
+                                                            <div class="form-group form-horizontal">
+                                                                <h:outputLabel for="txtFamilyName" class="control-label col-sm-2" value="Familly Name:" style="left: 11px"/>
+                                                                <div class="col-sm-4">
+                                                                    <p:autoComplete id="txtFamilyName" style="width:90%; left: 10px" placeholder="Search Familly Name" 
+                                                                                    value="#{hrSalaryDelegationRequestController.hrEmpFamilies.firstName}"
+                                                                                    completeMethod="#{hrSalaryDelegationRequestController.SearchFamillyName}" 
+                                                                                    var="famList" required="true" requiredMessage="Search delegated familly"
+                                                                                    itemValue="#{famList.firstName}" itemLabel="#{famList}" forceSelection="true" 
+                                                                                    size="20" emptyMessage="no data"> 
+                                                                        <p:ajax event="itemSelect" process="@this" 
+                                                                                listener="#{hrSalaryDelegationRequestController.getByFamillyName}" update="txtFamilyName"/> 
+                                                                        <p:column headerText="Family Name">
+                                                                            <h:outputText  value="#{famList.firstName} #{famList.middleName} #{famList.lastName}"/>
+                                                                        </p:column>
+                                                                        <p:column headerText="Your ID">
+                                                                            <h:outputText  value="#{famList.empId.empId}"/>
+                                                                        </p:column>
+                                                                    </p:autoComplete>
+                                                                    <p:message for="txtFamilyName" display="icon"/>
+                                                                </div>
+                                                            </div>                                            
+                                                        </div>    
+                                                    </h:panelGroup>
+
+                                                    <h:panelGroup id="pnl5" rendered="#{hrSalaryDelegationRequestController.chooseOtheremp}" class="col-sm-12">
+                                                        <div class="form-group" >
+                                                            <div class="col-sm-12" >
+                                                                <div class="col-sm-6" >                                                        
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel  class="control-label col-sm-4" value="Identification Type:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="txtIdentificationType" style="width:100%" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.identificationType}" required="true" 
+                                                                                                 requiredMessage="Identification Type cannot be empty." validator="#{validatorManagedBean.Text}">
+                                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                                                    <f:selectItem itemLabel="Driving License" itemValue="Driving License" />
+                                                                                    <f:selectItem itemLabel="Kebele ID" itemValue="Kebele ID" />
+                                                                                    <f:selectItem itemLabel="Passport" itemValue="Passport" />                  
+                                                                                    <p:ajax event="change" process="@this" />
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="txtIdentificationType" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>   
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtFirstName" class="control-label col-sm-4" value="First Name:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtFirstName" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.firstName}" required="true" title="First Name" class="form-control"
+                                                                                             requiredMessage="First Name cannot be empty." validator="#{validatorManagedBean.Text}"/>
+                                                                                <p:message for="txtFirstName" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>                                            
+                                                                    <br></br>
+                                                                    <br></br>                                                                                                                
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtMiddleName" class="control-label col-sm-4" value="Middle Name:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtMiddleName" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.middleName}" required="true" title="Middle Name" class="form-control"
+                                                                                             requiredMessage="Middle Name cannot be empty." validator="#{validatorManagedBean.Text}"/>
+                                                                                <p:message for="txtMiddleName" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>                                               
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtLastName" class="control-label col-sm-4" value="Last Name:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtLastName" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.lastName}" title="Last Name" class="form-control" 
+                                                                                             requiredMessage="Last Name cannot be empty." required="true" validator="#{validatorManagedBean.Text}"/>
+                                                                                <p:message for="txtLastName" display="icon"/>
+                                                                            </div> 
+                                                                        </div>                                            
+                                                                    </div>  
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="rdoSex" class="control-label col-sm-4" value="Sex:"></h:outputLabel> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneRadio id="rdoSex" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.sex}"
+                                                                                                  required="true" class="col-sm-6" requiredMessage="Select Sex type">
+                                                                                    <f:selectItem itemLabel="Male" itemValue="Male" />
+                                                                                    <f:selectItem itemLabel="Female" itemValue="Female" /> 
+                                                                                    <p:message for="rdoSex" display="icon"/>
+                                                                                    <p:ajax process="@this" event="change"/>
+                                                                                </p:selectOneRadio>
+                                                                                <p:message for="rdoSex" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                               
+                                                                    </div>
+                                                                </div>    
+
+                                                                <div class="col-sm-6" >  
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtIdentificationo" class="control-label col-sm-4" value="Identification No.:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtIdentificationo" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.identificationNum}" title="Identification Number" class="form-control"
+                                                                                             required="true" requiredMessage="Identification No. cannot be empty."/>
+                                                                                <p:message for="txtIdentificationo" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtAddress" class="control-label col-sm-4" value="Address:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtAddress" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.address}" required="true" title="Address" class="form-control"
+                                                                                             requiredMessage="Address cannot be empty." validator="#{validatorManagedBean.Text}"/>
+                                                                                <p:message for="txtAddress" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br> 
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtOrganization" class="control-label col-sm-4" value="Organization:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtOrganization" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.organization}" required="true" title="Organization" class="form-control"
+                                                                                             requiredMessage="Organization cannot be empty." validator="#{validatorManagedBean.Text}"/>
+                                                                                <p:message for="txtOrganization" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtTelPhone" class="control-label col-sm-4" value="Tele Phone:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtTelPhone" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.telPhone}" 
+                                                                                             title="Tele Phone" class="form-control" validator="#{validatorManagedBean.Phone}" required="true"
+                                                                                             requiredMessage="Phone Number is requiered." validatorMessage="Phone Number must be real phone number"/>
+                                                                                <p:message for="txtTelPhone" display="icon"/>
+                                                                            </div>                  
+                                                                        </div>
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtFax" class="control-label col-sm-4" value="Fax Number:"/>    
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtFax" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.fax}"  
+                                                                                             required="true" requiredMessage="Fax Number requiered." validator="#{validatorManagedBean.Phone}"
+                                                                                             title="Fax Number" class="form-control" validatorMessage="Phone Number must be real phone number"/>
+                                                                                <p:message for="txtFax" display="icon"/>
+                                                                            </div>                  
+                                                                        </div>
+                                                                    </div> 
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section> 
+
+                                            <section class="panel panel-info">
+                                                <section class="panel-body">                                                             
+                                                    <h:panelGroup id="pnl6" class="col-sm-12">                                                                   
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-sm-6">   
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel value="From Date:" for="calDateofDelegated" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:calendar pattern="dd/MM/yyyy" id="calDateofDelegated" required="true" title="Date of Delegate"
+                                                                                            value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.dateOfDelegated}" requiredMessage="Starting date is requered">
+                                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                                    <p:ajax event="change" process="@this"/></p:calendar>
+                                                                                <p:message for="calDateofDelegated" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                    <br></br>
+                                                                    <br></br>
+
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtReason" class="control-label col-sm-4" value="Remark:"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputTextarea id="txtReason" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.reason}"  class="form-control"
+                                                                                                 rows="1" cols="5" autoResize="false" title="Reason" validator="#{validatorManagedBean.Text}"/>
+                                                                                <p:message for="txtReason" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="col-sm-6">
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel value="To Date:" for="calEndofDelegated" class="control-label col-sm-4"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:calendar pattern="dd/MM/yyyy" id="calEndofDelegated" required="true" requiredMessage="Ending date is requered" title="End of Delegate date"
+                                                                                            value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.endOfDelegated}">
+                                                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                                                    <p:ajax event="change" process="@this" /></p:calendar>
+                                                                                <p:message for="calEndofDelegated" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div> 
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal"> 
+                                                                            <h:outputLabel  class="control-label col-sm-4" value="Amount Type:"/>
+                                                                            <div class="col-sm-8">
+                                                                                <p:selectOneMenu id="DelegateType" style="width:100%" required="true" requiredMessage="Select Delegate Type"
+                                                                                                 valueChangeListener="#{hrSalaryDelegationRequestController.handelDelegateType}"
+                                                                                                 value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.delegateType}">
+                                                                                    <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                                                    <f:selectItem itemLabel="Monthly Salary" itemValue="Monthly Salary" />
+                                                                                    <f:selectItem itemLabel="Monthly Salary and Allowance" itemValue="Monthly Salary and Allowance"/>
+                                                                                    <f:selectItem itemLabel="Allowance" itemValue="Allowance" />          
+                                                                                    <f:selectItem itemLabel="Other Amount" itemValue="Other Amount" />   
+                                                                                    <p:ajax event="change" process="@this" update=":frmSalary:pnl6"/>
+                                                                                </p:selectOneMenu>
+                                                                                <p:message for="DelegateType" display="icon"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>   
+                                                                    <br></br>
+                                                                    <br></br>
+                                                                    <div class="col-md-12 ">
+                                                                        <div class="form-group form-horizontal">
+                                                                            <h:outputLabel for="txtAmount" value="Amount:" rendered="#{hrSalaryDelegationRequestController.chooseMonthlySalary}" class="control-label col-sm-4"/> 
+                                                                            <div class="col-sm-8">
+                                                                                <p:inputText id="txtAmount" value="#{hrSalaryDelegationRequestController.hrSalaryDelegationRequest.amount}"
+                                                                                             rendered="#{hrSalaryDelegationRequestController.chooseMonthlySalary}"
+                                                                                             title="Amount" class="form-control"
+                                                                                             required="true" requiredMessage="Amount cannot be empty."/>
+                                                                                <p:message for="txtAmount" display="icon"/>
+                                                                            </div>
+                                                                        </div>                                            
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div> 
+                                                    </h:panelGroup>
+                                                </section>
+                                            </section>
+                                            <h:panelGroup id="pnlw6" class="col-sm-12">
+                                                <div class="panel-body col-sm-12">
+                                                    <div class="form-group col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnSave" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                     value="#{hrSalaryDelegationRequestController.saveorUpdateBundle}"
+                                                                                     action="#{hrSalaryDelegationRequestController.save}"
+                                                                                     process="@this,pnl1,pnl2,pnl3,pnl4,pnl5,pnl6"                                            
+                                                                                     update=":frmSalary"/>
+                                                                </div>
+                                                                <div class="col-sm-3">
+                                                                    <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4"                                             
+                                                                                     action="#{hrSalaryDelegationRequestController.clear()}"
+                                                                                     process="@this" update=":frmSalary"/>          
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form> 
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,445 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard"></i> <span> Dashboard</span></a></li>
+        <li> <a href="promotionCriteria.xhtml"><i class="fa fa-fw"></i><span>Promotion Criteria</span></a></li>  
+        <li><a href="promotionAdvment.xhtml"><i class="fa fa-fw"></i><span>Internal vacancy Notice</span></a></li>  
+        <li> <a href="candidateEvaluation.xhtml"><i class="fa fa-fw"></i><span>Candidate Evaluation</span></a></li>  
+        <li><a href="promoteCandidate.xhtml"><i class="fa fa-fw"></i>Promote Candidate</a> </li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmSample"> 
+            <p:toolbar  style="background-color:white;border-color: white">
+                <f:facet name="right">
+
+                    <p:commandButton id="btnNew"  action="#{candEvaControllers.createNewAdditionalAmount()}" 
+                                     validateClient="true"  
+                                     icon="ui-icon-search" title="Search" style="background-color: white; border-color: white"
+                                     process="@this" update="@this,:frmSample,:frmpromPost,:searchform" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="candidateEvaluation.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                </f:facet>
+            </p:toolbar>
+
+        </h:form>
+        <h:form id="searchform"> 
+            <h:panelGroup id="pnlPenalityDataTable"   rendered="#{candEvaControllers.renderPnlManPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header">
+                                <h3 class="box-title">Search   <small>Active </small></h3>
+                            </div>
+                            <div class="box-body ">
+                                <div class=" col-sm-12">
+                                    <div class="col-sm-6">
+                                        <h:outputLabel value="Search(List Of Promotion): " class="control-label col-sm-4"/>
+                                        <div class="col-sm-8">
+                                            <p:selectOneListbox  valueChangeListener="#{candEvaControllers.formToValueChange}"
+                                                                 style="width: 350px; height: 170px;" filterMatchMode="contains" filter="true">                                                   
+                                                <f:selectItems value="#{candEvaControllers.activeVacancies}" var="actVac"   itemValue="#{actVac}" itemLabel="#{actVac.advertDateFrom} -- #{actVac.advertDateTo}"/>
+                                                <p:ajax  update=":searchform:dtAdvertizedJobs" process="@this"/>
+                                            </p:selectOneListbox> 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>    
+                        </div> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header">
+                                <h3 class="box-title">Job Detail<small></small></h3>                       
+                            </div>    
+                            <div class="box-body panel-primary" >
+                                <div class="col-md-12" >  
+                                    <div class="col-md-12" style="margn-top: 30px;">
+                                        <div class="form-group">
+                                            <p:dataTable id="dtAdvertizedJobs" var="advertJobs" value="#{candEvaControllers.advertisedJobs}" rowIndexVar="no" selectionMode="single"
+                                                         rowKey="#{advertJobs}" selection="#{candEvaControllers.selectedRow}"
+                                                         class="dataTable" rows="5" paginator="true" paginatorPosition="bottom" editable="true">
+                                                <p:ajax event="rowSelect" listener="#{candEvaControllers.populateCadidate}"  update=":frmpromPost,:frmSample,:searchform,:frmCandEvalution" />
+
+                                                <p:column headerText="SNo">
+                                                    <h:outputText value="#{no+1}"/>
+                                                </p:column>
+                                                <p:column headerText="JobTitle">
+                                                    <h:outputText value="#{advertJobs.jobId.jobTitle}" />
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmpromPost">
+             <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information,fatal"/>  
+            <h:panelGroup id="renderPnlCreateAdditional"   rendered="#{candEvaControllers.renderPnlCreateAdditional}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary ">
+                            <div class="box-header">
+                                <h3 class="box-title">Candidate Evaluation</h3>                       
+                            </div>
+                            <div class="box-body ">
+                                <div class="box-body ">
+                                    <div class="col-sm-12" >
+                                        <div class="col-md-12">
+                                            <p:dataTable id="tblCandidList"   value="#{candEvaControllers.hrProApplyM}" emptyMessage="No cadidate applied"
+                                                        var="cadList"  rowIndexVar="no"  rowKey="#{cadList}" 
+                                                         selection="#{candEvaControllers.selctedCandidate}" selectionMode="single"
+                                                         class="dataTable" rows="5" paginator="true" paginatorPosition="bottom" editable="true"
+                                                         >
+                                                <p:ajax event="rowSelect" listener="#{candEvaControllers.giveCandidateResult}" process="@this"  update=":frmCandEvalution"/>
+
+                                                <p:column selectionMode="single"  style="width:40px;text-align:center"/>
+                                                <p:column headerText="EmpID">
+                                                    #{cadList.requesterId.empId}
+                                                </p:column>
+                                                <p:column headerText="Full Name">
+
+                                                    #{cadList.requesterId.firstName}     #{cadList.requesterId.middleName}     #{cadList.requesterId.lastName}
+                                                </p:column>
+                                                <p:column headerText="Performance (#{candEvaControllers.performanceWeight})" >
+                                                    #{cadList.prfmResult}
+                                                </p:column>
+
+                                                <p:column headerText="Experiance (#{candEvaControllers.workExpWeight})">
+                                                    #{cadList.exprResult}
+                                                </p:column>
+
+                                                <p:column headerText="Education Qualification (#{candEvaControllers.educLevlWeight})">
+                                                    #{cadList.educResult}
+                                                </p:column>
+
+                                                <p:column headerText="Interview/Test (#{candEvaControllers.interviewOrTestWeight})">
+                                                    #{cadList.exprResult}
+                                                </p:column>  
+
+                                                <p:column headerText="Training (#{candEvaControllers.trainingWeight})">
+                                                    #{cadList.trainingResult}
+                                                </p:column>  
+                                                <p:column headerText="Total">
+                                                    #{cadList.total}
+                                                </p:column>   
+                                            </p:dataTable>
+                                        </div>  
+                                    </div> 
+                                </div>                   
+                            </div>                   
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <h:form id="frmCandEvalution">            
+            <h:panelGroup id="pngDialgEvR" rendered="#{candEvaControllers.renderPnlCreateAdditional}">
+               
+                <div class="box box-primary">
+                    <div class="box-body panel-primary" >
+                        <div class="col-md-12" >  
+                            <div class="col-md-12">
+                                <div class="col-md-12" > 
+                                    <div class="col-sm-6" >                                           
+                                        <div class="form-horizontal col-md-12">
+                                            <div class="form-group required">
+                                                <h:outputLabel class="control-label col-sm-4" value="Performance (#{candEvaControllers.performanceWeight})"/>
+                                                <div class="col-sm-8"> 
+                                                    <p:inputText id="txtPerform" value="#{candEvaControllers.promotionApply.prfmResult}"     
+                                                                 required="true"  converterMessage="please enter number only"  /> 
+                                                    <p:message for="txtPerform" display="icon"/>
+                                                </div> 
+                                            </div>                                                           
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" >                                           
+                                        <div class="form-horizontal col-md-12">
+                                            <div class="form-group required">
+                                                <h:outputLabel class="control-label col-sm-4" value="Exprience (#{candEvaControllers.workExpWeight})"/>
+                                                <div class="col-sm-8"> 
+                                                    <p:inputText id="txtExprienceResult" value="#{candEvaControllers.promotionApply.exprResult}"    class="form-control" 
+                                                                 required="true" converterMessage="please enter number only"  />
+                                                    <p:message for="txtExprienceResult" display="icon"/>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>   
+                                <div class="col-md-12" >  
+                                    <div class="col-sm-6" >                                           
+                                        <div class="form-horizontal col-md-12">
+                                            <div class="form-group required">
+                                                <h:outputLabel for="txtEducRes" class="control-label col-sm-4" value="Education (#{candEvaControllers.educLevlWeight})"/>
+                                                <div class="col-sm-8"> 
+                                                    <p:inputText id="txtEducRes" value="#{candEvaControllers.promotionApply.educResult}" class="form-control"    
+                                                                 required="true" converterMessage="please enter number only"/>
+                                                       <p:message for="txtEducRes" display="icon"/>    
+                                                </div> 
+                                             
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6" >                                           
+                                        <div class="form-horizontal col-md-12">
+                                            <div class="form-group required">
+                                                <h:outputLabel class="control-label col-sm-4" value="Interview/Test (#{candEvaControllers.interviewOrTestWeight})"/>
+                                                <div class="col-sm-8"> 
+                                                    <p:inputText id="txtExamResult" value="#{candEvaControllers.promotionApply.examResult}" class="form-control"    
+                                                                 converterMessage="please enter number only"  />
+                                                    <p:message for="txtExamResult" display="icon"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                                                           
+                                </div>  
+                                <div class="col-md-12" >      
+                                    <div class="col-sm-6" >                                           
+                                        <div class="form-horizontal col-md-12">
+                                            <div class="form-group required">
+                                                <h:outputLabel class="control-label col-sm-4" value="Training (#{candEvaControllers.trainingWeight})"/>
+                                                <div class="col-sm-8"> 
+                                                    <p:inputText id="txtTraining" value="#{candEvaControllers.promotionApply.trainingResult}"   class="form-control" 
+                                                                 converterMessage="please enter number only"  />      
+                                                    <p:message for="txtTraining" display="icon"/>  
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>  
+                            </div>
+                        </div>                                
+                    </div>
+                </div>                        
+            </h:panelGroup> 
+
+
+
+            <h:panelGroup id="pnlSaveResult"  rendered="#{candEvaControllers.renderPnlCreateAdditional}">
+                <div class="form-group col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="col-sm-12 form-horizontal">
+                            <div class="col-sm-4">                                                              
+                            </div>                                                                    
+                            <div class="col-sm-4">
+                                <p:commandButton  id="btnSave"  value="#{candEvaControllers.saveOrUpdateButton}" 
+                                                  action="#{candEvaControllers.savePromotionEvalutionResult}"   class="btn  btn-block btn-primary col-lg-4" 
+                                                  process="@this,:frmCandEvalution" update="@this,:frmCandEvalution,:frmpromPost"/>  
+                            </div>
+                            <div class="col-sm-4">
+                                <p:commandButton  id="btnClose"  value="Reset"  action="#{candEvaControllers.clear}"
+                                                  class="btn  btn-block btn-primary col-lg-4" process="@this,:frmCandEvalution,:frmpromPost" update="@this,:frmCandEvalution,:frmpromPost" />  
+                            </div>
+                        </div>
+                    </div>  </div>
+            </h:panelGroup>       
+
+
+
+
+            <h:panelGroup id="pnlTab" rendered="#{candEvaControllers.renderPnlCreateAdditional}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box ">
+                            <div class=" col-sm-12">
+                                <div class="form-horizontal col-md-12">
+                                    <div class="form-group">
+                                        <div class="nav-tabs-custom">
+                                            <ul class="nav nav-tabs">
+                                                <li class="active">
+                                                    <a href="#tabPerformance" data-toggle="tab">Performance</a></li>
+                                                <li><a href="#tabEducation" data-toggle="tab">Education</a></li>
+                                                <li><a href="#tabExperience" data-toggle="tab">Experience</a></li>
+                                                <li><a href="#tabTraining" data-toggle="tab">Training</a></li>
+                                            </ul>
+                                            <div class="tab-content" id="maintab">
+                                                <div class="active tab-pane" id="tabPerformance">
+                                                    <p:dataTable id="dtEvalutionResult" var="evalutionResults" value="#{candEvaControllers.hrEvaluationResultsListUI}" 
+                                                                 rowIndexVar="no" class="dataTable" rows="3" paginator="fase" paginatorPosition="bottom" editable="true">
+                                                        <p:column headerText="SNO">
+                                                            #{no+1}
+                                                        </p:column>
+
+                                                        <p:column headerText="Session Year">
+                                                            #{evalutionResults.sessionId.sessionYear}
+                                                        </p:column>
+                                                        <p:column headerText="Term">
+                                                            #{evalutionResults.sessionId.term}
+                                                        </p:column>
+
+                                                        <p:column headerText="Evalution Date">
+                                                            #{evalutionResults.evaluationDate}
+                                                        </p:column>
+
+                                                        <p:column headerText="Remark">
+                                                            #{evalutionResults.remark}
+                                                        </p:column>
+                                                        <p:column headerText="Total Result">
+                                                            #{evalutionResults.sessionId.term}
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                                <div class=" tab-pane" id="tabEducation">  
+                                                    <p:dataTable id="dtEmpEduc" value="#{candEvaControllers.hrEmpEducationsList}" var="hrEmpEduc" 
+                                                                 rowIndexVar="no" class="dataTable" rows="5" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="SNO">
+                                                            #{no+1}
+                                                        </p:column>
+                                                        <p:column headerText="Education Level">
+                                                            #{hrEmpEduc.educLevelId.educLevel}
+                                                        </p:column>
+
+                                                        <p:column headerText="Education Type">
+                                                            #{hrEmpEduc.educTypeId.educType}
+                                                        </p:column>
+
+                                                        <p:column headerText="Award">
+                                                            #{hrEmpEduc.award}
+                                                        </p:column>
+
+                                                    </p:dataTable>
+                                                </div>
+                                                <div class=" tab-pane" id="tabExperience">   
+                                                    <p:dataTable id="dtEmpExpr" value="#{candEvaControllers.hrEmpExperiencesList}" var="hrEmpExprience"
+                                                                 rowIndexVar="no" class="dataTable" rows="5" paginator="true" paginatorPosition="bottom" editable="true">
+                                                        <p:column headerText="SNO">
+                                                            #{no+1}
+                                                        </p:column>
+                                                        <p:column headerText="Hire Date">
+                                                            #{hrEmpExprience.empId.hireDate}
+                                                        </p:column>
+                                                        <p:column headerText="Job Title">
+                                                            #{hrEmpExprience.jobTitle}
+                                                        </p:column>
+
+                                                        <p:column headerText="Start Date">
+                                                            #{hrEmpExprience.startDate}
+                                                        </p:column>
+
+                                                        <p:column headerText="End Date">
+                                                            #{hrEmpExprience.endDate}
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                    <br/>
+                                                    <p:dataTable  id="dtExp" value="#{candEvaControllers.hrPromExprinceCriterias}" var="exp"  class="dataTable" 
+                                                                  rowIndexVar="num"   rowKey="#{exp.luPromExprienceRelation.id}">
+                                                        <p:ajax event="rowSelect" />
+                                                        <p:column headerText="EXprience Relation" >
+                                                            <h:outputText value="#{exp.luPromExprienceRelation}" />
+                                                        </p:column>
+
+                                                        <p:column headerText="Weight" >
+                                                            <h:outputText value="#{exp.weight}" />
+                                                        </p:column>
+                                                        <p:column headerText="Exprience In Years"  >
+                                                            <p:inputText value="#{exp.yearExprience}" placeholder="Exprience In Years" required="true" />
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                    <br/>
+                                                    <div class=" col-sm-12">
+                                                        <div class="col-sm-6">
+                                                            <p:commandButton id="btnCalc" value="Calculate"  process="@this,dtExp" update="txtExprienceResult" action="#{candEvaControllers.calcExprienceResult()}"/>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class=" tab-pane" id="tabTraining">  
+                                                    <p:dataTable id="dtEmpTrain" value="#{candEvaControllers.hrEmpTrainingsList}" var="hrEmpTraining"
+                                                                 rowIndexVar="no" class="dataTable" rows="5" paginator="true" paginatorPosition="bottom" editable="true">
+                                                        <p:column headerText="SNO">
+                                                            #{no+1}
+                                                        </p:column>
+                                                        <p:column headerText="Training Title">
+                                                            #{hrEmpTraining.trainingTitle}
+                                                        </p:column>
+
+                                                        <p:column headerText="Institution">
+                                                            #{hrEmpTraining.institution}
+                                                        </p:column>
+
+                                                        <p:column headerText="Start Date">
+                                                            #{hrEmpTraining.startDate}
+                                                        </p:column>
+                                                        <p:column headerText="End Date">
+                                                            #{hrEmpTraining.endDate}
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                   
+                                </div>
+                            </div>  
+                        </div> 
+                    </div>
+                </div> 
+                <p:dialog id="dlgWorkflow" header="Workflow" widgetVar="dlgWorkflow" height="400"
+                          width="1200"  resizable="false" >
+                    <h:panelGroup id="pnlworkflow1" class="col-sm-12">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box-body ">                                     
+                                    <div class="col-md-12" >                                       
+                                        <div class="col-sm-12">
+                                            <p:dataTable id="tblWorkflow" value="#{candEvaControllers.workflowDataModel}" 
+                                                         var="currentRow" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                         rowKey="#{currentRow}" paginatorPosition="bottom">
+                                                <p:column headerText="Processed By">
+                                                    <h:outputText value="#{currentRow.processedBy}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Decision"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.decision}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Comment Given"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                </p:column>
+                                                <p:column >
+                                                    <f:facet name="header">
+                                                        <h:outputText value="Processed Date"/>
+                                                    </f:facet>
+                                                    <h:outputText value="#{currentRow.processedOn}"/> 
+                                                </p:column> 
+                                            </p:dataTable>
+                                        </div> 
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>   
+                </p:dialog>
+            </h:panelGroup>
+
+
+
+        </h:form>
+    </ui:define>
+</ui:composition>

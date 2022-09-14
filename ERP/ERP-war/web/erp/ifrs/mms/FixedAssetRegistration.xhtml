@@ -1,0 +1,482 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+
+            </div>
+
+        </h:form>
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li><a href="FixedAssetAttributeRegistration.xhtml"><i class="fa fa-circle-o"></i> <span>FA Attribute Registration</span></a></li> 
+        <li><a href="fixedAssetDepreciationCalc.xhtml"><i class="fa fa-circle-o"></i> <span>FA Depreciation Calculation</span></a></li> 
+        <li><a href="../depreciationSetup.xhtml"><i class="fa fa-circle-o"></i> <span>Depreciation SetUp</span></a></li> 
+        <a href="fixedAssetCompDepreciationCalc.xhtml"></a>
+  <li> <a href="fixedAssetCompDepreciationCalc.xhtml"><i class="fa fa-circle-o"></i> <span>Depreciation By GL</span></a></li> 
+    </ui:define>
+
+    <ui:define name="contents">
+        <h:form id="frmToolbar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnIcone"  action="#{fixedAssetRegistrationController.createNewFixaInfo()}"
+                                     icon="#{fixedAssetRegistrationController.icone}" validateClient="true" style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmToolbar"
+                                     title="#{fixedAssetRegistrationController.createOrSearchBundle}" />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="FixedAssetRegistration.xhtml"><i class="fa fa-fw fa-refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+
+        <h:form id="frmRegisterUI" class="form-horizontal">
+            <p:growl id="growl1" showDetail="true" autoUpdate="true" severity="information,error"/>
+            <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="true">
+                <div class="panel panel-info">
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#tabFixedAssetReg" data-toggle="tab">Fixed Asset Registration</a></li>
+                            <!--                            <li><a href="#tabLeaveBalence" data-toggle="tab">Leave Balance</a></li>
+                                                        <li><a href="#tabLeaveHistory" data-toggle="tab">Leave History</a></li>-->
+                        </ul>
+                        <div class="tab-content" id="maintab">
+                            <div class="active tab-pane" id="tabFixedAssetReg">
+                                <!--                    
+                                                    <p:tabView style=" width: 100%" activeIndex="{fixedAssetRegistrationController.activeIndex}">
+                                                        <p:tab title="Fixed Asset Category" > -->
+                                <p:panel style="border: 0px; background-color: transparent" id="commonUI" rendered="true"> 
+                                    <div class="box box-primary">
+                                        <div class="box-header with-border">
+                                            <!--<h3 class="box-title">Fixed Asset Common Attributes</h3>-->
+                                            <div class="box-tools pull-right">
+                                                <button class="btn btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>                        
+                                            </div>
+                                        </div>
+                                        <div class="box-body">
+                                            <div class="row"> 
+                                                <div class="col-md-12" > 
+                                                    <div class="form-horizontal  col-sm-12">
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">                                                                                                
+                                                            <h:outputLabel class="control-label col-sm-2" for="drdFACategory" value="GL Code:"/>
+                                                            <div class="col-sm-4">
+                                                                <p:selectOneMenu id="drdFACategory"  
+                                                                                 valueChangeListener="#{fixedAssetRegistrationController.handleSelectGlCode}"
+                                                                                 style="width: 100%" required="true" styleClass="noupdate">
+                                                                    <f:selectItem itemValue="" itemLabel="---select one---" />
+                                                                    <f:selectItems id="drdFACategory2" var="glCode" itemLabel="#{glCode.generalLedgerCode}" 
+                                                                                   value="#{fixedAssetRegistrationController.getGlList()}" />
+                                                                    <p:ajax update="slCode" process="@this" event="change" />
+                                                                </p:selectOneMenu>    
+                                                                <p:message display="icon"  for="drdFACategory"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="slCode" value="SL Code:"/> 
+                                                            <div class="col-sm-4">
+                                                                <p:selectOneMenu id="slCode"  value="#{fixedAssetRegistrationController.fmsSubsidiaryLedger.subsidiaryId}" 
+                                                                                 style="width: 100%" filter="true"
+                                                                                 valueChangeListener="#{fixedAssetRegistrationController.getListOfAttributesByCategory}">
+                                                                    <f:selectItem  itemLabel="---select one---"/> 
+                                                                    <f:selectItems value="#{fixedAssetRegistrationController.subsideryCodeList}"
+                                                                                   var="sdlCode" itemLabel="#{sdlCode.subsidiaryCode}" itemValue="#{sdlCode.subsidiaryId}"/>
+                                                                    <p:ajax update="@this,:frmRegisterUI" process="@this" event="change"/>
+                                                                </p:selectOneMenu> 
+                                                                <p:message for="slCode" display="icon" />
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">                                                                                               
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtFixedGroup" value="Depreciation type:"/>
+                                                            <div class="col-sm-4">
+
+                                                                <p:selectOneMenu id="txtFixedGroup" value="#{fixedAssetRegistrationController.fixedasset.fagId}"
+                                                                                 converter="entConverter"  style="width: 100%" filter="true" >
+                                                                    <f:selectItem  itemLabel="---select one---"/>
+                                                                    <f:selectItems value="#{fixedAssetRegistrationController.listofGroups}" 
+
+                                                                                   />
+                                                                </p:selectOneMenu>
+                                                                <p:message for="txtFixedGroup" display="icon" />
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtFaNo" value="Fixed Asset No:"/>
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtFaNo"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.fixedAssetNo}" disabled="true"/>      
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px">                                                                                               
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtFACode" value="FA Code:"/>
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtFACode"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.faCode}"/>      
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtRegionNo" value="Region No:"/>
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtRegionNo"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.regionNo}"/>      
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2" value="FA Name:" for="txtFAName"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtFAName"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.faName}"/>     
+                                                                <p:message display="icon"  for="txtFAName"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2"  for="txtNetPointEeast" value="NetPoint EAST :"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtNetPointEeast"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.netPointEast}"/>     
+                                                                <p:message display="icon"  for="txtNetPointEeast"/>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2" value="Useful Life Time:" for="txtUsefulLifeTime"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtUsefulLifeTime"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.useFullLifeTime}"/> 
+                                                                <p:message display="icon"  for="txtUsefulLifeTime"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtCostCenter" value="Cost Center :" />                                        
+                                                            <div class="col-sm-4">
+                                                                <p:selectOneMenu id="txtCostCenter" value="#{fixedAssetRegistrationController.fixedasset.costCenter}"
+                                                                                 converter="entConverter"  style="width: 100%"  >
+                                                                    <f:selectItem  itemLabel="---select one---"/>
+                                                                    <f:selectItems  value="#{fixedAssetRegistrationController.listOfCostCenter}"
+                                                                                    var="costCenter" itemValue="#{costCenter}" itemLabel="#{costCenter.description}"/>
+                                                                </p:selectOneMenu>
+                                                                <p:message display="icon"  for="txtCostCenter"/>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2"  for="txtLocationName" value="Location Name:"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtLocationName"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.locationName}"/> 
+                                                                <p:message display="icon"  for="txtLocationName"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtNoOffUnits" value="No Of Units :" />                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtNoOffUnits"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.noOfUnits}"/> 
+                                                                <p:message display="icon"  for="txtNoOffUnits"/>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2"  for="txtSystemNumber" value="System NUmber:"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtSystemNumber"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.systemNumber}"/> 
+                                                                <p:message display="icon"  for="txtSystemNumber"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtTypeNo" value="Type No :" />                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtTypeNo"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.typeNo}"/> 
+                                                                <p:message display="icon"  for="txtTypeNo"/>
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2"  for="txtInService" value="In Service:"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtInService" value="#{fixedAssetRegistrationController.fixedasset.inService}" class="form-control"
+                                                                             converter="dateConverter" required="true"
+                                                                             placeholder="dd/mm/yyyy" onclick="displayCalendar('frmRegisterUI:txtInService', 'frmRegisterUI:txtInService');" />
+                                                                <p:message for="txtInService" display="icon"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtNetBookValue" value="Net Book Value:" />                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtNetBookValue"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.netBookValue}"/> 
+                                                                <p:message display="icon"  for="txtNetBookValue"/>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2"  for="txtTypeName" value="Type Name:"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtTypeName"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.typeName}"/> 
+                                                                <p:message display="icon"  for="txtTypeName"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtAcDep" value="Accumulated Depreciation:" />                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtAcDep"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.accumulatedDepreciation}"/> 
+                                                                <p:message display="icon"  for="txtAcDep"/>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2"  for="txtDepYear" value="Depreciation Year:"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtDepYear"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.depreciationYear}"/> 
+                                                                <p:message display="icon"  for="txtDepYear"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtRevaSerYear" value="Revaluation Service Year:" />                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtRevaSerYear"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.revalutionServiceYear}"/> 
+                                                                <p:message display="icon"  for="txtRevaSerYear"/>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2"  for="txtPurchaseCost" value="Purchase Cost:"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtPurchaseCost"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.initialCost}"/> 
+                                                                <p:message display="icon"  for="txtPurchaseCost"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtRevalutedCost" value="Latest Revaluted Cost:" />                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtRevalutedCost"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.revalutionCost}"/> 
+                                                                <p:message display="icon"  for="txtRevalutedCost"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group col-sm-12 textBoxMargin6px"> 
+                                                            <h:outputLabel class="control-label col-sm-2"  for="txtSalvageCost" value="Salvage Cost:"/>                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtSalvageCost"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.salvageCost}"/> 
+                                                                <p:message display="icon"  for="txtSalvageCost"/>
+                                                            </div>
+                                                            <h:outputLabel class="control-label col-sm-2" for="txtPrepared" value="Prepared By :" />                                        
+                                                            <div class="col-sm-4">
+                                                                <p:inputText id="txtPrepared"  class="form-control"  value="#{fixedAssetRegistrationController.fixedasset.preparedBy}"/> 
+                                                                <p:message display="icon"  for="txtPrepared"/>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p:panel>
+                                <p:panel style="border: 0px; background-color: transparent" id="DynamicUI" rendered="true">
+                                    <div class="box box-primary">
+                                        <div class="box-body">
+                                            <div class="row"> 
+                                                <div class="col-md-12" > 
+                                                    <ui:repeat value="#{fixedAssetRegistrationController.attributeList}" var="field"   varStatus="index_id" id="rep">
+                                                        <div class="form-horizontal  col-sm-12">
+                                                            <div class="form-group">
+                                                                <h:outputLabel class="control-label col-sm-2" value="#{field.faaname}:" />
+                                                                <div class="col-sm-4">
+                                                                    <p:inputText class="form-control" value="#{field.ifrsFixedAssetAtValueList.valueName}" 
+                                                                                 rendered="#{field.fieldType == 'TEXT'}"                                                            
+                                                                                 valueChangeListener="#{fixedAssetRegistrationController.addInputTextValueToList}" >
+                                                                        <f:attribute name="myattribute" value="#{field.id}" />
+                                                                        <p:ajax event="blur" process="@this" />
+                                                                    </p:inputText>                                                
+                                                                    <p:selectManyCheckbox id="checkbox" value="#{field.optionValueListForCheckbox}" 
+                                                                                          valueChangeListener="#{fixedAssetRegistrationController.addSelectCheckboxValueToList}" 
+                                                                                          rendered="#{field.fieldType == 'CHECKMANY'}">
+                                                                        <f:selectItems id="selectecheckbox" 
+                                                                                       value="#{fixedAssetRegistrationController.checkboxForOptionValueList([field])}"
+                                                                                       var="checkboxOptionValue" 
+                                                                                       itemLabel="#{checkboxOptionValue.valueName}" itemValue="#{checkboxOptionValue.id}"/>
+                                                                        <f:attribute name="myCheckboxAttribute" value="#{field.id}" />
+                                                                        <p:ajax event="valueChange" process="@this" />
+                                                                    </p:selectManyCheckbox>
+                                                                    <p:selectOneMenu style="width: 100%" value="#{field.ifrsFixedAssetAtValueList.optionvalueId}"
+                                                                                     valueChangeListener="#{fixedAssetRegistrationController.changeOptionValueObject}" rendered="#{field.fieldType == 'SELECTONE'}">
+                                                                        <f:selectItem itemLabel="--- Select One ---" itemValue="" />
+                                                                        <f:selectItems id="selecterndedaval" value="#{fixedAssetRegistrationController.optionValueList([field])}" var="optionList" 
+                                                                                       itemLabel="#{optionList.valueName}" itemValue="#{optionList.id}"/>
+                                                                        <f:attribute name="mySelectattribute" value="#{field.id}" />
+                                                                        <p:ajax event="valueChange" process="@this" />
+                                                                    </p:selectOneMenu>
+
+                                                                    <p:selectOneRadio value="#{field.ifrsFixedAssetAtValueList.optionvalueId}"
+                                                                                      valueChangeListener="#{fixedAssetRegistrationController.addSelectRadioInputTextValueToList}" 
+                                                                                      rendered="#{field.fieldType == 'RADIO'}"
+                                                                                      >
+                                                                        <f:selectItems value="#{fixedAssetRegistrationController.radioForOptionValueList([field])}" 
+
+                                                                                       var="radioOptionValue" itemLabel="#{radioOptionValue}" itemValue="#{radioOptionValue.id}"/>
+                                                                        <f:attribute name="mySelectRadioAttribute" value="#{field.id}" />
+                                                                        <p:ajax event="valueChange" process="@this" />
+                                                                    </p:selectOneRadio>
+
+
+                                                                    <h:panelGrid id="despanle" columns="1" style="margin-left: 0px">
+                                                                        <p:inputTextarea class="form-control" rows="5"  value="#{field.ifrsFixedAssetAtValueList.valueName}"
+                                                                                         valueChangeListener="#{fixedAssetRegistrationController.addInputTextAreaValueToList}"
+                                                                                         rendered="#{field.fieldType == 'TEXTAREA'}"
+                                                                                         label="Description" cols="100" counter="Description" maxlength="450" 
+                                                                                         counterTemplate="{0} characters remaining." autoResize="false" >
+                                                                            <f:attribute name="mytxtattribute" value="#{field.id}" />
+                                                                            <p:ajax event="blur" process="@this"  />
+                                                                        </p:inputTextarea>
+                                                                        <h:outputText id="Description" />
+                                                                    </h:panelGrid>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </ui:repeat>
+
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p:panel>
+                                <h:panelGroup id="pnlSaveEmp">
+                                            <div class="panel-body col-sm-12">
+                                                <div class="form-group col-sm-12">
+                                                    <div class="col-sm-2">
+                                                    </div>
+                                                        <div class="col-sm-2">  
+                                                            <p:commandButton action="#{fixedAssetRegistrationController.saveFixedAssetInfo()}"  class="btn  btn-block btn-primary col-lg-2"
+                                                                             process="@this,:frmRegisterUI" update=":frmRegisterUI"
+                                                                             value="#{fixedAssetRegistrationController.saveorUpdateBundle}"/>            
+                                                       
+                                                    </div>
+                                                    <div class="col-sm-2">  </div>
+                                                </div>
+                                            </div>  
+<!--                                        </section>
+                                    </section>-->
+                                </h:panelGroup>
+                                <!--                                </p:tab>
+                                                                                        <p:tab title="Asset Registration" id="dynamic">
+                                                                
+                                                                                        </p:tab>
+                                                                </p:tabView>-->
+                            </div>
+                        </div>
+                    </div></div>
+            </h:panelGroup>
+        </h:form>
+
+        <!--        <h:form id="frmMainUI">
+                    <h:panelGroup style="border: 0px; background-color: transparent" id="mainUI" rendered="{fixedAssetRegistrationController.renderPnlManPage}">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Search ...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row"> 
+                                    <div class="col-md-12 textBoxMargin6px" > 
+                                        <h:panelGroup id="frmSearchGatePass"> 
+        
+        
+                                            <div class="form-horizontal  col-sm-12">
+                                                <div class="form-group textBoxMargin6px"> 
+                                                    <h:outputLabel class="control-label col-sm-2" value="Fixed Asset No:"/>
+        
+                                                    <div class="col-sm-4">
+                                                        <p:inputText id="txtSearchStoreName" class="form-control" value="{fixedAssetRegistrationController.fixedasset.fixedAssetNo}"/>
+                                                    </div>
+                                                </div>
+        
+                                                <div class="form-group textBoxMargin6px"> 
+                                                    <h:outputLabel id="FindInfo" class="control-label col-sm-2"/>
+                                                    <div class="col-sm-4">
+                                                        <p:commandButton  id="btnSearch" class="btn btn-primary" action="{fixedAssetRegistrationController.searchFixedAsset()}" icon="ui-icon-search" 
+                                                                          process="@this,frmSearchGatePass" update=":frmMainUI:frmGatepass:tblgatePassInfo,:frmMainUI:mainUI"
+                                                                          value="Find" />            
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </div>
+                                </div>
+        
+        
+                                <div class="row"> 
+                                    <div class="col-md-12" > 
+                                        <h:form id="frmGatepass">   
+        
+        
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group">                                        
+                                                    <div class="col-sm-12">
+                                                        <p:dataTable id="tblgatePassInfo"  var="fixedAsset" rows="5" 
+                                                                     style="font-family: Cambria; "  
+                                                                     rowIndexVar="num"   
+                                                                     selection="{fixedAssetRegistrationController.faselect}"
+                                                                     rowKey="{fixedAsset.id}"  selectionMode="single" 
+                                                                     value="{fixedAssetRegistrationController.ifrsFixedAssetDataModel}"
+                                                                     class="dataTable"
+                                                                     paginator="true" paginatorPosition="bottom" >
+        
+                                                            <p:ajax event="rowSelect" listener="{fixedAssetRegistrationController.rowSelect}" update=":frmRegisterUI, :frmMainUI, :frmToolbar" />      
+        
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="No"/>
+                                                                </f:facet>
+                                                                <h:outputText value="{num+1}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Fixed Asset No" />
+                                                                </f:facet>
+                                                                <h:outputText value="{fixedAsset.fixedAssetNo}"/>
+                                                            </p:column>
+        
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Fixed Asset Group" />
+                                                                </f:facet>
+                                                                <h:outputText value="{fixedAsset.fagId}"/>
+                                                            </p:column>
+        
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Fixed Asset Name" />
+                                                                </f:facet>
+                                                                <h:outputText value="{fixedAsset.faName}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Fixed Asset Code" />
+                                                                </f:facet>
+                                                                <h:outputText value="{fixedAsset.faCode}"/>
+                                                            </p:column>
+                                                            <p:column>
+                                                                <f:facet name="header">
+                                                                    <h:outputText value="Use Full life Time" />
+                                                                </f:facet>
+                                                                <h:outputText value="{fixedAsset.useFullLifeTime}"/>
+                                                            </p:column>
+        
+        
+        
+        
+                                                        </p:dataTable>
+        
+                                                    </div>                 
+                                                </div>    
+        
+        
+        
+                                            </div>  
+        
+        
+        
+                                        </h:form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+        
+                    </h:panelGroup>-->
+        <!--</h:form>-->
+
+    </ui:define>
+</ui:composition>

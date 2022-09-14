@@ -1,0 +1,583 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="../../../resources/templates/template.xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="search">  
+        <!-- search form -->
+        <h:form id="frmSearch" class="sidebar-form">
+            <div class="box-body no-padding">
+                <ul class="nav nav-pills nav-stacked">
+                    <li><h:outputLabel value="Search ..."/></li>
+                    <li><p:autoComplete id="themePojo"   var="theme" size="100"   forceSelection="true" placeholder="Search By Name..."/> </li>  
+                </ul>
+            </div>
+        </h:form>
+    </ui:define>
+    <ui:define name="navigaion_content">
+        <li><a href="mmsLostFixedAsset.xhtml"><i class="fa fa-circle-o"></i> <span>Lost Fixed Asset</span></a></li> 
+        <li><a href="stockItemLost.xhtml"><i class="fa fa-circle-o"></i> <span>Lost Stock Item </span></a></li> 
+        <li><a href="FixedAssetTransfer.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Transfer</span></a></li> 
+        <li><a href="FixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Fixed Asset Return </span></a></li> 
+        <li><a href="NonFixedAssetReturn.xhtml"><i class="fa fa-circle-o"></i> <span>Non Fixed Asset Return </span></a></li> 
+        <li><a href="StockDisposal.xhtml"><i class="fa fa-circle-o"></i> <span> Stock Disposal </span></a></li> 
+        <li><a href="Disposal.xhtml  "><i class="fa fa-circle-o"></i> <span>Fixed Asset Disposal</span></a></li> 
+        <li><a href="InventoryBalanceSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Balance Sheet</span></a></li> 
+        <li><a href="InventoryCountSheet.xhtml"><i class="fa fa-circle-o"></i> <span>Inventory Count Sheet</span></a></li> 
+        <li><a href="NeedAssessment.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment</span></a></li> 
+        <li><a href="NeedAssessmentCollected.xhtml"><i class="fa fa-circle-o"></i> <span>Need Assessment Collected</span></a></li> 
+    </ui:define>
+    <ui:define name="contents">   
+        <h:form id="frmSample"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <h:panelGroup id="pngBackSarch" rendered="#{itemDisposalController.renderpnlToSearchPage}">
+                        <p:commandButton id="btnBackToSearch" action="#{itemDisposalController.goBackToSearchpageBtnAction()}" icon="ui-icon-search" validateClient="true" 
+                                         style="background-color: white;border-color: white"
+                                         process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample"
+                                         title="Back to Search" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>   
+                    </h:panelGroup>
+                    <p:commandButton id="btnIcone" action="#{itemDisposalController.createNewDisposalInfo()}"
+                                     icon="#{itemDisposalController.icone}" validateClient="true" style="background-color: white;border-color: white"
+                                     process="@this" update="@this,:frmRegisterUI,:frmMainUI,:frmSample" rendered="#{itemDisposalController.isRenderCreate}" 
+                                     title="#{itemDisposalController.createOrSearchBundle}"  />
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>                    
+                    <h:panelGroup id="pnlGNotifica" rendered="#{itemDisposalController.isRenderedIconNitification}">
+                        <span  class="NotificationText"> #{itemDisposalController.mmsDispList.size()} </span>
+                        <p:commandLink id="cmdLinkNotf" class="fa fa-fw fa-bell" 
+                                       title="Notification" />
+                        <p:overlayPanel widgetVar="ovrNotf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkNotf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblReqNotf" value="Transfer List"/>
+                            <div class="col-md-12 textBoxMargin6px">     
+                                <div class="form-group">  
+                                    <div class="col-sm-8">                                                               
+                                        <p:selectOneListbox id="lstNotf" class="col-sm-8" style="width: 470px; height: 350px;" filterMatchMode="contains" filter="true"
+                                                            converter="entConverter" valueChangeListener="#{itemDisposalController.onSelectRequest}" scrollHeight="300">
+                                            <f:selectItems  var="srListVar" value="#{itemDisposalController.mmsDispList}"
+                                                            itemValue="#{srListVar}"  itemLabel="#{srListVar.disposalNo}"/> 
+                                            <p:ajax event="valueChange"  process="@this"  update=":frmRegisterUI, :frmMainUI, :frmSample"/>
+                                        </p:selectOneListbox>
+                                    </div>                               
+                                </div> 
+                            </div> 
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>     
+                    <h:panelGroup id="pnlWorkflow" rendered="#{itemDisposalController.isRenderedIconWorkflow}">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-wordpress " 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>                         
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWf" value="#{itemDisposalController.wfMmsProcessedDataModel}" rowIndexVar="num" var="wfVar" 
+                                                                 rows="10" paginator="true" paginatorPosition="bottom" >
+                                                        <p:column headerText="S/N" width="60">
+                                                            <h:outputText value="#{num+1}"/>
+                                                        </p:column> 
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{wfVar.processedBy}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Processed On">
+                                                            <h:outputText value="#{wfVar.processedOn}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Decision">
+                                                            <h:outputText value="#{wfVar.decision}" /> 
+                                                        </p:column>
+                                                        <p:column headerText="Comment Given">
+                                                            <h:outputText value="#{wfVar.commentGiven}" /> 
+                                                        </p:column>
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup>
+                    <a href="../../mms/InventoryInformation/FixedAssetItemDisposal.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i>  </a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span>
+                    <a href="../../mms/MmsNewDashBoard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i>  </a>
+                    <span class="ui-separator" >
+                        <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                    </span> 
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+      <h:form id="frmMainUI">
+            <h:panelGroup  style="border: 0px; background-color: transparent" id="mainUI" rendered="#{itemDisposalController.renderPnlManPage}">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Search} ...</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmSearchGatePass"> 
+                                    <h:panelGroup id="searchpnl">
+                                    <div class="form-horizontal  col-sm-12">
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Searching_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="txtPartyName" value="#{itemDisposalController.columnNameResolver.col_Name_FromTable}"
+                                                                 valueChangeListener="#{itemDisposalController.changeEventColumnName}" converter="entConverter"
+                                                                 style="width: 100%">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue=""/>
+                                                    <f:selectItems value="#{itemDisposalController.columnNameResolverList}" var="DisposaFAColName"
+                                                                    itemValue="#{DisposaFAColName.col_Name_FromTable}" 
+                                                                   itemLabel="#{DisposaFAColName.parsed_Col_Name}"/>
+                                                    <p:ajax event="change" process="@this" update="searchpnl"/>
+                                                </p:selectOneMenu>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="lblColumnName" class="control-label col-sm-2" value=" #{itemDisposalController.columnNameResolver.parsed_Col_Name}"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtColumnValue" class="form-control" value="#{itemDisposalController.disposalEntity.columnValue}"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel id="findbtn" class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                               
+                                                <p:commandButton id="btnSearch" class="btn btn-primary" 
+                                                                 action="#{itemDisposalController.searchDispInformation1()}" icon="ui-icon-search" 
+                                                                 process="@this,searchpnl" update=":frmMainUI:frmGatepass:tblgatePassInfo,searchpnl"
+                                                                 value="#{MMS.find}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                   </h:panelGroup>
+                                </h:form>
+                            </div>
+                        </div>
+                        <br></br>    
+                        <br></br>
+                        <br></br>
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:form id="frmGatepass">   
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblgatePassInfo" var="DispInfo" rows="5" 
+                                                             style="font-family: Cambria; "  
+                                                             rowIndexVar="num"   
+                                                             selection="#{itemDisposalController.hpSelect}"
+                                                             rowKey="#{DispInfo.disposalId}"  selectionMode="single" 
+                                                             value="#{itemDisposalController.mmsDispposalSearchInfoDataModel}"
+                                                             class="dataTable"
+                                                             paginator="true" paginatorPosition="bottom">
+                                                    <p:ajax event="rowSelect" listener="#{itemDisposalController.rowSelect}" update=":frmRegisterUI, :frmMainUI, :frmSample, :frmRegisterUI:frmTblMaterialInfo" />      
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{num+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Fixed_asset_Disposal_no}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.disposalNo}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Department}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.department}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Requisition_Date}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.requisitionDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Approved_date}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.approvalDate}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Requested_By}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DispInfo.requestedBy}"/>
+                                                    </p:column>
+                                                </p:dataTable>
+                                            </div>                 
+                                        </div>    
+                                    </div>  
+                                </h:form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+        <!-- Registration Form-->
+        <h:form id="frmRegisterUI">
+            <p:growl id="growlmain" showDetail="true" severity="information,fatal" life="3500" autoUpdate="true" />
+            <h:panelGroup style="border: 0px; background-color: transparent" id="registerUI" rendered="#{itemDisposalController.renderPnlCreateDisposal}" >
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Disposable_Fixed_Asset}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmGatePassDtlInfo">
+                                    <p:growl id="growl" showDetail="true" severity="information" autoUpdate="true" />
+                                    <div class="form-horizontal  col-sm-12"> 
+
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Type}:"/>
+                                            <div class="col-sm-6">
+                                                <p:selectOneRadio id="CkeckMovementType1" layout="grid" columns="4" value="#{itemDisposalController.disposalEntity.selectOpt}" class="col-sm-4"
+                                                                  valueChangeListener="#{itemDisposalController.changeItemDisposal}" required="true" requiredMessage="Please Choose One">
+                                                    <f:selectItem itemLabel="#{MMS.Fixed_Asset}" itemValue="1" />
+                                                    <f:selectItem itemLabel="#{MMS.Non_Fixed_Asset}" itemValue="2" />   
+                                                    <p:ajax process="CkeckMovementType1" update="@this,frmMaterialInfo,frmTblMaterialInfo"  event="valueChange" />  
+                                                </p:selectOneRadio>  
+                                                <p:message for="CkeckMovementType1" display="icon"/>
+                                            </div>
+                                        </div> 
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.DR_No}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtGatePassNumber" readonly="true"  
+                                                             value="#{itemDisposalController.generateDispNo()}"/>
+                                                
+                                                
+                                                
+                                                
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel class="control-label col-sm-2" value="#{MMS.Store_Name}:"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="stName" value="#{itemDisposalController.storeInfoEntity.storeId}"  style="width: 100%" 
+                                                                 valueChangeListener="#{itemDisposalController.handleSelectStoreName}" converter="entConverter"
+                                                                 required="true" requiredMessage="store Name is required"  disabled="#{workFlow.readonly}">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                    <f:selectItems value="#{itemDisposalController.storeInfoList}" var="listSt" itemLabel="#{listSt.storeName}" itemValue="#{listSt.storeId}" />
+                                                    <p:ajax update="ItemCode1,@this" event="change" />
+                                                </p:selectOneMenu> 
+                                                <p:message for="stName" display="icon"/>
+                                            </div>
+                                            <div>
+                                                <h:outputLabel id="lblDateAccepted1" class="control-label col-sm-2" value="#{MMS.Requisition_Date}:"/>
+                                                <div class="col-sm-4">
+
+                                                    <p:inputText id="calAceptedDate" value="#{itemDisposalController.disposalEntity.reqDate}"
+                                                                 placeholder="#{MMS.dd_mm_yyyy}" required="true" requiredMessage="Date is required" class="form-control"
+                                                                 onclick="displayCalendar('frmRegisterUI:calAceptedDate', 'frmRegisterUI:calAceptedDate');"  validator="#{validatorManagedBean.Date}" readonly="#{workFlow.readonly}"/>
+
+                                                    <p:message for="calAceptedDate" display="icon"/>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px required"> 
+                                            <p:outputLabel  class="control-label col-sm-2" value="#{MMS.Department}:"/> 
+                                            <div class="col-sm-3">
+                                                <p:inputText   id="txtDepartment" class="form-control" required="true" 
+                                                               requiredMessage="Department is required" placeholder="Use Only From + Button" onmousedown="return false;"
+                                                               value="#{itemDisposalController.hrDepartmentsEntity.depName}"  readonly="#{workFlow.readonly}"/>
+                                                <p:message for="txtDepartment" display="icon"/>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <p:commandButton  id="btnTree" onclick="PF('dlgDpt').show();"  partialSubmit="true" style="background: transparent;" value="+"/>
+                                            </div>                                       
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+
+                                            <h:outputLabel for="drdTypeOfTransfer" class="control-label col-sm-2" value="#{MMS.Disposal_Status}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="drdTypeOfTransfer" class="form-control" value="#{itemDisposalController.disposalEntity.disposalStatus}" readonly="#{workFlow.readonly}"  />
+                                                <p:message for="drdTypeOfTransfer" display="icon" />
+                                            </div>                                           
+                                        </div>                                       
+                                        <p:dialog id="dlgDpt" header="Departments" widgetVar="dlgDpt" height="300" width="500" showEffect="explode">
+                                            <h:panelGrid columns="3" style="border-color: #ffffff ">
+                                                <p:tree value="#{itemDisposalController.root2}" var="nodes" style="border: transparent; width: 100%"
+                                                        selectionMode="single" selection="#{itemDisposalController.selectedNode}" >
+                                                    <p:ajax event="select" listener="#{itemDisposalController.onNodeSelect}" process="@this" 
+                                                            update=":frmRegisterUI:txtDepartment"/>
+                                                    <p:treeNode>
+                                                        <h:outputText value="#{nodes}" />
+                                                    </p:treeNode>
+                                                </p:tree>                                       
+                                            </h:panelGrid>
+                                        </p:dialog>                                  
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">#{MMS.Disposable_Fixed_Asset_Detail}</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmMaterialInfo"  >
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel   class="control-label col-sm-2" value="#{MMS.Tag_No}:" rendered="#{itemDisposalController.renderFA}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="stName2" value="#{itemDisposalController.fixedAssetRegDtlEntity}"  style="width: 100%"  filter="true" filterMatchMode="contains"
+                                                                 valueChangeListener="#{itemDisposalController.handleTagNo}" converter="entConverter"
+                                                                 required="true"  rendered="#{itemDisposalController.renderFA}" disabled="#{workFlow.readonly}">
+                                                    <f:selectItem itemLabel="--- #{MMS.select} ---" itemValue="" /> 
+                                                    <f:selectItems value="#{itemDisposalController.fixedAssetDtlList}" var="listSt" itemLabel="#{listSt.tagNo}" itemValue="#{listSt}" />
+                                                    <p:ajax update="@this,frmMaterialInfo" event="change" />
+                                                </p:selectOneMenu> 
+                                            </div>
+                                            <h:outputLabel  for="ItemCode1"  class="control-label col-sm-4" value="#{MMS.Item_Code}:" rendered="#{itemDisposalController.renderNFA}"/>
+                                            <div class="col-sm-4">
+                                                <p:selectOneMenu id="ItemCode1" value="#{itemDisposalController.grndetail.grnDetailId}"  style="width: 100%" 
+                                                                 valueChangeListener="#{itemDisposalController.handleSelectItemCode2}" converter="entConverter"
+                                                                 rendered="#{itemDisposalController.renderNFA}" disabled="#{workFlow.readonly}">
+                                                    <f:selectItem itemLabel="#{MMS.select}" itemValue="" /> 
+                                                    <f:selectItems value="#{itemDisposalController.grnDtlList}"  var="listFxD" itemLabel="#{listFxD.itemId.matCode}" itemValue="#{listFxD.grnDetailId}"/>
+                                                    <p:ajax update="lblMatCode,txtUnit2,txtRemark,txtAccCode,txtQuantity,txtUnit" event="change" />
+                                                </p:selectOneMenu> 
+                                            </div>                                        
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel id="txtItemName" class="control-label col-sm-2" value="#{MMS.Item_Name}:" />
+                                            <div class="col-sm-4">
+                                                <p:inputText id="lblMatCode" 
+                                                             value="#{itemDisposalController.disposalDtlEntity.itemName}"
+                                                             readonly="true"
+                                                             />
+                                                <p:message for="lblMatCode" display="icon"/>
+                                            </div>
+                                            <h:outputLabel  for="txtUnit2"  class="control-label col-sm-2" value="#{MMS.Book_Value}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtUnit2"  
+                                                               readonly="true"
+                                                               value="#{itemDisposalController.disposalDtlEntity.bookValue}"
+
+                                                               />
+                                                <p:message for="txtUnit2" display="icon"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel for="txtRemark" class="control-label col-sm-2" value="#{MMS.Item_Status}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtRemark"  
+                                                             value="#{itemDisposalController.fixedAssetRegDtlEntity.itemStatus}"
+                                                             readonly="true"/>
+                                                <p:message for="txtRemark" display="icon" />
+                                            </div>
+                                            <h:outputLabel for="txtAccCode" class="control-label col-sm-2" value="#{MMS.Account_Code}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtAccCode"  
+                                                             value="#{itemDisposalController.fixedAssetRegDtlEntity.accountCode.generalLedgerCode}"
+                                                             readonly="true"/>
+                                                <p:message for="txtAccCode" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel  for="txtUnit"  class="control-label col-sm-2" value="#{MMS.Unit_Price}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtUnit"  readonly="true"
+                                                               value="#{itemDisposalController.disposalDtlEntity.unitPrice}"
+                                                               />
+                                                <p:message for="txtUnit" display="icon" />
+                                            </div>
+                                            <h:outputLabel  for="txtQuantity"  class="control-label col-sm-2" value="#{MMS.Description}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText   id="txtQuantity" 
+                                                               value="#{itemDisposalController.disposalDtlEntity.description}"
+                                                               validator="#{validatorManagedBean.Text}" readonly="#{workFlow.readonly}"/>
+                                                <p:message for="txtQuantity" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px">
+                                            <h:outputLabel for="txtQuantity1" class="control-label col-sm-2" value="#{MMS.Item_Quantity}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtQuantity1" 
+                                                             value="#{itemDisposalController.disposalDtlEntity.quantity}"  readonly="true"/>
+                                                <p:message for="txtQuantity1" display="icon" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnAdd" class="btn btn-primary" action="#{itemDisposalController.addDisposalDetail()}" icon="ui-icon-add" validateClient="true" 
+                                                                 process="frmMaterialInfo" update=":frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmMaterialInfo"
+                                                                 value="#{itemDisposalController.addOrModifyBundle}" style="font-family: monospace; font-style: normal; font-weight: normal; left: 0px;"/>            
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br></br>
+                                </h:panelGroup>
+                                <h:panelGroup id="frmTblMaterialInfo">
+                                    <div class="form-horizontal col-sm-12">
+                                        <div class="form-group textBoxMargin6px">                                        
+                                            <div class="col-sm-12">
+                                                <p:dataTable id="tblMaterial" value="#{itemDisposalController.dispposalAddDetailDataModel}" rowIndexVar="rowContact" var="DisposalDtl"
+                                                             paginator="true" paginatorPosition="bottom" editable="true">                                                  
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.No}"/>
+                                                        </f:facet>
+                                                        <h:outputText value="#{rowContact+1}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Tag_No}" rendered="#{itemDisposalController.renderFA}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DisposalDtl.tagNo}"  rendered="#{itemDisposalController.renderFA}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Name}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DisposalDtl.itemName}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Code}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DisposalDtl.itemCode}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Unit_Price}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DisposalDtl.unitPrice}"/>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Book_Value}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DisposalDtl.bookValue}"/>
+                                                    </p:column>
+                                                    <p:column headerText="#{MMS.Description}">
+                                                        <p:cellEditor>
+                                                            <f:facet name="output"><h:outputText value="#{DisposalDtl.description}" /></f:facet>
+                                                            <f:facet name="input"><p:inputText id="remark3" value="#{DisposalDtl.description}" style="width:100%"/></f:facet>
+                                                        </p:cellEditor>
+                                                    </p:column>
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Item_Status}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DisposalDtl.itemStatus}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Account_Code}" />
+                                                        </f:facet>
+                                                        <h:outputText value="#{DisposalDtl.accountCode}"/>
+                                                    </p:column>
+
+                                                    <p:column>
+                                                        <f:facet name="header">
+                                                            <h:outputText value="#{MMS.Option}"/>
+                                                        </f:facet>
+                                                        <p:commandLink value="edit" action="#{itemDisposalController.EditDisposalInfo}" process="@this,tblMaterial" 
+                                                                       update=":frmRegisterUI:frmMaterialInfo,tblMaterial"/>
+                                                    </p:column> 
+                                                </p:dataTable>                                             
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"></h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row"> 
+                            <div class="col-md-12" > 
+                                <h:panelGroup id="frmApproverInfo">
+                                    <div class="form-horizontal col-sm-12"> 
+                                        <div class="form-group textBoxMargin6px required">
+                                            <h:outputLabel for="txtRequestedBy" class="control-label col-sm-2" value="#{MMS.Processed_By}:"/>
+                                            <div class="col-sm-4">
+                                                <p:inputText id="txtRequestedBy" 
+                                                             value="#{itemDisposalController.userName}"
+                                                             required="true"
+                                                             requiredMessage="Processed By is required" 
+                                                             readonly="true"/>
+                                                <p:message for="txtRequestedBy" display="icon" />
+                                            </div>    
+                                            <h:outputLabel for="txtAcceptedDate" class="control-label col-sm-2" value="#{MMS.Processed_On}:"/>                                                                        
+                                            <div class="col-sm-4 required">
+                                                <p:inputText id="txtAcceptedDate" class="form-control" value="#{itemDisposalController.workFlow.processedOn}"
+                                                             required="true"  requiredMessage="Date is required" validator="#{validatorManagedBean.Date}"
+                                                             onclick="displayCalendar('frmRegisterUI:txtAcceptedDate', 'frmRegisterUI:txtAcceptedDate');" />                                                                                                                                                    
+                                                <p:message for="txtAcceptedDate" display="icon"/>
+                                            </div> 
+                                        </div>         
+                                        <h:panelGroup id="padding">
+                                            <div class="form-group textBoxMargin6px"> 
+                                                <h:outputLabel id="lbl_Decision"  class="control-label col-sm-2" value="Decicsion:" rendered="#{itemDisposalController.renderDecision}"/>
+                                                <div class="col-sm-4">
+                                                    <p:selectOneMenu id="drdDecision" style="width: 100%" value="#{itemDisposalController.selectedValue}" rendered="#{itemDisposalController.renderDecision}">
+                                                        <f:selectItem itemLabel="--- Select One ---" itemValue=""/>
+                                                        <f:selectItem itemLabel="Approve" itemValue="Approve"/>
+                                                        <f:selectItem itemLabel="Reject" itemValue="Reject"/>
+                                                    </p:selectOneMenu>   
+                                                </div> 
+                                                <h:outputLabel id="lbl_prepareRemxasrk"  class="control-label col-sm-2" value="comment:" rendered="#{itemDisposalController.renderDecision}"/>
+                                                <div class="col-sm-4">
+                                                    <p:inputTextarea id="txtprepareRemassrk" class="form-control" value="#{itemDisposalController.workFlow.commentGiven}"  rendered="#{itemDisposalController.renderDecision}"/>     
+                                                </div> 
+                                            </div>
+                                        </h:panelGroup>
+                                        <div class="form-group textBoxMargin6px"> 
+                                            <h:outputLabel  class="control-label col-sm-2"/>
+                                            <div class="col-sm-4">
+                                                <p:commandButton id="btnsave" class=" btn btn-primary" action="#{itemDisposalController.saveFAItemDisposal()}" icon="ui-icon-new" validateClient="true" 
+                                                                 process="@this,:frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI:frmApproverInfo"  
+                                                                 update=":frmRegisterUI:frmGatePassDtlInfo,:frmRegisterUI:frmTblMaterialInfo,:frmRegisterUI,:frmSample" 
+                                                                 value="#{itemDisposalController.saveorUpdateBundle}"/> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </h:panelGroup>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
+</ui:composition>

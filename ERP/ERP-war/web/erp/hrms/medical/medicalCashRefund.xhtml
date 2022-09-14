@@ -1,0 +1,481 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    template="../../../resources/templates/template.xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:define name="navigaion_content">
+        <li><a href="../hrmsDashboard.xhtml" title="Go to Dashboard"><i class="fa  fa-fw fa-dashboard"></i> <span>Dashboard</span></a></li>
+        <li><a href="medicalInstitution.xhtml"><i class="fa fa-circle-o "></i><span>Medical Institution</span></a></li>
+        <li><a href="medicalCreditBill.xhtml"><i class="fa fa-circle-o "></i><span>Medical Credit Bill Request</span></a></li>
+        <li><a href="medicaCreditBillApprove.xhtml"><i class="fa fa-circle-o "></i><span>Medical Credit Bill Approve</span></a></li>
+        <li><a href="medicalCashRefundApprove.xhtml"><i class="fa fa-circle-o "></i><span>Medical Cash Refund Approve</span></a></li>
+    </ui:define>
+    <ui:define name="contents">
+        <h:form id="frmToolBar"> 
+            <p:toolbar style="background-color:white;border-color: white">
+                <f:facet name="right">
+                    <p:commandButton id="btnNew" validateClient="true" action="#{cashRefundController.btnNewOrSearch()}"
+                                     icon="#{cashRefundController.icone}" title="#{cashRefundController.newOrSearch}" 
+                                     process="@this" update="@this,:frmToolBar,:frmSearch,:frmMedicalCashRefund" 
+                                     style="background-color: white;border-color: white"/>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <h:panelGroup id="pnlPlus"  rendered="#{cashRefundController.btnNewRender}"> 
+                        <p:commandButton validateClient="true" action="#{cashRefundController.newButtonAction()}"
+                                         icon="ui-icon-plus" style="background-color: white;border-color: white"  title="New record"
+                                         process="@this" update=":frmToolBar,:frmSearch,:frmMedicalCashRefund" />
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                        </span>
+                    </h:panelGroup> 
+                    <h:panelGroup id="pnlworkflowIcon">
+                        <p:commandLink id="cmdLinkWf" class="fa fa-fw fa-gear" 
+                                       title="Work Flow" style="background-color: white; border-color: white;"/>
+                        <p:overlayPanel widgetVar="wdvWf" showEffect="fade" hideEffect="fade" showCloseIcon="true" for="cmdLinkWf"
+                                        class="col-md-4" style="height: 400px">
+                            <p:outputLabel id="lblFaWf" value="Work Flow"/>
+                            <div class="row"> 
+                                <div class="col-md-12" > 
+                                    <h:form id="frmWf"> 
+                                        <div class="form-horizontal col-sm-12">
+                                            <div class="form-group">                                        
+                                                <div class="col-sm-12">
+                                                    <p:dataTable id="tblWorkflow" value="#{cashRefundController.workflowDataModel}"
+                                                                 var="currentRow" selectionMode="single" rowIndexVar="num" class="dataTable" rows="10" paginator="true"
+                                                                 rowKey="#{currentRow.workflowId}" paginatorPosition="bottom">
+                                                        <p:column headerText="Processed By">
+                                                            <h:outputText value="#{currentRow.processedBy}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Decision"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.decision}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Comment Given"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.commentGiven}"/> 
+                                                        </p:column>
+                                                        <p:column >
+                                                            <f:facet name="header">
+                                                                <h:outputText value="Processed Date"/>
+                                                            </f:facet>
+                                                            <h:outputText value="#{currentRow.processedOn}"/> 
+                                                        </p:column> 
+                                                    </p:dataTable>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </h:form>
+                                </div>
+                            </div>
+                        </p:overlayPanel>
+                        <span class="ui-separator">
+                            <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                        </span>
+                    </h:panelGroup> 
+                    <a href="../../hrms/medical/medicalCashRefund.xhtml"><i class="fa fa-fw fa-refresh" title="Refresh"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../hrms/hrmsDashboard.xhtml"><i class="fa fa-fw fa-dashboard" title="Dashboard"></i></a>
+                    <span class="ui-separator">
+                        <span class="ui-icon ui-icon-grip-dotted-vertical"/>
+                    </span>
+                    <a href="../../../HomePage.xhtml"><i class="fa fa-home" title="Home Page"></i></a>
+                </f:facet>
+            </p:toolbar>
+        </h:form>
+        <h:form id="frmSearch">
+            <h:panelGroup id="pnlSearch" rendered="#{cashRefundController.searchPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary"> 
+                            <div class="box-header with-border">
+                                <h3 class="box-title" title="Search medical cash refund on request">Search...</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body">
+                                    <div class="row">
+                                        <div class="col-md-8">  
+                                            <div class="form-horizontal col-sm-12">
+                                                <div class="form-group">
+                                                    <h:outputLabel class="control-label col-sm-2" value="Filter Criteria:"/>
+                                                    <div class="col-sm-5">
+                                                        <p:selectOneMenu id="somFiliterByStatus" style="width:100%"
+                                                                         valueChangeListener="#{cashRefundController.loadByStatus}">
+                                                            <f:selectItems value="#{cashRefundController.statusList}"/>   
+                                                            <p:ajax event="change" process="@this" update=":frmSearch:tblMedInvoiceList"/>
+                                                        </p:selectOneMenu> 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">                                       
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <p:dataTable id="tblMedInvoiceList" value="#{cashRefundController.settlementDataModel}" selectionMode="single"
+                                                         var="medsettlement" rowIndexVar="num" rowKey="#{medsettlement.id}" class="dataTable"
+                                                         selection="#{cashRefundController.selectedRow}" 
+                                                         rows="10" rowsPerPageTemplate="10,20,30" paginator="true"  paginatorPosition="bottom">
+                                                <p:ajax event="rowSelect" listener="#{cashRefundController.cashRefundDisplayChanged}" 
+                                                        process="@this,tblMedInvoiceList" update=":frmToolBar,:frmSearch,:frmMedicalCashRefund"/>
+                                                <p:column headerText="No." style="width:60px">
+                                                    <h:outputText value="#{num + 1}"/>
+                                                </p:column>
+                                                <p:column headerText="Patient Name" filterMatchMode="contains" filterBy="#{medsettlement.requesterId.firstName}">
+                                                    <h:outputText value="#{medsettlement.requesterId.firstName} #{medsettlement.requesterId.middleName} 
+                                                                  #{medsettlement.requesterId.lastName}"/>
+                                                </p:column> 
+                                                <p:column headerText="Employee Id">
+                                                    <h:outputText value="#{medsettlement.requesterId.empId}"/>
+                                                </p:column> 
+                                                <p:column headerText="Department" filterMatchMode="contains" filterBy="#{medsettlement.requesterId.deptId.depName}">                
+                                                    <h:outputText value="#{medsettlement.requesterId.deptId}"/>
+                                                </p:column>
+                                                <p:column headerText="Request Date">                
+                                                    <h:outputText value="#{medsettlement.requestDate}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </div>
+                                </div>        
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:panelGroup> 
+        </h:form>
+        <h:form id="frmMedicalCashRefund"> 
+            <p:growl id="growl" showDetail="true" autoUpdate="true" severity="information, fatal"/>
+            <h:panelGroup id="pnlMainpage" rendered="#{cashRefundController.newPage}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">Medical Cash Refund Request</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="box-body"> 
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl1" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="drdSearchBy" class="control-label col-sm-4" value="Search By:" title="Filter Criteria"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:selectOneRadio id="drdSearchBy" value="#{cashRefundController.selected}" 
+                                                                                          valueChangeListener="#{cashRefundController.searchCriteria}" class="col-sm-9">
+                                                                            <f:selectItem itemLabel="Patient ID" itemValue="Employee ID"/>
+                                                                            <f:selectItem itemLabel="Patient Name" itemValue="Employee Name"/>
+                                                                            <p:ajax event="change" process="@this" update="frmMedicalCashRefund"/>
+                                                                        </p:selectOneRadio>
+                                                                    </div>
+                                                                </div>                                               
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtPatientID" value="Patient ID: " class="control-label col-sm-4"/>   
+                                                                    <div class="col-sm-8">
+                                                                        <p:autoComplete id="txtPatientID" value="#{cashRefundController.hrEmployees}" scrollHeight="300" converter="entConverter"
+                                                                                        completeMethod="#{cashRefundController.searchPatientByID}" style="width:100%" placeholder="Enter ID to search" 
+                                                                                        var="empList" required="true" title="Employee ID" requiredMessage="Enter ID to search" size="20"
+                                                                                        itemValue="#{empList}" itemLabel="#{empList.empId}" forceSelection="true"
+                                                                                        emptyMessage="no data" disabled="#{cashRefundController.disableEmpID}">  
+                                                                            <p:column headerText="Employee ID" >
+                                                                                <h:outputText  value="#{empList.empId}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Full Name">
+                                                                                <h:outputText  value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                                            </p:column>
+                                                                            <p:ajax event="itemSelect" listener="#{cashRefundController.getPatientByID}" 
+                                                                                    process="@this" update="@this,pnl1"/>     
+                                                                        </p:autoComplete> 
+                                                                        <p:message for="txtPatientID" display="icon"/>
+                                                                    </div> 
+                                                                </div>                                                                                          
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="srcPatientName" value="Patient Name: " class="control-label col-sm-4"/>   
+                                                                    <div class="col-sm-8">
+                                                                        <p:autoComplete id="srcPatientName" value="#{cashRefundController.hrEmployees.firstName}" scrollHeight="300"
+                                                                                        completeMethod="#{cashRefundController.searchPatientByName}" style="width:100%" placeholder="Enter name to search" 
+                                                                                        var="empList" required="true" title="Employee Name" requiredMessage="Enter name to search" size="20"
+                                                                                        itemValue="#{empList.firstName}" itemLabel="#{empList}" forceSelection="true"
+                                                                                        emptyMessage="no data" disabled="#{cashRefundController.disableEmpName}">  
+                                                                            <p:column headerText="Full Name">
+                                                                                <h:outputText  value="#{empList.firstName} #{empList.middleName} #{empList.lastName}"/>
+                                                                            </p:column>
+                                                                            <p:column headerText="Employee ID" >
+                                                                                <h:outputText  value="#{empList.empId}"/>
+                                                                            </p:column>
+                                                                            <p:ajax event="itemSelect" listener="#{cashRefundController.getPatientByName}" 
+                                                                                    process="@this" update="@this,pnl1"/>     
+                                                                        </p:autoComplete> 
+                                                                        <p:message for="srcPatientName" display="icon"/>
+                                                                    </div> 
+                                                                </div>                                                                                          
+                                                            </div>
+                                                        </div>    
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtDepartment" class="control-label col-sm-4" value="Department:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtDepartment" value="#{cashRefundController.hrDepartments.depName}" 
+                                                                                     title="Department" readonly="true"/>
+                                                                        <p:message for="txtDepartment" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtPosition" class="control-label col-sm-4" value="Job Title:"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtPosition" value="#{cashRefundController.hrJobTypes.jobTitle}" 
+                                                                                     title="Job Position" readonly="true"/>
+                                                                        <p:message for="txtPosition" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="calRequestdate" value="Request Date:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="calRequestdate" value="#{cashRefundController.requstDate}"
+                                                                                     converter="dateConverter" title="Request Date"/>
+                                                                        <p:message for="calRequestdate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                        </div>
+                                                    </div> 
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnl2" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal form-group required">                                                                               
+                                                                    <h:outputLabel  for="txtMedicalInstitution" class="control-label col-sm-4" value="Medical Institution: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtMedicalInstitution" value="#{cashRefundController.hrLocalMedSettlementDetail.medicalInstitution}"
+                                                                                     validator="#{validatorManagedBean.Text}" title="Medical Institution" validatorMessage="Medical Institution must be a string"
+                                                                                     class="form-control" required="true" requiredMessage="Enter Medica Institution" />
+                                                                        <p:message for="txtMedicalInstitution" display="icon"/>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <br></br> <br></br>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal form-group required">
+                                                                    <h:outputLabel for="txtReceiptNumber" value="Receipt Number: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtReceiptNumber" value="#{cashRefundController.hrLocalMedSettlementDetail.receiptNumber}"
+                                                                                     class="form-control" required="true" requiredMessage="Enter Receipt Number" title="Receipt Number"/>
+                                                                        <p:message for="txtReceiptNumber" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div> 
+                                                            <br></br><br></br>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group form-horizontal form-group required"> 
+                                                                    <h:outputLabel for="txtAmount" class="control-label col-sm-4" value="Amount: "/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtAmount" value="#{cashRefundController.hrLocalMedSettlementDetail.amount}"
+                                                                                     title="Amount" class="form-control" required="true" requiredMessage="Enter Amount"
+                                                                                     validator="#{validatorManagedBean.Double}" converterMessage="Amount must be a number"/>
+                                                                        <p:message for="txtAmount" display="icon"/>
+                                                                    </div> 
+                                                                </div>
+                                                            </div>
+                                                            <br></br><br></br>
+                                                            <div class="col-sm-12 form-horizontal">
+                                                                <div class="col-sm-4">                                                              
+                                                                </div>                                                                    
+                                                                <div class="col-sm-3">
+                                                                    <center>
+                                                                        <p:commandButton id="btnAdd" value="#{cashRefundController.addOrUpdate}" class="btn  btn-block btn-primary col-lg-4" 
+                                                                                         action="#{cashRefundController.addSettlementDetail()}" style="margin-top: 10px"
+                                                                                         disabled="#{cashRefundController.disableBtn}"
+                                                                                         process="@this,pnl2" update="@this,pnl2,tblSettlementDetail"/>
+
+                                                                    </center>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtExpenseType" value="Expense Type:" class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtExpenseType" value="#{cashRefundController.hrLocalMedSettlementDetail.expenseType}"
+                                                                                     validator="#{validatorManagedBean.Text}" class="form-control" required="False"
+                                                                                     placeholder="treatment type" title="Expense Type"/>
+                                                                        <p:message for="txtExpenseType" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtDescription" class="control-label col-sm-4" value="Description:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtDescription" rows="1" cols="3" autoResize="false" title="Description"
+                                                                                         value="#{cashRefundController.hrLocalMedSettlementDetail.description}"
+                                                                                         validator="#{validatorManagedBean.Remark}" class="form-control"/>
+                                                                        <p:message for="txtDescription" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <br></br><br></br><br></br><br></br>
+                                                <br></br><br></br><br></br><br></br>
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-12">                                                                      
+                                                            <div class="form-group form-horizontal">  
+                                                                <p:dataTable id="tblSettlementDetail" value="#{cashRefundController.settlementDetailDataModel}" 
+                                                                             rows="5"  paginator="true"  paginatorPosition="bottom"
+                                                                             class="dataTable" var="settlementDetail" rowIndexVar="rowIndex">                                                                                       
+                                                                    <p:column style="width:60px">
+                                                                        <f:facet name="header">No.</f:facet>
+                                                                        <p:outputLabel value="#{rowIndex+1}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Medical Institution">
+                                                                        <h:outputText value="#{settlementDetail.medicalInstitution}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Receipt Number">
+                                                                        <h:outputText value="#{settlementDetail.receiptNumber}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Amount [ETB]">
+                                                                        <h:outputText value="#{settlementDetail.amount} birr"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Expense Type">
+                                                                        <h:outputText value="#{settlementDetail.expenseType}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Description">
+                                                                        <h:outputText value="#{settlementDetail.description}"/>
+                                                                    </p:column>
+                                                                    <p:column headerText="Edit">
+                                                                        <p:commandLink action="#{cashRefundController.editDataTable()}" value="Edit" 
+                                                                                       process="@this,tblSettlementDetail" update="@this,:frmMedicalCashRefund:pnl2"/>
+                                                                    </p:column>
+                                                                    <p:columnGroup type="footer">
+                                                                        <p:row>
+                                                                            <p:column colspan="3" footerText="Total Amount"/>
+                                                                            <p:column footerText="#{cashRefundController.amount}"/>
+                                                                        </p:row>
+                                                                    </p:columnGroup>
+                                                                </p:dataTable>
+                                                            </div>
+                                                        </div>
+                                                    </div>  
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <div class="box-header">
+                                        <h1 class="box-title">Work Flow</h1>                       
+                                    </div>
+                                    <section class="panel panel-info">
+                                        <section class="panel-body">
+                                            <h:panelGroup id="pnlWorkflow" class="col-sm-12">
+                                                <div class="form-group">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group required form-horizontal">
+                                                                    <h:outputLabel for="txtProcessedBy" value="Processed By: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtProcessedBy" value="#{workFlow.userName}" 
+                                                                                     title="Your name" readonly="true"/>
+                                                                        <p:message for="txtProcessedBy" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div>
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtProcessedDate" value="Processed Date: " class="control-label col-sm-4"/>
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputText id="txtProcessedDate" value="#{cashRefundController.wfHrProcessed.processedOn}"
+                                                                                     converter="dateConverter" readonly="true" title="processed On"
+                                                                                     validator="#{validatorManagedBean.Date}" validatorMessage="processed date should be in date format"/>
+                                                                        <p:message for="txtProcessedDate" display="icon"/>
+                                                                    </div>
+                                                                </div>                                                                                                       
+                                                            </div> 
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="col-md-12 textBoxMargin6px">
+                                                                <div class="form-group form-horizontal">
+                                                                    <h:outputLabel for="txtCommentGiven" class="control-label col-sm-4" value="Comment Given:"/> 
+                                                                    <div class="col-sm-8">
+                                                                        <p:inputTextarea id="txtCommentGiven" value="#{cashRefundController.wfHrProcessed.commentGiven}"
+                                                                                         rows="1" autoResize="false" title="Comment"
+                                                                                         validator="#{validatorManagedBean.Remark}" class="form-control"/>
+                                                                        <p:message for="txtCommentGiven" display="icon"/>
+                                                                    </div>
+                                                                </div>                                            
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </h:panelGroup>
+                                        </section>
+                                    </section>
+                                    <h:panelGroup id="pnl4" class="col-sm-12">
+                                        <div class="panel-body col-sm-12">
+                                            <div class="form-group col-sm-12">
+                                                <div class="col-sm-6">
+                                                    <div class="col-sm-12 form-horizontal">
+                                                        <div class="col-sm-4">                                                              
+                                                        </div>                                                                    
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnSave" value="#{cashRefundController.saveOrUpdate}" 
+                                                                             action="#{cashRefundController.saveMedicalCashRefundRequest()}"
+                                                                             disabled="#{cashRefundController.disableBtn}" class="btn  btn-block btn-primary col-lg-4" 
+                                                                             process="@this,pnl1,pnlWorkflow,tblSettlementDetail" update=":frmMedicalCashRefund"/>
+                                                        </div>
+                                                        <div class="col-sm-3">
+                                                            <p:commandButton id="btnReset" value="Reset" class="btn  btn-block btn-primary col-lg-4" 
+                                                                             action="#{cashRefundController.resetCashRefundRqst()}"
+                                                                             process="@this" update=":frmMedicalCashRefund" title="Cancel"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>   
+                            </div>                   
+                        </div>                   
+                    </div>
+                </div>
+            </h:panelGroup>
+        </h:form>  
+    </ui:define>
+</ui:composition>
+
+
